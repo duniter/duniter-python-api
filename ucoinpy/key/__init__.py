@@ -24,7 +24,7 @@ class SigningKey(NaclSigningKey):
         seed = scrypt.hash(password, salt,
                     SCRYPT_PARAMS['N'], SCRYPT_PARAMS['r'], SCRYPT_PARAMS['p'],
                     SEED_LENGTH)
-        seedb64 = base64.b64encode(seed)
+
         super().__init__(seed)
         self.pubkey = self.verify_key.encode(encoder=Base58Encoder)
 
