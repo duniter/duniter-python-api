@@ -6,6 +6,7 @@ Created on 2 déc. 2014
 
 import re
 
+from ..api.bma import ConnectionHandler
 from . import Document
 from .. import PROTOCOL_VERSION, MANAGED_API
 
@@ -146,3 +147,12 @@ class BMAEndpoint(Endpoint):
                             IPv4=self.ipv4,
                             IPv6=self.ipv6,
                             PORT=self.port)
+
+    def conn_handler(self):
+        if self.server:
+            return ConnectionHandler(self.server, self.port)
+        elif self.ipv4:
+            return ConnectionHandler(self.ipv4, self.port)
+        else:
+            return ConnectionHandler(self.ipv6, self.port)
+
