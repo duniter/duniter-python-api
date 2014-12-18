@@ -124,7 +124,7 @@ class UnknownEndpoint(Endpoint):
 
 
 class BMAEndpoint(Endpoint):
-    re_inline = re.compile('^BASIC_MERKLED_API(?: ([a-z_][a-z0-9-_.]+))?(?: ([0-9.]+))?(?: ([0-9a-f:]+))?(?: ([0-9]+))$')
+    re_inline = re.compile('^BASIC_MERKLED_API(?: ([a-z0-9-_.]*(?:.[a-zA-Z])))?(?: ((?:[0-9.]{1,4}){4}))?(?: ((?:[0-9a-f:]{4,5}){4,8}))?(?: ([0-9]+))$')
 
     @classmethod
     def from_inline(cls, inline):
@@ -143,10 +143,10 @@ class BMAEndpoint(Endpoint):
 
     def inline(self):
         return "BASIC_MERKLED_API {DNS} {IPv4} {IPv6} {PORT}" \
-                    .format(DNS=self.server,
-                            IPv4=self.ipv4,
-                            IPv6=self.ipv6,
-                            PORT=self.port)
+                    .format(DNS=(self.server if self.server else ""),
+                            IPv4=(self.ipv4 if self.ipv4 else ""),
+                            IPv6=(self.ipv6 if self.ipv6 else ""),
+                            PORT=(self.port if self.port else ""))
 
     def conn_handler(self):
         if self.server:
@@ -155,4 +155,3 @@ class BMAEndpoint(Endpoint):
             return ConnectionHandler(self.ipv4, self.port)
         else:
             return ConnectionHandler(self.ipv6, self.port)
-
