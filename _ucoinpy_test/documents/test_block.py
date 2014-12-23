@@ -5,7 +5,6 @@ Created on 12 déc. 2014
 '''
 import pytest
 from ucoinpy.documents.block import Block
-from mock import Mock
 
 raw_block = """Version: 1
 Type: Block

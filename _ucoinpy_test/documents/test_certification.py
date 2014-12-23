@@ -6,7 +6,6 @@ Created on 6 déc. 2014
 
 import pytest
 from ucoinpy.documents.certification import SelfCertification, Certification
-from mock import Mock
 
 selfcert_inlines = ["HnFcSms8jzwngtVomTTnzudZx7SHUQY8sVE1y8yBmULk:\
 h/H8tDIEbfA4yxMQcvfOXVDQhi1sUa9qYtPKrM59Bulv97ouwbAvAsEkC1Uyit1IOpeAV+CQQs4IaAyjE8F1Cw==:\
