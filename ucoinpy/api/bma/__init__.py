@@ -123,6 +123,8 @@ class API(object):
         Arguments:
         - `path`: the request path
         """
+        if 'self_' in kwargs.keys():
+            kwargs['self'] = kwargs.pop('self_')
 
         response = requests.post(self.reverse_url(path), data=kwargs, headers=self.headers)
 
