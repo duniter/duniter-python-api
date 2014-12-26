@@ -77,7 +77,6 @@ SIGNATURE
         inputs = []
         outputs = []
         signatures = []
-        logging.debug(compact)
         for i in range(0, issuers_num):
             issuer = Transaction.re_pubkey.match(lines[n]).group(1)
             issuers.append(issuer)
