@@ -5,7 +5,6 @@ Created on 12 déc. 2014
 '''
 import pytest
 from ucoinpy.documents.membership import Membership
-from mock import Mock
 
 membership_inline = "HnFcSms8jzwngtVomTTnzudZx7SHUQY8sVE1y8yBmULk:\
 dkaXIiCYUJtCg8Feh/BKvPYf4uFH9CJ/zY6J4MlA9BsjmcMe4YAblvNt/gJy31b1aGq3ue3h14mLMCu84rraDg==:\

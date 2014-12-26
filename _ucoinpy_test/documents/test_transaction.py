@@ -5,7 +5,6 @@ Created on 12 déc. 2014
 '''
 import pytest
 from ucoinpy.documents.transaction import Transaction
-from mock import Mock
 
 
 tx_compact = """TX:1:1:3:1:0
