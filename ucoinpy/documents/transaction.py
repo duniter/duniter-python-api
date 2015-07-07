@@ -1,14 +1,15 @@
-'''
+"""
 Created on 2 déc. 2014
 
 @author: inso
-'''
+"""
 
 from . import Document
 import re
+import logging
 
 class Transaction(Document):
-    '''
+    """
 Document format :
 Version: VERSION
 Type: Transaction
@@ -37,10 +38,10 @@ PUBLIC_KEY:AMOUNT
 COMMENT
 SIGNATURE
 ...
-    '''
+    """
 
     re_type = re.compile("Type: (Transaction)\n")
-    re_header = re.compile("TX:([0-9])+:([0-9])+:([0-9])+:([0-9])+:(0|1)\n")
+    re_header = re.compile("TX:([0-9]+):([0-9]+):([0-9]+):([0-9]+):(0|1)\n")
     re_issuers = re.compile("Issuers:\n")
     re_inputs = re.compile("Inputs:\n")
     re_outputs = re.compile("Outputs:\n")
@@ -50,9 +51,9 @@ SIGNATURE
 
     def __init__(self, version, currency, issuers, inputs, outputs,
                  comment, signatures):
-        '''
+        """
         Constructor
-        '''
+        """
         super().__init__(version, currency, signatures)
 
         self.issuers = issuers
@@ -180,9 +181,9 @@ Issuers:
         return doc
 
     def compact(self):
-        '''
+        """
         Return a transaction in its compact format.
-        '''
+        """
         """TX:VERSION:NB_ISSUERS:NB_INPUTS:NB_OUTPUTS:HAS_COMMENT
 PUBLIC_KEY:INDEX
 ...
@@ -212,26 +213,26 @@ COMMENT
 
 
 class SimpleTransaction(Transaction):
-    '''
+    """
 As transaction class, but for only one issuer.
 ...
-    '''
+    """
     def __init__(self, version, currency, issuer,
                  single_input, outputs, comment, signature):
-        '''
+        """
         Constructor
-        '''
+        """
         super().__init__(version, currency, [issuer], [single_input],
               outputs, comment, [signature])
 
 
 class InputSource():
-    '''
+    """
     A Transaction INPUT
 
     Compact :
     INDEX:SOURCE:FINGERPRINT:AMOUNT
-    '''
+    """
     re_inline = re.compile("([0-9]+):(D|T):([0-9]+):\
 ([0-9a-fA-F]{5,40}):([0-9]+)\n")
     re_compact = re.compile("([0-9]+):(D|T):([0-9a-fA-F]{5,40}):([0-9]+)\n")
@@ -277,9 +278,9 @@ class InputSource():
 
 
 class OutputSource():
-    '''
+    """
     A Transaction OUTPUT
-    '''
+    """
     re_inline = re.compile("([1-9A-Za-z][^OIl]{42,45}):([0-9]+)")
 
     def __init__(self, pubkey, amount):

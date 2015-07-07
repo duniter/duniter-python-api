@@ -16,8 +16,22 @@
 # Caner Candan <caner@candan.fr>, http://caner.candan.fr
 #
 
-PROTOCOL_VERSION="1"
+from .. import API, logging
 
-MANAGED_API=["BASIC_MERKLED_API"]
+logger = logging.getLogger("ucoin/node")
 
-from . import api, documents, key
+class Node(API):
+    def __init__(self, connection_handler, module='node'):
+        super(Node, self).__init__(connection_handler, module)
+
+
+class Summary(Node):
+    """GET Certification data over a member."""
+
+    def __init__(self, connection_handler, module='node'):
+        super(Summary, self).__init__(connection_handler, module)
+
+
+    def __get__(self, **kwargs):
+        return self.requests_get('/summary', **kwargs).json()
+

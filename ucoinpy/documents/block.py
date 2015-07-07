@@ -1,8 +1,8 @@
-'''
+"""
 Created on 2 déc. 2014
 
 @author: inso
-'''
+"""
 
 from .. import PROTOCOL_VERSION
 from . import Document
@@ -15,7 +15,7 @@ import logging
 
 
 class Block(Document):
-    '''
+    """
 Version: VERSION
 Type: Block
 Currency: CURRENCY
@@ -52,7 +52,7 @@ Transactions:
 COMPACT_TRANSACTION
 ...
 BOTTOM_SIGNATURE
-    '''
+    """
 
     re_type = re.compile("Type: (Block)\n")
     re_noonce = re.compile("Nonce: ([0-9]+)\n")
@@ -82,9 +82,9 @@ BOTTOM_SIGNATURE
                  parameters, members_count, identities, joiners,
                  actives, leavers, excluded, certifications,
                  transactions, signature):
-        '''
+        """
         Constructor
-        '''
+        """
         super().__init__(version, currency, [signature])
         self.noonce = noonce
         self.number = number
@@ -224,7 +224,7 @@ BOTTOM_SIGNATURE
                 for i in range(n, tx_max):
                     tx_lines += lines[n]
                     n = n + 1
-                transaction = Transaction.from_compact(version, tx_lines)
+                transaction = Transaction.from_compact(currency, tx_lines)
                 transactions.append(transaction)
 
         signature = Block.re_signature.match(lines[n]).group(1)
@@ -291,6 +291,6 @@ PreviousIssuer: {1}\n".format(self.prev_hash, self.prev_issuer)
 
         doc += "Transactions:\n"
         for transaction in self.transactions:
-            doc += "{0}\n".format(transaction.inline())
+            doc += "{0}\n".format(transaction.compact())
 
         return doc
