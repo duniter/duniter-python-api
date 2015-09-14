@@ -20,6 +20,7 @@ from .. import API, logging
 
 logger = logging.getLogger("ucoin/node")
 
+
 class Node(API):
     def __init__(self, connection_handler, module='node'):
         super(Node, self).__init__(connection_handler, module)
@@ -31,7 +32,7 @@ class Summary(Node):
     def __init__(self, connection_handler, module='node'):
         super(Summary, self).__init__(connection_handler, module)
 
-
     def __get__(self, **kwargs):
-        return self.requests_get('/summary', **kwargs).json()
+        r = yield from self.requests_get('/summary', **kwargs)
+        return (yield from r.json())
 

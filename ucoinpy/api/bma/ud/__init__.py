@@ -18,19 +18,22 @@
 
 from .. import API, logging
 
-logger = logging.getLogger("ucoin/network")
+logger = logging.getLogger("ucoin/ud")
 
 
-class Network(API):
-    def __init__(self, connection_handler, module='network'):
-        super(Network, self).__init__(connection_handler, module)
+class Ud(API):
+    def __init__(self, conn_handler, module='ud'):
+        super(Ud, self).__init__(conn_handler, module)
 
 
-class Peering(Network):
-    """GET peering information about a peer."""
+class History(Ud):
+    """Get UD history."""
+
+    def __init__(self, conn_handler, pubkey, module='ud'):
+        super(Ud, self).__init__(conn_handler, module)
+        self.pubkey = pubkey
 
     def __get__(self, **kwargs):
-        r = yield from self.requests_get('/peering', **kwargs)
+        assert self.pubkey is not None
+        r = yield from self.requests_get('/history/%s' % self.pubkey, **kwargs)
         return (yield from r.json())
-
-from . import peering

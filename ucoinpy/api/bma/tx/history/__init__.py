@@ -16,21 +16,17 @@
 # Caner Candan <caner@candan.fr>, http://caner.candan.fr
 #
 
-from .. import API, logging
+from .. import History, logging
 
-logger = logging.getLogger("ucoin/network")
-
-
-class Network(API):
-    def __init__(self, connection_handler, module='network'):
-        super(Network, self).__init__(connection_handler, module)
+logger = logging.getLogger("ucoin/tx")
 
 
-class Peering(Network):
-    """GET peering information about a peer."""
+class Blocks(History):
+    def __init__(self, conn_handler, pubkey, from_, to_, module='tx'):
+        super(Blocks, self).__init__(conn_handler, pubkey, module)
+        self.from_ = from_
+        self.to_ = to_
 
     def __get__(self, **kwargs):
-        r = yield from self.requests_get('/peering', **kwargs)
+        r = yield from self.requests_get('/history/%s/blocks/%s/%s' % (self.pubkey, self.from_, self.to_), **kwargs)
         return (yield from r.json())
-
-from . import peering
