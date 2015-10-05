@@ -10,5 +10,5 @@ if [[ $TRAVIS_OS_UNAME = 'Darwin' ]]; then
   export LDFLAGS="-m32 -arch i386";
 fi
 ./configure
-make && make install
-if [[ $TRAVIS_OS_UNAME = 'Linux' ]]; then ldconfig; fi
+make && sudo make install
+if [[ $TRAVIS_OS_UNAME = 'Linux' ]]; then sudo ldconfig; fi
