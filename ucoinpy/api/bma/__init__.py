@@ -14,18 +14,14 @@
 #
 # Authors:
 # Caner Candan <caner@candan.fr>, http://caner.candan.fr
-#
+# Inso <insomniak.fr at gmail.com>
 
 
 __all__ = ['api']
 
-__author__      = 'Caner Candan'
-__version__     = '0.11.0'
-__nonsense__    = 'uCoin'
-
 PROTOCOL_VERSION = "1"
 
-import aiohttp, requests, asyncio, logging, json
+import aiohttp, asyncio, logging, json
 
 logger = logging.getLogger("ucoin")
 

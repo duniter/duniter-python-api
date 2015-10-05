@@ -3,7 +3,7 @@ Created on 12 déc. 2014
 
 @author: inso
 '''
-import pytest
+import unittest
 from ucoinpy.documents.block import Block
 
 raw_block = """Version: 1
@@ -71,95 +71,102 @@ Transactions:
 """
 
 
-class Test_Block:
+class Test_Block(unittest.TestCase):
     def test_fromraw(self):
         block = Block.from_signed_raw(raw_block)
-        assert block.version == 1
-        assert block.currency == "zeta_brouzouf"
-        assert block.noonce == 45079
-        assert block.number == 15
-        assert block.powmin == 4
-        assert block.time == 1418083330
-        assert block.mediantime == 1418080208
-        assert block.issuer == "HnFcSms8jzwngtVomTTnzudZx7SHUQY8sVE1y8yBmULk"
-        assert block.prev_hash == "0000E73C340601ACA1AD5AAA5B5E56B03E178EF8"
-        assert block.prev_issuer == "HnFcSms8jzwngtVomTTnzudZx7SHUQY8sVE1y8yBmULk"
-        assert block.members_count == 4
-        assert block.identities == []
-        assert block.joiners == []
-        assert block.actives == []
-        assert block.leavers == []
-        assert block.excluded == []
-        assert block.certifications == []
-        assert block.transactions == []
+        self.assertEquals(block.version, 1)
+        self.assertEquals(block.currency, "zeta_brouzouf")
+        self.assertEquals(block.noonce, 45079)
+        self.assertEquals(block.number, 15)
+        self.assertEquals(block.powmin, 4)
+        self.assertEquals(block.time, 1418083330)
+        self.assertEquals(block.mediantime, 1418080208)
+        self.assertEquals(block.issuer, "HnFcSms8jzwngtVomTTnzudZx7SHUQY8sVE1y8yBmULk")
+        self.assertEquals(block.prev_hash, "0000E73C340601ACA1AD5AAA5B5E56B03E178EF8")
+        self.assertEquals(block.prev_issuer, "HnFcSms8jzwngtVomTTnzudZx7SHUQY8sVE1y8yBmULk")
+        self.assertEquals(block.members_count, 4)
+        self.assertEquals(block.identities, [])
+        self.assertEquals(block.joiners, [])
+        self.assertEquals(block.actives, [])
+        self.assertEquals(block.leavers, [])
+        self.assertEquals(block.excluded, [])
+        self.assertEquals(block.certifications, [])
+        self.assertEquals(block.transactions, [])
 
     def test_from_signed_raw_block_zero(self):
         block = Block.from_signed_raw(raw_block_zero)
-        assert block.version == 1
-        assert block.currency == "zeta_brouzouf"
-        assert block.noonce == 2125
-        assert block.number == 0
-        assert block.powmin == 3
-        assert block.time == 1418077277
-        assert block.mediantime == 1418077277
-        assert block.issuer == "HnFcSms8jzwngtVomTTnzudZx7SHUQY8sVE1y8yBmULk"
-        assert block.parameters == ('0.01','302400','100','5259600','2629800','3','5',
-                                    '2629800','3','11','600','10','20','0.67')
-        assert block.members_count == 4
-        assert len(block.identities) == 4
-        assert len(block.joiners) == 4
-        assert block.actives == []
-        assert block.leavers == []
-        assert block.excluded == []
-        assert len(block.certifications) == 12
-        assert block.transactions == []
+        self.assertEquals(block.version, 1)
+        self.assertEquals(block.currency, "zeta_brouzouf")
+        self.assertEquals(block.noonce, 2125)
+        self.assertEquals(block.number, 0)
+        self.assertEquals(block.powmin, 3)
+        self.assertEquals(block.time, 1418077277)
+        self.assertEquals(block.mediantime, 1418077277)
+        self.assertEquals(block.issuer, "HnFcSms8jzwngtVomTTnzudZx7SHUQY8sVE1y8yBmULk")
+        self.assertEquals(block.parameters, ('0.01','302400','100','5259600','2629800','3','5',
+                                    '2629800','3','11','600','10','20','0.67'))
+        self.assertEquals(block.members_count, 4)
+        self.assertEquals(len(block.identities), 4)
+        self.assertEquals(len(block.joiners), 4)
+        self.assertEquals(block.actives, [])
+        self.assertEquals(block.leavers, [])
+        self.assertEquals(block.excluded, [])
+        self.assertEquals(len(block.certifications), 12)
+        self.assertEquals(block.transactions, [])
+        self.assertEqual(block.raw(), raw_block_zero)
 
     def test_toraw_fromsignedraw(self):
         block = Block.from_signed_raw(raw_block)
         rendered_raw = block.signed_raw()
         from_rendered_raw = Block.from_signed_raw(rendered_raw)
 
-        assert from_rendered_raw.version == 1
-        assert from_rendered_raw.currency == "zeta_brouzouf"
-        assert from_rendered_raw.noonce == 45079
-        assert from_rendered_raw.number == 15
-        assert from_rendered_raw.powmin == 4
-        assert from_rendered_raw.time == 1418083330
-        assert from_rendered_raw.mediantime == 1418080208
-        assert from_rendered_raw.issuer == "HnFcSms8jzwngtVomTTnzudZx7SHUQY8sVE1y8yBmULk"
-        assert from_rendered_raw.prev_hash == "0000E73C340601ACA1AD5AAA5B5E56B03E178EF8"
-        assert from_rendered_raw.prev_issuer == "HnFcSms8jzwngtVomTTnzudZx7SHUQY8sVE1y8yBmULk"
-        assert from_rendered_raw.members_count == 4
-        assert from_rendered_raw.identities == []
-        assert from_rendered_raw.joiners == []
-        assert from_rendered_raw.actives == []
-        assert from_rendered_raw.leavers == []
-        assert from_rendered_raw.excluded == []
-        assert from_rendered_raw.certifications == []
-        assert from_rendered_raw.transactions == []
+        self.assertEquals(from_rendered_raw.version, 1)
+        self.assertEquals(from_rendered_raw.currency, "zeta_brouzouf")
+        self.assertEquals(from_rendered_raw.noonce, 45079)
+        self.assertEquals(from_rendered_raw.number, 15)
+        self.assertEquals(from_rendered_raw.powmin, 4)
+        self.assertEquals(from_rendered_raw.time, 1418083330)
+        self.assertEquals(from_rendered_raw.mediantime, 1418080208)
+        self.assertEquals(from_rendered_raw.issuer, "HnFcSms8jzwngtVomTTnzudZx7SHUQY8sVE1y8yBmULk")
+        self.assertEquals(from_rendered_raw.prev_hash, "0000E73C340601ACA1AD5AAA5B5E56B03E178EF8")
+        self.assertEquals(from_rendered_raw.prev_issuer, "HnFcSms8jzwngtVomTTnzudZx7SHUQY8sVE1y8yBmULk")
+        self.assertEquals(from_rendered_raw.members_count, 4)
+        self.assertEquals(from_rendered_raw.identities, [])
+        self.assertEquals(from_rendered_raw.joiners, [])
+        self.assertEquals(from_rendered_raw.actives, [])
+        self.assertEquals(from_rendered_raw.leavers, [])
+        self.assertEquals(from_rendered_raw.excluded, [])
+        self.assertEquals(from_rendered_raw.certifications, [])
+        self.assertEquals(from_rendered_raw.transactions, [])
+        self.assertEqual(block.raw(), raw_block)
 
     def test_toraw_fromrawzero(self):
         block = Block.from_signed_raw(raw_block_zero)
         rendered_raw = block.signed_raw()
         from_rendered_raw = block.from_signed_raw(rendered_raw)
 
-        assert from_rendered_raw.version == 1
-        assert from_rendered_raw.currency == "zeta_brouzouf"
-        assert from_rendered_raw.noonce == 2125
-        assert from_rendered_raw.number == 0
-        assert from_rendered_raw.powmin == 3
-        assert from_rendered_raw.time == 1418077277
-        assert from_rendered_raw.mediantime == 1418077277
-        assert from_rendered_raw.issuer == "HnFcSms8jzwngtVomTTnzudZx7SHUQY8sVE1y8yBmULk"
-        assert from_rendered_raw.parameters == ('0.01','302400','100','5259600','2629800','3','5',
-                                    '2629800','3','11','600','10','20','0.67')
-        assert from_rendered_raw.members_count == 4
-        assert len(from_rendered_raw.identities) == 4
-        assert len(from_rendered_raw.joiners) == 4
-        assert from_rendered_raw.actives == []
-        assert from_rendered_raw.leavers == []
-        assert from_rendered_raw.excluded == []
-        assert len(from_rendered_raw.certifications) == 12
-        assert from_rendered_raw.transactions == []
+        self.assertEquals(from_rendered_raw.version, 1)
+        self.assertEquals(from_rendered_raw.currency, "zeta_brouzouf")
+        self.assertEquals(from_rendered_raw.noonce, 2125)
+        self.assertEquals(from_rendered_raw.number, 0)
+        self.assertEquals(from_rendered_raw.powmin, 3)
+        self.assertEquals(from_rendered_raw.time, 1418077277)
+        self.assertEquals(from_rendered_raw.mediantime, 1418077277)
+        self.assertEquals(from_rendered_raw.issuer, "HnFcSms8jzwngtVomTTnzudZx7SHUQY8sVE1y8yBmULk")
+        self.assertEquals(from_rendered_raw.parameters, ('0.01','302400','100','5259600','2629800','3','5',
+                                    '2629800','3','11','600','10','20','0.67'))
+        self.assertEquals(from_rendered_raw.members_count, 4)
+        self.assertEquals(len(from_rendered_raw.identities), 4)
+        self.assertEquals(len(from_rendered_raw.joiners), 4)
+        self.assertEquals(from_rendered_raw.actives, [])
+        self.assertEquals(from_rendered_raw.leavers, [])
+        self.assertEquals(from_rendered_raw.excluded, [])
+        self.assertEquals(len(from_rendered_raw.certifications), 12)
+        self.assertEquals(from_rendered_raw.transactions, [])
+
+        self.assertEqual(block.raw(), raw_block_zero)
+
+if __name__ == '__main__':
+    unittest.main()
 
 
