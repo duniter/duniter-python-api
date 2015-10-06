@@ -17,11 +17,13 @@ SCRYPT_PARAMS = {'N': 4096,
                  'p': 1
                  }
 
+
 def _ensure_bytes(data):
     if isinstance(data, str):
         return bytes(data, 'utf-8')
 
     return data
+
 
 class SigningKey(libnacl.sign.Signer):
     def __init__(self, salt, password):
