@@ -28,6 +28,46 @@ Transactions:
 42yQm4hGTJYWkPg39hQAUgP6S6EQ4vTfXdJuxKEHL1ih6YHiDL2hcwrFgBHjXLRgxRhj2VNVqqc6b4JayKqTE14r
 """
 
+raw_block_with_tx = """Version: 1
+Type: Block
+Currency: meta_brouzouf
+Nonce: 581
+Number: 34436
+PoWMin: 5
+Time: 1443896211
+MedianTime: 1443881811
+Issuer: HnFcSms8jzwngtVomTTnzudZx7SHUQY8sVE1y8yBmULk
+PreviousHash: 000002B06C990DEBD5C1D947289C2CF4F4396FB2
+PreviousIssuer: HnFcSms8jzwngtVomTTnzudZx7SHUQY8sVE1y8yBmULk
+MembersCount: 19
+Identities:
+Joiners:
+Actives:
+ATkjQPa4sn4LBF69jqEPzFtRdHYJs6MJQjvP8JdN7MtN:QTowsupV+uXrcomL44WCxbu3LQoJM2C2VPMet5Xg6gXGAHEtGRp47FfQLb2ok1+/588JiIHskCyazj3UOsmKDw==:34434:00000D21F80687248A8C02F16BB19A975B4F983D:1422108319:urodelus
+Leavers:
+Excluded:
+Certifications:
+5ocqzyDMMWf1V8bsoNhWb1iNwax1e9M7VTUN6navs8of:ATkjQPa4sn4LBF69jqEPzFtRdHYJs6MJQjvP8JdN7MtN:34435:6TuxRcARnpo13l3cXtgPTkjJlv8DZOUvsAzmZJMbjHZbbZfDQ6MJpH9DIuH0eyG3WGc0EX/046mbMGBrKKg9DQ==
+ATkjQPa4sn4LBF69jqEPzFtRdHYJs6MJQjvP8JdN7MtN:2qwGeLWoPG7db72bKXPfJpAtj67FYDnPaJn2JB7tyXxJ:34434:LusTbb7CgwrqqacDKjtldw60swwvDBH8wVUIJN4SWRb2pZPJSpDxgqaGyjC5P9i/DendfyQWc7cfzPDqSZmZAg==
+Transactions:
+TX:1:1:1:2:1
+DKqZ9LqCtHRQD3WWZWJNaStxiqNm46Q64Pg6eaixrzRL
+0:D:15253:0000F84AD8625D767C9A9D53EA3929A41BF59F0E:1784852
+8ML26qB3pfydANsBDMzebNh3GQyFKwheV8BnuGRDHJFy:877169
+DKqZ9LqCtHRQD3WWZWJNaStxiqNm46Q64Pg6eaixrzRL:907683
+0.10.2
+Gqb9pZGYQqJ2ZT8acLXp0ajzVvJjKfn8ruM1OXbbF9Wwx+jhBefoHFz9Ju0VvJxWF74MKGgyJ6lR1N9r5EqYCg==
+TX:1:1:2:2:1
+5ocqzyDMMWf1V8bsoNhWb1iNwax1e9M7VTUN6navs8of
+0:D:32793:00003BD004943CA9C229435A454D051BA32338E3:245953766553
+0:D:32936:0000D42C2D0B09AC4B6238D2A7BA4FDA027C49AB:270549143208
+GzSdk1gSsdEpV7ydHpndAaHhY7XsrDT4xTDYYMaQMCWq:438584250177
+5ocqzyDMMWf1V8bsoNhWb1iNwax1e9M7VTUN6navs8of:77918659584
+welcome !
+Nzy+iceGg757bZ4ddS44Z2Ji52BNlHZiBigzavqmI0PUBbFcjHEUhHJ0RE0I4Jsjx9MuDoZaP3TjwlnH99bGCA==
+nY/MsFU2luiohLmSiOOimL1RIqbriOBgc22ua03Z2dhxtSJxKZeGNGDvl1jaXgmEBRnXU87yXbZ7ioOS/AAVCA==
+"""
+
 
 raw_block_zero = """Version: 1
 Type: Block
@@ -113,7 +153,8 @@ class Test_Block(unittest.TestCase):
         self.assertEquals(block.excluded, [])
         self.assertEquals(len(block.certifications), 12)
         self.assertEquals(block.transactions, [])
-        self.assertEqual(block.raw(), raw_block_zero)
+
+        self.assertEqual(block.signed_raw(), raw_block_zero)
 
     def test_toraw_fromsignedraw(self):
         block = Block.from_signed_raw(raw_block)
@@ -138,7 +179,8 @@ class Test_Block(unittest.TestCase):
         self.assertEquals(from_rendered_raw.excluded, [])
         self.assertEquals(from_rendered_raw.certifications, [])
         self.assertEquals(from_rendered_raw.transactions, [])
-        self.assertEqual(block.raw(), raw_block)
+
+        self.assertEqual(block.signed_raw(), raw_block)
 
     def test_toraw_fromrawzero(self):
         block = Block.from_signed_raw(raw_block_zero)
@@ -153,8 +195,6 @@ class Test_Block(unittest.TestCase):
         self.assertEquals(from_rendered_raw.time, 1418077277)
         self.assertEquals(from_rendered_raw.mediantime, 1418077277)
         self.assertEquals(from_rendered_raw.issuer, "HnFcSms8jzwngtVomTTnzudZx7SHUQY8sVE1y8yBmULk")
-        self.assertEquals(from_rendered_raw.parameters, ('0.01','302400','100','5259600','2629800','3','5',
-                                    '2629800','3','11','600','10','20','0.67'))
         self.assertEquals(from_rendered_raw.members_count, 4)
         self.assertEquals(len(from_rendered_raw.identities), 4)
         self.assertEquals(len(from_rendered_raw.joiners), 4)
@@ -164,7 +204,32 @@ class Test_Block(unittest.TestCase):
         self.assertEquals(len(from_rendered_raw.certifications), 12)
         self.assertEquals(from_rendered_raw.transactions, [])
 
-        self.assertEqual(block.raw(), raw_block_zero)
+        self.assertEqual(block.signed_raw(), raw_block_zero)
+
+    def test_raw_with_tx(self):
+        block = Block.from_signed_raw(raw_block_with_tx)
+        rendered_raw = block.signed_raw()
+        from_rendered_raw = block.from_signed_raw(rendered_raw)
+
+        self.assertEquals(from_rendered_raw.version, 1)
+        self.assertEquals(from_rendered_raw.currency, "meta_brouzouf")
+        self.assertEquals(from_rendered_raw.noonce, 581)
+        self.assertEquals(from_rendered_raw.number, 34436)
+        self.assertEquals(from_rendered_raw.powmin, 5)
+        self.assertEquals(from_rendered_raw.time, 1443896211)
+        self.assertEquals(from_rendered_raw.mediantime, 1443881811)
+        self.assertEquals(from_rendered_raw.issuer, "HnFcSms8jzwngtVomTTnzudZx7SHUQY8sVE1y8yBmULk")
+        self.assertEquals(from_rendered_raw.parameters, None)
+        self.assertEquals(from_rendered_raw.members_count, 19)
+        self.assertEquals(from_rendered_raw.identities, [])
+        self.assertEquals(from_rendered_raw.joiners, [])
+        self.assertEquals(len(from_rendered_raw.actives), 1)
+        self.assertEquals(from_rendered_raw.leavers, [])
+        self.assertEquals(from_rendered_raw.excluded, [])
+        self.assertEquals(len(from_rendered_raw.certifications), 2)
+        self.assertEquals(len(from_rendered_raw.transactions), 2)
+
+        self.assertEqual(block.signed_raw(), raw_block_with_tx)
 
 if __name__ == '__main__':
     unittest.main()

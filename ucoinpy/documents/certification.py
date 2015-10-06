@@ -7,7 +7,7 @@ import re
 import base64
 import logging
 
-from . import Document
+from .document import Document
 
 
 class SelfCertification(Document):
@@ -52,8 +52,7 @@ class Certification(Document):
     A document describing a certification.
     """
 
-    re_inline = re.compile("([1-9A-Za-z][^OIl]{42,45}):\
-([1-9A-Za-z][^OIl]{42,45}):([0-9]+):([A-Za-z0-9+/]+(?:=|==)?)\n")
+    re_inline = re.compile("([1-9A-Za-z][^OIl]{42,45}):([1-9A-Za-z][^OIl]{42,45}):([0-9]+):([A-Za-z0-9+/]+(?:=|==)?)\n")
     re_timestamp = re.compile("META:TS:([0-9]+)-([0-9a-fA-F]{5,40})\n")
 
     def __init__(self, version, currency, pubkey_from, pubkey_to,
@@ -77,12 +76,11 @@ class Certification(Document):
             blockhash = "DA39A3EE5E6B4B0D3255BFEF95601890AFD80709"
         signature = cert_data.group(4)
         return cls(version, currency, pubkey_from, pubkey_to,
-                   blockhash, blocknumber, signature)
+                   blocknumber, blockhash, signature)
 
     def raw(self, selfcert):
         return """{0}META:TS:{1}-{2}
 """.format(selfcert.signed_raw(), self.blocknumber, self.blockhash)
-
 
     def sign(self, selfcert, keys):
         """
