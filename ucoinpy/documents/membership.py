@@ -11,15 +11,17 @@ import re
 
 class Membership(Document):
     """
-    This is a utility class to generate membership documents :
-    Version: VERSION
-    Type: Membership
-    Currency: CURRENCY_NAME
-    Issuer: ISSUER
-    Block: NUMBER-HASH
-    Membership: MEMBERSHIP_TYPE
-    UserID: USER_ID
-    CertTS: CERTIFICATION_TS
+.. note:: A membership document is specified by the following format :
+
+    | Version: VERSION
+    | Type: Membership
+    | Currency: CURRENCY_NAME
+    | Issuer: ISSUER
+    | Block: NUMBER-HASH
+    | Membership: MEMBERSHIP_TYPE
+    | UserID: USER_ID
+    | CertTS: CERTIFICATION_TS
+
     """
 
     # PUBLIC_KEY:SIGNATURE:NUMBER:HASH:TIMESTAMP:USER_ID

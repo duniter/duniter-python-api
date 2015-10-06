@@ -1,22 +1,19 @@
-"""
-Created on 2 déc. 2014
-
-@author: inso
-"""
-
 import re
 from .document import Document
 
 
 class Status(Document):
     """
-    Version: VERSION
-    Type: Status
-    Currency: CURRENCY_NAME
-    Status: STATUS
-    Block: BLOCK
-    From: SENDER
-    To: RECIPIENT
+.. note:: A status document is specified by the following format :
+
+    | Version: VERSION
+    | Type: Status
+    | Currency: CURRENCY_NAME
+    | Status: STATUS
+    | Block: BLOCK
+    | From: SENDER
+    | To: RECIPIENT
+
     """
 
     re_type = re.compile("Type: (Status)")

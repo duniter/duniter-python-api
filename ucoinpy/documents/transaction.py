@@ -1,9 +1,3 @@
-"""
-Created on 2 déc. 2014
-
-@author: inso
-"""
-
 from .document import Document
 import re
 import logging
@@ -11,34 +5,37 @@ import logging
 
 class Transaction(Document):
     """
-Document format :
-Version: VERSION
-Type: Transaction
-Currency: CURRENCY_NAME
-Issuers:
-PUBLIC_KEY
-...
-Inputs:
-INDEX:SOURCE:NUMBER:FINGERPRINT:AMOUNT
-...
-Outputs:
-PUBLIC_KEY:AMOUNT
-...
-Comment: COMMENT
-...
+.. note:: A transaction document is specified by the following format :
 
+    | Document format :
+    | Version: VERSION
+    | Type: Transaction
+    | Currency: CURRENCY_NAME
+    | Issuers:
+    | PUBLIC_KEY
+    | ...
+    | Inputs:
+    | INDEX:SOURCE:NUMBER:FINGERPRINT:AMOUNT
+    | ...
+    | Outputs:
+    | PUBLIC_KEY:AMOUNT
+    | ...
+    | Comment: COMMENT
+    | ...
+    |
+    |
+    | Compact format :
+    | TX:VERSION:NB_ISSUERS:NB_INPUTS:NB_OUTPUTS:HAS_COMMENT
+    | PUBLIC_KEY:INDEX
+    | ...
+    | INDEX:SOURCE:FINGERPRINT:AMOUNT
+    | ...
+    | PUBLIC_KEY:AMOUNT
+    | ...
+    | COMMENT
+    | SIGNATURE
+    | ...
 
-Compact format :
-TX:VERSION:NB_ISSUERS:NB_INPUTS:NB_OUTPUTS:HAS_COMMENT
-PUBLIC_KEY:INDEX
-...
-INDEX:SOURCE:FINGERPRINT:AMOUNT
-...
-PUBLIC_KEY:AMOUNT
-...
-COMMENT
-SIGNATURE
-...
     """
 
     re_type = re.compile("Type: (Transaction)\n")
@@ -231,8 +228,9 @@ class InputSource:
     """
     A Transaction INPUT
 
-    Compact :
+.. note:: Compact :
     INDEX:SOURCE:FINGERPRINT:AMOUNT
+
     """
     re_inline = re.compile("([0-9]+):(D|T):([0-9]+):([0-9a-fA-F]{5,40}):([0-9]+)\n")
     re_compact = re.compile("([0-9]+):(D|T):([0-9a-fA-F]{5,40}):([0-9]+)\n")

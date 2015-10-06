@@ -1,9 +1,3 @@
-"""
-Created on 2 déc. 2014
-
-@author: inso
-"""
-
 from .. import PROTOCOL_VERSION
 from .document import Document
 from .certification import SelfCertification, Certification
@@ -46,42 +40,47 @@ class BlockId:
 
 class Block(Document):
     """
-Version: VERSION
-Type: Block
-Currency: CURRENCY
-Nonce: NONCE
-Number: BLOCK_NUMBER
-PoWMin: NUMBER_OF_ZEROS
-Time: GENERATED_ON
-MedianTime: MEDIAN_DATE
-UniversalDividend: DIVIDEND_AMOUNT
-Issuer: ISSUER_KEY
-PreviousHash: PREVIOUS_HASH
-PreviousIssuer: PREVIOUS_ISSUER_KEY
-Parameters: PARAMETERS
-MembersCount: WOT_MEM_COUNT
-Identities:
-PUBLIC_KEY:SIGNATURE:TIMESTAMP:USER_ID
-...
-Joiners:
-PUBLIC_KEY:SIGNATURE:NUMBER:HASH:TIMESTAMP:USER_ID
-...
-Actives:
-PUBLIC_KEY:SIGNATURE:NUMBER:HASH:TIMESTAMP:USER_ID
-...
-Leavers:
-PUBLIC_KEY:SIGNATURE:NUMBER:HASH:TIMESTAMP:USER_ID
-...
-Excluded:
-PUBLIC_KEY
-...
-Certifications:
-PUBKEY_FROM:PUBKEY_TO:BLOCK_NUMBER:SIGNATURE
-...
-Transactions:
-COMPACT_TRANSACTION
-...
-BOTTOM_SIGNATURE
+The class Block handles Block documents.
+
+.. note:: A block document is specified by the following format :
+
+    | Version: VERSION
+    | Type: Block
+    | Currency: CURRENCY
+    | Nonce: NONCE
+    | Number: BLOCK_NUMBER
+    | PoWMin: NUMBER_OF_ZEROS
+    | Time: GENERATED_ON
+    | MedianTime: MEDIAN_DATE
+    | UniversalDividend: DIVIDEND_AMOUNT
+    | Issuer: ISSUER_KEY
+    | PreviousHash: PREVIOUS_HASH
+    | PreviousIssuer: PREVIOUS_ISSUER_KEY
+    | Parameters: PARAMETERS
+    | MembersCount: WOT_MEM_COUNT
+    | Identities:
+    | PUBLIC_KEY:SIGNATURE:TIMESTAMP:USER_ID
+    | ...
+    | Joiners:
+    | PUBLIC_KEY:SIGNATURE:NUMBER:HASH:TIMESTAMP:USER_ID
+    | ...
+    | Actives:
+    | PUBLIC_KEY:SIGNATURE:NUMBER:HASH:TIMESTAMP:USER_ID
+    | ...
+    | Leavers:
+    | PUBLIC_KEY:SIGNATURE:NUMBER:HASH:TIMESTAMP:USER_ID
+    | ...
+    | Excluded:
+    | PUBLIC_KEY
+    | ...
+    | Certifications:
+    | PUBKEY_FROM:PUBKEY_TO:BLOCK_NUMBER:SIGNATURE
+    | ...
+    | Transactions:
+    | COMPACT_TRANSACTION
+    | ...
+    | BOTTOM_SIGNATURE
+
     """
 
     re_type = re.compile("Type: (Block)\n")
@@ -116,6 +115,27 @@ BOTTOM_SIGNATURE
                  transactions, signature):
         """
         Constructor
+
+        :param int version: ucoin protocol version
+        :param str currency: the block currency
+        :param int noonce: the noonce value of the block
+        :param int number: the number of the block
+        :param int powmin: the powmin value of this block
+        :param int time: the timestamp of this block
+        :param int ud: the dividend amount, or None if no dividend present in this block
+        :param str issuer: the pubkey of the issuer of the block
+        :param str prev_hash: the previous block hash
+        :param str prev_issuer: the previous block issuer
+        :param tuple parameters: the parameters of the currency. Should only be present in block 0.
+        :param int members_count: the number of members found in this block
+        :param list[ucoinpy.documents.SelfCertification] identities: the self certifications declared in this block
+        :param list[ucoinpy.documents.Membership] joiners: the joiners memberships via "IN" documents
+        :param list[ucoinpy.documents.Membership] actives: renewed memberships via "IN" documents
+        :param list[ucoinpy.documents.Membership] leavers: the leavers memberships via "OUT" documents
+        :param list[ucoinpy.documents.Membership] excluded: members excluded because of missing certifications
+        :param list[ucoinpy.documents.Membership] actives: renewed memberships via "IN" documents
+        :param list[ucoinpy.documents.Certification] certifications: certifications documents
+        :param list[ucoinpy.documents.Transaction] transactions: transactions documents
         """
         super().__init__(version, currency, [signature])
         self.noonce = noonce

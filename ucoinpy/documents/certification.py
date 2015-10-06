@@ -1,8 +1,3 @@
-"""
-Created on 2 déc. 2014
-
-@author: inso
-"""
 import re
 import base64
 import logging

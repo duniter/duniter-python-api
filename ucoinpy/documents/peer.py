@@ -1,9 +1,3 @@
-"""
-Created on 2 déc. 2014
-
-@author: inso
-"""
-
 import re
 
 from ..api.bma import ConnectionHandler
@@ -13,16 +7,19 @@ from .. import PROTOCOL_VERSION, MANAGED_API
 
 class Peer(Document):
     """
-    Version: VERSION
-    Type: Peer
-    Currency: CURRENCY_NAME
-    PublicKey: NODE_PUBLICKEY
-    Block: BLOCK
-    Endpoints:
-    END_POINT_1
-    END_POINT_2
-    END_POINT_3
-    [...]
+.. note:: A peer document is specified by the following format :
+
+    | Version: VERSION
+    | Type: Peer
+    | Currency: CURRENCY_NAME
+    | PublicKey: NODE_PUBLICKEY
+    | Block: BLOCK
+    | Endpoints:
+    | END_POINT_1
+    | END_POINT_2
+    | END_POINT_3
+    | [...]
+
     """
 
     re_type = re.compile("Type: (Peer)")
