@@ -5,9 +5,8 @@ Ucoin public and private keys
 """
 
 import base58
-import base64
+import libnacl
 from pylibscrypt import scrypt
-from libnacl.sign import Signer as NaclSigningKey
 
 
 SEED_LENGTH = 32  # Length of the key
@@ -23,7 +22,8 @@ def _ensure_bytes(data):
 
     return data
 
-class SigningKey(NaclSigningKey):
+
+class SigningKey(libnacl.sign.Signer):
     def __init__(self, salt, password):
         salt = _ensure_bytes(salt)
         password = _ensure_bytes(password)
