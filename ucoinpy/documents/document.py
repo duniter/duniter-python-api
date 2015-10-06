@@ -3,7 +3,6 @@ import base64
 import re
 import logging
 import hashlib
-from ..key import Base58Encoder
 
 
 class Document:
