@@ -4,9 +4,10 @@ Created on 2 déc. 2014
 @author: inso
 """
 
-from . import Document
+from .document import Document
 import re
 import logging
+
 
 class Transaction(Document):
     """
@@ -201,7 +202,7 @@ COMMENT
         for pubkey in self.issuers:
             doc += "{0}\n".format(pubkey)
         for i in self.inputs:
-            doc += "{0}\n".format(i.compact())
+            doc += "{0}\n".format(i.inline())
         for o in self.outputs:
             doc += "{0}\n".format(o.inline())
         if self.comment != "":
@@ -226,15 +227,14 @@ As transaction class, but for only one issuer.
               outputs, comment, [signature])
 
 
-class InputSource():
+class InputSource:
     """
     A Transaction INPUT
 
     Compact :
     INDEX:SOURCE:FINGERPRINT:AMOUNT
     """
-    re_inline = re.compile("([0-9]+):(D|T):([0-9]+):\
-([0-9a-fA-F]{5,40}):([0-9]+)\n")
+    re_inline = re.compile("([0-9]+):(D|T):([0-9]+):([0-9a-fA-F]{5,40}):([0-9]+)\n")
     re_compact = re.compile("([0-9]+):(D|T):([0-9a-fA-F]{5,40}):([0-9]+)\n")
 
     def __init__(self, index, source, number, txhash, amount):
@@ -269,12 +269,6 @@ class InputSource():
                                             self.number,
                                             self.txhash,
                                             self.amount)
-
-    def compact(self):
-        return "{0}:{1}:{2}:{3}".format(self.index,
-                                        self.source,
-                                        self.txhash,
-                                        self.amount)
 
 
 class OutputSource():
