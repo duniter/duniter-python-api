@@ -5,7 +5,8 @@ Ucoin public and private keys
 """
 
 import base58
-import libnacl
+import base64
+import libnacl.sign
 from pylibscrypt import scrypt
 
 
@@ -21,7 +22,6 @@ def _ensure_bytes(data):
         return bytes(data, 'utf-8')
 
     return data
-
 
 class SigningKey(libnacl.sign.Signer):
     def __init__(self, salt, password):
