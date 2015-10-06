@@ -5,7 +5,7 @@ A python implementation of [uCoin](https://github.com/ucoin-io/ucoin) API
 
 ## Features
  * Supports uCoin's Basic Merkle Api
- * Asynchronous usage thanks to 
+ * Asynchronous
  * uCoin signing key
 
 ## Requirements
