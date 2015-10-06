@@ -16,6 +16,7 @@
 import sys
 import os
 import shlex
+from unittest.mock import MagicMock
 
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
@@ -23,16 +24,6 @@ import shlex
 #sys.path.insert(0, os.path.abspath('.'))
 sys.path.append(os.path.join(".."))
 # -- General configuration ------------------------------------------------
-
-from unittest.mock import MagicMock
-
-class Mock(MagicMock):
-    @classmethod
-    def __getattr__(cls, name):
-            return Mock()
-
-MOCK_MODULES = ['libnacl.sign']
-sys.modules.update((mod_name, Mock()) for mod_name in MOCK_MODULES)
 
 # If your documentation needs a minimal Sphinx version, state it here.
 #needs_sphinx = '1.0'
@@ -46,6 +37,15 @@ extensions = [
     'sphinx.ext.todo',
     'sphinx.ext.coverage',
 ]
+
+class Mock(MagicMock):
+    @classmethod
+    def __getattr__(cls, name):
+            return Mock()
+
+MOCK_MODULES = ['libnacl.sign']
+sys.modules.update((mod_name, Mock()) for mod_name in MOCK_MODULES)
+
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
