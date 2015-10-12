@@ -111,6 +111,30 @@ Transactions:
 """
 
 
+raw_block_with_leavers = """Version: 1
+Type: Block
+Currency: meta_brouzouf
+Nonce: 9906
+Number: 34895
+PoWMin: 4
+Time: 1444434128
+MedianTime: 1444426438
+Issuer: HnFcSms8jzwngtVomTTnzudZx7SHUQY8sVE1y8yBmULk
+PreviousHash: 0000E88115ADDF79344372C0212928501E21622B
+PreviousIssuer: HnFcSms8jzwngtVomTTnzudZx7SHUQY8sVE1y8yBmULk
+MembersCount: 21
+Identities:
+Joiners:
+Actives:
+Leavers:
+2sq8bBDQGK74f1eD3mAPQVgHCmFdijZr9nbv16FwbokX:4MsVEpiL5YXQ0w8KgkbeKR73Y/aSLtQS5HxPFoQJuG5pt+Zl0Q2dLCQfmfvePW4/ANLzcOGnZJH2Tgsw5inJDw==:34893:0000CC15C495623FFAF370D87A7E025FCF01D0AF:1422489754:smoul
+Excluded:
+Certifications:
+Transactions:
+5LZCFSnm5FkFihPBTpmsPyILEdvu8MXfJOp6OR4d1s+/e2jVWg4J6YSDfO2KBBPgubASyr2QwQuiBlYD2918Bw==
+"""
+
+
 class Test_Block(unittest.TestCase):
     def test_fromraw(self):
         block = Block.from_signed_raw(raw_block)
@@ -230,6 +254,33 @@ class Test_Block(unittest.TestCase):
         self.assertEquals(len(from_rendered_raw.transactions), 2)
 
         self.assertEqual(block.signed_raw(), raw_block_with_tx)
+
+    def test_raw_with_leavers(self):
+        block = Block.from_signed_raw(raw_block_with_leavers)
+        rendered_raw = block.signed_raw()
+        from_rendered_raw = block.from_signed_raw(rendered_raw)
+        self.assertEquals(from_rendered_raw.version, 1)
+        self.assertEquals(from_rendered_raw.currency, "meta_brouzouf")
+        self.assertEquals(from_rendered_raw.noonce, 9906)
+        self.assertEquals(from_rendered_raw.number, 34895)
+        self.assertEquals(from_rendered_raw.powmin, 4)
+        self.assertEquals(from_rendered_raw.time, 1444434128)
+        self.assertEquals(from_rendered_raw.mediantime, 1444426438)
+        self.assertEquals(from_rendered_raw.issuer, "HnFcSms8jzwngtVomTTnzudZx7SHUQY8sVE1y8yBmULk")
+        self.assertEquals(from_rendered_raw.prev_hash, "0000E88115ADDF79344372C0212928501E21622B")
+        self.assertEquals(from_rendered_raw.prev_issuer, "HnFcSms8jzwngtVomTTnzudZx7SHUQY8sVE1y8yBmULk")
+        self.assertEquals(from_rendered_raw.parameters, None)
+        self.assertEquals(from_rendered_raw.members_count, 21)
+        self.assertEquals(from_rendered_raw.identities, [])
+        self.assertEquals(from_rendered_raw.joiners, [])
+        self.assertEquals(from_rendered_raw.actives, [])
+        self.assertEquals(len(from_rendered_raw.leavers), 1)
+        self.assertEquals(from_rendered_raw.excluded, [])
+        self.assertEquals(from_rendered_raw.certifications, [])
+        self.assertEquals(from_rendered_raw.transactions, [])
+
+        self.assertEqual(block.signed_raw(), raw_block_with_leavers)
+
 
 if __name__ == '__main__':
     unittest.main()

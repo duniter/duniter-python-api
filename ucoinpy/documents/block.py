@@ -338,7 +338,7 @@ PreviousIssuer: {1}\n".format(self.prev_hash, self.prev_issuer)
 
         doc += "Leavers:\n"
         for leaver in self.leavers:
-            doc += "{0]\n".format(leaver.inline())
+            doc += "{0}\n".format(leaver.inline())
 
         doc += "Excluded:\n"
         for exclude in self.excluded:
