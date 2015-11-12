@@ -28,12 +28,64 @@ class Base(Network):
 
 class Peers(Base):
     """GET peering entries of every node inside the currency network."""
+    schema = {
+        "type": ["object"],
+        "properties": {
+            "depth": {
+                "type": "number"
+            },
+            "nodesCount": {
+                "type": "number"
+            },
+            "leavesCount": {
+                "type": "number"
+            },
+            "root": {
+                "type": "string"
+            },
+            "hash": {
+                "type": "string"
+            },
+            "value": {
+                "type": "object",
+                "properties": {
+                    "version": {
+                        "type": "string"
+                    },
+                    "currency": {
+                        "type": "string"
+                    },
+                    "pubkey": {
+                        "type": "string"
+                    },
+                    "endpoints": {
+                        "type": "array",
+                        "item": {
+                            "type": "string"
+                        }
+                    },
+                    "signature": {
+                        "type": "string"
+                    }
+                },
+                "required": ["version", "currency", "pubkey", "endpoints", "signature"]
+            }
+        },
+        "oneOf": [
+            {
+                "required": ["depth", "nodesCount", "leavesCount", "root"]
+            },
+            {
+                "required": ["hash", "value"]
+            }
+        ]
+    }
 
     def __get__(self, **kwargs):
         """creates a generator with one peering entry per iteration."""
 
         r = yield from self.requests_get('/peers', **kwargs)
-        return (yield from r.json())
+        return (yield from self.parse(r))
 
     def __post__(self, **kwargs):
         assert 'entry' in kwargs

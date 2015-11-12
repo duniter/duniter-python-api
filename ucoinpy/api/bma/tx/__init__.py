@@ -28,6 +28,87 @@ class Tx(API):
 
 class History(Tx):
     """Get transaction sources."""
+    schema = {
+        "type": "object",
+        "properties": {
+            "currency": {
+                "type": "string"
+            },
+            "pubkey": {
+                "type": "string"
+            },
+            "history": {
+                "type": "object",
+                "properties": {
+                    "sent": {
+                        "$ref": "#/definitions/transaction_data"
+                    },
+                    "received": {
+                        "$ref": "#/definitions/transaction_data"
+                    },
+                    "sending": {
+                        "$ref": "#/definitions/transaction_data"
+                    },
+                    "receiving": {
+                        "$ref": "#/definitions/transaction_data"
+                    },
+                },
+                "required": ["sent", "received", "sending", "receiving"]
+            }
+        },
+        "definitions": {
+            "transaction_data": {
+                "type": "array",
+                "item": {
+                    "type": "object",
+                    "properties": {
+                        "version": {
+                            "type": "number"
+                        },
+                        "issuers": {
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            }
+                        },
+                        "inputs": {
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            }
+                        },
+                        "outputs": {
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            }
+                        },
+                        "comment": {
+                            "type": "string"
+                        },
+                        "signatures": {
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            }
+                        },
+                        "hash": {
+                            "type": "string"
+                        },
+                        "block_number": {
+                            "type": "number"
+                        },
+                        "time": {
+                            "type": "number"
+                        }
+                    },
+                    "required": ["version", "issuers", "inputs", "outputs",
+                                 "comment", "signatures", "hash", "block_number", "time"]
+                }
+            }
+        }
+    }
+
     def __init__(self, conn_handler, pubkey, module='tx'):
         super(Tx, self).__init__(conn_handler, module)
         self.pubkey = pubkey
@@ -35,7 +116,7 @@ class History(Tx):
     def __get__(self, **kwargs):
         assert self.pubkey is not None
         r = yield from self.requests_get('/history/%s' % self.pubkey, **kwargs)
-        return (yield from r.json())
+        return (yield from self.parse(r))
 
 
 class Process(Tx):
@@ -50,6 +131,43 @@ class Process(Tx):
 
 class Sources(Tx):
     """Get transaction sources."""
+    schema = {
+        "type": "object",
+        "properties": {
+            "currency": {
+                "type": "string"
+            },
+            "pubkey": {
+                "type": "string"
+            },
+            "sources": {
+                "type": "array",
+                "item": {
+                    "type": "object",
+                    "properties": {
+                        "pubkey": {
+                            "type": "string"
+                        },
+                        "type": {
+                            "type": "string"
+                        },
+                        "number": {
+                            "type": "number"
+                        },
+                        "fingerprint": {
+                            "type": "string"
+                        },
+                        "amount": {
+                            "type": "number"
+                        }
+                    },
+                    "required": ["pubkey", "type", "number", "fingerprint", "amount"]
+                }
+            }
+        },
+        "required": ["currency", "pubkey", "sources"]
+    }
+
     def __init__(self, connection_handler, pubkey, module='tx'):
         super(Tx, self).__init__(connection_handler, module)
         self.pubkey = pubkey
@@ -58,5 +176,6 @@ class Sources(Tx):
         assert self.pubkey is not None
         r = yield from self.requests_get('/sources/%s' % self.pubkey, **kwargs)
         return (yield from r.json())
+
 
 from . import history

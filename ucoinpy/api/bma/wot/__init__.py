@@ -51,6 +51,93 @@ class Revoke(WOT):
 
 class Lookup(WOT):
     """GET Public key data."""
+    schema = {
+        "type": "object",
+        "definitions": {
+            "meta_data": {
+                "type": "object",
+                "properties": {
+                    "timestamp": {
+                        "type": "number"
+                    }
+                }
+            },
+        },
+        "properties": {
+            "partial": {
+                "type": "boolean"
+            },
+            "results": {
+                "type": "array",
+                "item": {
+                    "type": "object",
+                    "properties": {
+                        "pubkey": {
+                            "type": "string"
+                        }
+                    },
+                    "uids": {
+                        "type": "array",
+                        "item": {
+                            "type": "object",
+                            "properties": {
+                                "uid": {
+                                    "type": "string"
+                                },
+                                "meta": {
+                                    "$ref": "#/definitions/meta_data"
+                                },
+                                "self": {
+                                    "type": "string",
+                                },
+                                "others": {
+                                    "type": "array",
+                                    "item": {
+                                        "type": "object",
+                                        "properties": {
+                                            "pubkey": {
+                                                "type": "string",
+                                            },
+                                            "meta": {
+                                                "$ref": "#/definitions/meta_data"
+                                            },
+                                            "signature": {
+                                                "type": "string"
+                                            }
+                                        }
+                                    }
+                                }
+                            },
+                            "required": ["uid", "meta", "self", "others"]
+                        }
+                    },
+                    "signed": {
+                        "type": "array",
+                        "item": {
+                            "type": "object",
+                            "properties": {
+                                "uid": {
+                                    "type": "string"
+                                },
+                                "pubkey": {
+                                    "type": "string"
+                                },
+                                "meta": {
+                                    "$ref": "#/definitions/meta_data"
+                                },
+                                "signature": {
+                                    "type": "string"
+                                }
+                            },
+                            "required": ["uid", "pubkey", "meta", "signature"]
+                        }
+                    },
+                    "required": ["uids", "signed"]
+                }
+            }
+        },
+        "required": ["partial", "results"]
+    }
 
     def __init__(self, connection_handler, search, module='wot'):
         super(WOT, self).__init__(connection_handler, module)
@@ -67,6 +154,67 @@ class Lookup(WOT):
 class CertifiersOf(WOT):
     """GET Certification data over a member."""
 
+    schema = {
+        "type": "object",
+        "properties": {
+            "pubkey": {
+                "type": "string"
+            },
+            "uid": {
+                "type": "string"
+            },
+            "isMember": {
+                "type": "boolean"
+            },
+            "certifications": {
+                "type": "array",
+                "item": {
+                    "type": "object",
+                    "properties": {
+                        "pubkey": {
+                            "type": "string"
+                        },
+                        "uid": {
+                            "type": "string"
+                        },
+                        "cert_time": {
+                            "type": "object",
+                            "properties": {
+                                "block": {
+                                    "type": "number"
+                                },
+                                "medianTime": {
+                                    "type": "number"
+                                }
+                            },
+                            "required": ["block", "medianTime"]
+                        },
+                        "written": {
+                            "type": "object",
+                            "properties": {
+                                "number": {
+                                    "type": "number",
+                                },
+                                "hash": {
+                                    "type": "string"
+                                }
+                            },
+                            "required": ["number", "hash"]
+                        },
+                        "isMember": {
+                            "type": "boolean"
+                        },
+                        "signature": {
+                            "type": "string"
+                        }
+                    },
+                    "required": ["pubkey", "uid", "cert_time", "written", "isMember", "signature"]
+                }
+            }
+        },
+        "required": ["pubkey", "uid", "isMember", "certifications"]
+    }
+
     def __init__(self, connection_handler, search, module='wot'):
         super(WOT, self).__init__(connection_handler, module)
 
@@ -82,6 +230,8 @@ class CertifiersOf(WOT):
 class CertifiedBy(WOT):
     """GET Certification data from a member."""
 
+    schema = CertifiersOf.schema
+
     def __init__(self, connection_handler, search, module='wot'):
         super(WOT, self).__init__(connection_handler, module)
 
@@ -96,6 +246,22 @@ class CertifiedBy(WOT):
 
 class Members(WOT):
     """GET List all current members of the Web of Trust."""
+    schema = {
+        "type": "object",
+        "properties": {
+            "results": {
+                "type": "array",
+                "item": {
+                    "type": "object",
+                    "properties": {
+                        "pubkey": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        }
+    }
 
     def __init__(self, connection_handler, module='wot'):
         super(WOT, self).__init__(connection_handler, module)

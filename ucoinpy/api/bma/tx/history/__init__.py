@@ -22,6 +22,9 @@ logger = logging.getLogger("ucoin/tx")
 
 
 class Blocks(History):
+
+    schema = History.schema
+
     def __init__(self, conn_handler, pubkey, from_, to_, module='tx'):
         super(Blocks, self).__init__(conn_handler, pubkey, module)
         self.from_ = from_
@@ -29,4 +32,4 @@ class Blocks(History):
 
     def __get__(self, **kwargs):
         r = yield from self.requests_get('/history/%s/blocks/%s/%s' % (self.pubkey, self.from_, self.to_), **kwargs)
-        return (yield from r.json())
+        return (yield from self.parse(r))

@@ -28,11 +28,32 @@ class Node(API):
 
 class Summary(Node):
     """GET Certification data over a member."""
+    schema = {
+        "type": "object",
+        "properties": {
+            "ucoin": {
+                "type": "object",
+                "properties": {
+                    "software": {
+                    "type": "string"
+                    },
+                    "version": {
+                        "type": "string",
+                    },
+                    "forkWindowSize": {
+                        "type": "number"
+                    }
+                },
+                "required": ["software", "version"]
+            },
+        },
+        "required": ["ucoin"]
+    }
 
     def __init__(self, connection_handler, module='node'):
         super(Summary, self).__init__(connection_handler, module)
 
     def __get__(self, **kwargs):
         r = yield from self.requests_get('/summary', **kwargs)
-        return (yield from r.json())
+        return (yield from self.parse(r))
 

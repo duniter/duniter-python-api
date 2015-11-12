@@ -28,9 +28,33 @@ class Network(API):
 
 class Peering(Network):
     """GET peering information about a peer."""
+    schema = {
+        "type": "object",
+        "properties": {
+          "version": {
+              "type": ["number", "string"]
+          },
+          "currency": {
+              "type": "string"
+          },
+          "pubkey": {
+              "type": "string"
+          },
+          "endpoints": {
+              "type": "array",
+              "item": {
+                  "type:" "string"
+              }
+          },
+          "signature": {
+              "type": "string"
+          }
+        },
+        "required": ["version", "currency", "pubkey", "endpoints", "signature"]
+    }
 
     def __get__(self, **kwargs):
         r = yield from self.requests_get('/peering', **kwargs)
-        return (yield from r.json())
+        return (yield from self.parse(r))
 
 from . import peering

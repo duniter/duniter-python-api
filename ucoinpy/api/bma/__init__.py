@@ -21,7 +21,7 @@ __all__ = ['api']
 
 PROTOCOL_VERSION = "1"
 
-import aiohttp, asyncio, logging, json
+import aiohttp, asyncio, logging, jsonschema
 
 logger = logging.getLogger("ucoin")
 
@@ -95,6 +95,21 @@ class API(object):
     def __post__(self, **kwargs):
         """interface purpose for POST request"""
         pass
+
+    @asyncio.coroutine
+    def parse(self, response):
+        """
+        Validate and parse the BMA answer
+
+        :param response:
+        :return: the json data
+        """
+        try:
+            data = yield from response.json()
+            jsonschema.validate(data, self.schema)
+            return data
+        except TypeError:
+            raise jsonschema.ValidationError("Could not parse json")
 
     @asyncio.coroutine
     def requests_get(self, path, **kwargs):
