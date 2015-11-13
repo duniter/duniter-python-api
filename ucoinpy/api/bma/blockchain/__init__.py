@@ -172,10 +172,10 @@ class Block(Blockchain):
                 "type": "string"
             },
             "previousHash": {
-                "type": "string"
+                "type": ["string", "null"]
             },
             "previousIssuer": {
-                "type": "string"
+                "type": ["string", "null"]
             },
             "membersCount": {
                 "type": "number"
