@@ -8,14 +8,14 @@ setup(
 
     packages=find_packages(),
 
-    author="Caner & inso",
+    author="inso, canercanda, s_b",
 
     author_email="insomniak.fr@gmail.com",
 
     description="A python implementation of [uCoin](https://github.com/ucoin-io/ucoin) API",
 
     long_description=open('README.md').read(),
-    
+
     # Active la prise en compte du fichier MANIFEST.in
     include_package_data=True,
     url='https://github.com/ucoin-io/ucoin-python-api',
@@ -30,6 +30,6 @@ setup(
         "Programming Language :: Python :: 3.4",
         "Topic :: Communications",
     ],
- 
+
 
 )
