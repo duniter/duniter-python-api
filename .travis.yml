@@ -5,6 +5,9 @@ python:
 before_install:
  - bash ci/libsodium.sh
 install:
-  - pip install -r requirements.txt
+ - pip install -r requirements.txt
 # command to run tests
-script: python setup.py test
+script:
+ - coverage run --source=ucoinpy setup.py test
+after_success:
+ - coveralls
