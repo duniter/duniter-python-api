@@ -45,7 +45,7 @@ setup(
 
     packages=find_packages(),
 
-    author="Caner & inso",
+    author="inso, canercanda, s_b",
 
     author_email="insomniak.fr@gmail.com",
 
@@ -69,6 +69,5 @@ setup(
     ],
     install_requires=install_requires,
     dependency_links=dependency_links
- 
 
 )
