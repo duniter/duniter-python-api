@@ -148,7 +148,7 @@ class Lookup(WOT):
         assert self.search is not None
 
         r = yield from self.requests_get('/lookup/%s' % self.search, **kwargs)
-        return (yield from r.json())
+        return (yield from self.parse(r))
 
 
 class CertifiersOf(WOT):
@@ -224,7 +224,7 @@ class CertifiersOf(WOT):
         assert self.search is not None
 
         r = yield from self.requests_get('/certifiers-of/%s' % self.search, **kwargs)
-        return (yield from r.json())
+        return (yield from self.parse(r))
 
 
 class CertifiedBy(WOT):
@@ -241,7 +241,7 @@ class CertifiedBy(WOT):
         assert self.search is not None
 
         r = yield from self.requests_get('/certified-by/%s' % self.search, **kwargs)
-        return (yield from r.json())
+        return (yield from self.parse(r))
 
 
 class Members(WOT):
@@ -257,10 +257,12 @@ class Members(WOT):
                         "pubkey": {
                             "type": "string"
                         }
-                    }
+                    },
+                    "required": ["pubkey"]
                 }
             }
-        }
+        },
+        "required": ["results"]
     }
 
     def __init__(self, connection_handler, module='wot'):
@@ -268,4 +270,4 @@ class Members(WOT):
 
     def __get__(self, **kwargs):
         r = yield from self.requests_get('/members', **kwargs)
-        return (yield from r.json())
+        return (yield from self.parse(r))

@@ -1,11 +1,12 @@
 import unittest
 import jsonschema
 from ucoinpy.api.bma.network import Peering
-from ucoinpy.api.bma.network.peering import Peers, Status
+from _ucoinpy_test.api.webserver import WebFunctionalSetupMixin, web, asyncio
+from ucoinpy.api.bma.network.peering import Peers
 
 
-class Test_BMA_Network(unittest.TestCase):
-    
+class Test_BMA_Network(WebFunctionalSetupMixin, unittest.TestCase):
+
     def test_peering(self):
         json_sample = {
           "version": "1",
@@ -20,6 +21,21 @@ class Test_BMA_Network(unittest.TestCase):
         }
         jsonschema.validate(json_sample, Peering.schema)
 
+    def test_peering_bad(self):
+        @asyncio.coroutine
+        def handler(request):
+            yield from request.read()
+            return web.Response(body=b'{}', content_type='application/json')
+
+        @asyncio.coroutine
+        def go():
+            _, srv, url = yield from self.create_server('GET', '/', handler)
+            peering = Peering(None)
+            peering.reverse_url = lambda path: url
+            with self.assertRaises(jsonschema.exceptions.ValidationError):
+                yield from peering.get()
+
+        self.loop.run_until_complete(go())
 
     def test_peers_root(self):
         json_sample = {
@@ -46,3 +62,19 @@ class Test_BMA_Network(unittest.TestCase):
           }
         }
         jsonschema.validate(json_sample, Peers.schema)
+
+    def test_peers_bad(self):
+        @asyncio.coroutine
+        def handler(request):
+            yield from request.read()
+            return web.Response(body=b'{}', content_type='application/json')
+
+        @asyncio.coroutine
+        def go():
+            _, srv, url = yield from self.create_server('GET', '/', handler)
+            peers = Peers(None)
+            peers.reverse_url = lambda path: url
+            with self.assertRaises(jsonschema.exceptions.ValidationError):
+                yield from peers.get()
+
+        self.loop.run_until_complete(go())

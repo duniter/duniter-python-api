@@ -16,20 +16,19 @@ BYfWYFrsyjpvpFysgu19rGK3VHBkz4MqmQbNyEuVU64g:30
 42yQm4hGTJYWkPg39hQAUgP6S6EQ4vTfXdJuxKEHL1ih6YHiDL2hcwrFgBHjXLRgxRhj2VNVqqc6b4JayKqTE14r
 """
 
-tx_raw = """Version: 1
-Type: Transaction
-Currency: beta_brousouf
-Issuers:
-HsLShAtzXTVxeUtQd7yi5Z5Zh4zNvbu8sTEZ53nfKcqY
-Inputs:
-0:T:65:D717FEC1993554F8EAE4CEA88DE5FBB6887CFAE8:4
-0:T:77:F80993776FB55154A60B3E58910C942A347964AD:15
-0:D:88:F4A47E39BC2A20EE69DCD5CAB0A9EB3C92FD8F7B:11
-Outputs:
-BYfWYFrsyjpvpFysgu19rGK3VHBkz4MqmQbNyEuVU64g:30
-Comment: 
-42yQm4hGTJYWkPg39hQAUgP6S6EQ4vTfXdJuxKEHL1ih6YHiDL2hcwrFgBHjXLRgxRhj2VNVqqc6b4JayKqTE14r
-"""
+tx_raw = ("Version: 1\n"
+          "Type: Transaction\n"
+          "Currency: beta_brousouf\n"
+          "Issuers:\n"
+          "HsLShAtzXTVxeUtQd7yi5Z5Zh4zNvbu8sTEZ53nfKcqY\n"
+          "Inputs:\n"
+          "0:T:65:D717FEC1993554F8EAE4CEA88DE5FBB6887CFAE8:4\n"
+          "0:T:77:F80993776FB55154A60B3E58910C942A347964AD:15\n"
+          "0:D:88:F4A47E39BC2A20EE69DCD5CAB0A9EB3C92FD8F7B:11\n"
+          "Outputs:\n"
+          "BYfWYFrsyjpvpFysgu19rGK3VHBkz4MqmQbNyEuVU64g:30\n"
+          "Comment: \n"
+          "42yQm4hGTJYWkPg39hQAUgP6S6EQ4vTfXdJuxKEHL1ih6YHiDL2hcwrFgBHjXLRgxRhj2VNVqqc6b4JayKqTE14r\n")
 
 
 class Test_Transaction(unittest.TestCase):

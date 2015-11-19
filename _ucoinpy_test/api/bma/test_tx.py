@@ -1,10 +1,11 @@
 import unittest
 import jsonschema
 from ucoinpy.api.bma.tx import History, Sources
+from _ucoinpy_test.api.webserver import WebFunctionalSetupMixin, web, asyncio
 from ucoinpy.api.bma.tx.history import Blocks
 
 
-class Test_BMA_TX(unittest.TestCase):
+class Test_BMA_TX(WebFunctionalSetupMixin, unittest.TestCase):
     def test_bma_tx_history(self):
         json_sample = {
           "currency": "meta_brouzouf",
@@ -119,6 +120,38 @@ class Test_BMA_TX(unittest.TestCase):
         jsonschema.validate(json_sample, History.schema)
         jsonschema.validate(json_sample, Blocks.schema)
 
+    def test_bma_tx_history_bad(self):
+        @asyncio.coroutine
+        def handler(request):
+            yield from request.read()
+            return web.Response(body=b'{}', content_type='application/json')
+
+        @asyncio.coroutine
+        def go():
+            _, srv, url = yield from self.create_server('GET', '/pubkey', handler)
+            history = History(None, 'pubkey')
+            history.reverse_url = lambda path: url
+            with self.assertRaises(jsonschema.exceptions.ValidationError):
+                yield from history.get()
+
+        self.loop.run_until_complete(go())
+
+    def test_bma_tx_history_blocks_bad(self):
+        @asyncio.coroutine
+        def handler(request):
+            yield from request.read()
+            return web.Response(body=b'{}', content_type='application/json')
+
+        @asyncio.coroutine
+        def go():
+            _, srv, url = yield from self.create_server('GET', '/pubkey/0/100', handler)
+            blocks = Blocks(None, 'pubkey', 0, 100)
+            blocks.reverse_url = lambda path: url
+            with self.assertRaises(jsonschema.exceptions.ValidationError):
+                yield from blocks.get()
+
+        self.loop.run_until_complete(go())
+
     def test_bma_tx_sources(self):
         json_sample = {
           "currency": "meta_brouzouf",
@@ -141,3 +174,19 @@ class Test_BMA_TX(unittest.TestCase):
           ]
         }
         jsonschema.validate(json_sample, Sources.schema)
+
+    def test_bma_tx_sources_bad(self):
+        @asyncio.coroutine
+        def handler(request):
+            yield from request.read()
+            return web.Response(body=b'{}', content_type='application/json')
+
+        @asyncio.coroutine
+        def go():
+            _, srv, url = yield from self.create_server('GET', '/pubkey', handler)
+            sources = Sources(None, 'pubkey')
+            sources.reverse_url = lambda path: url
+            with self.assertRaises(jsonschema.exceptions.ValidationError):
+                yield from sources.get()
+
+        self.loop.run_until_complete(go())

@@ -32,52 +32,54 @@ class Parameters(Blockchain):
         "type": "object",
         "properties":
         {
-      "currency": {
-          "type": "string"
-      },
-      "c": {
-          "type": "number"
-      },
-      "dt": {
-          "type": "number"
-      },
-      "ud0": {
-          "type": "number"
-      },
-      "sigDelay": {
-          "type": "number"
-      },
-      "sigValidity": {
-          "type": "number"
-      },
-      "sigQty": {
-          "type": "number"
-      },
-      "sigWoT": {
-          "type": "number"
-      },
-      "msValidity": {
-          "type": "number"
-      },
-      "stepMax": {
-          "type": "number"
-      },
-      "medianTimeBlocks": {
-          "type": "number"
-      },
-      "avgGenTime": {
-          "type": "number"
-      },
-      "dtDiffEval": {
-          "type": "number"
-      },
-      "blocksRot": {
-          "type": "number"
-      },
-      "percentRot": {
-          "type": "number"
-      },
-    }
+              "currency": {
+                  "type": "string"
+              },
+              "c": {
+                  "type": "number"
+              },
+              "dt": {
+                  "type": "number"
+              },
+              "ud0": {
+                  "type": "number"
+              },
+              "sigDelay": {
+                  "type": "number"
+              },
+              "sigValidity": {
+                  "type": "number"
+              },
+              "sigQty": {
+                  "type": "number"
+              },
+              "sigWoT": {
+                  "type": "number"
+              },
+              "msValidity": {
+                  "type": "number"
+              },
+              "stepMax": {
+                  "type": "number"
+              },
+              "medianTimeBlocks": {
+                  "type": "number"
+              },
+              "avgGenTime": {
+                  "type": "number"
+              },
+              "dtDiffEval": {
+                  "type": "number"
+              },
+              "blocksRot": {
+                  "type": "number"
+              },
+              "percentRot": {
+                  "type": "number"
+              },
+            },
+        "required": ["currency", "c", "dt", "ud0","sigDelay","sigValidity","sigQty","sigWoT","msValidity",
+                     "stepMax", "medianTimeBlocks", "avgGenTime", "dtDiffEval", "blocksRot", "percentRot"]
     }
     def __get__(self, **kwargs):
         r = yield from self.requests_get('/parameters', **kwargs)
@@ -120,9 +122,11 @@ class Membership(Blockchain):
                             "type": "string"
                         }
                     },
+                    "required": ["version", "currency", "membership", "blockNumber", "blockHash"]
                 }
             }
-        }
+        },
+        "required": ["pubkey", "uid", "sigDate", "memberships"]
     }
 
     def __init__(self, connection_handler, search=None):
@@ -159,7 +163,10 @@ class Block(Blockchain):
             "number": {
                 "type": "number"
             },
-            "timestamp": {
+            "time": {
+                "type": "number"
+            },
+            "medianTime": {
                 "type": "number"
             },
             "dividend": {
@@ -245,13 +252,17 @@ class Block(Blockchain):
                                 "type": "string"
                             }
                         }
-                    }
+                    },
+                    "required": ["signatures", "version", "currency", "issuers", "inputs", "outputs"]
                 }
             },
             "signature": {
                 "type": "string"
-            }
-        }
+            },
+        },
+        "required": ["version", "currency", "nonce", "number", "time", "medianTime", "dividend", "monetaryMass",
+                     "issuer", "previousHash", "previousIssuer", "membersCount", "hash", "identities",
+                     "joiners", "leavers", "excluded", "certifications", "transactions", "signature"]
     }
 
     def __init__(self, connection_handler, number=None):
@@ -300,7 +311,8 @@ class Hardship(Blockchain):
           "level": {
               "type": "number"
           }
-        }
+        },
+        "required": ["block", "level"]
     }
 
     def __init__(self, connection_handler, fingerprint):
@@ -327,13 +339,18 @@ class Newcomers(Blockchain):
     schema = {
         "type": "object",
         "properties": {
-            "block": {
-                "type": "number"
-            },
-            "level": {
-                "type": "number"
+            "result":{
+                "type": "object",
+                "properties": {
+                        "blocks": {
+                        "type": "array",
+                        "item": "number"
+                    },
+                },
+                "required": ["blocks"]
             }
-        }
+        },
+        "required": ["result"]
     }
 
     def __get__(self, **kwargs):
@@ -355,6 +372,7 @@ class Joiners(Blockchain):
     """GET, return block numbers containing joiners."""
 
     schema = Newcomers.schema
+
     def __get__(self, **kwargs):
         r = yield from self.requests_get('/with/joiners', **kwargs)
         return (yield from self.parse(r))
@@ -397,7 +415,7 @@ class UD(Blockchain):
 
     def __get__(self, **kwargs):
         r = yield from self.requests_get('/with/ud', **kwargs)
-        return (yield from r.json())
+        return (yield from self.parse(r))
 
 
 class TX(Blockchain):
@@ -407,4 +425,4 @@ class TX(Blockchain):
 
     def __get__(self, **kwargs):
         r = yield from self.requests_get('/with/tx', **kwargs)
-        return (yield from r.json())
+        return (yield from self.parse(r))

@@ -106,7 +106,8 @@ class History(Tx):
                                  "comment", "signatures", "hash", "block_number", "time"]
                 }
             }
-        }
+        },
+        "required": ["currency", "pubkey", "history"]
     }
 
     def __init__(self, conn_handler, pubkey, module='tx'):
@@ -175,7 +176,7 @@ class Sources(Tx):
     def __get__(self, **kwargs):
         assert self.pubkey is not None
         r = yield from self.requests_get('/sources/%s' % self.pubkey, **kwargs)
-        return (yield from r.json())
+        return (yield from self.parse(r))
 
 
 from . import history

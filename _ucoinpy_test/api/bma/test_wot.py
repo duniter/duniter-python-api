@@ -1,9 +1,10 @@
 import unittest
 import jsonschema
+from _ucoinpy_test.api.webserver import WebFunctionalSetupMixin, web, asyncio
 from ucoinpy.api.bma.wot import Lookup, Members, CertifiedBy, CertifiersOf
 
 
-class Test_BMA_Wot(unittest.TestCase):
+class Test_BMA_Wot(WebFunctionalSetupMixin, unittest.TestCase):
     def test_bma_wot_lookup(self):
         json_sample = {
             "partial": False,
@@ -65,7 +66,23 @@ class Test_BMA_Wot(unittest.TestCase):
                 }
             ]
         }
-        jsonschema.validate(Lookup.schema, json_sample)
+        jsonschema.validate(json_sample, Lookup.schema)
+
+    def test_bma_wot_lookup_bad(self):
+        @asyncio.coroutine
+        def handler(request):
+            yield from request.read()
+            return web.Response(body=b'{}', content_type='application/json')
+
+        @asyncio.coroutine
+        def go():
+            _, srv, url = yield from self.create_server('GET', '/pubkey', handler)
+            lookup = Lookup(None, "pubkey")
+            lookup.reverse_url = lambda path: url
+            with self.assertRaises(jsonschema.exceptions.ValidationError):
+                yield from lookup.get()
+
+        self.loop.run_until_complete(go())
 
     def test_bma_wot_members(self):
         json_sample = {
@@ -76,6 +93,22 @@ class Test_BMA_Wot(unittest.TestCase):
             ]
         }
         jsonschema.validate(Members.schema, json_sample)
+
+    def test_bma_wot_members_bad(self):
+        @asyncio.coroutine
+        def handler(request):
+            yield from request.read()
+            return web.Response(body=b'{}', content_type='application/json')
+
+        @asyncio.coroutine
+        def go():
+            _, srv, url = yield from self.create_server('GET', '/', handler)
+            members = Members(None)
+            members.reverse_url = lambda path: url
+            with self.assertRaises(jsonschema.exceptions.ValidationError):
+                yield from members.get()
+
+        self.loop.run_until_complete(go())
 
     def test_bma_wot_cert(self):
         json_sample = {
@@ -101,3 +134,35 @@ class Test_BMA_Wot(unittest.TestCase):
         }
         jsonschema.validate(json_sample, CertifiersOf.schema)
         jsonschema.validate(json_sample, CertifiedBy.schema)
+
+    def test_bma_wot_certifiers_bad(self):
+        @asyncio.coroutine
+        def handler(request):
+            yield from request.read()
+            return web.Response(body=b'{}', content_type='application/json')
+
+        @asyncio.coroutine
+        def go():
+            _, srv, url = yield from self.create_server('GET', '/pubkey', handler)
+            certsof = CertifiersOf(None, 'pubkey')
+            certsof.reverse_url = lambda path: url
+            with self.assertRaises(jsonschema.exceptions.ValidationError):
+                yield from certsof.get()
+
+        self.loop.run_until_complete(go())
+
+    def test_bma_wot_certified_bad(self):
+        @asyncio.coroutine
+        def handler(request):
+            yield from request.read()
+            return web.Response(body=b'{}', content_type='application/json')
+
+        @asyncio.coroutine
+        def go():
+            _, srv, url = yield from self.create_server('GET', '/pubkey', handler)
+            certby = CertifiedBy(None, 'pubkey')
+            certby.reverse_url = lambda path: url
+            with self.assertRaises(jsonschema.exceptions.ValidationError):
+                yield from certby.get()
+
+        self.loop.run_until_complete(go())
