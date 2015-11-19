@@ -47,10 +47,10 @@ class History(Tx):
                         "$ref": "#/definitions/transaction_data"
                     },
                     "sending": {
-                        "$ref": "#/definitions/transaction_data"
+                        "$ref": "#/definitions/transactioning_data"
                     },
                     "receiving": {
-                        "$ref": "#/definitions/transaction_data"
+                        "$ref": "#/definitions/transactioning_data"
                     },
                 },
                 "required": ["sent", "received", "sending", "receiving"]
@@ -104,6 +104,49 @@ class History(Tx):
                     },
                     "required": ["version", "issuers", "inputs", "outputs",
                                  "comment", "signatures", "hash", "block_number", "time"]
+                }
+            },
+            "transactioning_data": {
+                "type": "array",
+                "items": {
+                    "type": "object",
+                    "properties": {
+                        "version": {
+                            "type": "number"
+                        },
+                        "issuers": {
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            }
+                        },
+                        "inputs": {
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            }
+                        },
+                        "outputs": {
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            }
+                        },
+                        "comment": {
+                            "type": "string"
+                        },
+                        "signatures": {
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            }
+                        },
+                        "hash": {
+                            "type": "string"
+                        },
+                    },
+                    "required": ["version", "issuers", "inputs", "outputs",
+                                 "comment", "signatures", "hash"]
                 }
             }
         },
