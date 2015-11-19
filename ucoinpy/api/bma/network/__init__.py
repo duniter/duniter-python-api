@@ -43,7 +43,7 @@ class Peering(Network):
           "endpoints": {
               "type": "array",
               "items": {
-                  "type:" "string"
+                  "type": "string"
               }
           },
           "signature": {

@@ -248,7 +248,7 @@ class Block(Blockchain):
                         },
                         "outputs": {
                             "type": "array",
-                            "items": {
+                            "item": {
                                 "type": "string"
                             }
                         }
@@ -344,7 +344,9 @@ class Newcomers(Blockchain):
                 "properties": {
                         "blocks": {
                         "type": "array",
-                        "items": "number"
+                        "items": {
+                            "type": "number"
+                        }
                     },
                 },
                 "required": ["blocks"]

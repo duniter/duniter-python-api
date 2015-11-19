@@ -35,8 +35,6 @@ class Test_BMA_Network(WebFunctionalSetupMixin, unittest.TestCase):
             with self.assertRaises(jsonschema.exceptions.ValidationError):
                 yield from peering.get()
 
-        self.loop.run_until_complete(go())
-
     def test_peers_root(self):
         json_sample = {
           "depth": 3,
@@ -76,5 +74,3 @@ class Test_BMA_Network(WebFunctionalSetupMixin, unittest.TestCase):
             peers.reverse_url = lambda path: url
             with self.assertRaises(jsonschema.exceptions.ValidationError):
                 yield from peers.get()
-
-        self.loop.run_until_complete(go())
