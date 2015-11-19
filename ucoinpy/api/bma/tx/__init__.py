@@ -59,7 +59,7 @@ class History(Tx):
         "definitions": {
             "transaction_data": {
                 "type": "array",
-                "item": {
+                "items": {
                     "type": "object",
                     "properties": {
                         "version": {
@@ -143,7 +143,7 @@ class Sources(Tx):
             },
             "sources": {
                 "type": "array",
-                "item": {
+                "items": {
                     "type": "object",
                     "properties": {
                         "pubkey": {

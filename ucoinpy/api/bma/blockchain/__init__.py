@@ -192,37 +192,37 @@ class Block(Blockchain):
             },
             "identities": {
                 "type": "array",
-                "item": {
+                "items": {
                     "type": "string"
                 }
             },
             "joiners": {
                 "type": "array",
-                "item": {
+                "items": {
                     "type": "string"
                 }
             },
             "leavers": {
                 "type": "array",
-                "item": {
+                "items": {
                     "type": "string"
                 }
             },
             "excluded": {
                 "type": "array",
-                "item": {
+                "items": {
                     "type": "string"
                 }
             },
             "certifications": {
                 "type": "array",
-                "item": {
+                "items": {
                     "type": "string"
                 }
             },
             "transactions": {
                 "type": "array",
-                "item": {
+                "items": {
                     "type": "object",
                     "properties": {
                         "signatures": {
@@ -236,19 +236,19 @@ class Block(Blockchain):
                         },
                         "issuers": {
                             "type": "array",
-                            "item": {
+                            "items": {
                                 "type": "string"
                             }
                         },
                         "inputs": {
                             "type": "array",
-                            "item": {
+                            "items": {
                                 "type": "string"
                             }
                         },
                         "outputs": {
                             "type": "array",
-                            "item": {
+                            "items": {
                                 "type": "string"
                             }
                         }
@@ -344,7 +344,7 @@ class Newcomers(Blockchain):
                 "properties": {
                         "blocks": {
                         "type": "array",
-                        "item": "number"
+                        "items": "number"
                     },
                 },
                 "required": ["blocks"]

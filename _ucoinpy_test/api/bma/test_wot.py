@@ -1,5 +1,6 @@
 import unittest
 import jsonschema
+import json
 from _ucoinpy_test.api.webserver import WebFunctionalSetupMixin, web, asyncio
 from ucoinpy.api.bma.wot import Lookup, Members, CertifiedBy, CertifiersOf
 
@@ -140,6 +141,40 @@ class Test_BMA_Wot(WebFunctionalSetupMixin, unittest.TestCase):
         def handler(request):
             yield from request.read()
             return web.Response(body=b'{}', content_type='application/json')
+
+        @asyncio.coroutine
+        def go():
+            _, srv, url = yield from self.create_server('GET', '/pubkey', handler)
+            certsof = CertifiersOf(None, 'pubkey')
+            certsof.reverse_url = lambda path: url
+            with self.assertRaises(jsonschema.exceptions.ValidationError):
+                yield from certsof.get()
+
+        self.loop.run_until_complete(go())
+
+    def test_bma_wot_certifiers_inner_bad(self):
+        @asyncio.coroutine
+        def handler(request):
+            yield from request.read()
+            return web.Response(body=bytes(json.dumps({
+    "pubkey": "7Aqw6Efa9EzE7gtsc8SveLLrM7gm6NEGoywSv4FJx6pZ",
+    "uid": "john",
+    "isMember": True,
+    "certifications": [
+        {
+            "pubkey": "FADxcH5LmXGmGFgdixSes6nWnC4Vb4pRUBYT81zQRhjn",
+            "meta": {
+                "block_number": 38580
+            },
+            "uids": [
+                "doe"
+            ],
+            "isMember": True,
+            "wasMember": True,
+            "signature": "8XYmBdElqNkkl4AeFjJnC5oj/ujBrzH9FNgPZvK8Cicp8Du0PQa0yYFG95EQ46MJhdV0fUT2g5xyH8N3/OGhDA=="
+        },
+    ]
+}), "utf-8"), content_type='application/json')
 
         @asyncio.coroutine
         def go():

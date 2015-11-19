@@ -69,7 +69,7 @@ class Lookup(WOT):
             },
             "results": {
                 "type": "array",
-                "item": {
+                "items": {
                     "type": "object",
                     "properties": {
                         "pubkey": {
@@ -78,7 +78,7 @@ class Lookup(WOT):
                     },
                     "uids": {
                         "type": "array",
-                        "item": {
+                        "items": {
                             "type": "object",
                             "properties": {
                                 "uid": {
@@ -92,7 +92,7 @@ class Lookup(WOT):
                                 },
                                 "others": {
                                     "type": "array",
-                                    "item": {
+                                    "items": {
                                         "type": "object",
                                         "properties": {
                                             "pubkey": {
@@ -113,7 +113,7 @@ class Lookup(WOT):
                     },
                     "signed": {
                         "type": "array",
-                        "item": {
+                        "items": {
                             "type": "object",
                             "properties": {
                                 "uid": {
@@ -168,7 +168,7 @@ class CertifiersOf(WOT):
             },
             "certifications": {
                 "type": "array",
-                "item": {
+                "items": {
                     "type": "object",
                     "properties": {
                         "pubkey": {
@@ -251,7 +251,7 @@ class Members(WOT):
         "properties": {
             "results": {
                 "type": "array",
-                "item": {
+                "items": {
                     "type": "object",
                     "properties": {
                         "pubkey": {

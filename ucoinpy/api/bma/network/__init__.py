@@ -42,7 +42,7 @@ class Peering(Network):
           },
           "endpoints": {
               "type": "array",
-              "item": {
+              "items": {
                   "type:" "string"
               }
           },

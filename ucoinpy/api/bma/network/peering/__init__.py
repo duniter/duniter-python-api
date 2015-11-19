@@ -60,7 +60,7 @@ class Peers(Base):
                     },
                     "endpoints": {
                         "type": "array",
-                        "item": {
+                        "items": {
                             "type": "string"
                         }
                     },
