@@ -130,6 +130,17 @@ class Test_BMA_Wot(WebFunctionalSetupMixin, unittest.TestCase):
                     },
                     "isMember": True,
                     "signature": "42yQm4hGTJYWkPg39hQAUgP6S6EQ4vTfXdJuxKEHL1ih6YHiDL2hcwrFgBHjXLRgxRhj2VNVqqc6b4JayKqTE14r"
+                },
+                {
+                    "pubkey": "9WYHTavL1pmhunFCzUwiiq4pXwvgGG5ysjZnjz9H8yB",
+                    "uid": "certifier uid",
+                    "cert_time": {
+                        "block": 88,
+                        "medianTime": 1509991044
+                    },
+                    "written": None,
+                    "isMember": True,
+                    "signature": "42yQm4hGTJYWkPg39hQAUgP6S6EQ4vTfXdJuxKEHL1ih6YHiDL2hcwrFgBHjXLRgxRhj2VNVqqc6b4JayKqTE14r"
                 }
             ]
         }

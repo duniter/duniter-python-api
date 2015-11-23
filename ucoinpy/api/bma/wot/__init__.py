@@ -190,16 +190,23 @@ class CertifiersOf(WOT):
                             "required": ["block", "medianTime"]
                         },
                         "written": {
-                            "type": "object",
-                            "properties": {
-                                "number": {
-                                    "type": "number",
+                            "oneOf": [
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "number": {
+                                            "type": "number",
+                                        },
+                                        "hash": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "required": ["number", "hash"]
                                 },
-                                "hash": {
-                                    "type": "string"
+                                {
+                                    "type": "null"
                                 }
-                            },
-                            "required": ["number", "hash"]
+                            ]
                         },
                         "isMember": {
                             "type": "boolean"
