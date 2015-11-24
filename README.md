@@ -1,5 +1,5 @@
 #ucoin-python-api
-[![Build Status](https://travis-ci.org/ucoin-io/ucoin-python-api.svg)](https://travis-ci.org/ucoin-io/ucoin-python-api)
+[![Build Status](https://travis-ci.org/ucoin-io/ucoin-python-api.svg)](https://travis-ci.org/ucoin-io/ucoin-python-api) [![Coverage Status](https://coveralls.io/repos/ucoin-io/ucoin-python-api/badge.svg?branch=master&service=github)](https://coveralls.io/github/ucoin-io/ucoin-python-api?branch=master)
 
 A python implementation of [uCoin](https://github.com/ucoin-io/ucoin) API
 
