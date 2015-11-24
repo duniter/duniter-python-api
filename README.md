@@ -1,5 +1,5 @@
 #ucoin-python-api
-![Build status](https://api.travis-ci.org/ucoin-io/ucoin-python-api.svg)
+[![Build Status](https://travis-ci.org/ucoin-io/ucoin-python-api.svg)](https://travis-ci.org/ucoin-io/ucoin-python-api)
 
 A python implementation of [uCoin](https://github.com/ucoin-io/ucoin) API
 
