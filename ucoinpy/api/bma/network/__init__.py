@@ -53,8 +53,8 @@ class Peering(Network):
         "required": ["version", "currency", "pubkey", "endpoints", "signature"]
     }
 
-    def __get__(self, **kwargs):
-        r = yield from self.requests_get('/peering', **kwargs)
-        return (yield from self.parse(r))
+    async def __get__(self, **kwargs):
+        r = await self.requests_get('/peering', **kwargs)
+        return (await self.parse(r))
 
 from . import peering

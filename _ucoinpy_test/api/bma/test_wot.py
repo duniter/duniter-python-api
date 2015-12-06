@@ -70,18 +70,16 @@ class Test_BMA_Wot(WebFunctionalSetupMixin, unittest.TestCase):
         jsonschema.validate(json_sample, Lookup.schema)
 
     def test_bma_wot_lookup_bad(self):
-        @asyncio.coroutine
-        def handler(request):
-            yield from request.read()
+        async        def handler(request):
+            await request.read()
             return web.Response(body=b'{}', content_type='application/json')
 
-        @asyncio.coroutine
-        def go():
-            _, srv, url = yield from self.create_server('GET', '/pubkey', handler)
+        async        def go():
+            _, srv, url = await self.create_server('GET', '/pubkey', handler)
             lookup = Lookup(None, "pubkey")
             lookup.reverse_url = lambda path: url
             with self.assertRaises(jsonschema.exceptions.ValidationError):
-                yield from lookup.get()
+                await lookup.get()
 
         self.loop.run_until_complete(go())
 
@@ -96,18 +94,16 @@ class Test_BMA_Wot(WebFunctionalSetupMixin, unittest.TestCase):
         jsonschema.validate(Members.schema, json_sample)
 
     def test_bma_wot_members_bad(self):
-        @asyncio.coroutine
-        def handler(request):
-            yield from request.read()
+        async        def handler(request):
+            await request.read()
             return web.Response(body=b'{}', content_type='application/json')
 
-        @asyncio.coroutine
-        def go():
-            _, srv, url = yield from self.create_server('GET', '/', handler)
+        async        def go():
+            _, srv, url = await self.create_server('GET', '/', handler)
             members = Members(None)
             members.reverse_url = lambda path: url
             with self.assertRaises(jsonschema.exceptions.ValidationError):
-                yield from members.get()
+                await members.get()
 
         self.loop.run_until_complete(go())
 
@@ -148,25 +144,22 @@ class Test_BMA_Wot(WebFunctionalSetupMixin, unittest.TestCase):
         jsonschema.validate(json_sample, CertifiedBy.schema)
 
     def test_bma_wot_certifiers_bad(self):
-        @asyncio.coroutine
-        def handler(request):
-            yield from request.read()
+        async        def handler(request):
+            await request.read()
             return web.Response(body=b'{}', content_type='application/json')
 
-        @asyncio.coroutine
-        def go():
-            _, srv, url = yield from self.create_server('GET', '/pubkey', handler)
+        async        def go():
+            _, srv, url = await self.create_server('GET', '/pubkey', handler)
             certsof = CertifiersOf(None, 'pubkey')
             certsof.reverse_url = lambda path: url
             with self.assertRaises(jsonschema.exceptions.ValidationError):
-                yield from certsof.get()
+                await certsof.get()
 
         self.loop.run_until_complete(go())
 
     def test_bma_wot_certifiers_inner_bad(self):
-        @asyncio.coroutine
-        def handler(request):
-            yield from request.read()
+        async        def handler(request):
+            await request.read()
             return web.Response(body=bytes(json.dumps({
     "pubkey": "7Aqw6Efa9EzE7gtsc8SveLLrM7gm6NEGoywSv4FJx6pZ",
     "uid": "john",
@@ -187,28 +180,25 @@ class Test_BMA_Wot(WebFunctionalSetupMixin, unittest.TestCase):
     ]
 }), "utf-8"), content_type='application/json')
 
-        @asyncio.coroutine
-        def go():
-            _, srv, url = yield from self.create_server('GET', '/pubkey', handler)
+        async        def go():
+            _, srv, url = await self.create_server('GET', '/pubkey', handler)
             certsof = CertifiersOf(None, 'pubkey')
             certsof.reverse_url = lambda path: url
             with self.assertRaises(jsonschema.exceptions.ValidationError):
-                yield from certsof.get()
+                await certsof.get()
 
         self.loop.run_until_complete(go())
 
     def test_bma_wot_certified_bad(self):
-        @asyncio.coroutine
-        def handler(request):
-            yield from request.read()
+        async        def handler(request):
+            await request.read()
             return web.Response(body=b'{}', content_type='application/json')
 
-        @asyncio.coroutine
-        def go():
-            _, srv, url = yield from self.create_server('GET', '/pubkey', handler)
+        async        def go():
+            _, srv, url = await self.create_server('GET', '/pubkey', handler)
             certby = CertifiedBy(None, 'pubkey')
             certby.reverse_url = lambda path: url
             with self.assertRaises(jsonschema.exceptions.ValidationError):
-                yield from certby.get()
+                await certby.get()
 
         self.loop.run_until_complete(go())

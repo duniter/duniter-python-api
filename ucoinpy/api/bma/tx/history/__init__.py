@@ -30,6 +30,6 @@ class Blocks(History):
         self.from_ = from_
         self.to_ = to_
 
-    def __get__(self, **kwargs):
-        r = yield from self.requests_get('/history/%s/blocks/%s/%s' % (self.pubkey, self.from_, self.to_), **kwargs)
-        return (yield from self.parse(r))
+    async def __get__(self, **kwargs):
+        r = await self.requests_get('/history/%s/blocks/%s/%s' % (self.pubkey, self.from_, self.to_), **kwargs)
+        return (await self.parse(r))

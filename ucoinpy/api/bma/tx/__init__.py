@@ -157,19 +157,19 @@ class History(Tx):
         super(Tx, self).__init__(conn_handler, module)
         self.pubkey = pubkey
 
-    def __get__(self, **kwargs):
+    async def __get__(self, **kwargs):
         assert self.pubkey is not None
-        r = yield from self.requests_get('/history/%s' % self.pubkey, **kwargs)
-        return (yield from self.parse(r))
+        r = await self.requests_get('/history/%s' % self.pubkey, **kwargs)
+        return (await self.parse(r))
 
 
 class Process(Tx):
     """POST a transaction."""
 
-    def __post__(self, **kwargs):
+    async def __post__(self, **kwargs):
         assert 'transaction' in kwargs
 
-        r = yield from self.requests_post('/process', **kwargs)
+        r = await self.requests_post('/process', **kwargs)
         return r
 
 
@@ -216,10 +216,10 @@ class Sources(Tx):
         super(Tx, self).__init__(connection_handler, module)
         self.pubkey = pubkey
 
-    def __get__(self, **kwargs):
+    async def __get__(self, **kwargs):
         assert self.pubkey is not None
-        r = yield from self.requests_get('/sources/%s' % self.pubkey, **kwargs)
-        return (yield from self.parse(r))
+        r = await self.requests_get('/sources/%s' % self.pubkey, **kwargs)
+        return (await self.parse(r))
 
 
 from . import history

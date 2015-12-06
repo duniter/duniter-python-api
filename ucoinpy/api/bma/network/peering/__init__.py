@@ -81,26 +81,26 @@ class Peers(Base):
         ]
     }
 
-    def __get__(self, **kwargs):
+    async def __get__(self, **kwargs):
         """creates a generator with one peering entry per iteration."""
 
-        r = yield from self.requests_get('/peers', **kwargs)
-        return (yield from self.parse(r))
+        r = await self.requests_get('/peers', **kwargs)
+        return (await self.parse(r))
 
-    def __post__(self, **kwargs):
+    async def __post__(self, **kwargs):
         assert 'entry' in kwargs
         assert 'signature' in kwargs
 
-        r = yield from self.requests_post('/peers', **kwargs)
+        r = await self.requests_post('/peers', **kwargs)
         return r
 
 
 class Status(Base):
     """POST a network status document to this node in order notify of its status."""
 
-    def __post__(self, **kwargs):
+    async def __post__(self, **kwargs):
         assert 'status' in kwargs
         assert 'signature' in kwargs
 
-        r = yield from self.requests_post('/status', **kwargs)
+        r = await self.requests_post('/status', **kwargs)
         return r

@@ -27,18 +27,16 @@ class Test_BMA_Blockchain(WebFunctionalSetupMixin, unittest.TestCase):
         jsonschema.validate(json_sample, Parameters.schema)
 
     def test_parameters_bad(self):
-        @asyncio.coroutine
-        def handler(request):
-            yield from request.read()
+        async        def handler(request):
+            await request.read()
             return web.Response(body=b'{}', content_type='application/json')
 
-        @asyncio.coroutine
-        def go():
-            _, srv, url = yield from self.create_server('GET', '/', handler)
+        async        def go():
+            _, srv, url = await self.create_server('GET', '/', handler)
             params = Parameters(None)
             params.reverse_url = lambda path: url
             with self.assertRaises(jsonschema.exceptions.ValidationError):
-                yield from params.get()
+                await params.get()
 
         self.loop.run_until_complete(go())
 
@@ -97,34 +95,30 @@ class Test_BMA_Blockchain(WebFunctionalSetupMixin, unittest.TestCase):
         jsonschema.validate(json_sample, Current.schema)
 
     def test_block_bad(self):
-        @asyncio.coroutine
-        def handler(request):
-            yield from request.read()
+        async        def handler(request):
+            await request.read()
             return web.Response(body=b'{}', content_type='application/json')
 
-        @asyncio.coroutine
-        def go():
-            _, srv, url = yield from self.create_server('GET', '/100', handler)
+        async        def go():
+            _, srv, url = await self.create_server('GET', '/100', handler)
             block = Block(None, 100)
             block.reverse_url = lambda path: url
             with self.assertRaises(jsonschema.exceptions.ValidationError):
-                yield from block.get()
+                await block.get()
 
         self.loop.run_until_complete(go())
 
     def test_current_bad(self):
-        @asyncio.coroutine
-        def handler(request):
-            yield from request.read()
+        async        def handler(request):
+            await request.read()
             return web.Response(body=b'{}', content_type='application/json')
 
-        @asyncio.coroutine
-        def go():
-            _, srv, url = yield from self.create_server('GET', '/', handler)
+        async        def go():
+            _, srv, url = await self.create_server('GET', '/', handler)
             current = Current(None)
             current.reverse_url = lambda path: url
             with self.assertRaises(jsonschema.exceptions.ValidationError):
-                yield from current.get()
+                await current.get()
 
         self.loop.run_until_complete(go())
 
@@ -175,18 +169,16 @@ class Test_BMA_Blockchain(WebFunctionalSetupMixin, unittest.TestCase):
         jsonschema.validate(json_sample, Hardship.schema)
 
     def test_hardship_bad(self):
-        @asyncio.coroutine
-        def handler(request):
-            yield from request.read()
+        async        def handler(request):
+            await request.read()
             return web.Response(body=b'{}', content_type='application/json')
 
-        @asyncio.coroutine
-        def go():
-            _, srv, url = yield from self.create_server('GET', '/fingerprint', handler)
+        async        def go():
+            _, srv, url = await self.create_server('GET', '/fingerprint', handler)
             hardship = Hardship(None, "fingerprint")
             hardship.reverse_url = lambda path: url
             with self.assertRaises(jsonschema.exceptions.ValidationError):
-                yield from hardship.get()
+                await hardship.get()
 
         self.loop.run_until_complete(go())
 
@@ -215,18 +207,16 @@ class Test_BMA_Blockchain(WebFunctionalSetupMixin, unittest.TestCase):
         jsonschema.validate(json_sample, Membership.schema)
 
     def test_membership_bad(self):
-        @asyncio.coroutine
-        def handler(request):
-            yield from request.read()
+        async        def handler(request):
+            await request.read()
             return web.Response(body=b'{}', content_type='application/json')
 
-        @asyncio.coroutine
-        def go():
-            _, srv, url = yield from self.create_server('GET', '/pubkey', handler)
+        async        def go():
+            _, srv, url = await self.create_server('GET', '/pubkey', handler)
             membership = Membership(None, "pubkey")
             membership.reverse_url = lambda path: url
             with self.assertRaises(jsonschema.exceptions.ValidationError):
-                yield from membership.get()
+                await membership.get()
 
         self.loop.run_until_complete(go())
 
@@ -239,18 +229,16 @@ class Test_BMA_Blockchain(WebFunctionalSetupMixin, unittest.TestCase):
         jsonschema.validate(json_sample, Newcomers.schema)
 
     def test_newcomers_bad(self):
-        @asyncio.coroutine
-        def handler(request):
-            yield from request.read()
+        async        def handler(request):
+            await request.read()
             return web.Response(body=b'{}', content_type='application/json')
 
-        @asyncio.coroutine
-        def go():
-            _, srv, url = yield from self.create_server('GET', '/', handler)
+        async        def go():
+            _, srv, url = await self.create_server('GET', '/', handler)
             newcomers = Newcomers(None)
             newcomers.reverse_url = lambda path: url
             with self.assertRaises(jsonschema.exceptions.ValidationError):
-                yield from newcomers.get()
+                await newcomers.get()
 
         self.loop.run_until_complete(go())
 
@@ -263,18 +251,16 @@ class Test_BMA_Blockchain(WebFunctionalSetupMixin, unittest.TestCase):
         jsonschema.validate(json_sample, Certifications.schema)
 
     def test_certifications_bad(self):
-        @asyncio.coroutine
-        def handler(request):
-            yield from request.read()
+        async        def handler(request):
+            await request.read()
             return web.Response(body=b'{}', content_type='application/json')
 
-        @asyncio.coroutine
-        def go():
-            _, srv, url = yield from self.create_server('GET', '/', handler)
+        async        def go():
+            _, srv, url = await self.create_server('GET', '/', handler)
             certs = Certifications(None)
             certs.reverse_url = lambda path: url
             with self.assertRaises(jsonschema.exceptions.ValidationError):
-                yield from certs.get()
+                await certs.get()
 
         self.loop.run_until_complete(go())
 
@@ -287,18 +273,16 @@ class Test_BMA_Blockchain(WebFunctionalSetupMixin, unittest.TestCase):
         jsonschema.validate(json_sample, Joiners.schema)
 
     def test_joiners_bad(self):
-        @asyncio.coroutine
-        def handler(request):
-            yield from request.read()
+        async        def handler(request):
+            await request.read()
             return web.Response(body=b'{}', content_type='application/json')
 
-        @asyncio.coroutine
-        def go():
-            _, srv, url = yield from self.create_server('GET', '/', handler)
+        async        def go():
+            _, srv, url = await self.create_server('GET', '/', handler)
             joiners = Joiners(None)
             joiners.reverse_url = lambda path: url
             with self.assertRaises(jsonschema.exceptions.ValidationError):
-                yield from joiners.get()
+                await joiners.get()
 
         self.loop.run_until_complete(go())
 
@@ -311,18 +295,16 @@ class Test_BMA_Blockchain(WebFunctionalSetupMixin, unittest.TestCase):
         jsonschema.validate(json_sample, Actives.schema)
 
     def test_actives_bad(self):
-        @asyncio.coroutine
-        def handler(request):
-            yield from request.read()
+        async        def handler(request):
+            await request.read()
             return web.Response(body=b'{}', content_type='application/json')
 
-        @asyncio.coroutine
-        def go():
-            _, srv, url = yield from self.create_server('GET', '/', handler)
+        async        def go():
+            _, srv, url = await self.create_server('GET', '/', handler)
             actives = Actives(None)
             actives.reverse_url = lambda path: url
             with self.assertRaises(jsonschema.exceptions.ValidationError):
-                yield from actives.get()
+                await actives.get()
 
         self.loop.run_until_complete(go())
 
@@ -335,18 +317,16 @@ class Test_BMA_Blockchain(WebFunctionalSetupMixin, unittest.TestCase):
         jsonschema.validate(json_sample, Leavers.schema)
 
     def test_leavers_bad(self):
-        @asyncio.coroutine
-        def handler(request):
-            yield from request.read()
+        async        def handler(request):
+            await request.read()
             return web.Response(body=b'{}', content_type='application/json')
 
-        @asyncio.coroutine
-        def go():
-            _, srv, url = yield from self.create_server('GET', '/', handler)
+        async        def go():
+            _, srv, url = await self.create_server('GET', '/', handler)
             leavers = Leavers(None)
             leavers.reverse_url = lambda path: url
             with self.assertRaises(jsonschema.exceptions.ValidationError):
-                yield from leavers.get()
+                await leavers.get()
 
         self.loop.run_until_complete(go())
 
@@ -359,18 +339,16 @@ class Test_BMA_Blockchain(WebFunctionalSetupMixin, unittest.TestCase):
         jsonschema.validate(json_sample, UD.schema)
 
     def test_ud_bad(self):
-        @asyncio.coroutine
-        def handler(request):
-            yield from request.read()
+        async        def handler(request):
+            await request.read()
             return web.Response(body=b'{}', content_type='application/json')
 
-        @asyncio.coroutine
-        def go():
-            _, srv, url = yield from self.create_server('GET', '/', handler)
+        async        def go():
+            _, srv, url = await self.create_server('GET', '/', handler)
             ud = UD(None)
             ud.reverse_url = lambda path: url
             with self.assertRaises(jsonschema.exceptions.ValidationError):
-                yield from ud.get()
+                await ud.get()
 
         self.loop.run_until_complete(go())
 
@@ -383,17 +361,15 @@ class Test_BMA_Blockchain(WebFunctionalSetupMixin, unittest.TestCase):
         jsonschema.validate(json_sample, TX.schema)
 
     def test_tx_bad(self):
-        @asyncio.coroutine
-        def handler(request):
-            yield from request.read()
+        async        def handler(request):
+            await request.read()
             return web.Response(body=b'{}', content_type='application/json')
 
-        @asyncio.coroutine
-        def go():
-            _, srv, url = yield from self.create_server('GET', '/', handler)
+        async        def go():
+            _, srv, url = await self.create_server('GET', '/', handler)
             tx = TX(None)
             tx.reverse_url = lambda path: url
             with self.assertRaises(jsonschema.exceptions.ValidationError):
-                yield from tx.get()
+                await tx.get()
 
         self.loop.run_until_complete(go())

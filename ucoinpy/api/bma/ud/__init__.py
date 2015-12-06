@@ -33,7 +33,7 @@ class History(Ud):
         super(Ud, self).__init__(conn_handler, module)
         self.pubkey = pubkey
 
-    def __get__(self, **kwargs):
+    async def __get__(self, **kwargs):
         assert self.pubkey is not None
-        r = yield from self.requests_get('/history/%s' % self.pubkey, **kwargs)
-        return (yield from r.json())
+        r = await self.requests_get('/history/%s' % self.pubkey, **kwargs)
+        return (await r.json())

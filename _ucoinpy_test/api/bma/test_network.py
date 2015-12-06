@@ -22,18 +22,16 @@ class Test_BMA_Network(WebFunctionalSetupMixin, unittest.TestCase):
         jsonschema.validate(json_sample, Peering.schema)
 
     def test_peering_bad(self):
-        @asyncio.coroutine
-        def handler(request):
-            yield from request.read()
+        async        def handler(request):
+            await request.read()
             return web.Response(body=b'{}', content_type='application/json')
 
-        @asyncio.coroutine
-        def go():
-            _, srv, url = yield from self.create_server('GET', '/', handler)
+        async        def go():
+            _, srv, url = await self.create_server('GET', '/', handler)
             peering = Peering(None)
             peering.reverse_url = lambda path: url
             with self.assertRaises(jsonschema.exceptions.ValidationError):
-                yield from peering.get()
+                await peering.get()
 
     def test_peers_root(self):
         json_sample = {
@@ -62,15 +60,13 @@ class Test_BMA_Network(WebFunctionalSetupMixin, unittest.TestCase):
         jsonschema.validate(json_sample, Peers.schema)
 
     def test_peers_bad(self):
-        @asyncio.coroutine
-        def handler(request):
-            yield from request.read()
+        async        def handler(request):
+            await request.read()
             return web.Response(body=b'{}', content_type='application/json')
 
-        @asyncio.coroutine
-        def go():
-            _, srv, url = yield from self.create_server('GET', '/', handler)
+        async        def go():
+            _, srv, url = await self.create_server('GET', '/', handler)
             peers = Peers(None)
             peers.reverse_url = lambda path: url
             with self.assertRaises(jsonschema.exceptions.ValidationError):
-                yield from peers.get()
+                await peers.get()

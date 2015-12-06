@@ -29,23 +29,23 @@ class WOT(API):
 class Add(WOT):
     """POST Public key data."""
 
-    def __post__(self, **kwargs):
+    async def __post__(self, **kwargs):
         assert 'pubkey' in kwargs
         assert 'self_' in kwargs
         assert 'other' in kwargs
 
-        r = yield from self.requests_post('/add', **kwargs)
+        r = await self.requests_post('/add', **kwargs)
         return r
 
 
 class Revoke(WOT):
     """POST Public key data."""
 
-    def __post__(self, **kwargs):
+    async def __post__(self, **kwargs):
         assert 'pubkey' in kwargs
         assert 'self_' in kwargs
 
-        r = yield from self.requests_post('/revoke', **kwargs)
+        r = await self.requests_post('/revoke', **kwargs)
         return r
 
 
@@ -144,11 +144,11 @@ class Lookup(WOT):
 
         self.search = search
 
-    def __get__(self, **kwargs):
+    async def __get__(self, **kwargs):
         assert self.search is not None
 
-        r = yield from self.requests_get('/lookup/%s' % self.search, **kwargs)
-        return (yield from self.parse(r))
+        r = await self.requests_get('/lookup/%s' % self.search, **kwargs)
+        return (await self.parse(r))
 
 
 class CertifiersOf(WOT):
@@ -227,11 +227,11 @@ class CertifiersOf(WOT):
 
         self.search = search
 
-    def __get__(self, **kwargs):
+    async def __get__(self, **kwargs):
         assert self.search is not None
 
-        r = yield from self.requests_get('/certifiers-of/%s' % self.search, **kwargs)
-        return (yield from self.parse(r))
+        r = await self.requests_get('/certifiers-of/%s' % self.search, **kwargs)
+        return (await self.parse(r))
 
 
 class CertifiedBy(WOT):
@@ -244,11 +244,11 @@ class CertifiedBy(WOT):
 
         self.search = search
 
-    def __get__(self, **kwargs):
+    async def __get__(self, **kwargs):
         assert self.search is not None
 
-        r = yield from self.requests_get('/certified-by/%s' % self.search, **kwargs)
-        return (yield from self.parse(r))
+        r = await self.requests_get('/certified-by/%s' % self.search, **kwargs)
+        return (await self.parse(r))
 
 
 class Members(WOT):
@@ -275,6 +275,6 @@ class Members(WOT):
     def __init__(self, connection_handler, module='wot'):
         super(WOT, self).__init__(connection_handler, module)
 
-    def __get__(self, **kwargs):
-        r = yield from self.requests_get('/members', **kwargs)
-        return (yield from self.parse(r))
+    async def __get__(self, **kwargs):
+        r = await self.requests_get('/members', **kwargs)
+        return (await self.parse(r))

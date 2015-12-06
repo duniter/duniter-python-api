@@ -88,16 +88,15 @@ class API(object):
 
         return data
 
-    def __get__(self, **kwargs):
+    async def __get__(self, **kwargs):
         """interface purpose for GET request"""
         pass
 
-    def __post__(self, **kwargs):
+    async def __post__(self, **kwargs):
         """interface purpose for POST request"""
         pass
 
-    @asyncio.coroutine
-    def parse(self, response):
+    async def parse(self, response):
         """
         Validate and parse the BMA answer
 
@@ -105,14 +104,13 @@ class API(object):
         :return: the json data
         """
         try:
-            data = yield from response.json()
+            data = await response.json()
             jsonschema.validate(data, self.schema)
             return data
         except TypeError:
             raise jsonschema.ValidationError("Could not parse json")
 
-    @asyncio.coroutine
-    def requests_get(self, path, **kwargs):
+    async def requests_get(self, path, **kwargs):
         """
         Requests GET wrapper in order to use API parameters.
 
@@ -120,15 +118,14 @@ class API(object):
         - `path`: the request path
         """
         logging.debug("Request : {0}".format(self.reverse_url(path)))
-        response = yield from asyncio.wait_for(aiohttp.get(self.reverse_url(path), params=kwargs,
-                                headers=self.headers), 15)
+        with aiohttp.Timeout(15):
+            response = await aiohttp.get(self.reverse_url(path), params=kwargs,headers=self.headers)
+            if response.status != 200:
+                raise ValueError('status code != 200 => %d (%s)' % (response.status, (await response.text())))
 
-        if response.status != 200:
-            raise ValueError('status code != 200 => %d (%s)' % (response.status, (yield from response.text())))
+            return response
 
-        return response
-
-    def requests_post(self, path, **kwargs):
+    async def requests_post(self, path, **kwargs):
         """
         Requests POST wrapper in order to use API parameters.
 
@@ -139,9 +136,8 @@ class API(object):
             kwargs['self'] = kwargs.pop('self_')
 
         logging.debug("POST : {0}".format(kwargs))
-        response = yield from asyncio.wait_for(
-            aiohttp.post(self.reverse_url(path), data=kwargs, headers=self.headers),
-                                 timeout=15)
-        return response
+        with aiohttp.Timeout(15):
+            response = await aiohttp.post(self.reverse_url(path), data=kwargs, headers=self.headers)
+            return response
 
 from . import network, blockchain, tx, wot, node, ud

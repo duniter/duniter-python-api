@@ -53,7 +53,7 @@ class Summary(Node):
     def __init__(self, connection_handler, module='node'):
         super(Summary, self).__init__(connection_handler, module)
 
-    def __get__(self, **kwargs):
-        r = yield from self.requests_get('/summary', **kwargs)
-        return (yield from self.parse(r))
+    async def __get__(self, **kwargs):
+        r = await self.requests_get('/summary', **kwargs)
+        return (await self.parse(r))
 

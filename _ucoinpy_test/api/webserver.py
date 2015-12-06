@@ -29,8 +29,7 @@ class WebFunctionalSetupMixin:
         s.close()
         return port
 
-    @asyncio.coroutine
-    def create_server(self, method, path, handler=None, ssl_ctx=None):
+    async    def create_server(self, method, path, handler=None, ssl_ctx=None):
         app = web.Application(loop=self.loop)
         if handler:
             app.router.add_route(method, path, handler)
@@ -39,7 +38,7 @@ class WebFunctionalSetupMixin:
         self.handler = app.make_handler(
             keep_alive_on=False,
             access_log=log.access_logger)
-        srv = yield from self.loop.create_server(
+        srv = await self.loop.create_server(
             self.handler, '127.0.0.1', port, ssl=ssl_ctx)
         protocol = "https" if ssl_ctx else "http"
         url = "{}://127.0.0.1:{}".format(protocol, port) + path

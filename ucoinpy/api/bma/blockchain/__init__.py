@@ -81,9 +81,9 @@ class Parameters(Blockchain):
         "required": ["currency", "c", "dt", "ud0","sigDelay","sigValidity","sigQty","sigWoT","msValidity",
                      "stepMax", "medianTimeBlocks", "avgGenTime", "dtDiffEval", "blocksRot", "percentRot"]
     }
-    def __get__(self, **kwargs):
-        r = yield from self.requests_get('/parameters', **kwargs)
-        return (yield from self.parse(r))
+    async def __get__(self, **kwargs):
+        r = await self.requests_get('/parameters', **kwargs)
+        return (await self.parse(r))
 
 
 class Membership(Blockchain):
@@ -133,16 +133,16 @@ class Membership(Blockchain):
         super().__init__(connection_handler)
         self.search = search
 
-    def __post__(self, **kwargs):
+    async def __post__(self, **kwargs):
         assert 'membership' in kwargs
 
-        r = yield from self.requests_post('/membership', **kwargs)
+        r = await self.requests_post('/membership', **kwargs)
         return r
 
-    def __get__(self, **kwargs):
+    async def __get__(self, **kwargs):
         assert self.search is not None
-        r = yield from self.requests_get('/memberships/%s' % self.search, **kwargs)
-        return (yield from self.parse(r))
+        r = await self.requests_get('/memberships/%s' % self.search, **kwargs)
+        return (await self.parse(r))
 
 
 class Block(Blockchain):
@@ -277,16 +277,16 @@ class Block(Blockchain):
 
         self.number = number
 
-    def __get__(self, **kwargs):
+    async def __get__(self, **kwargs):
         assert self.number is not None
-        r = yield from self.requests_get('/block/%d' % self.number, **kwargs)
-        return (yield from self.parse(r))
+        r = await self.requests_get('/block/%d' % self.number, **kwargs)
+        return (await self.parse(r))
 
-    def __post__(self, **kwargs):
+    async def __post__(self, **kwargs):
         assert 'block' in kwargs
         assert 'signature' in kwargs
 
-        r = yield from self.requests_post('/block', **kwargs)
+        r = await self.requests_post('/block', **kwargs)
         return r
 
 
@@ -295,9 +295,9 @@ class Current(Blockchain):
 
     schema = Block.schema
 
-    def __get__(self, **kwargs):
-        r = yield from self.requests_get('/current', **kwargs)
-        return (yield from self.parse(r))
+    async def __get__(self, **kwargs):
+        r = await self.requests_get('/current', **kwargs)
+        return (await self.parse(r))
 
 
 class Hardship(Blockchain):
@@ -327,10 +327,10 @@ class Hardship(Blockchain):
 
         self.fingerprint = fingerprint
 
-    def __get__(self, **kwargs):
+    async def __get__(self, **kwargs):
         assert self.fingerprint is not None
-        r = yield from self.requests_get('/hardship/%s' % self.fingerprint.upper(), **kwargs)
-        return (yield from self.parse(r))
+        r = await self.requests_get('/hardship/%s' % self.fingerprint.upper(), **kwargs)
+        return (await self.parse(r))
 
 
 class Newcomers(Blockchain):
@@ -355,9 +355,9 @@ class Newcomers(Blockchain):
         "required": ["result"]
     }
 
-    def __get__(self, **kwargs):
-        r = yield from self.requests_get('/with/newcomers', **kwargs)
-        return (yield from self.parse(r))
+    async def __get__(self, **kwargs):
+        r = await self.requests_get('/with/newcomers', **kwargs)
+        return (await self.parse(r))
 
 
 class Certifications(Blockchain):
@@ -365,9 +365,9 @@ class Certifications(Blockchain):
 
     schema = Newcomers.schema
 
-    def __get__(self, **kwargs):
-        r = yield from self.requests_get('/with/certs', **kwargs)
-        return (yield from self.parse(r))
+    async def __get__(self, **kwargs):
+        r = await self.requests_get('/with/certs', **kwargs)
+        return (await self.parse(r))
 
 
 class Joiners(Blockchain):
@@ -375,9 +375,9 @@ class Joiners(Blockchain):
 
     schema = Newcomers.schema
 
-    def __get__(self, **kwargs):
-        r = yield from self.requests_get('/with/joiners', **kwargs)
-        return (yield from self.parse(r))
+    async def __get__(self, **kwargs):
+        r = await self.requests_get('/with/joiners', **kwargs)
+        return (await self.parse(r))
 
 
 class Actives(Blockchain):
@@ -385,9 +385,9 @@ class Actives(Blockchain):
 
     schema = Newcomers.schema
 
-    def __get__(self, **kwargs):
-        r = yield from self.requests_get('/with/actives', **kwargs)
-        return (yield from self.parse(r))
+    async def __get__(self, **kwargs):
+        r = await self.requests_get('/with/actives', **kwargs)
+        return (await self.parse(r))
 
 
 class Leavers(Blockchain):
@@ -395,9 +395,9 @@ class Leavers(Blockchain):
 
     schema = Newcomers.schema
 
-    def __get__(self, **kwargs):
-        r = yield from self.requests_get('/with/leavers', **kwargs)
-        return (yield from self.parse(r))
+    async def __get__(self, **kwargs):
+        r = await self.requests_get('/with/leavers', **kwargs)
+        return (await self.parse(r))
 
 
 class Excluded(Blockchain):
@@ -405,9 +405,9 @@ class Excluded(Blockchain):
 
     schema = Newcomers.schema
 
-    def __get__(self, **kwargs):
-        r = yield from self.requests_get('/with/excluded', **kwargs)
-        return (yield from self.parse(r))
+    async def __get__(self, **kwargs):
+        r = await self.requests_get('/with/excluded', **kwargs)
+        return (await self.parse(r))
 
 
 class UD(Blockchain):
@@ -415,9 +415,9 @@ class UD(Blockchain):
 
     schema = Newcomers.schema
 
-    def __get__(self, **kwargs):
-        r = yield from self.requests_get('/with/ud', **kwargs)
-        return (yield from self.parse(r))
+    async def __get__(self, **kwargs):
+        r = await self.requests_get('/with/ud', **kwargs)
+        return (await self.parse(r))
 
 
 class TX(Blockchain):
@@ -425,6 +425,6 @@ class TX(Blockchain):
 
     schema = Newcomers.schema
 
-    def __get__(self, **kwargs):
-        r = yield from self.requests_get('/with/tx', **kwargs)
-        return (yield from self.parse(r))
+    async def __get__(self, **kwargs):
+        r = await self.requests_get('/with/tx', **kwargs)
+        return (await self.parse(r))
