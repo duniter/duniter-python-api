@@ -21,7 +21,7 @@ PROTOCOL_VERSION="1"
 MANAGED_API=["BASIC_MERKLED_API"]
 
 __author__      = 'Caner Candan & inso'
-__version__     = '0.12.2'
+__version__     = '0.13.0'
 __nonsense__    = 'uCoin'
 
 from . import api, documents, key
