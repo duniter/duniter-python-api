@@ -189,14 +189,14 @@ class Test_BMA_Blockchain(WebFunctionalSetupMixin, unittest.TestCase):
             "sigDate": 1421787800,
             "memberships": [
                 {
-                    "version": "1",
+                    "version": 1,
                     "currency": "meta_brouzouf",
                     "membership": "IN",
                     "blockNumber": 0,
                     "blockHash": "DA39A3EE5E6B4B0D3255BFEF95601890AFD80709"
                 },
                 {
-                    "version": "1",
+                    "version": 1,
                     "currency": "meta_brouzouf",
                     "membership": "IN",
                     "blockNumber": 31658,
