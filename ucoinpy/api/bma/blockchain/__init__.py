@@ -81,6 +81,7 @@ class Parameters(Blockchain):
         "required": ["currency", "c", "dt", "ud0","sigDelay","sigValidity","sigQty","sigWoT","msValidity",
                      "stepMax", "medianTimeBlocks", "avgGenTime", "dtDiffEval", "blocksRot", "percentRot"]
     }
+
     def __get__(self, **kwargs):
         r = yield from self.requests_get('/parameters', **kwargs)
         return (yield from self.parse(r))
@@ -107,7 +108,7 @@ class Membership(Blockchain):
                     "type": "object",
                     "properties": {
                         "version": {
-                            "type": "string"
+                            "type": "number"
                         },
                         "currency": {
                             "type": "string"
@@ -116,7 +117,7 @@ class Membership(Blockchain):
                             "type": "string"
                         },
                         "blockNumber": {
-                            "type": "number",
+                            "type": "number"
                         },
                         "blockHash": {
                             "type": "string"
