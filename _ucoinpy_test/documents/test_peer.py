@@ -67,5 +67,4 @@ class TestPeer(unittest.TestCase):
         self.assertEqual(from_rendered_peer.endpoints[1].port, 9002)
 
         self.assertEqual(from_rendered_peer.signatures[0], "dkaXIiCYUJtCg8Feh/BKvPYf4uFH9CJ/zY6J4MlA9BsjmcMe4YAblvNt/gJy31b1aGq3ue3h14mLMCu84rraDg==")
-
-
+        self.assertEqual(rawpeer, from_rendered_peer.signed_raw())

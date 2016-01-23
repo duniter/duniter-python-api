@@ -80,7 +80,6 @@ Endpoints:
         for endpoint in self.endpoints:
             doc += "{0}\n".format(endpoint.inline())
 
-        doc += "{0}\n".format(self.signatures[0])
         return doc
 
 
