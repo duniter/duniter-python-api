@@ -160,7 +160,7 @@ class History(Tx):
     async def __get__(self, **kwargs):
         assert self.pubkey is not None
         r = await self.requests_get('/history/%s' % self.pubkey, **kwargs)
-        return (await self.parse(r))
+        return (await self.parse_response(r))
 
 
 class Process(Tx):
@@ -219,7 +219,7 @@ class Sources(Tx):
     async def __get__(self, **kwargs):
         assert self.pubkey is not None
         r = await self.requests_get('/sources/%s' % self.pubkey, **kwargs)
-        return (await self.parse(r))
+        return (await self.parse_response(r))
 
 
 from . import history

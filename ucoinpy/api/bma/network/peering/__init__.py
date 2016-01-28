@@ -85,7 +85,7 @@ class Peers(Base):
         """creates a generator with one peering entry per iteration."""
 
         r = await self.requests_get('/peers', **kwargs)
-        return (await self.parse(r))
+        return (await self.parse_response(r))
 
     async def __post__(self, **kwargs):
         assert 'entry' in kwargs

@@ -27,14 +27,14 @@ class Test_BMA_Blockchain(WebFunctionalSetupMixin, unittest.TestCase):
         jsonschema.validate(json_sample, Parameters.schema)
 
     def test_parameters_bad(self):
-        async        def handler(request):
+        async def handler(request):
             await request.read()
             return web.Response(body=b'{}', content_type='application/json')
 
-        async        def go():
+        async def go():
             _, srv, url = await self.create_server('GET', '/', handler)
             params = Parameters(None)
-            params.reverse_url = lambda path: url
+            params.reverse_url = lambda scheme, path: url
             with self.assertRaises(jsonschema.exceptions.ValidationError):
                 await params.get()
 
@@ -95,28 +95,28 @@ class Test_BMA_Blockchain(WebFunctionalSetupMixin, unittest.TestCase):
         jsonschema.validate(json_sample, Current.schema)
 
     def test_block_bad(self):
-        async        def handler(request):
+        async def handler(request):
             await request.read()
             return web.Response(body=b'{}', content_type='application/json')
 
-        async        def go():
+        async def go():
             _, srv, url = await self.create_server('GET', '/100', handler)
             block = Block(None, 100)
-            block.reverse_url = lambda path: url
+            block.reverse_url = lambda scheme, path: url
             with self.assertRaises(jsonschema.exceptions.ValidationError):
                 await block.get()
 
         self.loop.run_until_complete(go())
 
     def test_current_bad(self):
-        async        def handler(request):
+        async def handler(request):
             await request.read()
             return web.Response(body=b'{}', content_type='application/json')
 
-        async        def go():
+        async def go():
             _, srv, url = await self.create_server('GET', '/', handler)
             current = Current(None)
-            current.reverse_url = lambda path: url
+            current.reverse_url = lambda scheme, path: url
             with self.assertRaises(jsonschema.exceptions.ValidationError):
                 await current.get()
 
@@ -169,14 +169,14 @@ class Test_BMA_Blockchain(WebFunctionalSetupMixin, unittest.TestCase):
         jsonschema.validate(json_sample, Hardship.schema)
 
     def test_hardship_bad(self):
-        async        def handler(request):
+        async def handler(request):
             await request.read()
             return web.Response(body=b'{}', content_type='application/json')
 
-        async        def go():
+        async def go():
             _, srv, url = await self.create_server('GET', '/fingerprint', handler)
             hardship = Hardship(None, "fingerprint")
-            hardship.reverse_url = lambda path: url
+            hardship.reverse_url = lambda scheme, path: url
             with self.assertRaises(jsonschema.exceptions.ValidationError):
                 await hardship.get()
 
@@ -207,14 +207,14 @@ class Test_BMA_Blockchain(WebFunctionalSetupMixin, unittest.TestCase):
         jsonschema.validate(json_sample, Membership.schema)
 
     def test_membership_bad(self):
-        async        def handler(request):
+        async def handler(request):
             await request.read()
             return web.Response(body=b'{}', content_type='application/json')
 
-        async        def go():
+        async def go():
             _, srv, url = await self.create_server('GET', '/pubkey', handler)
             membership = Membership(None, "pubkey")
-            membership.reverse_url = lambda path: url
+            membership.reverse_url = lambda scheme, path: url
             with self.assertRaises(jsonschema.exceptions.ValidationError):
                 await membership.get()
 
@@ -229,14 +229,14 @@ class Test_BMA_Blockchain(WebFunctionalSetupMixin, unittest.TestCase):
         jsonschema.validate(json_sample, Newcomers.schema)
 
     def test_newcomers_bad(self):
-        async        def handler(request):
+        async def handler(request):
             await request.read()
             return web.Response(body=b'{}', content_type='application/json')
 
-        async        def go():
+        async def go():
             _, srv, url = await self.create_server('GET', '/', handler)
             newcomers = Newcomers(None)
-            newcomers.reverse_url = lambda path: url
+            newcomers.reverse_url = lambda scheme, path: url
             with self.assertRaises(jsonschema.exceptions.ValidationError):
                 await newcomers.get()
 
@@ -251,14 +251,14 @@ class Test_BMA_Blockchain(WebFunctionalSetupMixin, unittest.TestCase):
         jsonschema.validate(json_sample, Certifications.schema)
 
     def test_certifications_bad(self):
-        async        def handler(request):
+        async def handler(request):
             await request.read()
             return web.Response(body=b'{}', content_type='application/json')
 
-        async        def go():
+        async def go():
             _, srv, url = await self.create_server('GET', '/', handler)
             certs = Certifications(None)
-            certs.reverse_url = lambda path: url
+            certs.reverse_url = lambda scheme, path: url
             with self.assertRaises(jsonschema.exceptions.ValidationError):
                 await certs.get()
 
@@ -273,14 +273,14 @@ class Test_BMA_Blockchain(WebFunctionalSetupMixin, unittest.TestCase):
         jsonschema.validate(json_sample, Joiners.schema)
 
     def test_joiners_bad(self):
-        async        def handler(request):
+        async def handler(request):
             await request.read()
             return web.Response(body=b'{}', content_type='application/json')
 
-        async        def go():
+        async def go():
             _, srv, url = await self.create_server('GET', '/', handler)
             joiners = Joiners(None)
-            joiners.reverse_url = lambda path: url
+            joiners.reverse_url = lambda scheme, path: url
             with self.assertRaises(jsonschema.exceptions.ValidationError):
                 await joiners.get()
 
@@ -295,14 +295,14 @@ class Test_BMA_Blockchain(WebFunctionalSetupMixin, unittest.TestCase):
         jsonschema.validate(json_sample, Actives.schema)
 
     def test_actives_bad(self):
-        async        def handler(request):
+        async def handler(request):
             await request.read()
             return web.Response(body=b'{}', content_type='application/json')
 
-        async        def go():
+        async def go():
             _, srv, url = await self.create_server('GET', '/', handler)
             actives = Actives(None)
-            actives.reverse_url = lambda path: url
+            actives.reverse_url = lambda scheme, path: url
             with self.assertRaises(jsonschema.exceptions.ValidationError):
                 await actives.get()
 
@@ -317,14 +317,14 @@ class Test_BMA_Blockchain(WebFunctionalSetupMixin, unittest.TestCase):
         jsonschema.validate(json_sample, Leavers.schema)
 
     def test_leavers_bad(self):
-        async        def handler(request):
+        async def handler(request):
             await request.read()
             return web.Response(body=b'{}', content_type='application/json')
 
-        async        def go():
+        async def go():
             _, srv, url = await self.create_server('GET', '/', handler)
             leavers = Leavers(None)
-            leavers.reverse_url = lambda path: url
+            leavers.reverse_url = lambda scheme, path: url
             with self.assertRaises(jsonschema.exceptions.ValidationError):
                 await leavers.get()
 
@@ -339,14 +339,14 @@ class Test_BMA_Blockchain(WebFunctionalSetupMixin, unittest.TestCase):
         jsonschema.validate(json_sample, UD.schema)
 
     def test_ud_bad(self):
-        async        def handler(request):
+        async def handler(request):
             await request.read()
             return web.Response(body=b'{}', content_type='application/json')
 
-        async        def go():
+        async def go():
             _, srv, url = await self.create_server('GET', '/', handler)
             ud = UD(None)
-            ud.reverse_url = lambda path: url
+            ud.reverse_url = lambda scheme, path: url
             with self.assertRaises(jsonschema.exceptions.ValidationError):
                 await ud.get()
 
@@ -361,14 +361,14 @@ class Test_BMA_Blockchain(WebFunctionalSetupMixin, unittest.TestCase):
         jsonschema.validate(json_sample, TX.schema)
 
     def test_tx_bad(self):
-        async        def handler(request):
+        async def handler(request):
             await request.read()
             return web.Response(body=b'{}', content_type='application/json')
 
-        async        def go():
+        async def go():
             _, srv, url = await self.create_server('GET', '/', handler)
             tx = TX(None)
-            tx.reverse_url = lambda path: url
+            tx.reverse_url = lambda scheme, path: url
             with self.assertRaises(jsonschema.exceptions.ValidationError):
                 await tx.get()
 

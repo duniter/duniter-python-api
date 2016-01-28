@@ -148,7 +148,7 @@ class Lookup(WOT):
         assert self.search is not None
 
         r = await self.requests_get('/lookup/%s' % self.search, **kwargs)
-        return (await self.parse(r))
+        return (await self.parse_response(r))
 
 
 class CertifiersOf(WOT):
@@ -231,7 +231,7 @@ class CertifiersOf(WOT):
         assert self.search is not None
 
         r = await self.requests_get('/certifiers-of/%s' % self.search, **kwargs)
-        return (await self.parse(r))
+        return (await self.parse_response(r))
 
 
 class CertifiedBy(WOT):
@@ -248,7 +248,7 @@ class CertifiedBy(WOT):
         assert self.search is not None
 
         r = await self.requests_get('/certified-by/%s' % self.search, **kwargs)
-        return (await self.parse(r))
+        return (await self.parse_response(r))
 
 
 class Members(WOT):
@@ -277,4 +277,4 @@ class Members(WOT):
 
     async def __get__(self, **kwargs):
         r = await self.requests_get('/members', **kwargs)
-        return (await self.parse(r))
+        return (await self.parse_response(r))

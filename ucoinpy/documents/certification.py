@@ -51,15 +51,14 @@ class Certification(Document):
     re_timestamp = re.compile("META:TS:([0-9]+)-([0-9a-fA-F]{5,40})\n")
 
     def __init__(self, version, currency, pubkey_from, pubkey_to,
-                 blocknumber, blockhash, signature):
+                 blockid, signature):
         """
         Constructor
         """
         super().__init__(version, currency, [signature])
         self.pubkey_from = pubkey_from
         self.pubkey_to = pubkey_to
-        self.blockhash = blockhash
-        self.blocknumber = blocknumber
+        self.blockid = blockid
 
     @classmethod
     def from_inline(cls, version, currency, blockhash, inline):
@@ -70,12 +69,13 @@ class Certification(Document):
         if blocknumber == 0:
             blockhash = "DA39A3EE5E6B4B0D3255BFEF95601890AFD80709"
         signature = cert_data.group(4)
+        from .block import BlockId
         return cls(version, currency, pubkey_from, pubkey_to,
-                   blocknumber, blockhash, signature)
+                   BlockId(blocknumber, blockhash), signature)
 
     def raw(self, selfcert):
-        return """{0}META:TS:{1}-{2}
-""".format(selfcert.signed_raw(), self.blocknumber, self.blockhash)
+        return """{0}META:TS:{1}
+""".format(selfcert.signed_raw(), self.blockid)
 
     def sign(self, selfcert, keys):
         """
@@ -96,7 +96,7 @@ class Certification(Document):
 
     def inline(self):
         return "{0}:{1}:{2}:{3}".format(self.pubkey_from, self.pubkey_to,
-                                        self.blocknumber, self.signatures[0])
+                                        self.blockid.number, self.signatures[0])
 
 
 class Revocation(Document):

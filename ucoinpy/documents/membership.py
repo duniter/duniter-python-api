@@ -3,7 +3,6 @@ Created on 2 déc. 2014
 
 @author: inso
 """
-from .. import PROTOCOL_VERSION
 from .document import Document
 
 import re
@@ -34,17 +33,14 @@ class Membership(Document):
     re_userid = re.compile("UserID: ([^\n]+)\n")
     re_certts = re.compile("CertTS: ([0-9]+)\n")
 
-
-
-    def __init__(self, version, currency, issuer, block_number, block_hash,
+    def __init__(self, version, currency, issuer, blockid,
                  membership_type, uid, cert_ts, signature):
         """
         Constructor
         """
         super().__init__(version, currency, [signature])
         self.issuer = issuer
-        self.block_number = block_number
-        self.block_hash = block_hash
+        self.blockid = blockid
         self.membership_type = membership_type
         self.uid = uid
         self.cert_ts = cert_ts
@@ -58,8 +54,8 @@ class Membership(Document):
         block_hash = data.group(4)
         cert_ts = int(data.group(5))
         uid = data.group(6)
-        return cls(version, currency, issuer, block_number,
-                   block_hash, membership_type, uid, cert_ts, signature)
+        from .block import BlockId
+        return cls(version, currency, issuer, BlockId(block_number, block_hash), membership_type, uid, cert_ts, signature)
 
     @classmethod
     def from_signed_raw(cls, raw, signature=None):
@@ -95,7 +91,8 @@ class Membership(Document):
         signature = Membership.re_signature.match(lines[n]).group(1)
         n = n + 1
 
-        return cls(version, currency, issuer, blocknumber, blockhash,
+        from .block import BlockId
+        return cls(version, currency, issuer, BlockId(blocknumber, blockhash),
                    membership_type, uid, cert_ts, signature)
 
     def raw(self):
@@ -103,14 +100,14 @@ class Membership(Document):
 Type: Membership
 Currency: {1}
 Issuer: {2}
-Block: {3}-{4}
-Membership: {5}
-UserID: {6}
-CertTS: {7}
+Block: {3}
+Membership: {4}
+UserID: {5}
+CertTS: {6}
 """.format(self.version,
                       self.currency,
                       self.issuer,
-                      self.block_number, self.block_hash,
+                      self.blockid,
                       self.membership_type,
                       self.uid,
                       self.cert_ts)
@@ -118,7 +115,7 @@ CertTS: {7}
     def inline(self):
         return "{0}:{1}:{2}:{3}:{4}:{5}".format(self.issuer,
                                         self.signatures[0],
-                                        self.block_number,
-                                        self.block_hash,
+                                        self.blockid.number,
+                                        self.blockid.sha_hash,
                                         self.cert_ts,
                                         self.uid)

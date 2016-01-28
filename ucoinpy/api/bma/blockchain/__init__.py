@@ -84,7 +84,7 @@ class Parameters(Blockchain):
 
     async def __get__(self, **kwargs):
         r = await self.requests_get('/parameters', **kwargs)
-        return (await self.parse(r))
+        return (await self.parse_response(r))
 
 
 class Membership(Blockchain):
@@ -143,7 +143,7 @@ class Membership(Blockchain):
     async def __get__(self, **kwargs):
         assert self.search is not None
         r = await self.requests_get('/memberships/%s' % self.search, **kwargs)
-        return (await self.parse(r))
+        return (await self.parse_response(r))
 
 
 class Block(Blockchain):
@@ -281,7 +281,7 @@ class Block(Blockchain):
     async def __get__(self, **kwargs):
         assert self.number is not None
         r = await self.requests_get('/block/%d' % self.number, **kwargs)
-        return (await self.parse(r))
+        return (await self.parse_response(r))
 
     async def __post__(self, **kwargs):
         assert 'block' in kwargs
@@ -298,7 +298,7 @@ class Current(Blockchain):
 
     async def __get__(self, **kwargs):
         r = await self.requests_get('/current', **kwargs)
-        return (await self.parse(r))
+        return (await self.parse_response(r))
 
 
 class Hardship(Blockchain):
@@ -331,7 +331,7 @@ class Hardship(Blockchain):
     async def __get__(self, **kwargs):
         assert self.fingerprint is not None
         r = await self.requests_get('/hardship/%s' % self.fingerprint.upper(), **kwargs)
-        return (await self.parse(r))
+        return (await self.parse_response(r))
 
 
 class Newcomers(Blockchain):
@@ -358,7 +358,7 @@ class Newcomers(Blockchain):
 
     async def __get__(self, **kwargs):
         r = await self.requests_get('/with/newcomers', **kwargs)
-        return (await self.parse(r))
+        return (await self.parse_response(r))
 
 
 class Certifications(Blockchain):
@@ -368,7 +368,7 @@ class Certifications(Blockchain):
 
     async def __get__(self, **kwargs):
         r = await self.requests_get('/with/certs', **kwargs)
-        return (await self.parse(r))
+        return (await self.parse_response(r))
 
 
 class Joiners(Blockchain):
@@ -378,7 +378,7 @@ class Joiners(Blockchain):
 
     async def __get__(self, **kwargs):
         r = await self.requests_get('/with/joiners', **kwargs)
-        return (await self.parse(r))
+        return (await self.parse_response(r))
 
 
 class Actives(Blockchain):
@@ -388,7 +388,7 @@ class Actives(Blockchain):
 
     async def __get__(self, **kwargs):
         r = await self.requests_get('/with/actives', **kwargs)
-        return (await self.parse(r))
+        return (await self.parse_response(r))
 
 
 class Leavers(Blockchain):
@@ -398,7 +398,7 @@ class Leavers(Blockchain):
 
     async def __get__(self, **kwargs):
         r = await self.requests_get('/with/leavers', **kwargs)
-        return (await self.parse(r))
+        return (await self.parse_response(r))
 
 
 class Excluded(Blockchain):
@@ -408,7 +408,7 @@ class Excluded(Blockchain):
 
     async def __get__(self, **kwargs):
         r = await self.requests_get('/with/excluded', **kwargs)
-        return (await self.parse(r))
+        return (await self.parse_response(r))
 
 
 class UD(Blockchain):
@@ -418,7 +418,7 @@ class UD(Blockchain):
 
     async def __get__(self, **kwargs):
         r = await self.requests_get('/with/ud', **kwargs)
-        return (await self.parse(r))
+        return (await self.parse_response(r))
 
 
 class TX(Blockchain):
@@ -428,4 +428,4 @@ class TX(Blockchain):
 
     async def __get__(self, **kwargs):
         r = await self.requests_get('/with/tx', **kwargs)
-        return (await self.parse(r))
+        return (await self.parse_response(r))

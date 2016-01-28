@@ -2,6 +2,7 @@ import re
 
 from ..api.bma import ConnectionHandler
 from .document import Document
+from . import BlockId
 from .. import PROTOCOL_VERSION, MANAGED_API
 
 
@@ -52,7 +53,7 @@ class Peer(Document):
         pubkey = Peer.re_pubkey.match(lines[n]).group(1)
         n = n + 1
 
-        blockid = Peer.re_block.match(lines[n]).group(1)
+        blockid = BlockId.from_str(Peer.re_block.match(lines[n]).group(1))
         n = n + 1
 
         Peer.re_endpoints.match(lines[n])
@@ -83,7 +84,7 @@ Endpoints:
         return doc
 
 
-class Endpoint():
+class Endpoint:
     """
     Describing endpoints
     """

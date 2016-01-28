@@ -70,14 +70,14 @@ class Test_BMA_Wot(WebFunctionalSetupMixin, unittest.TestCase):
         jsonschema.validate(json_sample, Lookup.schema)
 
     def test_bma_wot_lookup_bad(self):
-        async        def handler(request):
+        async def handler(request):
             await request.read()
             return web.Response(body=b'{}', content_type='application/json')
 
-        async        def go():
+        async def go():
             _, srv, url = await self.create_server('GET', '/pubkey', handler)
             lookup = Lookup(None, "pubkey")
-            lookup.reverse_url = lambda path: url
+            lookup.reverse_url = lambda scheme, path: url
             with self.assertRaises(jsonschema.exceptions.ValidationError):
                 await lookup.get()
 
@@ -94,14 +94,14 @@ class Test_BMA_Wot(WebFunctionalSetupMixin, unittest.TestCase):
         jsonschema.validate(Members.schema, json_sample)
 
     def test_bma_wot_members_bad(self):
-        async        def handler(request):
+        async def handler(request):
             await request.read()
             return web.Response(body=b'{}', content_type='application/json')
 
-        async        def go():
+        async def go():
             _, srv, url = await self.create_server('GET', '/', handler)
             members = Members(None)
-            members.reverse_url = lambda path: url
+            members.reverse_url = lambda scheme, path: url
             with self.assertRaises(jsonschema.exceptions.ValidationError):
                 await members.get()
 
@@ -144,21 +144,21 @@ class Test_BMA_Wot(WebFunctionalSetupMixin, unittest.TestCase):
         jsonschema.validate(json_sample, CertifiedBy.schema)
 
     def test_bma_wot_certifiers_bad(self):
-        async        def handler(request):
+        async def handler(request):
             await request.read()
             return web.Response(body=b'{}', content_type='application/json')
 
-        async        def go():
+        async def go():
             _, srv, url = await self.create_server('GET', '/pubkey', handler)
             certsof = CertifiersOf(None, 'pubkey')
-            certsof.reverse_url = lambda path: url
+            certsof.reverse_url = lambda scheme, path: url
             with self.assertRaises(jsonschema.exceptions.ValidationError):
                 await certsof.get()
 
         self.loop.run_until_complete(go())
 
     def test_bma_wot_certifiers_inner_bad(self):
-        async        def handler(request):
+        async def handler(request):
             await request.read()
             return web.Response(body=bytes(json.dumps({
     "pubkey": "7Aqw6Efa9EzE7gtsc8SveLLrM7gm6NEGoywSv4FJx6pZ",
@@ -180,24 +180,24 @@ class Test_BMA_Wot(WebFunctionalSetupMixin, unittest.TestCase):
     ]
 }), "utf-8"), content_type='application/json')
 
-        async        def go():
+        async def go():
             _, srv, url = await self.create_server('GET', '/pubkey', handler)
             certsof = CertifiersOf(None, 'pubkey')
-            certsof.reverse_url = lambda path: url
+            certsof.reverse_url = lambda scheme, path: url
             with self.assertRaises(jsonschema.exceptions.ValidationError):
                 await certsof.get()
 
         self.loop.run_until_complete(go())
 
     def test_bma_wot_certified_bad(self):
-        async        def handler(request):
+        async def handler(request):
             await request.read()
             return web.Response(body=b'{}', content_type='application/json')
 
-        async        def go():
+        async def go():
             _, srv, url = await self.create_server('GET', '/pubkey', handler)
             certby = CertifiedBy(None, 'pubkey')
-            certby.reverse_url = lambda path: url
+            certby.reverse_url = lambda scheme, path: url
             with self.assertRaises(jsonschema.exceptions.ValidationError):
                 await certby.get()
 

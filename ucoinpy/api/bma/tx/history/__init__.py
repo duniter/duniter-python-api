@@ -32,4 +32,4 @@ class Blocks(History):
 
     async def __get__(self, **kwargs):
         r = await self.requests_get('/history/%s/blocks/%s/%s' % (self.pubkey, self.from_, self.to_), **kwargs)
-        return (await self.parse(r))
+        return (await self.parse_response(r))

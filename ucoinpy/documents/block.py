@@ -1,11 +1,9 @@
-from .. import PROTOCOL_VERSION
 from .document import Document
 from .certification import SelfCertification, Certification
 from .membership import Membership
 from .transaction import Transaction
 
 import re
-import logging
 
 
 class BlockId:

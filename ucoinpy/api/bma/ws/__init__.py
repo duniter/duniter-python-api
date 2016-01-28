@@ -16,12 +16,34 @@
 # Caner Candan <caner@candan.fr>, http://caner.candan.fr
 #
 
-PROTOCOL_VERSION="1"
+from .. import API, logging
+from ..blockchain import Block as _Block
+from ..network.peering import Peers as _Peers
 
-MANAGED_API=["BASIC_MERKLED_API"]
+logger = logging.getLogger("ucoin/ws")
 
-__author__      = 'Caner Candan & inso'
-__version__     = '0.14.0'
-__nonsense__    = 'uCoin'
 
-from . import api, documents, key
+class Websocket(API):
+    def __init__(self, connection_handler, module='ws'):
+        super(Websocket, self).__init__(connection_handler, module)
+
+
+class Block(Websocket):
+    """Connect to block websocket."""
+    schema = _Block.schema
+
+    def connect(self):
+
+        r = self.connect_ws('/block')
+        return r
+
+
+class Peer(Websocket):
+    """Connect to block websocket."""
+    schema = _Peers.schema
+
+    def connect(self):
+
+        r = self.connect_ws('/peer')
+        return r
+
