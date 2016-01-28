@@ -21,7 +21,7 @@ __all__ = ['api']
 
 PROTOCOL_VERSION = "1"
 
-import aiohttp, asyncio, logging, jsonschema
+import aiohttp, json, logging, jsonschema
 
 logger = logging.getLogger("ucoin")
 
@@ -59,7 +59,7 @@ class API(object):
         self.connection_handler = connection_handler
         self.headers = {}
 
-    def reverse_url(self, path):
+    def reverse_url(self, scheme, path):
         """
         Reverses the url using self.url and path given in parameter.
 
@@ -69,7 +69,10 @@ class API(object):
 
         server, port = self.connection_handler.server, self.connection_handler.port
 
-        url = 'http://%s:%d/%s' % (server, port, self.module)
+        url = '{scheme}://{server}:{port}/{module}'.format(scheme=scheme,
+                                                           server=server,
+                                                           port=port,
+                                                           module=self.module)
         return url + path
 
     def get(self, **kwargs):
@@ -96,7 +99,21 @@ class API(object):
         """interface purpose for POST request"""
         pass
 
-    async def parse(self, response):
+    def parse_text(self, text):
+        """
+        Validate and parse the BMA answer from websocket
+
+        :param str text: the bma answer
+        :return: the json data
+        """
+        try:
+            data = json.loads(text)
+            jsonschema.validate(data, self.schema)
+            return data
+        except TypeError:
+            raise jsonschema.ValidationError("Could not parse json")
+
+    async def parse_response(self, response):
         """
         Validate and parse the BMA answer
 
@@ -117,9 +134,9 @@ class API(object):
         Arguments:
         - `path`: the request path
         """
-        logging.debug("Request : {0}".format(self.reverse_url(path)))
+        logging.debug("Request : {0}".format(self.reverse_url("http", path)))
         with aiohttp.Timeout(15):
-            response = await aiohttp.get(self.reverse_url(path), params=kwargs,headers=self.headers)
+            response = await aiohttp.get(self.reverse_url("http", path), params=kwargs,headers=self.headers)
             if response.status != 200:
                 raise ValueError('status code != 200 => %d (%s)' % (response.status, (await response.text())))
 
@@ -137,7 +154,7 @@ class API(object):
 
         logging.debug("POST : {0}".format(kwargs))
         with aiohttp.Timeout(15):
-            response = await aiohttp.post(self.reverse_url(path), data=kwargs, headers=self.headers)
+            response = await aiohttp.post(self.reverse_url("http", path), data=kwargs, headers=self.headers)
             return response
 
     def connect_ws(self, path):
@@ -147,7 +164,8 @@ class API(object):
         :param str path: the url path
         :return:
         """
-        return aiohttp.ws_connect(self.reverse_url(path))
+        url = self.reverse_url("ws", path)
+        return aiohttp.ws_connect(url)
 
 
-from . import network, blockchain, tx, wot, node, ud, websocket
+from . import network, blockchain, tx, wot, node, ud, ws

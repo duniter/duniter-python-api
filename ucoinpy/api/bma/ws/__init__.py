@@ -17,17 +17,20 @@
 #
 
 from .. import API, logging
+from ..blockchain import Block as _Block
+from ..network.peering import Peers as _Peers
 
-logger = logging.getLogger("ucoin/wot")
+logger = logging.getLogger("ucoin/ws")
 
 
 class Websocket(API):
-    def __init__(self, connection_handler, module='websocket'):
+    def __init__(self, connection_handler, module='ws'):
         super(Websocket, self).__init__(connection_handler, module)
 
 
 class Block(Websocket):
     """Connect to block websocket."""
+    schema = _Block.schema
 
     def connect(self):
 
@@ -37,6 +40,7 @@ class Block(Websocket):
 
 class Peer(Websocket):
     """Connect to block websocket."""
+    schema = _Peers.schema
 
     def connect(self):
 
