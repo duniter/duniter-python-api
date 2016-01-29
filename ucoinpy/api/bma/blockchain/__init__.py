@@ -119,11 +119,11 @@ class Membership(Blockchain):
                         "blockNumber": {
                             "type": "number"
                         },
-                        "blockHash": {
-                            "type": "string"
+                        "written": {
+                            "type": "number"
                         }
                     },
-                    "required": ["version", "currency", "membership", "blockNumber", "blockHash"]
+                    "required": ["version", "currency", "membership", "blockNumber", "blockHash", "written"]
                 }
             }
         },
