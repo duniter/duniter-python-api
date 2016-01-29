@@ -33,17 +33,37 @@ class Block(Websocket):
     schema = _Block.schema
 
     def connect(self):
-
         r = self.connect_ws('/block')
         return r
 
 
 class Peer(Websocket):
     """Connect to block websocket."""
-    schema = _Peers.schema
+    schema = {
+        "type": "object",
+        "properties": {
+            "version": {
+                "type": "string"
+            },
+            "currency": {
+                "type": "string"
+            },
+            "pubkey": {
+                "type": "string"
+            },
+            "endpoints": {
+                "type": "array",
+                "items": {
+                    "type": "string"
+                }
+            },
+            "signature": {
+                "type": "string"
+            }
+        },
+        "required": ["version", "currency", "pubkey", "endpoints", "signature"]
+    }
 
     def connect(self):
-
         r = self.connect_ws('/peer')
         return r
-
