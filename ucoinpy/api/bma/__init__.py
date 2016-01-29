@@ -46,6 +46,19 @@ class ConnectionHandler(object):
 class API(object):
     """APIRequest is a class used as an interface. The intermediate derivated classes are the modules and the leaf classes are the API requests."""
 
+    error_schema = {
+        "type": "object",
+        "properties": {
+            "ucode": {
+                "type": "number"
+            },
+            "message": {
+                "type": "string"
+            }
+        },
+        "required": ["ucode", "message"]
+    }
+
     def __init__(self, connection_handler, module):
         """
         Asks a module in order to create the url used then by derivated classes.
@@ -109,6 +122,20 @@ class API(object):
         try:
             data = json.loads(text)
             jsonschema.validate(data, self.schema)
+            return data
+        except TypeError:
+            raise jsonschema.ValidationError("Could not parse json")
+
+    def parse_error(self, text):
+        """
+        Validate and parse the BMA answer from websocket
+
+        :param str text: the bma error
+        :return: the json data
+        """
+        try:
+            data = json.loads(text)
+            jsonschema.validate(data, self.error_schema)
             return data
         except TypeError:
             raise jsonschema.ValidationError("Could not parse json")
