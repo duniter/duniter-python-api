@@ -2,7 +2,7 @@ import re
 import base64
 import logging
 
-from .document import Document
+from .document import Document, MalformedDocumentError
 
 
 class SelfCertification(Document):
@@ -26,6 +26,8 @@ class SelfCertification(Document):
     @classmethod
     def from_inline(cls, version, currency, inline):
         selfcert_data = SelfCertification.re_inline.match(inline)
+        if selfcert_data is None:
+            raise MalformedDocumentError("Inline self certification")
         pubkey = selfcert_data.group(1)
         signature = selfcert_data.group(2)
         ts = int(selfcert_data.group(3))
@@ -63,6 +65,8 @@ class Certification(Document):
     @classmethod
     def from_inline(cls, version, currency, blockhash, inline):
         cert_data = Certification.re_inline.match(inline)
+        if cert_data is None:
+            raise MalformedDocumentError("Certification")
         pubkey_from = cert_data.group(1)
         pubkey_to = cert_data.group(2)
         blocknumber = int(cert_data.group(3))

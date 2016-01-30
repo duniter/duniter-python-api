@@ -1,7 +1,7 @@
 import re
 
 from ..api.bma import ConnectionHandler
-from .document import Document
+from .document import Document, MalformedDocumentError
 from . import BlockId
 from .. import PROTOCOL_VERSION, MANAGED_API
 
@@ -26,7 +26,14 @@ class Peer(Document):
     re_type = re.compile("Type: (Peer)")
     re_pubkey = re.compile("PublicKey: ([1-9A-Za-z][^OIl]{42,45})\n")
     re_block = re.compile("Block: ([0-9]+-[0-9a-fA-F]{5,40})\n")
-    re_endpoints = re.compile("Endpoints:\n")
+    re_endpoints = re.compile("(Endpoints:)\n")
+
+    fields_parsers = {**Document.fields_parsers, **{
+        "Type": re_type,
+        "Pubkey": re_pubkey,
+        "Block": re_block,
+        "Endpoints": re_endpoints
+    }}
 
     def __init__(self, version, currency, pubkey, blockid,
                  endpoints, signature):
@@ -41,29 +48,29 @@ class Peer(Document):
         lines = raw.splitlines(True)
         n = 0
 
-        version = int(Peer.re_version.match(lines[n]).group(1))
-        n = n + 1
+        version = int(Peer.parse_field("Version", lines[n]))
+        n += 1
 
-        Peer.re_type.match(lines[n]).group(1)
-        n = n + 1
+        Peer.parse_field("Type", lines[n])
+        n += 1
 
-        currency = Peer.re_currency.match(lines[n]).group(1)
-        n = n + 1
+        currency = Peer.parse_field("Currency", lines[n])
+        n += 1
 
-        pubkey = Peer.re_pubkey.match(lines[n]).group(1)
-        n = n + 1
+        pubkey = Peer.parse_field("Pubkey", lines[n])
+        n += 1
 
-        blockid = BlockId.from_str(Peer.re_block.match(lines[n]).group(1))
-        n = n + 1
+        blockid = BlockId.from_str(Peer.parse_field("Block", lines[n]))
+        n += 1
 
-        Peer.re_endpoints.match(lines[n])
-        n = n + 1
+        Peer.parse_field("Endpoints", lines[n])
+        n += 1
 
         endpoints = []
         while not Peer.re_signature.match(lines[n]):
             endpoint = Endpoint.from_inline(lines[n])
             endpoints.append(endpoint)
-            n = n + 1
+            n += 1
 
         signature = Peer.re_signature.match(lines[n]).group(1)
 
@@ -123,6 +130,8 @@ class BMAEndpoint(Endpoint):
     @classmethod
     def from_inline(cls, inline):
         m = BMAEndpoint.re_inline.match(inline)
+        if m is None:
+            raise MalformedDocumentError("BMAEndpoint")
         server = m.group(1)
         ipv4 = m.group(2)
         ipv6 = m.group(3)

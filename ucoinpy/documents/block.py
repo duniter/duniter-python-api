@@ -1,4 +1,4 @@
-from .document import Document
+from .document import Document, MalformedDocumentError
 from .certification import SelfCertification, Certification
 from .membership import Membership
 from .transaction import Transaction
@@ -28,6 +28,8 @@ class BlockId:
         :param str blockid: The block id
         """
         data = blockid.split("-")
+        if len(data) != 2:
+            raise MalformedDocumentError('BlockId')
         number = int(data[0])
         sha_hash = data[1]
         return cls(number, sha_hash)
@@ -107,6 +109,28 @@ The class Block handles Block documents.
     re_certifications = re.compile("Certifications:\n")
     re_transactions = re.compile("Transactions:\n")
 
+    fields_parsers = {**Document.fields_parsers, **{
+                'Type': re_type,
+                'Noonce': re_noonce,
+                'Number': re_number,
+                'PoWMin': re_powmin,
+                'Time': re_time,
+                'MedianTime': re_mediantime,
+                'UD': re_universaldividend,
+                'Issuer': re_issuer,
+                'PreviousIssuer': re_previousissuer,
+                'PreviousHash': re_previoushash,
+                'Parameters': re_parameters,
+                'MembersCount': re_memberscount,
+                'Identities': re_identities,
+                'Joiners': re_joiners,
+                'Actives': re_actives,
+                'Leavers': re_leavers,
+                'Certifications': re_certifications,
+                'Transactions': re_transactions
+            }
+      }
+
     Empty_Hash = "DA39A3EE5E6B4B0D3255BFEF95601890AFD80709"
 
     def __init__(self, version, currency, noonce, number, powmin, time,
@@ -167,54 +191,54 @@ The class Block handles Block documents.
         lines = raw.splitlines(True)
         n = 0
 
-        version = int(Block.re_version.match(lines[n]).group(1))
-        n = n + 1
+        version = int(Block.parse_field("Version", lines[n]))
+        n += 1
 
-        Block.re_type.match(lines[n]).group(1)
-        n = n + 1
+        Block.parse_field("Type", lines[n])
+        n += 1
 
-        currency = Block.re_currency.match(lines[n]).group(1)
-        n = n + 1
+        currency = Block.parse_field("Currency", lines[n])
+        n += 1
 
-        noonce = int(Block.re_noonce.match(lines[n]).group(1))
-        n = n + 1
+        noonce = int(Block.parse_field("Noonce", lines[n]))
+        n += 1
 
-        number = int(Block.re_number.match(lines[n]).group(1))
-        n = n + 1
+        number = int(Block.parse_field("Number", lines[n]))
+        n += 1
 
-        powmin = int(Block.re_powmin.match(lines[n]).group(1))
-        n = n + 1
+        powmin = int(Block.parse_field("PoWMin", lines[n]))
+        n += 1
 
-        time = int(Block.re_time.match(lines[n]).group(1))
-        n = n + 1
+        time = int(Block.parse_field("Time", lines[n]))
+        n += 1
 
-        mediantime = int(Block.re_mediantime.match(lines[n]).group(1))
-        n = n + 1
+        mediantime = int(Block.parse_field("MedianTime", lines[n]))
+        n += 1
 
         ud = Block.re_universaldividend.match(lines[n])
         if ud is not None:
             ud = int(ud.group(1))
-            n = n + 1
+            n += 1
 
-        issuer = Block.re_issuer.match(lines[n]).group(1)
-        n = n + 1
+        issuer = Block.parse_field("Issuer", lines[n])
+        n += 1
 
         prev_hash = None
         prev_issuer = None
         if number > 0:
-            prev_hash = Block.re_previoushash.match(lines[n]).group(1)
-            n = n + 1
+            prev_hash = Block.parse_field("PreviousHash", lines[n])
+            n += 1
 
-            prev_issuer = Block.re_previousissuer.match(lines[n]).group(1)
-            n = n + 1
+            prev_issuer = Block.parse_field("PreviousIssuer", lines[n])
+            n += 1
 
         parameters = None
         if number == 0:
             parameters = Block.re_parameters.match(lines[n]).groups()
-            n = n + 1
+            n += 1
 
-        members_count = int(Block.re_memberscount.match(lines[n]).group(1))
-        n = n + 1
+        members_count = int(Block.parse_field("MembersCount", lines[n]))
+        n += 1
 
         identities = []
         joiners = []
@@ -225,50 +249,50 @@ The class Block handles Block documents.
         transactions = []
 
         if Block.re_identities.match(lines[n]) is not None:
-            n = n + 1
+            n += 1
             while Block.re_joiners.match(lines[n]) is None:
                 selfcert = SelfCertification.from_inline(version, currency, lines[n])
                 identities.append(selfcert)
-                n = n + 1
+                n += 1
 
         if Block.re_joiners.match(lines[n]):
-            n = n + 1
+            n += 1
             while Block.re_actives.match(lines[n]) is None:
                 membership = Membership.from_inline(version, currency, "IN", lines[n])
                 joiners.append(membership)
-                n = n + 1
+                n += 1
 
         if Block.re_actives.match(lines[n]):
-            n = n + 1
+            n += 1
             while Block.re_leavers.match(lines[n]) is None:
                 membership = Membership.from_inline(version, currency, "IN", lines[n])
                 actives.append(membership)
-                n = n + 1
+                n += 1
 
         if Block.re_leavers.match(lines[n]):
-            n = n + 1
+            n += 1
             while Block.re_excluded.match(lines[n]) is None:
                 membership = Membership.from_inline(version, currency, "OUT", lines[n])
                 leavers.append(membership)
-                n = n + 1
+                n += 1
 
         if Block.re_excluded.match(lines[n]):
-            n = n + 1
+            n += 1
             while Block.re_certifications.match(lines[n]) is None:
                 membership = Block.re_exclusion.match(lines[n]).group(1)
                 excluded.append(membership)
-                n = n + 1
+                n += 1
 
         if Block.re_certifications.match(lines[n]):
-            n = n + 1
+            n += 1
             while Block.re_transactions.match(lines[n]) is None:
                 certification = Certification.from_inline(version, currency,
                                                           prev_hash, lines[n])
                 certifications.append(certification)
-                n = n + 1
+                n += 1
 
         if Block.re_transactions.match(lines[n]):
-            n = n + 1
+            n += 1
             while not Block.re_signature.match(lines[n]):
                 tx_lines = ""
                 header_data = Transaction.re_header.match(lines[n])
@@ -277,14 +301,14 @@ The class Block handles Block documents.
                 inputs_num = int(header_data.group(3))
                 outputs_num = int(header_data.group(4))
                 has_comment = int(header_data.group(5))
-                tx_max = n+issuers_num*2+inputs_num+outputs_num+has_comment+1
+                tx_max = n + issuers_num * 2 + inputs_num + outputs_num + has_comment + 1
                 for i in range(n, tx_max):
                     tx_lines += lines[n]
-                    n = n + 1
+                    n += 1
                 transaction = Transaction.from_compact(currency, tx_lines)
                 transactions.append(transaction)
 
-        signature = Block.re_signature.match(lines[n]).group(1)
+        signature = Block.parse_field("Signature", lines[n])
 
         return cls(version, currency, noonce, number, powmin, time,
                    mediantime, ud, issuer, prev_hash, prev_issuer,

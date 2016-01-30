@@ -1,14 +1,41 @@
-import base58
 import base64
 import re
 import logging
 import hashlib
 
 
+class MalformedDocumentError(Exception):
+    """
+    Malformed document exception
+    """
+    def __init__(self, field_name):
+        super().__init__("Could not parse field {0}".format(field_name))
+
+
 class Document:
     re_version = re.compile("Version: ([0-9]+)\n")
     re_currency = re.compile("Currency: ([^\n]+)\n")
     re_signature = re.compile("([A-Za-z0-9+/]+(?:=|==)?)\n")
+
+    fields_parsers = {
+        "Version": re_version,
+        "Currency": re_currency,
+        "Signature": re_signature
+    }
+
+    @classmethod
+    def parse_field(cls, field_name, line):
+        """
+
+        :param field_name:
+        :param line:
+        :return:
+        """
+        try:
+            value = cls.fields_parsers[field_name].match(line).group(1)
+        except AttributeError:
+            raise MalformedDocumentError(field_name)
+        return value
 
     def __init__(self, version, currency, signatures):
         self.version = version

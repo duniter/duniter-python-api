@@ -1,6 +1,5 @@
-from .document import Document
+from .document import Document, MalformedDocumentError
 import re
-import logging
 
 
 class Transaction(Document):
@@ -47,6 +46,18 @@ class Transaction(Document):
     re_comment = re.compile("Comment: ([^\n]*)\n")
     re_pubkey = re.compile("([1-9A-Za-z][^OIl]{42,45})\n")
 
+    fields_parsers = {**Document.fields_parsers, **{
+            "Type": re_type,
+            "TX": re_header,
+            "Issuers": re_issuers,
+            "Inputs": re_inputs,
+            "Outputs": re_outputs,
+            "Comment": re_comment,
+            "Compact comment": re_compact_comment,
+            "Pubkey": re_pubkey
+        }
+    }
+
     def __init__(self, version, currency, issuers, inputs, outputs,
                  comment, signatures):
         """
@@ -65,40 +76,42 @@ class Transaction(Document):
         n = 0
 
         header_data = Transaction.re_header.match(lines[n])
+        if header_data is None:
+            raise MalformedDocumentError("Compact TX header")
         version = int(header_data.group(1))
         issuers_num = int(header_data.group(2))
         inputs_num = int(header_data.group(3))
         outputs_num = int(header_data.group(4))
         has_comment = int(header_data.group(5))
-        n = n + 1
+        n += 1
 
         issuers = []
         inputs = []
         outputs = []
         signatures = []
         for i in range(0, issuers_num):
-            issuer = Transaction.re_pubkey.match(lines[n]).group(1)
+            issuer = Transaction.parse_field("Pubkey", lines[n])
             issuers.append(issuer)
-            n = n + 1
+            n += 1
 
         for i in range(0, inputs_num):
             input_source = InputSource.from_inline(lines[n])
             inputs.append(input_source)
-            n = n + 1
+            n += 1
 
         for i in range(0, outputs_num):
             output_source = OutputSource.from_inline(lines[n])
             outputs.append(output_source)
-            n = n + 1
+            n += 1
 
         comment = ""
         if has_comment == 1:
             comment = Transaction.re_compact_comment.match(lines[n]).group(1)
-            n = n + 1
+            n += 1
 
         while n < len(lines):
             signatures.append(Transaction.re_signature.match(lines[n]).group(1))
-            n = n + 1
+            n += 1
 
         return cls(version, currency, issuers, inputs, outputs, comment, signatures)
 
@@ -107,14 +120,14 @@ class Transaction(Document):
         lines = raw.splitlines(True)
         n = 0
 
-        version = int(Transaction.re_version.match(lines[n]).group(1))
-        n = n + 1
+        version = int(Transaction.parse_field("Version", lines[n]))
+        n += 1
 
-        Transaction.re_type.match(lines[n]).group(1)
-        n = n + 1
+        Transaction.parse_field("Type", lines[n])
+        n += 1
 
-        currency = Transaction.re_currency.match(lines[n]).group(1)
-        n = n + 1
+        currency = Transaction.parse_field("Currency", lines[n])
+        n += 1
 
         issuers = []
         inputs = []
@@ -122,34 +135,34 @@ class Transaction(Document):
         signatures = []
 
         if Transaction.re_issuers.match(lines[n]):
-            n = n + 1
+            n += 1
             while Transaction.re_inputs.match(lines[n]) is None:
-                issuer = Transaction.re_pubkey.match(lines[n]).group(1)
+                issuer = Transaction.parse_field("Pubkey", lines[n])
                 issuers.append(issuer)
-                n = n + 1
+                n += 1
 
         if Transaction.re_inputs.match(lines[n]):
-            n = n + 1
+            n += 1
             while Transaction.re_outputs.match(lines[n]) is None:
                 input_source = InputSource.from_inline(lines[n])
                 inputs.append(input_source)
-                n = n + 1
+                n += 1
 
         if Transaction.re_outputs.match(lines[n]) is not None:
-            n = n + 1
+            n += 1
             while not Transaction.re_comment.match(lines[n]):
                 output = OutputSource.from_inline(lines[n])
                 outputs.append(output)
-                n = n + 1
+                n += 1
 
-        comment = Transaction.re_comment.match(lines[n]).group(1)
-        n = n + 1
+        comment = Transaction.parse_field("Comment", lines[n])
+        n += 1
 
         if Transaction.re_signature.match(lines[n]) is not None:
             while n < len(lines):
-                sign = Transaction.re_signature.match(lines[n]).group(1)
+                sign = Transaction.parse_field("Signature", lines[n])
                 signatures.append(sign)
-                n = n + 1
+                n += 1
 
         return cls(version, currency, issuers, inputs, outputs,
                    comment, signatures)
@@ -245,6 +258,8 @@ class InputSource:
     @classmethod
     def from_inline(cls, inline):
         data = InputSource.re_inline.match(inline)
+        if data is None:
+            raise MalformedDocumentError("Inline input")
         index = int(data.group(1))
         source = data.group(2)
         number = int(data.group(3))
@@ -282,6 +297,8 @@ class OutputSource():
     @classmethod
     def from_inline(cls, inline):
         data = OutputSource.re_inline.match(inline)
+        if data is None:
+            raise MalformedDocumentError("Inline output")
         pubkey = data.group(1)
         amount = int(data.group(2))
         return cls(pubkey, amount)
