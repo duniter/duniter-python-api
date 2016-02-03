@@ -43,7 +43,7 @@ class Peer(Websocket):
         "type": "object",
         "properties": {
             "version": {
-                "type": "string"
+                "type": "number"
             },
             "currency": {
                 "type": "string"

@@ -38,7 +38,7 @@ class Test_BMA_Websocket(WebFunctionalSetupMixin, unittest.TestCase):
 
     def test_peer(self):
         json_sample = """{
-  "version": "1",
+  "version": 1,
   "currency": "beta_brouzouf",
   "pubkey": "HsLShAtzXTVxeUtQd7yi5Z5Zh4zNvbu8sTEZ53nfKcqY",
   "endpoints": [
@@ -51,7 +51,7 @@ class Test_BMA_Websocket(WebFunctionalSetupMixin, unittest.TestCase):
 """
         peer = Peer(None)
         data = peer.parse_text(json_sample)
-        self.assertEqual(data["version"], "1")
+        self.assertEqual(data["version"], 1)
         self.assertEqual(data["currency"], "beta_brouzouf")
         self.assertEqual(data["pubkey"], "HsLShAtzXTVxeUtQd7yi5Z5Zh4zNvbu8sTEZ53nfKcqY")
         self.assertEqual(len(data["endpoints"]), 3)
