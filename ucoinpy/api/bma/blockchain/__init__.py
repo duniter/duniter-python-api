@@ -120,7 +120,7 @@ class Membership(Blockchain):
                             "type": "number"
                         },
                         "written": {
-                            "type": "number"
+                            "type": ["number", "null"]
                         }
                     },
                     "required": ["version", "currency", "membership", "blockNumber", "blockHash", "written"]
