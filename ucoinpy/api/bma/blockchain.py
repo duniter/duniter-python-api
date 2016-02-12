@@ -16,7 +16,7 @@
 # Caner Candan <caner@candan.fr>, http://caner.candan.fr
 #
 
-from .. import API, logging
+from ucoinpy.api.bma import API, logging
 
 logger = logging.getLogger("ucoin/blockchain")
 
@@ -82,8 +82,8 @@ class Parameters(Blockchain):
                      "stepMax", "medianTimeBlocks", "avgGenTime", "dtDiffEval", "blocksRot", "percentRot"]
     }
 
-    async def __get__(self, **kwargs):
-        r = await self.requests_get('/parameters', **kwargs)
+    async def __get__(self, session, **kwargs):
+        r = await self.requests_get(session, '/parameters', **kwargs)
         return (await self.parse_response(r))
 
 
@@ -134,15 +134,15 @@ class Membership(Blockchain):
         super().__init__(connection_handler)
         self.search = search
 
-    async def __post__(self, **kwargs):
+    async def __post__(self, session, **kwargs):
         assert 'membership' in kwargs
 
         r = await self.requests_post('/membership', **kwargs)
         return r
 
-    async def __get__(self, **kwargs):
+    async def __get__(self, session, **kwargs):
         assert self.search is not None
-        r = await self.requests_get('/memberships/%s' % self.search, **kwargs)
+        r = await self.requests_get(session, '/memberships/%s' % self.search, **kwargs)
         return (await self.parse_response(r))
 
 
@@ -278,12 +278,12 @@ class Block(Blockchain):
 
         self.number = number
 
-    async def __get__(self, **kwargs):
+    async def __get__(self, session, **kwargs):
         assert self.number is not None
-        r = await self.requests_get('/block/%d' % self.number, **kwargs)
+        r = await self.requests_get(session, '/block/%d' % self.number, **kwargs)
         return (await self.parse_response(r))
 
-    async def __post__(self, **kwargs):
+    async def __post__(self, session, **kwargs):
         assert 'block' in kwargs
         assert 'signature' in kwargs
 
@@ -296,8 +296,8 @@ class Current(Blockchain):
 
     schema = Block.schema
 
-    async def __get__(self, **kwargs):
-        r = await self.requests_get('/current', **kwargs)
+    async def __get__(self, session, **kwargs):
+        r = await self.requests_get(session, '/current', **kwargs)
         return (await self.parse_response(r))
 
 
@@ -328,9 +328,9 @@ class Hardship(Blockchain):
 
         self.fingerprint = fingerprint
 
-    async def __get__(self, **kwargs):
+    async def __get__(self, session, **kwargs):
         assert self.fingerprint is not None
-        r = await self.requests_get('/hardship/%s' % self.fingerprint.upper(), **kwargs)
+        r = await self.requests_get(session, '/hardship/%s' % self.fingerprint.upper(), **kwargs)
         return (await self.parse_response(r))
 
 
@@ -356,8 +356,8 @@ class Newcomers(Blockchain):
         "required": ["result"]
     }
 
-    async def __get__(self, **kwargs):
-        r = await self.requests_get('/with/newcomers', **kwargs)
+    async def __get__(self, session, **kwargs):
+        r = await self.requests_get(session, '/with/newcomers', **kwargs)
         return (await self.parse_response(r))
 
 
@@ -366,8 +366,8 @@ class Certifications(Blockchain):
 
     schema = Newcomers.schema
 
-    async def __get__(self, **kwargs):
-        r = await self.requests_get('/with/certs', **kwargs)
+    async def __get__(self, session, **kwargs):
+        r = await self.requests_get(session, '/with/certs', **kwargs)
         return (await self.parse_response(r))
 
 
@@ -376,8 +376,8 @@ class Joiners(Blockchain):
 
     schema = Newcomers.schema
 
-    async def __get__(self, **kwargs):
-        r = await self.requests_get('/with/joiners', **kwargs)
+    async def __get__(self, session, **kwargs):
+        r = await self.requests_get(session, '/with/joiners', **kwargs)
         return (await self.parse_response(r))
 
 
@@ -386,8 +386,8 @@ class Actives(Blockchain):
 
     schema = Newcomers.schema
 
-    async def __get__(self, **kwargs):
-        r = await self.requests_get('/with/actives', **kwargs)
+    async def __get__(self, session, **kwargs):
+        r = await self.requests_get(session, '/with/actives', **kwargs)
         return (await self.parse_response(r))
 
 
@@ -396,8 +396,8 @@ class Leavers(Blockchain):
 
     schema = Newcomers.schema
 
-    async def __get__(self, **kwargs):
-        r = await self.requests_get('/with/leavers', **kwargs)
+    async def __get__(self, session, **kwargs):
+        r = await self.requests_get(session, '/with/leavers', **kwargs)
         return (await self.parse_response(r))
 
 
@@ -406,8 +406,8 @@ class Excluded(Blockchain):
 
     schema = Newcomers.schema
 
-    async def __get__(self, **kwargs):
-        r = await self.requests_get('/with/excluded', **kwargs)
+    async def __get__(self, session, **kwargs):
+        r = await self.requests_get(session, '/with/excluded', **kwargs)
         return (await self.parse_response(r))
 
 
@@ -416,8 +416,8 @@ class UD(Blockchain):
 
     schema = Newcomers.schema
 
-    async def __get__(self, **kwargs):
-        r = await self.requests_get('/with/ud', **kwargs)
+    async def __get__(self, session, **kwargs):
+        r = await self.requests_get(session, '/with/ud', **kwargs)
         return (await self.parse_response(r))
 
 
@@ -426,6 +426,6 @@ class TX(Blockchain):
 
     schema = Newcomers.schema
 
-    async def __get__(self, **kwargs):
-        r = await self.requests_get('/with/tx', **kwargs)
+    async def __get__(self, session, **kwargs):
+        r = await self.requests_get(session, '/with/tx', **kwargs)
         return (await self.parse_response(r))

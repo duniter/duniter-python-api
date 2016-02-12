@@ -1,3 +1,4 @@
+import aiohttp
 import unittest
 import jsonschema
 import json
@@ -79,7 +80,8 @@ class Test_BMA_Wot(WebFunctionalSetupMixin, unittest.TestCase):
             lookup = Lookup(None, "pubkey")
             lookup.reverse_url = lambda scheme, path: url
             with self.assertRaises(jsonschema.exceptions.ValidationError):
-                await lookup.get()
+                with aiohttp.ClientSession() as session:
+                    await lookup.get(session)
 
         self.loop.run_until_complete(go())
 
@@ -103,7 +105,8 @@ class Test_BMA_Wot(WebFunctionalSetupMixin, unittest.TestCase):
             members = Members(None)
             members.reverse_url = lambda scheme, path: url
             with self.assertRaises(jsonschema.exceptions.ValidationError):
-                await members.get()
+                with aiohttp.ClientSession() as session:
+                    await members.get(session)
 
         self.loop.run_until_complete(go())
 
@@ -153,7 +156,8 @@ class Test_BMA_Wot(WebFunctionalSetupMixin, unittest.TestCase):
             certsof = CertifiersOf(None, 'pubkey')
             certsof.reverse_url = lambda scheme, path: url
             with self.assertRaises(jsonschema.exceptions.ValidationError):
-                await certsof.get()
+                with aiohttp.ClientSession() as session:
+                    await certsof.get(session)
 
         self.loop.run_until_complete(go())
 
@@ -185,7 +189,8 @@ class Test_BMA_Wot(WebFunctionalSetupMixin, unittest.TestCase):
             certsof = CertifiersOf(None, 'pubkey')
             certsof.reverse_url = lambda scheme, path: url
             with self.assertRaises(jsonschema.exceptions.ValidationError):
-                await certsof.get()
+                with aiohttp.ClientSession() as session:
+                    await certsof.get(session)
 
         self.loop.run_until_complete(go())
 
@@ -199,6 +204,7 @@ class Test_BMA_Wot(WebFunctionalSetupMixin, unittest.TestCase):
             certby = CertifiedBy(None, 'pubkey')
             certby.reverse_url = lambda scheme, path: url
             with self.assertRaises(jsonschema.exceptions.ValidationError):
-                await certby.get()
+                with aiohttp.ClientSession() as session:
+                    await certby.get(session)
 
         self.loop.run_until_complete(go())

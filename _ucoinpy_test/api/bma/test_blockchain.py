@@ -1,5 +1,6 @@
 import unittest
 import jsonschema
+import aiohttp
 from _ucoinpy_test.api.webserver import WebFunctionalSetupMixin, web, asyncio
 from ucoinpy.api.bma.blockchain import Parameters, Block, Current, Hardship, Membership, Newcomers, \
     Certifications, Joiners, Actives, Leavers, UD, TX
@@ -36,7 +37,8 @@ class Test_BMA_Blockchain(WebFunctionalSetupMixin, unittest.TestCase):
             params = Parameters(None)
             params.reverse_url = lambda scheme, path: url
             with self.assertRaises(jsonschema.exceptions.ValidationError):
-                await params.get()
+                with aiohttp.ClientSession() as session:
+                    await params.get(session)
 
         self.loop.run_until_complete(go())
 
@@ -104,7 +106,8 @@ class Test_BMA_Blockchain(WebFunctionalSetupMixin, unittest.TestCase):
             block = Block(None, 100)
             block.reverse_url = lambda scheme, path: url
             with self.assertRaises(jsonschema.exceptions.ValidationError):
-                await block.get()
+                with aiohttp.ClientSession() as session:
+                    await block.get(session)
 
         self.loop.run_until_complete(go())
 
@@ -118,7 +121,8 @@ class Test_BMA_Blockchain(WebFunctionalSetupMixin, unittest.TestCase):
             current = Current(None)
             current.reverse_url = lambda scheme, path: url
             with self.assertRaises(jsonschema.exceptions.ValidationError):
-                await current.get()
+                with aiohttp.ClientSession() as session:
+                    await current.get(session)
 
         self.loop.run_until_complete(go())
 
@@ -178,7 +182,8 @@ class Test_BMA_Blockchain(WebFunctionalSetupMixin, unittest.TestCase):
             hardship = Hardship(None, "fingerprint")
             hardship.reverse_url = lambda scheme, path: url
             with self.assertRaises(jsonschema.exceptions.ValidationError):
-                await hardship.get()
+                with aiohttp.ClientSession() as session:
+                    await hardship.get(session)
 
         self.loop.run_until_complete(go())
 
@@ -218,7 +223,8 @@ class Test_BMA_Blockchain(WebFunctionalSetupMixin, unittest.TestCase):
             membership = Membership(None, "pubkey")
             membership.reverse_url = lambda scheme, path: url
             with self.assertRaises(jsonschema.exceptions.ValidationError):
-                await membership.get()
+                with aiohttp.ClientSession() as session:
+                    await membership.get(session)
 
         self.loop.run_until_complete(go())
 
@@ -240,7 +246,8 @@ class Test_BMA_Blockchain(WebFunctionalSetupMixin, unittest.TestCase):
             newcomers = Newcomers(None)
             newcomers.reverse_url = lambda scheme, path: url
             with self.assertRaises(jsonschema.exceptions.ValidationError):
-                await newcomers.get()
+                with aiohttp.ClientSession() as session:
+                    await newcomers.get(session)
 
         self.loop.run_until_complete(go())
 
@@ -262,7 +269,8 @@ class Test_BMA_Blockchain(WebFunctionalSetupMixin, unittest.TestCase):
             certs = Certifications(None)
             certs.reverse_url = lambda scheme, path: url
             with self.assertRaises(jsonschema.exceptions.ValidationError):
-                await certs.get()
+                with aiohttp.ClientSession() as session:
+                    await certs.get(session)
 
         self.loop.run_until_complete(go())
 
@@ -284,7 +292,8 @@ class Test_BMA_Blockchain(WebFunctionalSetupMixin, unittest.TestCase):
             joiners = Joiners(None)
             joiners.reverse_url = lambda scheme, path: url
             with self.assertRaises(jsonschema.exceptions.ValidationError):
-                await joiners.get()
+                with aiohttp.ClientSession() as session:
+                    await joiners.get(session)
 
         self.loop.run_until_complete(go())
 
@@ -306,7 +315,8 @@ class Test_BMA_Blockchain(WebFunctionalSetupMixin, unittest.TestCase):
             actives = Actives(None)
             actives.reverse_url = lambda scheme, path: url
             with self.assertRaises(jsonschema.exceptions.ValidationError):
-                await actives.get()
+                with aiohttp.ClientSession() as session:
+                    await actives.get(session)
 
         self.loop.run_until_complete(go())
 
@@ -328,7 +338,8 @@ class Test_BMA_Blockchain(WebFunctionalSetupMixin, unittest.TestCase):
             leavers = Leavers(None)
             leavers.reverse_url = lambda scheme, path: url
             with self.assertRaises(jsonschema.exceptions.ValidationError):
-                await leavers.get()
+                with aiohttp.ClientSession() as session:
+                    await leavers.get(session)
 
         self.loop.run_until_complete(go())
 
@@ -350,7 +361,8 @@ class Test_BMA_Blockchain(WebFunctionalSetupMixin, unittest.TestCase):
             ud = UD(None)
             ud.reverse_url = lambda scheme, path: url
             with self.assertRaises(jsonschema.exceptions.ValidationError):
-                await ud.get()
+                with aiohttp.ClientSession() as session:
+                    await ud.get(session)
 
         self.loop.run_until_complete(go())
 
@@ -372,6 +384,7 @@ class Test_BMA_Blockchain(WebFunctionalSetupMixin, unittest.TestCase):
             tx = TX(None)
             tx.reverse_url = lambda scheme, path: url
             with self.assertRaises(jsonschema.exceptions.ValidationError):
-                await tx.get()
+                with aiohttp.ClientSession() as session:
+                    await tx.get(session)
 
         self.loop.run_until_complete(go())

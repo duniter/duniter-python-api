@@ -16,7 +16,7 @@
 # Caner Candan <caner@candan.fr>, http://caner.candan.fr
 #
 
-from .. import API, logging
+from ucoinpy.api.bma import API, logging
 
 logger = logging.getLogger("ucoin/wot")
 
@@ -29,23 +29,23 @@ class WOT(API):
 class Add(WOT):
     """POST Public key data."""
 
-    async def __post__(self, **kwargs):
+    async def __post__(self, session, **kwargs):
         assert 'pubkey' in kwargs
         assert 'self_' in kwargs
         assert 'other' in kwargs
 
-        r = await self.requests_post('/add', **kwargs)
+        r = await self.requests_post(session, '/add', **kwargs)
         return r
 
 
 class Revoke(WOT):
     """POST Public key data."""
 
-    async def __post__(self, **kwargs):
+    async def __post__(self, session, **kwargs):
         assert 'pubkey' in kwargs
         assert 'self_' in kwargs
 
-        r = await self.requests_post('/revoke', **kwargs)
+        r = await self.requests_post(session, '/revoke', **kwargs)
         return r
 
 
@@ -144,10 +144,10 @@ class Lookup(WOT):
 
         self.search = search
 
-    async def __get__(self, **kwargs):
+    async def __get__(self, session, **kwargs):
         assert self.search is not None
 
-        r = await self.requests_get('/lookup/%s' % self.search, **kwargs)
+        r = await self.requests_get(session, '/lookup/%s' % self.search, **kwargs)
         return (await self.parse_response(r))
 
 
@@ -227,10 +227,10 @@ class CertifiersOf(WOT):
 
         self.search = search
 
-    async def __get__(self, **kwargs):
+    async def __get__(self, session, **kwargs):
         assert self.search is not None
 
-        r = await self.requests_get('/certifiers-of/%s' % self.search, **kwargs)
+        r = await self.requests_get(session, '/certifiers-of/%s' % self.search, **kwargs)
         return (await self.parse_response(r))
 
 
@@ -244,10 +244,10 @@ class CertifiedBy(WOT):
 
         self.search = search
 
-    async def __get__(self, **kwargs):
+    async def __get__(self, session, **kwargs):
         assert self.search is not None
 
-        r = await self.requests_get('/certified-by/%s' % self.search, **kwargs)
+        r = await self.requests_get(session, '/certified-by/%s' % self.search, **kwargs)
         return (await self.parse_response(r))
 
 
@@ -275,6 +275,6 @@ class Members(WOT):
     def __init__(self, connection_handler, module='wot'):
         super(WOT, self).__init__(connection_handler, module)
 
-    async def __get__(self, **kwargs):
-        r = await self.requests_get('/members', **kwargs)
+    async def __get__(self, session, **kwargs):
+        r = await self.requests_get(session, '/members', **kwargs)
         return (await self.parse_response(r))

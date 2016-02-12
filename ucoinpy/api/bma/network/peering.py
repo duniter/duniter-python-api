@@ -16,7 +16,7 @@
 # Caner Candan <caner@candan.fr>, http://caner.candan.fr
 #
 
-from .. import Network, logging
+from ucoinpy.api.bma.network import Network, logging
 
 logger = logging.getLogger("ucoin/network/peering")
 
@@ -81,13 +81,13 @@ class Peers(Base):
         ]
     }
 
-    async def __get__(self, **kwargs):
+    async def __get__(self, session, **kwargs):
         """creates a generator with one peering entry per iteration."""
 
         r = await self.requests_get('/peers', **kwargs)
         return (await self.parse_response(r))
 
-    async def __post__(self, **kwargs):
+    async def __post__(self, session, **kwargs):
         assert 'entry' in kwargs
         assert 'signature' in kwargs
 
@@ -98,7 +98,7 @@ class Peers(Base):
 class Status(Base):
     """POST a network status document to this node in order notify of its status."""
 
-    async def __post__(self, **kwargs):
+    async def __post__(self, session, **kwargs):
         assert 'status' in kwargs
         assert 'signature' in kwargs
 

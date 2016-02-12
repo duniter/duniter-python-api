@@ -16,7 +16,7 @@
 # Caner Candan <caner@candan.fr>, http://caner.candan.fr
 #
 
-from .. import API, logging
+from ucoinpy.api.bma import API, logging
 
 logger = logging.getLogger("ucoin/node")
 
@@ -53,7 +53,7 @@ class Summary(Node):
     def __init__(self, connection_handler, module='node'):
         super(Summary, self).__init__(connection_handler, module)
 
-    async def __get__(self, **kwargs):
-        r = await self.requests_get('/summary', **kwargs)
+    async def __get__(self, session, **kwargs):
+        r = await self.requests_get(session, '/summary', **kwargs)
         return (await self.parse_response(r))
 

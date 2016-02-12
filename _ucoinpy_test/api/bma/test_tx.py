@@ -1,5 +1,6 @@
 import unittest
 import jsonschema
+import aiohttp
 from ucoinpy.api.bma.tx import History, Sources
 from _ucoinpy_test.api.webserver import WebFunctionalSetupMixin, web, asyncio
 from ucoinpy.api.bma.tx.history import Blocks
@@ -130,7 +131,8 @@ class Test_BMA_TX(WebFunctionalSetupMixin, unittest.TestCase):
             history = History(None, 'pubkey')
             history.reverse_url = lambda scheme, path: url
             with self.assertRaises(jsonschema.exceptions.ValidationError):
-                await history.get()
+                with aiohttp.ClientSession() as session:
+                    await history.get(session)
 
         self.loop.run_until_complete(go())
 
@@ -144,7 +146,8 @@ class Test_BMA_TX(WebFunctionalSetupMixin, unittest.TestCase):
             blocks = Blocks(None, 'pubkey', 0, 100)
             blocks.reverse_url = lambda scheme, path: url
             with self.assertRaises(jsonschema.exceptions.ValidationError):
-                await blocks.get()
+                with aiohttp.ClientSession() as session:
+                    await blocks.get(session)
 
         self.loop.run_until_complete(go())
 
@@ -181,6 +184,7 @@ class Test_BMA_TX(WebFunctionalSetupMixin, unittest.TestCase):
             sources = Sources(None, 'pubkey')
             sources.reverse_url = lambda scheme, path: url
             with self.assertRaises(jsonschema.exceptions.ValidationError):
-                await sources.get()
+                with aiohttp.ClientSession() as session:
+                    await sources.get(session)
 
         self.loop.run_until_complete(go())

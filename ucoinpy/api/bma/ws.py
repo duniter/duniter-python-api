@@ -16,9 +16,9 @@
 # Caner Candan <caner@candan.fr>, http://caner.candan.fr
 #
 
-from .. import API, logging
-from ..blockchain import Block as _Block
-from ..network.peering import Peers as _Peers
+from ucoinpy.api.bma import API, logging
+from ucoinpy.api.bma.blockchain import Block as _Block
+from ucoinpy.api.bma.network.peering import Peers as _Peers
 
 logger = logging.getLogger("ucoin/ws")
 
@@ -32,8 +32,8 @@ class Block(Websocket):
     """Connect to block websocket."""
     schema = _Block.schema
 
-    def connect(self):
-        r = self.connect_ws('/block')
+    def connect(self, session):
+        r = self.connect_ws(session, '/block')
         return r
 
 
@@ -64,6 +64,6 @@ class Peer(Websocket):
         "required": ["version", "currency", "pubkey", "endpoints", "signature"]
     }
 
-    def connect(self):
-        r = self.connect_ws('/peer')
+    def connect(self, session):
+        r = self.connect_ws(session, '/peer')
         return r

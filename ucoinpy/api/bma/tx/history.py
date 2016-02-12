@@ -16,24 +16,20 @@
 # Caner Candan <caner@candan.fr>, http://caner.candan.fr
 #
 
-from .. import API, logging
+from ucoinpy.api.bma.tx import History, logging
 
-logger = logging.getLogger("ucoin/ud")
-
-
-class Ud(API):
-    def __init__(self, conn_handler, module='ud'):
-        super(Ud, self).__init__(conn_handler, module)
+logger = logging.getLogger("ucoin/tx")
 
 
-class History(Ud):
-    """Get UD history."""
+class Blocks(History):
 
-    def __init__(self, conn_handler, pubkey, module='ud'):
-        super(Ud, self).__init__(conn_handler, module)
-        self.pubkey = pubkey
+    schema = History.schema
 
-    async def __get__(self, **kwargs):
-        assert self.pubkey is not None
-        r = await self.requests_get('/history/%s' % self.pubkey, **kwargs)
-        return (await r.json())
+    def __init__(self, conn_handler, pubkey, from_, to_, module='tx'):
+        super(Blocks, self).__init__(conn_handler, pubkey, module)
+        self.from_ = from_
+        self.to_ = to_
+
+    async def __get__(self, session, **kwargs):
+        r = await self.requests_get(session, '/history/%s/blocks/%s/%s' % (self.pubkey, self.from_, self.to_), **kwargs)
+        return (await self.parse_response(r))
