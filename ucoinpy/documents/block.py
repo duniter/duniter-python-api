@@ -2,6 +2,7 @@ from .document import Document, MalformedDocumentError
 from .certification import SelfCertification, Certification
 from .membership import Membership
 from .transaction import Transaction
+from .constants import pubkey_regex, signature_regex, block_hash_regex
 
 import re
 
@@ -10,7 +11,7 @@ class BlockId:
     """
     A simple block id
     """
-    re_hash = re.compile("([0-9a-fA-F]{5,40})")
+    re_hash = re.compile("({block_hash_regex})".format(block_hash_regex=block_hash_regex))
 
     @classmethod
     def empty(cls):
@@ -93,9 +94,9 @@ The class Block handles Block documents.
     re_time = re.compile("Time: ([0-9]+)\n")
     re_mediantime = re.compile("MedianTime: ([0-9]+)\n")
     re_universaldividend = re.compile("UniversalDividend: ([0-9]+)\n")
-    re_issuer = re.compile("Issuer: ([1-9A-Za-z][^OIl]{42,45})\n")
-    re_previoushash = re.compile("PreviousHash: ([0-9a-fA-F]{5,40})\n")
-    re_previousissuer = re.compile("PreviousIssuer: ([1-9A-Za-z][^OIl]{42,45})\n")
+    re_issuer = re.compile("Issuer: ({pubkey_regex})\n".format(pubkey_regex=pubkey_regex))
+    re_previoushash = re.compile("PreviousHash: ({block_hash_regex})\n".format(block_hash_regex=block_hash_regex))
+    re_previousissuer = re.compile("PreviousIssuer: ({pubkey_regex})\n".format(pubkey_regex=pubkey_regex))
     re_parameters = re.compile("Parameters: ([0-9]+\.[0-9]+):([0-9]+):([0-9]+):([0-9]+):\
 ([0-9]+):([0-9]+):([0-9]+):([0-9]+):([0-9]+):([0-9]+):([0-9]+):([0-9]+):([0-9]+):\
 ([0-9]+\.[0-9]+)\n")
@@ -105,7 +106,7 @@ The class Block handles Block documents.
     re_actives = re.compile("Actives:\n")
     re_leavers = re.compile("Leavers:\n")
     re_excluded = re.compile("Excluded:\n")
-    re_exclusion = re.compile("([1-9A-Za-z][^OIl]{42,45})\n")
+    re_exclusion = re.compile("({pubkey_regex})\n".format(pubkey_regex=pubkey_regex))
     re_certifications = re.compile("Certifications:\n")
     re_transactions = re.compile("Transactions:\n")
 

@@ -4,6 +4,7 @@ Created on 2 déc. 2014
 @author: inso
 """
 from .document import Document, MalformedDocumentError
+from .constants import block_hash_regex, signature_regex, pubkey_regex
 
 import re
 
@@ -24,11 +25,11 @@ class Membership(Document):
     """
 
     # PUBLIC_KEY:SIGNATURE:NUMBER:HASH:TIMESTAMP:USER_ID
-    re_inline = re.compile("([1-9A-Za-z][^OIl]{42,45}):([A-Za-z0-9+/]+(?:=|==)?):\
-([0-9]+):([0-9a-fA-F]{5,40}):([0-9]+):([^\n]+)\n")
+    re_inline = re.compile("({pubkey_regex}):({signature_regex}):([0-9]+):({block_hash_regex}):([0-9]+):([^\n]+)\n"
+                                .format(pubkey_regex=pubkey_regex, signature_regex=signature_regex, block_hash_regex=block_hash_regex))
     re_type = re.compile("Type: (Membership)")
-    re_issuer = re.compile("Issuer: ([1-9A-Za-z][^OIl]{42,45})\n")
-    re_block = re.compile("Block: ([0-9]+-[0-9a-fA-F]{5,40})\n")
+    re_issuer = re.compile("Issuer: ({pubkey_regex})\n".format(pubkey_regex=pubkey_regex))
+    re_block = re.compile("Block: ([0-9]+-{block_hash_regex})\n".format(block_hash_regex=block_hash_regex))
     re_membership_type = re.compile("Membership: (IN|OUT)")
     re_userid = re.compile("UserID: ([^\n]+)\n")
     re_certts = re.compile("CertTS: ([0-9]+)\n")

@@ -1,6 +1,6 @@
 from .document import Document, MalformedDocumentError
 import re
-
+from .constants import pubkey_regex, block_hash_regex
 
 class Transaction(Document):
     """
@@ -44,7 +44,7 @@ class Transaction(Document):
     re_outputs = re.compile("Outputs:\n")
     re_compact_comment = re.compile("([^\n]+)\n")
     re_comment = re.compile("Comment: ([^\n]*)\n")
-    re_pubkey = re.compile("([1-9A-Za-z][^OIl]{42,45})\n")
+    re_pubkey = re.compile("({pubkey_regex})\n".format(pubkey_regex=pubkey_regex))
 
     fields_parsers = {**Document.fields_parsers, **{
             "Type": re_type,
@@ -245,7 +245,8 @@ class InputSource:
     INDEX:SOURCE:FINGERPRINT:AMOUNT
 
     """
-    re_inline = re.compile("([0-9]+):(D|T):([0-9]+):([0-9a-fA-F]{5,40}):([0-9]+)\n")
+    re_inline = re.compile("([0-9]+):(D|T):([0-9]+):({block_hash_regex}):([0-9]+)\n"
+                           .format(block_hash_regex=block_hash_regex))
     re_compact = re.compile("([0-9]+):(D|T):([0-9a-fA-F]{5,40}):([0-9]+)\n")
 
     def __init__(self, index, source, number, txhash, amount):
@@ -288,7 +289,7 @@ class OutputSource():
     """
     A Transaction OUTPUT
     """
-    re_inline = re.compile("([1-9A-Za-z][^OIl]{42,45}):([0-9]+)")
+    re_inline = re.compile("({pubkey_regex}):([0-9]+)".format(pubkey_regex=pubkey_regex))
 
     def __init__(self, pubkey, amount):
         self.pubkey = pubkey

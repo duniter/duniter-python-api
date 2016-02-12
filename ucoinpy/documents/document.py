@@ -2,6 +2,7 @@ import base64
 import re
 import logging
 import hashlib
+from .constants import signature_regex
 
 
 class MalformedDocumentError(Exception):
@@ -15,7 +16,7 @@ class MalformedDocumentError(Exception):
 class Document:
     re_version = re.compile("Version: ([0-9]+)\n")
     re_currency = re.compile("Currency: ([^\n]+)\n")
-    re_signature = re.compile("([A-Za-z0-9+/]+(?:=|==)?)\n")
+    re_signature = re.compile("({signature_regex})\n".format(signature_regex=signature_regex))
 
     fields_parsers = {
         "Version": re_version,

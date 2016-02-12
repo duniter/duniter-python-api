@@ -3,14 +3,15 @@ import base64
 import logging
 
 from .document import Document, MalformedDocumentError
-
+from .constants import pubkey_regex, signature_regex, block_hash_regex
 
 class SelfCertification(Document):
     """
     A document discribing a self certification.
     """
 
-    re_inline = re.compile("([1-9A-Za-z][^OIl]{42,45}):([A-Za-z0-9+/]+(?:=|==)?):([0-9]+):([^\n]+)\n")
+    re_inline = re.compile("({pubkey_regex}):({signature_regex}):([0-9]+):([^\n]+)\n"
+                           .format(pubkey_regex=pubkey_regex, signature_regex=signature_regex))
     re_uid = re.compile("UID:([^\n]+)\n")
     re_timestamp = re.compile("META:TS:([0-9]+)\n")
 
@@ -49,8 +50,12 @@ class Certification(Document):
     A document describing a certification.
     """
 
-    re_inline = re.compile("([1-9A-Za-z][^OIl]{42,45}):([1-9A-Za-z][^OIl]{42,45}):([0-9]+):([A-Za-z0-9+/]+(?:=|==)?)\n")
-    re_timestamp = re.compile("META:TS:([0-9]+)-([0-9a-fA-F]{5,40})\n")
+    re_inline = re.compile("({certifier_regex}):({certified_regex}):([0-9]+):({signature_regex})\n".format(
+                                certifier_regex=pubkey_regex,
+                                certified_regex=pubkey_regex,
+                                signature_regex=signature_regex
+                    ))
+    re_timestamp = re.compile("META:TS:([0-9]+)-([0-9a-fA-F]{5,64})\n")
 
     def __init__(self, version, currency, pubkey_from, pubkey_to,
                  blockid, signature):
