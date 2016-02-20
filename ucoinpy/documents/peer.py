@@ -2,7 +2,7 @@ import re
 
 from ..api.bma import ConnectionHandler
 from .document import Document, MalformedDocumentError
-from . import BlockId
+from . import BlockUID
 from .. import PROTOCOL_VERSION, MANAGED_API
 from .constants import block_hash_regex, pubkey_regex
 
@@ -60,7 +60,7 @@ class Peer(Document):
         pubkey = Peer.parse_field("Pubkey", lines[n])
         n += 1
 
-        blockid = BlockId.from_str(Peer.parse_field("Block", lines[n]))
+        blockid = BlockUID.from_str(Peer.parse_field("Block", lines[n]))
         n += 1
 
         Peer.parse_field("Endpoints", lines[n])

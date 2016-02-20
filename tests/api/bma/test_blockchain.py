@@ -1,7 +1,7 @@
 import unittest
 import jsonschema
 import aiohttp
-from _ucoinpy_test.api.webserver import WebFunctionalSetupMixin, web, asyncio
+from tests.api.webserver import WebFunctionalSetupMixin, web, asyncio
 from ucoinpy.api.bma.blockchain import Parameters, Block, Current, Hardship, Membership, Newcomers, \
     Certifications, Joiners, Actives, Leavers, UD, TX
 

@@ -3,19 +3,22 @@ import base64
 import logging
 
 from .document import Document, MalformedDocumentError
-from .constants import pubkey_regex, signature_regex, block_hash_regex
+from .constants import pubkey_regex, signature_regex, block_id_regex, block_uid_regex
+
 
 class SelfCertification(Document):
     """
     A document discribing a self certification.
     """
 
-    re_inline = re.compile("({pubkey_regex}):({signature_regex}):([0-9]+):([^\n]+)\n"
-                           .format(pubkey_regex=pubkey_regex, signature_regex=signature_regex))
+    re_inline = re.compile("({pubkey_regex}):({signature_regex}):({block_uid_regex}):([^\n]+)\n"
+                           .format(pubkey_regex=pubkey_regex,
+                                   signature_regex=signature_regex,
+                                   block_uid_regex=block_uid_regex))
     re_uid = re.compile("UID:([^\n]+)\n")
-    re_timestamp = re.compile("META:TS:([0-9]+)\n")
+    re_timestamp = re.compile("META:TS:({block_uid_regex})\n".format(block_uid_regex=block_uid_regex))
 
-    def __init__(self, version, currency, pubkey, ts, uid, signature):
+    def __init__(self, version, currency, pubkey, uid, ts, signature):
         if signature:
             super().__init__(version, currency, [signature])
         else:
@@ -26,23 +29,37 @@ class SelfCertification(Document):
 
     @classmethod
     def from_inline(cls, version, currency, inline):
+        from .block import BlockUID
+
         selfcert_data = SelfCertification.re_inline.match(inline)
         if selfcert_data is None:
             raise MalformedDocumentError("Inline self certification")
         pubkey = selfcert_data.group(1)
         signature = selfcert_data.group(2)
-        ts = int(selfcert_data.group(3))
+        ts = BlockUID.from_str(selfcert_data.group(3))
         uid = selfcert_data.group(4)
-        return cls(version, currency, pubkey, ts, uid, signature)
+
+        return cls(version, currency, pubkey, uid, ts, signature)
 
     def raw(self):
-        return """UID:{0}
-META:TS:{1}
-""".format(self.uid, self.timestamp)
+        return """Version: {version}
+Type: Identity
+Currency: {currency}
+Issuer: {pubkey}
+UniqueID: {uid}
+Timestamp: {timestamp}
+""".format(version=self.version,
+           currency=self.currency,
+           pubkey=self.pubkey,
+           uid=self.uid,
+           timestamp=self.timestamp)
 
     def inline(self):
-        return "{0}:{1}:{2}:{3}".format(self.pubkey, self.signatures[0],
-                                    self.timestamp, self.uid)
+        return "{pubkey}:{signature}:{timestamp}:{uid}".format(
+            pubkey=self.pubkey,
+            signature=self.signatures[0],
+            timestamp=self.timestamp,
+            uid=self.uid)
 
 
 class Certification(Document):
@@ -50,41 +67,79 @@ class Certification(Document):
     A document describing a certification.
     """
 
-    re_inline = re.compile("({certifier_regex}):({certified_regex}):([0-9]+):({signature_regex})\n".format(
+    re_inline = re.compile("({certifier_regex}):({certified_regex}):({block_id_regex}):({signature_regex})\n".format(
                                 certifier_regex=pubkey_regex,
                                 certified_regex=pubkey_regex,
+                                block_id_regex=block_id_regex,
                                 signature_regex=signature_regex
                     ))
-    re_timestamp = re.compile("META:TS:([0-9]+)-([0-9a-fA-F]{5,64})\n")
+    re_timestamp = re.compile("META:TS:({block_uid_regex})\n".format(block_uid_regex=block_uid_regex))
 
     def __init__(self, version, currency, pubkey_from, pubkey_to,
-                 blockid, signature):
+                 timestamp, signature):
         """
         Constructor
+
+        :param str version: the UCP version
+        :param str currency: the currency of the blockchain
+        :param str pubkey_from:
+        :param str pubkey_to:
+        :param BlockUID timestamp: the blockuid
+        :param str signature: the signature of the document
         """
         super().__init__(version, currency, [signature])
         self.pubkey_from = pubkey_from
         self.pubkey_to = pubkey_to
-        self.blockid = blockid
+        self.timestamp = timestamp
 
     @classmethod
     def from_inline(cls, version, currency, blockhash, inline):
+        """
+        From inline version in block
+        :param version:
+        :param currency:
+        :param blockhash:
+        :param inline:
+        :return:
+        """
+        from .block import Block, BlockUID
         cert_data = Certification.re_inline.match(inline)
         if cert_data is None:
-            raise MalformedDocumentError("Certification")
+            raise MalformedDocumentError("Certification ({0})".format(inline))
         pubkey_from = cert_data.group(1)
         pubkey_to = cert_data.group(2)
-        blocknumber = int(cert_data.group(3))
-        if blocknumber == 0:
-            blockhash = "DA39A3EE5E6B4B0D3255BFEF95601890AFD80709"
+        blockid = int(cert_data.group(3))
+        if blockid == 0:
+            timestamp = BlockUID.empty()
+        else:
+            timestamp = BlockUID(blockid, blockhash)
+
         signature = cert_data.group(4)
-        from .block import BlockId
-        return cls(version, currency, pubkey_from, pubkey_to,
-                   BlockId(blocknumber, blockhash), signature)
+        return cls(version, currency, pubkey_from, pubkey_to, timestamp, signature)
 
     def raw(self, selfcert):
-        return """{0}META:TS:{1}
-""".format(selfcert.signed_raw(), self.blockid)
+        """
+
+        :param SelfCertification selfcert:
+        :return:
+        """
+        return """Version: {version}
+Type: Certification
+Currency: {currency}
+Issuer: {issuer}
+IdtyIssuer: {certified_pubkey}
+IdtyUniqueID: {certified_uid}
+IdtyTimestamp: {certified_ts}
+IdtySignature: {certified_signature}
+CertTimestamp: {timestamp}
+""".format(version=self.version,
+           currency=self.currency,
+           issuer=self.pubkey_from,
+           certified_pubkey=selfcert.pubkey,
+           certified_uid=selfcert.uid,
+           certified_ts=selfcert.timestamp,
+           certified_signature=selfcert.signatures[0],
+           timestamp=self.timestamp)
 
     def sign(self, selfcert, keys):
         """
@@ -105,22 +160,62 @@ class Certification(Document):
 
     def inline(self):
         return "{0}:{1}:{2}:{3}".format(self.pubkey_from, self.pubkey_to,
-                                        self.blockid.number, self.signatures[0])
+                                        self.timestamp.number, self.signatures[0])
 
 
-class Revocation(Document):
+class Revokation(Document):
     """
     A document describing a self-revocation.
     """
-    def __init__(self, version, currency, signature):
+    re_inline = re.compile("({pubkey_regex}):({signature_regex})\n".format(
+                                pubkey_regex=pubkey_regex,
+                                signature_regex=signature_regex
+                    ))
+
+    def __init__(self, version, currency, pubkey, signature):
         """
         Constructor
         """
         super().__init__(version, currency, [signature])
+        self.pubkey = pubkey
+
+    @classmethod
+    def from_inline(cls, version, currency, inline):
+        """
+        From inline version in block
+        :param int version:
+        :param str currency:
+        :param str pubkey:
+        :param str signature:
+        :return:
+        """
+        cert_data = Revokation.re_inline.match(inline)
+        if cert_data is None:
+            raise MalformedDocumentError("Revokation")
+        pubkey = cert_data.group(1)
+        signature = cert_data.group(2)
+        return cls(version, currency, pubkey, signature)
+
 
     def raw(self, selfcert):
-        return """{0}META:REVOKE
-""".format(selfcert.signed_raw())
+        """
+
+        :param SelfCertification selfcert:
+        :return:
+        """
+        return """Version: {version}
+Type: Revocation
+Currency: {currency}
+Issuer: {pubkey}
+IdtyUniqueID: {uid}
+IdtyTimestamp: {timestamp}
+IdtySignature: {signature}
+""".format(version=self.version,
+           currency=self.currency,
+           pubkey=selfcert.pubkey,
+           uid=selfcert.uid,
+           timestamp=selfcert.timestamp,
+           signature=selfcert.signatures[0])
 
     def sign(self, selfcert, keys):
         """
@@ -132,3 +227,8 @@ class Revocation(Document):
             signing = base64.b64encode(key.signature(bytes(self.raw(selfcert), 'ascii')))
             self.signatures.append(signing.decode("ascii"))
 
+    def signed_raw(self, selfcert):
+        raw = self.raw(selfcert)
+        signed = "\n".join(self.signatures)
+        signed_raw = raw + signed + "\n"
+        return signed_raw

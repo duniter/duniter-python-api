@@ -7,7 +7,7 @@ import unittest
 from ucoinpy.documents.peer import Peer, BMAEndpoint, UnknownEndpoint
 
 
-rawpeer = """Version: 1
+rawpeer = """Version: 2
 Type: Peer
 Currency: beta_brousouf
 PublicKey: HsLShAtzXTVxeUtQd7yi5Z5Zh4zNvbu8sTEZ53nfKcqY

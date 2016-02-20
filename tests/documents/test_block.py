@@ -6,10 +6,9 @@ Created on 12 déc. 2014
 import unittest
 from ucoinpy.documents.block import Block
 
-raw_block = """Version: 1
+raw_block = """Version: 2
 Type: Block
 Currency: zeta_brouzouf
-Nonce: 45079
 Number: 15
 PoWMin: 4
 Time: 1418083330
@@ -22,16 +21,18 @@ Identities:
 Joiners:
 Actives:
 Leavers:
+Revoked:
 Excluded:
 Certifications:
 Transactions:
+Hash: DB30D958EE5CB75186972286ED3F4686B8A1C2CD
+Nonce: 45079
 42yQm4hGTJYWkPg39hQAUgP6S6EQ4vTfXdJuxKEHL1ih6YHiDL2hcwrFgBHjXLRgxRhj2VNVqqc6b4JayKqTE14r
 """
 
-raw_block_with_tx = """Version: 1
+raw_block_with_tx = """Version: 2
 Type: Block
 Currency: meta_brouzouf
-Nonce: 581
 Number: 34436
 PoWMin: 5
 Time: 1443896211
@@ -43,36 +44,56 @@ MembersCount: 19
 Identities:
 Joiners:
 Actives:
-ATkjQPa4sn4LBF69jqEPzFtRdHYJs6MJQjvP8JdN7MtN:QTowsupV+uXrcomL44WCxbu3LQoJM2C2VPMet5Xg6gXGAHEtGRp47FfQLb2ok1+/588JiIHskCyazj3UOsmKDw==:34434:00000D21F80687248A8C02F16BB19A975B4F983D:1422108319:urodelus
+ATkjQPa4sn4LBF69jqEPzFtRdHYJs6MJQjvP8JdN7MtN:QTowsupV+uXrcomL44WCxbu3LQoJM2C2VPMet5Xg6gXGAHEtGRp47FfQLb2ok1+/588JiIHskCyazj3UOsmKDw==:34434-00000D21F80687248A8C02F16BB19A975B4F983D:34432-00000D21F80687248A8C02F16BB19A975B4F983D:urodelus
 Leavers:
+Revoked:
 Excluded:
 Certifications:
-5ocqzyDMMWf1V8bsoNhWb1iNwax1e9M7VTUN6navs8of:ATkjQPa4sn4LBF69jqEPzFtRdHYJs6MJQjvP8JdN7MtN:34435:6TuxRcARnpo13l3cXtgPTkjJlv8DZOUvsAzmZJMbjHZbbZfDQ6MJpH9DIuH0eyG3WGc0EX/046mbMGBrKKg9DQ==
-ATkjQPa4sn4LBF69jqEPzFtRdHYJs6MJQjvP8JdN7MtN:2qwGeLWoPG7db72bKXPfJpAtj67FYDnPaJn2JB7tyXxJ:34434:LusTbb7CgwrqqacDKjtldw60swwvDBH8wVUIJN4SWRb2pZPJSpDxgqaGyjC5P9i/DendfyQWc7cfzPDqSZmZAg==
+5ocqzyDMMWf1V8bsoNhWb1iNwax1e9M7VTUN6navs8of:ATkjQPa4sn4LBF69jqEPzFtRdHYJs6MJQjvP8JdN7MtN:0:6TuxRcARnpo13l3cXtgPTkjJlv8DZOUvsAzmZJMbjHZbbZfDQ6MJpH9DIuH0eyG3WGc0EX/046mbMGBrKKg9DQ==
+ATkjQPa4sn4LBF69jqEPzFtRdHYJs6MJQjvP8JdN7MtN:2qwGeLWoPG7db72bKXPfJpAtj67FYDnPaJn2JB7tyXxJ:0:LusTbb7CgwrqqacDKjtldw60swwvDBH8wVUIJN4SWRb2pZPJSpDxgqaGyjC5P9i/DendfyQWc7cfzPDqSZmZAg==
 Transactions:
-TX:1:1:1:2:1
-DKqZ9LqCtHRQD3WWZWJNaStxiqNm46Q64Pg6eaixrzRL
-0:D:15253:0000F84AD8625D767C9A9D53EA3929A41BF59F0E:1784852
-8ML26qB3pfydANsBDMzebNh3GQyFKwheV8BnuGRDHJFy:877169
-DKqZ9LqCtHRQD3WWZWJNaStxiqNm46Q64Pg6eaixrzRL:907683
-0.10.2
-Gqb9pZGYQqJ2ZT8acLXp0ajzVvJjKfn8ruM1OXbbF9Wwx+jhBefoHFz9Ju0VvJxWF74MKGgyJ6lR1N9r5EqYCg==
-TX:1:1:2:2:1
-5ocqzyDMMWf1V8bsoNhWb1iNwax1e9M7VTUN6navs8of
-0:D:32793:00003BD004943CA9C229435A454D051BA32338E3:245953766553
-0:D:32936:0000D42C2D0B09AC4B6238D2A7BA4FDA027C49AB:270549143208
-GzSdk1gSsdEpV7ydHpndAaHhY7XsrDT4xTDYYMaQMCWq:438584250177
-5ocqzyDMMWf1V8bsoNhWb1iNwax1e9M7VTUN6navs8of:77918659584
-welcome !
-Nzy+iceGg757bZ4ddS44Z2Ji52BNlHZiBigzavqmI0PUBbFcjHEUhHJ0RE0I4Jsjx9MuDoZaP3TjwlnH99bGCA==
+TX:2:1:3:1:0:0
+HsLShAtzXTVxeUtQd7yi5Z5Zh4zNvbu8sTEZ53nfKcqY
+T:6991C993631BED4733972ED7538E41CCC33660F554E3C51963E2A0AC4D6453D3:0
+T:3A09A20E9014110FD224889F13357BAB4EC78A72F95CA03394D8CCA2936A7435:10
+D:HsLShAtzXTVxeUtQd7yi5Z5Zh4zNvbu8sTEZ53nfKcqY:88
+0:SIG(0)
+1:SIG(0)
+2:SIG(0)
+30:2:SIG(BYfWYFrsyjpvpFysgu19rGK3VHBkz4MqmQbNyEuVU64g)
+42yQm4hGTJYWkPg39hQAUgP6S6EQ4vTfXdJuxKEHL1ih6YHiDL2hcwrFgBHjXLRgxRhj2VNVqqc6b4JayKqTE14r
+TX:2:3:6:3:1:0
+HsLShAtzXTVxeUtQd7yi5Z5Zh4zNvbu8sTEZ53nfKcqY
+CYYjHsNyg3HMRMpTHqCJAN9McjH5BwFLmDKGV3PmCuKp
+9WYHTavL1pmhunFCzUwiiq4pXwvgGG5ysjZnjz9H8yB
+T:6991C993631BED4733972ED7538E41CCC33660F554E3C51963E2A0AC4D6453D3:2
+T:3A09A20E9014110FD224889F13357BAB4EC78A72F95CA03394D8CCA2936A7435:8
+D:HsLShAtzXTVxeUtQd7yi5Z5Zh4zNvbu8sTEZ53nfKcqY:46
+T:A0D9B4CDC113ECE1145C5525873821398890AE842F4B318BD076095A23E70956:3
+T:67F2045B5318777CC52CD38B424F3E40DDA823FA0364625F124BABE0030E7B5B:5
+D:9WYHTavL1pmhunFCzUwiiq4pXwvgGG5ysjZnjz9H8yB:46
+0:SIG(0)
+1:XHX(7665798292)
+2:SIG(0)
+3:SIG(0) SIG(2)
+4:SIG(0) SIG(1) SIG(2)
+5:SIG(2)
+120:2:SIG(BYfWYFrsyjpvpFysgu19rGK3VHBkz4MqmQbNyEuVU64g)
+146:2:SIG(DSz4rgncXCytsUMW2JU2yhLquZECD2XpEkpP9gG5HyAx)
+49:2:(SIG(6DyGr5LFtFmbaJYRvcs9WmBsr4cbJbJ1EV9zBbqG7A6i) OR XHX(3EB4702F2AC2FD3FA4FDC46A4FC05AE8CDEE1A85))
+-----@@@----- (why not this comment?)
+42yQm4hGTJYWkPg39hQAUgP6S6EQ4vTfXdJuxKEHL1ih6YHiDL2hcwrFgBHjXLRgxRhj2VNVqqc6b4JayKqTE14r
+2D96KZwNUvVtcapQPq2mm7J9isFcDCfykwJpVEZwBc7tCgL4qPyu17BT5ePozAE9HS6Yvj51f62Mp4n9d9dkzJoX
+2XiBDpuUdu6zCPWGzHXXy8c4ATSscfFQG9DjmqMZUxDZVt1Dp4m2N5oHYVUfoPdrU9SLk4qxi65RNrfCVnvQtQJk
+Hash: DB30D958EE5CB75186972286ED3F4686B8A1C2CD
+Nonce: 581
 nY/MsFU2luiohLmSiOOimL1RIqbriOBgc22ua03Z2dhxtSJxKZeGNGDvl1jaXgmEBRnXU87yXbZ7ioOS/AAVCA==
 """
 
 
-raw_block_zero = """Version: 1
+raw_block_zero = """Version: 2
 Type: Block
 Currency: zeta_brouzouf
-Nonce: 2125
 Number: 0
 PoWMin: 3
 Time: 1418077277
@@ -81,17 +102,18 @@ Issuer: HnFcSms8jzwngtVomTTnzudZx7SHUQY8sVE1y8yBmULk
 Parameters: 0.01:302400:100:5259600:2629800:3:5:2629800:3:11:600:10:20:0.67
 MembersCount: 4
 Identities:
-HnFcSms8jzwngtVomTTnzudZx7SHUQY8sVE1y8yBmULk:h/H8tDIEbfA4yxMQcvfOXVDQhi1sUa9qYtPKrM59Bulv97ouwbAvAsEkC1Uyit1IOpeAV+CQQs4IaAyjE8F1Cw==:1416335620:cgeek
-8Fi1VSTbjkXguwThF4v2ZxC5whK7pwG2vcGTkPUPjPGU:lAW4mCPqA3cnEubHAGpMXR0o8euEdDVeSLplRgdLPf8Bty7R7FqVqwoAlL/4q/7p3O57Cz9z3mvhRSNwt23qBw==:1416378344:inso
-RdrHvL179Rw62UuyBrqy2M1crx7RPajaViBatS59EGS:Ah55O8cvdkGS4at6AGOKUjy+wrFwAq8iKRJ5xLIb6Xdi3M8WfGOUdMjwZA6GlSkdtlMgEhQPm+r2PMebxKrCBg==:1416428323:vit
-9fx25FmeBDJcikZLWxK5HuzKNbY6MaWYXoK1ajteE42Y:ZjlNz2k/7Y38xwzaVEtyteOD12ukRT+x8NBFVTrcZtUHSJdqt7ejBAC0ULu7eCTLlmJk0jS6cuJ3IeVTLfFRDg==:1416436555:ManUtopiK
+HnFcSms8jzwngtVomTTnzudZx7SHUQY8sVE1y8yBmULk:h/H8tDIEbfA4yxMQcvfOXVDQhi1sUa9qYtPKrM59Bulv97ouwbAvAsEkC1Uyit1IOpeAV+CQQs4IaAyjE8F1Cw==:0-DA39A3EE5E6B4B0D3255BFEF95601890AFD80709:cgeek
+8Fi1VSTbjkXguwThF4v2ZxC5whK7pwG2vcGTkPUPjPGU:lAW4mCPqA3cnEubHAGpMXR0o8euEdDVeSLplRgdLPf8Bty7R7FqVqwoAlL/4q/7p3O57Cz9z3mvhRSNwt23qBw==:0-DA39A3EE5E6B4B0D3255BFEF95601890AFD80709:inso
+RdrHvL179Rw62UuyBrqy2M1crx7RPajaViBatS59EGS:Ah55O8cvdkGS4at6AGOKUjy+wrFwAq8iKRJ5xLIb6Xdi3M8WfGOUdMjwZA6GlSkdtlMgEhQPm+r2PMebxKrCBg==:0-DA39A3EE5E6B4B0D3255BFEF95601890AFD80709:vit
+9fx25FmeBDJcikZLWxK5HuzKNbY6MaWYXoK1ajteE42Y:ZjlNz2k/7Y38xwzaVEtyteOD12ukRT+x8NBFVTrcZtUHSJdqt7ejBAC0ULu7eCTLlmJk0jS6cuJ3IeVTLfFRDg==:0-DA39A3EE5E6B4B0D3255BFEF95601890AFD80709:ManUtopiK
 Joiners:
-HnFcSms8jzwngtVomTTnzudZx7SHUQY8sVE1y8yBmULk:dkaXIiCYUJtCg8Feh/BKvPYf4uFH9CJ/zY6J4MlA9BsjmcMe4YAblvNt/gJy31b1aGq3ue3h14mLMCu84rraDg==:0:DA39A3EE5E6B4B0D3255BFEF95601890AFD80709:1416335620:cgeek
-8Fi1VSTbjkXguwThF4v2ZxC5whK7pwG2vcGTkPUPjPGU:43FEO5wwKzo79k+WmZsrUDsNNceStYkrweEntwYGoGn9+YNjyyCbMmKcEU38xzMV2M0ZMgjvlTK30/vWwrD5CQ==:0:DA39A3EE5E6B4B0D3255BFEF95601890AFD80709:1416378344:inso
-RdrHvL179Rw62UuyBrqy2M1crx7RPajaViBatS59EGS:zPg1kgjVstsaKDBq3Re6Z84hlw0Ja2pjJEORmn7w5ifT6/e45BnEPJaqoVgImzSnytjOpzXN/rhAO4+UDJOUBQ==:0:DA39A3EE5E6B4B0D3255BFEF95601890AFD80709:1416428323:vit
-9fx25FmeBDJcikZLWxK5HuzKNbY6MaWYXoK1ajteE42Y:ox/t5um2bbFJfc6NdRDM8DniGxlRB5zmKuW7WK+MiDpE32GUhf/tDcyfBkIpwIFcaY0hqLYW1OQlgbm2qT6xAw==:0:DA39A3EE5E6B4B0D3255BFEF95601890AFD80709:1416436555:ManUtopiK
+HnFcSms8jzwngtVomTTnzudZx7SHUQY8sVE1y8yBmULk:dkaXIiCYUJtCg8Feh/BKvPYf4uFH9CJ/zY6J4MlA9BsjmcMe4YAblvNt/gJy31b1aGq3ue3h14mLMCu84rraDg==:0-DA39A3EE5E6B4B0D3255BFEF95601890AFD80709:0-DA39A3EE5E6B4B0D3255BFEF95601890AFD80709:cgeek
+8Fi1VSTbjkXguwThF4v2ZxC5whK7pwG2vcGTkPUPjPGU:43FEO5wwKzo79k+WmZsrUDsNNceStYkrweEntwYGoGn9+YNjyyCbMmKcEU38xzMV2M0ZMgjvlTK30/vWwrD5CQ==:0-DA39A3EE5E6B4B0D3255BFEF95601890AFD80709:0-DA39A3EE5E6B4B0D3255BFEF95601890AFD80709:inso
+RdrHvL179Rw62UuyBrqy2M1crx7RPajaViBatS59EGS:zPg1kgjVstsaKDBq3Re6Z84hlw0Ja2pjJEORmn7w5ifT6/e45BnEPJaqoVgImzSnytjOpzXN/rhAO4+UDJOUBQ==:0-DA39A3EE5E6B4B0D3255BFEF95601890AFD80709:0-DA39A3EE5E6B4B0D3255BFEF95601890AFD80709:vit
+9fx25FmeBDJcikZLWxK5HuzKNbY6MaWYXoK1ajteE42Y:ox/t5um2bbFJfc6NdRDM8DniGxlRB5zmKuW7WK+MiDpE32GUhf/tDcyfBkIpwIFcaY0hqLYW1OQlgbm2qT6xAw==:0-DA39A3EE5E6B4B0D3255BFEF95601890AFD80709:0-DA39A3EE5E6B4B0D3255BFEF95601890AFD80709:ManUtopiK
 Actives:
 Leavers:
+Revoked:
 Excluded:
 Certifications:
 8Fi1VSTbjkXguwThF4v2ZxC5whK7pwG2vcGTkPUPjPGU:HnFcSms8jzwngtVomTTnzudZx7SHUQY8sVE1y8yBmULk:0:TgmDuMxZdyutroj9jiLJA8tQp/389JIzDKuxW5+h7GIfjDu1ZbwI7HNm5rlUDhR2KreaV/QJjEaItT4Cf75rCQ==
@@ -107,14 +129,15 @@ HnFcSms8jzwngtVomTTnzudZx7SHUQY8sVE1y8yBmULk:RdrHvL179Rw62UuyBrqy2M1crx7RPajaViB
 RdrHvL179Rw62UuyBrqy2M1crx7RPajaViBatS59EGS:9fx25FmeBDJcikZLWxK5HuzKNbY6MaWYXoK1ajteE42Y:0:90w2HrbdsKIc6YJq3Ksa4sSgjpYSMM05+UuowAlYjrk1ixHIyWyg5odyZPRwO50aiIyUsbikoOWsMc3G8ob/Cg==
 HnFcSms8jzwngtVomTTnzudZx7SHUQY8sVE1y8yBmULk:9fx25FmeBDJcikZLWxK5HuzKNbY6MaWYXoK1ajteE42Y:0:28lv0p8EPHpVgAMiPvXvIe5lMvYJxwko2tv5bPO4voHRHSaDcTz5BR7Oe69S6wjANIEAMfebXiFMqZdj+mWRAA==
 Transactions:
+Hash: DB30D958EE5CB75186972286ED3F4686B8A1C2CD
+Nonce: 2125
 42yQm4hGTJYWkPg39hQAUgP6S6EQ4vTfXdJuxKEHL1ih6YHiDL2hcwrFgBHjXLRgxRhj2VNVqqc6b4JayKqTE14r
 """
 
 
-raw_block_with_leavers = """Version: 1
+raw_block_with_leavers = """Version: 2
 Type: Block
 Currency: meta_brouzouf
-Nonce: 9906
 Number: 34895
 PoWMin: 4
 Time: 1444434128
@@ -127,10 +150,13 @@ Identities:
 Joiners:
 Actives:
 Leavers:
-2sq8bBDQGK74f1eD3mAPQVgHCmFdijZr9nbv16FwbokX:4MsVEpiL5YXQ0w8KgkbeKR73Y/aSLtQS5HxPFoQJuG5pt+Zl0Q2dLCQfmfvePW4/ANLzcOGnZJH2Tgsw5inJDw==:34893:0000CC15C495623FFAF370D87A7E025FCF01D0AF:1422489754:smoul
+2sq8bBDQGK74f1eD3mAPQVgHCmFdijZr9nbv16FwbokX:4MsVEpiL5YXQ0w8KgkbeKR73Y/aSLtQS5HxPFoQJuG5pt+Zl0Q2dLCQfmfvePW4/ANLzcOGnZJH2Tgsw5inJDw==:34893-0000CC15C495623FFAF370D87A7E025FCF01D0AF:0-DA39A3EE5E6B4B0D3255BFEF95601890AFD80709:smoul
+Revoked:
 Excluded:
 Certifications:
 Transactions:
+Hash: DB30D958EE5CB75186972286ED3F4686B8A1C2CD
+Nonce: 9906
 5LZCFSnm5FkFihPBTpmsPyILEdvu8MXfJOp6OR4d1s+/e2jVWg4J6YSDfO2KBBPgubASyr2QwQuiBlYD2918Bw==
 """
 
@@ -138,7 +164,7 @@ Transactions:
 class Test_Block(unittest.TestCase):
     def test_fromraw(self):
         block = Block.from_signed_raw(raw_block)
-        self.assertEqual(block.version, 1)
+        self.assertEqual(block.version, 2)
         self.assertEqual(block.currency, "zeta_brouzouf")
         self.assertEqual(block.noonce, 45079)
         self.assertEqual(block.number, 15)
@@ -159,7 +185,7 @@ class Test_Block(unittest.TestCase):
 
     def test_from_signed_raw_block_zero(self):
         block = Block.from_signed_raw(raw_block_zero)
-        self.assertEqual(block.version, 1)
+        self.assertEqual(block.version, 2)
         self.assertEqual(block.currency, "zeta_brouzouf")
         self.assertEqual(block.noonce, 2125)
         self.assertEqual(block.number, 0)
@@ -185,7 +211,7 @@ class Test_Block(unittest.TestCase):
         rendered_raw = block.signed_raw()
         from_rendered_raw = Block.from_signed_raw(rendered_raw)
 
-        self.assertEqual(from_rendered_raw.version, 1)
+        self.assertEqual(from_rendered_raw.version, 2)
         self.assertEqual(from_rendered_raw.currency, "zeta_brouzouf")
         self.assertEqual(from_rendered_raw.noonce, 45079)
         self.assertEqual(from_rendered_raw.number, 15)
@@ -211,7 +237,7 @@ class Test_Block(unittest.TestCase):
         rendered_raw = block.signed_raw()
         from_rendered_raw = block.from_signed_raw(rendered_raw)
 
-        self.assertEqual(from_rendered_raw.version, 1)
+        self.assertEqual(from_rendered_raw.version, 2)
         self.assertEqual(from_rendered_raw.currency, "zeta_brouzouf")
         self.assertEqual(from_rendered_raw.noonce, 2125)
         self.assertEqual(from_rendered_raw.number, 0)
@@ -235,7 +261,7 @@ class Test_Block(unittest.TestCase):
         rendered_raw = block.signed_raw()
         from_rendered_raw = block.from_signed_raw(rendered_raw)
 
-        self.assertEqual(from_rendered_raw.version, 1)
+        self.assertEqual(from_rendered_raw.version, 2)
         self.assertEqual(from_rendered_raw.currency, "meta_brouzouf")
         self.assertEqual(from_rendered_raw.noonce, 581)
         self.assertEqual(from_rendered_raw.number, 34436)
@@ -259,7 +285,7 @@ class Test_Block(unittest.TestCase):
         block = Block.from_signed_raw(raw_block_with_leavers)
         rendered_raw = block.signed_raw()
         from_rendered_raw = block.from_signed_raw(rendered_raw)
-        self.assertEqual(from_rendered_raw.version, 1)
+        self.assertEqual(from_rendered_raw.version, 2)
         self.assertEqual(from_rendered_raw.currency, "meta_brouzouf")
         self.assertEqual(from_rendered_raw.noonce, 9906)
         self.assertEqual(from_rendered_raw.number, 34895)

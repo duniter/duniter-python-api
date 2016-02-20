@@ -56,7 +56,7 @@ setup(
     # Active la prise en compte du fichier MANIFEST.in
     include_package_data=True,
     url='https://github.com/ucoin-io/ucoin-python-api',
-    test_suite="_ucoinpy_test",
+    test_suite="tests",
 
     classifiers=[
         "Programming Language :: Python",

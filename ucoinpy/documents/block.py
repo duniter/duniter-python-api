@@ -1,16 +1,18 @@
 from .document import Document, MalformedDocumentError
-from .certification import SelfCertification, Certification
+from .certification import SelfCertification, Certification, Revokation
 from .membership import Membership
 from .transaction import Transaction
-from .constants import pubkey_regex, signature_regex, block_hash_regex
+from .constants import pubkey_regex, block_id_regex, block_hash_regex
 
 import re
 
 
-class BlockId:
+class BlockUID:
     """
     A simple block id
     """
+    re_block_uid = re.compile("({block_id_regex})-({block_hash_regex})".format(block_id_regex=block_id_regex,
+                                                                             block_hash_regex=block_hash_regex))
     re_hash = re.compile("({block_hash_regex})".format(block_hash_regex=block_hash_regex))
 
     @classmethod
@@ -19,7 +21,7 @@ class BlockId:
 
     def __init__(self, number, sha_hash):
         assert(type(number) is int)
-        assert(BlockId.re_hash.match(sha_hash) is not None)
+        assert(BlockUID.re_hash.match(sha_hash) is not None)
         self.number = number
         self.sha_hash = sha_hash
 
@@ -28,11 +30,17 @@ class BlockId:
         """
         :param str blockid: The block id
         """
-        data = blockid.split("-")
-        if len(data) != 2:
-            raise MalformedDocumentError('BlockId')
-        number = int(data[0])
-        sha_hash = data[1]
+        data = BlockUID.re_block_uid.match(blockid)
+        try:
+            number = int(data.group(1))
+        except AttributeError:
+            raise MalformedDocumentError("BlockId")
+
+        try:
+            sha_hash = data.group(2)
+        except AttributeError:
+            raise MalformedDocumentError("BlockHash")
+
         return cls(number, sha_hash)
 
     def __str__(self):
@@ -88,12 +96,12 @@ The class Block handles Block documents.
     """
 
     re_type = re.compile("Type: (Block)\n")
-    re_noonce = re.compile("Nonce: ([0-9]+)\n")
     re_number = re.compile("Number: ([0-9]+)\n")
     re_powmin = re.compile("PoWMin: ([0-9]+)\n")
     re_time = re.compile("Time: ([0-9]+)\n")
     re_mediantime = re.compile("MedianTime: ([0-9]+)\n")
     re_universaldividend = re.compile("UniversalDividend: ([0-9]+)\n")
+    re_unitbase = re.compile("UnitBase: ([0-6])\n")
     re_issuer = re.compile("Issuer: ({pubkey_regex})\n".format(pubkey_regex=pubkey_regex))
     re_previoushash = re.compile("PreviousHash: ({block_hash_regex})\n".format(block_hash_regex=block_hash_regex))
     re_previousissuer = re.compile("PreviousIssuer: ({pubkey_regex})\n".format(pubkey_regex=pubkey_regex))
@@ -105,19 +113,22 @@ The class Block handles Block documents.
     re_joiners = re.compile("Joiners:\n")
     re_actives = re.compile("Actives:\n")
     re_leavers = re.compile("Leavers:\n")
+    re_revoked = re.compile("Revoked:\n")
     re_excluded = re.compile("Excluded:\n")
     re_exclusion = re.compile("({pubkey_regex})\n".format(pubkey_regex=pubkey_regex))
     re_certifications = re.compile("Certifications:\n")
     re_transactions = re.compile("Transactions:\n")
+    re_hash = re.compile("Hash: ({block_hash_regex})\n".format(block_hash_regex=block_hash_regex))
+    re_noonce = re.compile("Nonce: ([0-9]+)\n")
 
     fields_parsers = {**Document.fields_parsers, **{
                 'Type': re_type,
-                'Noonce': re_noonce,
                 'Number': re_number,
                 'PoWMin': re_powmin,
                 'Time': re_time,
                 'MedianTime': re_mediantime,
                 'UD': re_universaldividend,
+                'UnitBase': re_unitbase,
                 'Issuer': re_issuer,
                 'PreviousIssuer': re_previousissuer,
                 'PreviousHash': re_previoushash,
@@ -127,28 +138,32 @@ The class Block handles Block documents.
                 'Joiners': re_joiners,
                 'Actives': re_actives,
                 'Leavers': re_leavers,
+                'Revoked': re_revoked,
+                'Excluded': re_excluded,
                 'Certifications': re_certifications,
-                'Transactions': re_transactions
+                'Transactions': re_transactions,
+                'Hash': re_hash,
+                'Noonce': re_noonce,
             }
       }
 
     Empty_Hash = "DA39A3EE5E6B4B0D3255BFEF95601890AFD80709"
 
-    def __init__(self, version, currency, noonce, number, powmin, time,
-                 mediantime, ud, issuer, prev_hash, prev_issuer,
+    def __init__(self, version, currency, number, powmin, time,
+                 mediantime, ud, unit_base, issuer, prev_hash, prev_issuer,
                  parameters, members_count, identities, joiners,
-                 actives, leavers, excluded, certifications,
-                 transactions, signature):
+                 actives, leavers, revokations, excluded, certifications,
+                 transactions, sha_hash, noonce, signature):
         """
         Constructor
 
         :param int version: ucoin protocol version
         :param str currency: the block currency
-        :param int noonce: the noonce value of the block
         :param int number: the number of the block
         :param int powmin: the powmin value of this block
         :param int time: the timestamp of this block
         :param int ud: the dividend amount, or None if no dividend present in this block
+        :param int unit_base: the unit_base of the dividend, or None if no dividend present in this block
         :param str issuer: the pubkey of the issuer of the block
         :param str prev_hash: the previous block hash
         :param str prev_issuer: the previous block issuer
@@ -158,18 +173,22 @@ The class Block handles Block documents.
         :param list[ucoinpy.documents.Membership] joiners: the joiners memberships via "IN" documents
         :param list[ucoinpy.documents.Membership] actives: renewed memberships via "IN" documents
         :param list[ucoinpy.documents.Membership] leavers: the leavers memberships via "OUT" documents
+        :param list[ucoinpy.documents.Revokation] revokations: revokations
         :param list[ucoinpy.documents.Membership] excluded: members excluded because of missing certifications
         :param list[ucoinpy.documents.Membership] actives: renewed memberships via "IN" documents
         :param list[ucoinpy.documents.Certification] certifications: certifications documents
         :param list[ucoinpy.documents.Transaction] transactions: transactions documents
+        :param str sha_hash: the block hah
+        :param int noonce: the noonce value of the block
+        :param list[str] signatures: the block signaturezs
         """
         super().__init__(version, currency, [signature])
-        self.noonce = noonce
         self.number = number
         self.powmin = powmin
         self.time = time
         self.mediantime = mediantime
         self.ud = ud
+        self.unit_base = unit_base
         self.issuer = issuer
         self.prev_hash = prev_hash
         self.prev_issuer = prev_issuer
@@ -179,13 +198,20 @@ The class Block handles Block documents.
         self.joiners = joiners
         self.actives = actives
         self.leavers = leavers
+        self.revoked = revokations
         self.excluded = excluded
         self.certifications = certifications
         self.transactions = transactions
+        self._sha_hash = sha_hash
+        self.noonce = noonce
 
     @property
     def blockid(self):
-        return BlockId(self.number, self.sha_hash)
+        return BlockUID(self.number, self.sha_hash)
+
+    @property
+    def sha_hash(self):
+        return self._sha_hash
 
     @classmethod
     def from_signed_raw(cls, raw):
@@ -201,9 +227,6 @@ The class Block handles Block documents.
         currency = Block.parse_field("Currency", lines[n])
         n += 1
 
-        noonce = int(Block.parse_field("Noonce", lines[n]))
-        n += 1
-
         number = int(Block.parse_field("Number", lines[n]))
         n += 1
 
@@ -217,8 +240,12 @@ The class Block handles Block documents.
         n += 1
 
         ud = Block.re_universaldividend.match(lines[n])
+        unit_base = None
         if ud is not None:
-            ud = int(ud.group(1))
+            ud = int(Block.parse_field("UD", lines[n]))
+            n += 1
+
+            unit_base = int(Block.parse_field("UnitBase", lines[n]))
             n += 1
 
         issuer = Block.parse_field("Issuer", lines[n])
@@ -245,6 +272,7 @@ The class Block handles Block documents.
         joiners = []
         actives = []
         leavers = []
+        revoked = []
         excluded = []
         certifications = []
         transactions = []
@@ -272,9 +300,16 @@ The class Block handles Block documents.
 
         if Block.re_leavers.match(lines[n]):
             n += 1
-            while Block.re_excluded.match(lines[n]) is None:
+            while Block.re_revoked.match(lines[n]) is None:
                 membership = Membership.from_inline(version, currency, "OUT", lines[n])
                 leavers.append(membership)
+                n += 1
+
+        if Block.re_revoked.match(lines[n]):
+            n += 1
+            while Block.re_excluded.match(lines[n]) is None:
+                revokation = Revokation.from_inline(version, currency, lines[n])
+                revoked.append(revokation)
                 n += 1
 
         if Block.re_excluded.match(lines[n]):
@@ -294,47 +329,54 @@ The class Block handles Block documents.
 
         if Block.re_transactions.match(lines[n]):
             n += 1
-            while not Block.re_signature.match(lines[n]):
+            while not Block.re_hash.match(lines[n]):
                 tx_lines = ""
                 header_data = Transaction.re_header.match(lines[n])
+                if header_data is None:
+                    raise MalformedDocumentError("Inline transaction ({0})".format(lines[n]))
                 version = int(header_data.group(1))
                 issuers_num = int(header_data.group(2))
                 inputs_num = int(header_data.group(3))
                 outputs_num = int(header_data.group(4))
                 has_comment = int(header_data.group(5))
-                tx_max = n + issuers_num * 2 + inputs_num + outputs_num + has_comment + 1
+                tx_max = n + issuers_num * 2 + inputs_num * 2 + outputs_num + has_comment + 1
                 for i in range(n, tx_max):
                     tx_lines += lines[n]
                     n += 1
                 transaction = Transaction.from_compact(currency, tx_lines)
                 transactions.append(transaction)
 
+        sha_hash = Block.parse_field("Hash", lines[n])
+        n += 1
+
+        noonce = int(Block.parse_field("Noonce", lines[n]))
+        n += 1
+
         signature = Block.parse_field("Signature", lines[n])
 
-        return cls(version, currency, noonce, number, powmin, time,
-                   mediantime, ud, issuer, prev_hash, prev_issuer,
+        return cls(version, currency, number, powmin, time,
+                   mediantime, ud, unit_base, issuer, prev_hash, prev_issuer,
                    parameters, members_count, identities, joiners,
-                   actives, leavers, excluded, certifications,
-                   transactions, signature)
+                   actives, leavers, revoked, excluded, certifications,
+                   transactions, sha_hash, noonce, signature)
 
     def raw(self):
-        doc = """Version: {0}
+        doc = """Version: {version}
 Type: Block
-Currency: {1}
-Nonce: {2}
-Number: {3}
-PoWMin: {4}
-Time: {5}
-MedianTime: {6}
-""".format(self.version,
-                      self.currency,
-                      self.noonce,
-                      self.number,
-                      self.powmin,
-                      self.time,
-                      self.mediantime)
+Currency: {currency}
+Number: {number}
+PoWMin: {powmin}
+Time: {time}
+MedianTime: {mediantime}
+""".format(version=self.version,
+                      currency=self.currency,
+                      number=self.number,
+                      powmin=self.powmin,
+                      time=self.time,
+                      mediantime=self.mediantime)
         if self.ud:
             doc += "UniversalDividend: {0}\n".format(self.ud)
+            doc += "UnitBase: {0}\n".format(self.unit_base)
 
         doc += "Issuer: {0}\n".format(self.issuer)
 
@@ -363,6 +405,10 @@ PreviousIssuer: {1}\n".format(self.prev_hash, self.prev_issuer)
         for leaver in self.leavers:
             doc += "{0}\n".format(leaver.inline())
 
+        doc += "Revoked:\n"
+        for revokation in self.revoked:
+            doc += "{0}\n".format(revokation)
+
         doc += "Excluded:\n"
         for exclude in self.excluded:
             doc += "{0}\n".format(exclude)
@@ -374,5 +420,9 @@ PreviousIssuer: {1}\n".format(self.prev_hash, self.prev_issuer)
         doc += "Transactions:\n"
         for transaction in self.transactions:
             doc += "{0}".format(transaction.compact())
+
+        doc += "Hash: {0}\n".format(self.sha_hash)
+
+        doc += "Nonce: {0}\n".format(self.noonce)
 
         return doc

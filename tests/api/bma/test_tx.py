@@ -2,7 +2,7 @@ import unittest
 import jsonschema
 import aiohttp
 from ucoinpy.api.bma.tx import History, Sources
-from _ucoinpy_test.api.webserver import WebFunctionalSetupMixin, web, asyncio
+from tests.api.webserver import WebFunctionalSetupMixin, web, asyncio
 from ucoinpy.api.bma.tx.history import Blocks
 
 

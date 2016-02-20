@@ -1,4 +1,4 @@
-from .block import Block, BlockId
+from .block import Block, BlockUID
 from .certification import SelfCertification, Certification
 from .membership import Membership
 from .peer import Endpoint, BMAEndpoint, UnknownEndpoint, Peer

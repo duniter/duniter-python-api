@@ -2,7 +2,7 @@ import aiohttp
 import unittest
 import jsonschema
 import json
-from _ucoinpy_test.api.webserver import WebFunctionalSetupMixin, web, asyncio
+from tests.api.webserver import WebFunctionalSetupMixin, web, asyncio
 from ucoinpy.api.bma.wot import Lookup, Members, CertifiedBy, CertifiersOf
 
 

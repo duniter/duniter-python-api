@@ -1,7 +1,7 @@
 import unittest
 import jsonschema
 from ucoinpy.api.bma.network import Peering
-from _ucoinpy_test.api.webserver import WebFunctionalSetupMixin, web, asyncio
+from tests.api.webserver import WebFunctionalSetupMixin, web, asyncio
 from ucoinpy.api.bma.network.peering import Peers
 
 

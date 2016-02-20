@@ -1,5 +1,5 @@
 import unittest
-from _ucoinpy_test.api.webserver import WebFunctionalSetupMixin
+from tests.api.webserver import WebFunctionalSetupMixin
 from ucoinpy.api.bma.ws import Block, Peer
 
 

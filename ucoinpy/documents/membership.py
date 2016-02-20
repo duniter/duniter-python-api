@@ -4,7 +4,7 @@ Created on 2 déc. 2014
 @author: inso
 """
 from .document import Document, MalformedDocumentError
-from .constants import block_hash_regex, signature_regex, pubkey_regex
+from .constants import block_uid_regex, signature_regex, pubkey_regex
 
 import re
 
@@ -25,14 +25,16 @@ class Membership(Document):
     """
 
     # PUBLIC_KEY:SIGNATURE:NUMBER:HASH:TIMESTAMP:USER_ID
-    re_inline = re.compile("({pubkey_regex}):({signature_regex}):([0-9]+):({block_hash_regex}):([0-9]+):([^\n]+)\n"
-                                .format(pubkey_regex=pubkey_regex, signature_regex=signature_regex, block_hash_regex=block_hash_regex))
+    re_inline = re.compile("({pubkey_regex}):({signature_regex}):({ms_block_uid_regex}):({identity_block_uid_regex}):([^\n]+)\n"
+                                .format(pubkey_regex=pubkey_regex, signature_regex=signature_regex,
+                                        ms_block_uid_regex=block_uid_regex,
+                                        identity_block_uid_regex=block_uid_regex))
     re_type = re.compile("Type: (Membership)")
     re_issuer = re.compile("Issuer: ({pubkey_regex})\n".format(pubkey_regex=pubkey_regex))
-    re_block = re.compile("Block: ([0-9]+-{block_hash_regex})\n".format(block_hash_regex=block_hash_regex))
+    re_block = re.compile("Block: ({block_uid_regex})\n".format(block_uid_regex=block_uid_regex))
     re_membership_type = re.compile("Membership: (IN|OUT)")
     re_userid = re.compile("UserID: ([^\n]+)\n")
-    re_certts = re.compile("CertTS: ([0-9]+)\n")
+    re_certts = re.compile("CertTS: ({block_uid_regex})\n".format(block_uid_regex=block_uid_regex))
 
     fields_parsers = {**Document.fields_parsers, **{
         "Type": re_type,
@@ -43,35 +45,34 @@ class Membership(Document):
         "CertTS": re_certts
     }}
 
-    def __init__(self, version, currency, issuer, blockid,
-                 membership_type, uid, cert_ts, signature):
+    def __init__(self, version, currency, issuer, membership_ts,
+                 membership_type, uid, identity_ts, signature):
         """
         Constructor
         """
         super().__init__(version, currency, [signature])
         self.issuer = issuer
-        self.blockid = blockid
+        self.membership_ts = membership_ts
         self.membership_type = membership_type
         self.uid = uid
-        self.cert_ts = cert_ts
+        self.identity_ts = identity_ts
 
     @classmethod
     def from_inline(cls, version, currency, membership_type, inline):
+        from .block import BlockUID
         data = Membership.re_inline.match(inline)
         if data is None:
-            raise MalformedDocumentError("Inline membership")
+            raise MalformedDocumentError("Inline membership ({0})".format(inline))
         issuer = data.group(1)
         signature = data.group(2)
-        block_number = int(data.group(3))
-        block_hash = data.group(4)
-        cert_ts = int(data.group(5))
-        uid = data.group(6)
-        from .block import BlockId
-        return cls(version, currency, issuer, BlockId(block_number, block_hash), membership_type, uid, cert_ts, signature)
+        membership_ts = BlockUID.from_str(data.group(3))
+        identity_ts = BlockUID.from_str(data.group(4))
+        uid = data.group(5)
+        return cls(version, currency, issuer, membership_ts, membership_type, uid, identity_ts, signature)
 
     @classmethod
     def from_signed_raw(cls, raw, signature=None):
-        from .block import BlockId
+        from .block import BlockUID
         lines = raw.splitlines(True)
         n = 0
 
@@ -87,7 +88,7 @@ class Membership(Document):
         issuer = Membership.parse_field("Issuer", lines[n])
         n += 1
 
-        blockid = BlockId.from_str(Membership.parse_field("Block", lines[n]))
+        membership_ts = BlockUID.from_str(Membership.parse_field("Block", lines[n]))
         n += 1
 
         membership_type = Membership.parse_field("Membership", lines[n])
@@ -96,14 +97,14 @@ class Membership(Document):
         uid = Membership.parse_field("UserID", lines[n])
         n += 1
 
-        cert_ts = int(Membership.parse_field("CertTS", lines[n]))
+        identity_ts = BlockUID.from_str(Membership.parse_field("CertTS", lines[n]))
         n += 1
 
         signature = Membership.parse_field("Signature", lines[n])
         n += 1
 
-        return cls(version, currency, issuer, blockid,
-                   membership_type, uid, cert_ts, signature)
+        return cls(version, currency, issuer, membership_ts,
+                   membership_type, uid, identity_ts, signature)
 
     def raw(self):
         return """Version: {0}
@@ -117,15 +118,14 @@ CertTS: {6}
 """.format(self.version,
                       self.currency,
                       self.issuer,
-                      self.blockid,
+                      self.membership_ts,
                       self.membership_type,
                       self.uid,
-                      self.cert_ts)
+                      self.identity_ts)
 
     def inline(self):
-        return "{0}:{1}:{2}:{3}:{4}:{5}".format(self.issuer,
+        return "{0}:{1}:{2}:{3}:{4}".format(self.issuer,
                                         self.signatures[0],
-                                        self.blockid.number,
-                                        self.blockid.sha_hash,
-                                        self.cert_ts,
+                                        self.membership_ts,
+                                        self.identity_ts,
                                         self.uid)

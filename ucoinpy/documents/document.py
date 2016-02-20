@@ -39,6 +39,7 @@ class Document:
         return value
 
     def __init__(self, version, currency, signatures):
+        assert version == 2
         self.version = version
         self.currency = currency
         if signatures:
@@ -69,4 +70,4 @@ class Document:
 
     @property
     def sha_hash(self):
-        return hashlib.sha1(self.signed_raw().encode("ascii")).hexdigest().upper()
+        return hashlib.sha256(self.signed_raw().encode("ascii")).hexdigest().upper()
