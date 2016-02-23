@@ -153,7 +153,7 @@ The class Block handles Block documents.
                  mediantime, ud, unit_base, issuer, prev_hash, prev_issuer,
                  parameters, members_count, identities, joiners,
                  actives, leavers, revokations, excluded, certifications,
-                 transactions, sha_hash, noonce, signature):
+                 transactions, inner_hash, noonce, signature):
         """
         Constructor
 
@@ -178,7 +178,7 @@ The class Block handles Block documents.
         :param list[ucoinpy.documents.Membership] actives: renewed memberships via "IN" documents
         :param list[ucoinpy.documents.Certification] certifications: certifications documents
         :param list[ucoinpy.documents.Transaction] transactions: transactions documents
-        :param str sha_hash: the block hah
+        :param str inner_hash: the block hah
         :param int noonce: the noonce value of the block
         :param list[str] signatures: the block signaturezs
         """
@@ -202,17 +202,13 @@ The class Block handles Block documents.
         self.excluded = excluded
         self.certifications = certifications
         self.transactions = transactions
-        self._sha_hash = sha_hash
+        self.inner_hash = inner_hash
         self.noonce = noonce
 
     @property
     def blockid(self):
-        return BlockUID(self.number, self.sha_hash)
-
-    @property
-    def sha_hash(self):
-        return self._sha_hash
-
+        return BlockUID(self.number, self.inner_hash)
+    
     @classmethod
     def from_signed_raw(cls, raw):
         lines = raw.splitlines(True)
@@ -346,7 +342,7 @@ The class Block handles Block documents.
                 transaction = Transaction.from_compact(currency, tx_lines)
                 transactions.append(transaction)
 
-        sha_hash = Block.parse_field("InnerHash", lines[n])
+        inner_hash = Block.parse_field("InnerHash", lines[n])
         n += 1
 
         noonce = int(Block.parse_field("Noonce", lines[n]))
@@ -358,7 +354,7 @@ The class Block handles Block documents.
                    mediantime, ud, unit_base, issuer, prev_hash, prev_issuer,
                    parameters, members_count, identities, joiners,
                    actives, leavers, revoked, excluded, certifications,
-                   transactions, sha_hash, noonce, signature)
+                   transactions, inner_hash, noonce, signature)
 
     def raw(self):
         doc = """Version: {version}
@@ -421,7 +417,7 @@ PreviousIssuer: {1}\n".format(self.prev_hash, self.prev_issuer)
         for transaction in self.transactions:
             doc += "{0}".format(transaction.compact())
 
-        doc += "InnerHash: {0}\n".format(self.sha_hash)
+        doc += "InnerHash: {0}\n".format(self.inner_hash)
 
         doc += "Nonce: {0}\n".format(self.noonce)
 
