@@ -118,7 +118,7 @@ The class Block handles Block documents.
     re_exclusion = re.compile("({pubkey_regex})\n".format(pubkey_regex=pubkey_regex))
     re_certifications = re.compile("Certifications:\n")
     re_transactions = re.compile("Transactions:\n")
-    re_hash = re.compile("Hash: ({block_hash_regex})\n".format(block_hash_regex=block_hash_regex))
+    re_hash = re.compile("InnerHash: ({block_hash_regex})\n".format(block_hash_regex=block_hash_regex))
     re_noonce = re.compile("Nonce: ([0-9]+)\n")
 
     fields_parsers = {**Document.fields_parsers, **{
@@ -142,7 +142,7 @@ The class Block handles Block documents.
                 'Excluded': re_excluded,
                 'Certifications': re_certifications,
                 'Transactions': re_transactions,
-                'Hash': re_hash,
+                'InnerHash': re_hash,
                 'Noonce': re_noonce,
             }
       }
@@ -346,7 +346,7 @@ The class Block handles Block documents.
                 transaction = Transaction.from_compact(currency, tx_lines)
                 transactions.append(transaction)
 
-        sha_hash = Block.parse_field("Hash", lines[n])
+        sha_hash = Block.parse_field("InnerHash", lines[n])
         n += 1
 
         noonce = int(Block.parse_field("Noonce", lines[n]))
@@ -421,7 +421,7 @@ PreviousIssuer: {1}\n".format(self.prev_hash, self.prev_issuer)
         for transaction in self.transactions:
             doc += "{0}".format(transaction.compact())
 
-        doc += "Hash: {0}\n".format(self.sha_hash)
+        doc += "InnerHash: {0}\n".format(self.sha_hash)
 
         doc += "Nonce: {0}\n".format(self.noonce)
 
