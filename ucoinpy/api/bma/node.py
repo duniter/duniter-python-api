@@ -55,5 +55,5 @@ class Summary(Node):
 
     async def __get__(self, session, **kwargs):
         r = await self.requests_get(session, '/summary', **kwargs)
-        return (await self.parse_response(r))
+        return await self.parse_response(r)
 

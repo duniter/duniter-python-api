@@ -58,7 +58,7 @@ class Lookup(WOT):
                 "type": "object",
                 "properties": {
                     "timestamp": {
-                        "type": "number"
+                        "type": "string"
                     }
                 }
             },
@@ -148,7 +148,7 @@ class Lookup(WOT):
         assert self.search is not None
 
         r = await self.requests_get(session, '/lookup/%s' % self.search, **kwargs)
-        return (await self.parse_response(r))
+        return await self.parse_response(r)
 
 
 class CertifiersOf(WOT):
@@ -189,6 +189,9 @@ class CertifiersOf(WOT):
                             },
                             "required": ["block", "medianTime"]
                         },
+                        "sigDate": {
+                            "type": "string"
+                        },
                         "written": {
                             "oneOf": [
                                 {
@@ -211,11 +214,15 @@ class CertifiersOf(WOT):
                         "isMember": {
                             "type": "boolean"
                         },
+                        "wasMember": {
+                            "type": "boolean"
+                        },
                         "signature": {
                             "type": "string"
                         }
                     },
-                    "required": ["pubkey", "uid", "cert_time", "written", "isMember", "signature"]
+                    "required": ["pubkey", "uid", "cert_time", "sigDate",
+                                 "written", "wasMember", "isMember", "signature"]
                 }
             }
         },
@@ -231,7 +238,7 @@ class CertifiersOf(WOT):
         assert self.search is not None
 
         r = await self.requests_get(session, '/certifiers-of/%s' % self.search, **kwargs)
-        return (await self.parse_response(r))
+        return await self.parse_response(r)
 
 
 class CertifiedBy(WOT):
@@ -248,7 +255,7 @@ class CertifiedBy(WOT):
         assert self.search is not None
 
         r = await self.requests_get(session, '/certified-by/%s' % self.search, **kwargs)
-        return (await self.parse_response(r))
+        return await self.parse_response(r)
 
 
 class Members(WOT):

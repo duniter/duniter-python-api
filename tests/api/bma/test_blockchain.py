@@ -17,6 +17,8 @@ class Test_BMA_Blockchain(WebFunctionalSetupMixin, unittest.TestCase):
           "sigValidity": 2629800,
           "sigQty": 3,
           "sigWoT": 3,
+          "sigStock": 10,
+          "sigWindow": 10203044,
           "msValidity": 2629800,
           "stepMax": 3,
           "medianTimeBlocks": 11,
@@ -44,7 +46,7 @@ class Test_BMA_Blockchain(WebFunctionalSetupMixin, unittest.TestCase):
 
     def test_schema_block_0(self):
         json_sample = {
-  "version": 1,
+  "version": 2,
   "nonce": 10144,
   "number": 0,
   "powMin": 3,
@@ -56,6 +58,7 @@ class Test_BMA_Blockchain(WebFunctionalSetupMixin, unittest.TestCase):
   "issuer": "HnFcSms8jzwngtVomTTnzudZx7SHUQY8sVE1y8yBmULk",
   "signature": "+78w7251vvRdhoIJ6IWHEiEOLxNrmfQf45Y5sYvPdnAdXkVpO1unMV5YA/G5Vhphyz1dICrbeKCPM5qbFsoWAQ==",
   "hash": "00063EB6E83F8717CEF1D25B3E2EE308374A14B1",
+  "inner_hash": "00063EB6E83F8717CEF1D25B3E2EE308374A14B1",
   "parameters": "0.1:86400:100:604800:2629800:3:3:2629800:3:11:600:20:144:0.67",
   "previousHash": None,
   "previousIssuer": None,
@@ -76,6 +79,7 @@ class Test_BMA_Blockchain(WebFunctionalSetupMixin, unittest.TestCase):
   "actives": [],
   "leavers": [],
   "excluded": [],
+  "revoked": [],
   "certifications": [
     "37qBxM4hLV2jfyYo2bNzAjkeLngLr2r7G2HpdpKieVxw:8Fi1VSTbjkXguwThF4v2ZxC5whK7pwG2vcGTkPUPjPGU:0:3wmCVW8AbVxRFm2PuLXD9UTCIg93MhUblZJvlYrDldSV4xuA7mZCd8TV4vb/6Bkc0FMQgBdHtpXrQ7dpo20uBA==",
     "HnFcSms8jzwngtVomTTnzudZx7SHUQY8sVE1y8yBmULk:8Fi1VSTbjkXguwThF4v2ZxC5whK7pwG2vcGTkPUPjPGU:0:7UMQsUjLvuiZKIzOH5rrZDdDi5rXUo69EuQulY1Zm42xpRx/Gt5CkoTcJ/Mu83oElQbcZZTz/lVJ6IS0jzMiCQ==",
@@ -128,7 +132,7 @@ class Test_BMA_Blockchain(WebFunctionalSetupMixin, unittest.TestCase):
 
     def test_schema_block(self):
         json_sample = {
-            "version": 1,
+            "version": 2,
             "nonce": 162294,
             "number": 34435,
             "powMin": 5,
@@ -154,6 +158,8 @@ class Test_BMA_Blockchain(WebFunctionalSetupMixin, unittest.TestCase):
             "actives": [],
             "leavers": [],
             "excluded": [],
+            "revoked": [],
+            "inner_hash": "00063EB6E83F8717CEF1D25B3E2EE308374A14B1",
             "certifications": [
             "ATkjQPa4sn4LBF69jqEPzFtRdHYJs6MJQjvP8JdN7MtN:APGtJqMq91jKxgGX9KEoCKqqD6UTsnPmALGNyaLbTknA:34434:oGGiYVBAfhreOzWS1M7HQ0OHHUWAA3NdU29XAca3/3mbfD581QBxeADVR+Bj7kTBqrAxwpwyODtaHyZZNYI3AA==",
             "2sq8bBDQGK74f1eD3mAPQVgHCmFdijZr9nbv16FwbokX:APGtJqMq91jKxgGX9KEoCKqqD6UTsnPmALGNyaLbTknA:34432:KFKYioosI3FAvyfTKiWyQqRGUros03S/NITNxShB/3L1LI4P7XSLp2+hFbCK375ODm1g/fnwfzOoorOKPGIOAw==",

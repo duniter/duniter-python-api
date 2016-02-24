@@ -159,16 +159,18 @@ class Test_BMA_TX(WebFunctionalSetupMixin, unittest.TestCase):
             {
               "pubkey": "8Fi1VSTbjkXguwThF4v2ZxC5whK7pwG2vcGTkPUPjPGU",
               "type": "T",
-              "number": 34444,
-              "fingerprint": "6ACECB199D1B054B2633D0E42C066939B7F8EF1D",
-              "amount": 1000000
+              "noffset": 34444,
+              "identifier": "6ACECB199D1B054B2633D0E42C066939B7F8EF1D",
+              "amount": 1000000,
+              "base": 1
             },
             {
               "pubkey": "8Fi1VSTbjkXguwThF4v2ZxC5whK7pwG2vcGTkPUPjPGU",
               "type": "D",
-              "number": 34989,
-              "fingerprint": "0007CCC9755067008C28E791E6F2B0D4CBE9B894",
-              "amount": 1730543585843
+              "noffset": 34989,
+              "identifier": "0007CCC9755067008C28E791E6F2B0D4CBE9B894",
+              "amount": 1730543585843,
+              "base": 2
             }
           ]
         }

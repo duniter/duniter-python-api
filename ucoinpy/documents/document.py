@@ -39,7 +39,8 @@ class Document:
         return value
 
     def __init__(self, version, currency, signatures):
-        assert version == 2
+        if version < 2:
+            raise MalformedDocumentError("Version 1 documents are not handled by ucoinpy>0.2")
         self.version = version
         self.currency = currency
         if signatures:

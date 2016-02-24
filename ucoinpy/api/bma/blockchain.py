@@ -56,6 +56,12 @@ class Parameters(Blockchain):
               "sigWoT": {
                   "type": "number"
               },
+              "sigStock": {
+                  "type": "number"
+              },
+              "sigWindow": {
+                  "type": "number"
+              },
               "msValidity": {
                   "type": "number"
               },
@@ -78,8 +84,9 @@ class Parameters(Blockchain):
                   "type": "number"
               },
             },
-        "required": ["currency", "c", "dt", "ud0","sigDelay","sigValidity","sigQty","sigWoT","msValidity",
-                     "stepMax", "medianTimeBlocks", "avgGenTime", "dtDiffEval", "blocksRot", "percentRot"]
+        "required": ["currency", "c", "dt", "ud0","sigDelay", "sigValidity", "sigQty", "sigWoT", "sigStock",
+                     "sigWindow", "msValidity","stepMax", "medianTimeBlocks",
+                     "avgGenTime", "dtDiffEval", "blocksRot", "percentRot"]
     }
 
     async def __get__(self, session, **kwargs):
@@ -191,6 +198,9 @@ class Block(Blockchain):
             "hash": {
                 "type": "string"
             },
+            "inner_hash": {
+                "type": "string"
+            },
             "identities": {
                 "type": "array",
                 "items": {
@@ -204,6 +214,12 @@ class Block(Blockchain):
                 }
             },
             "leavers": {
+                "type": "array",
+                "items": {
+                    "type": "string"
+                }
+            },
+            "revoked": {
                 "type": "array",
                 "items": {
                     "type": "string"
@@ -247,6 +263,12 @@ class Block(Blockchain):
                                 "type": "string"
                             }
                         },
+                        "unlocks": {
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            }
+                        },
                         "outputs": {
                             "type": "array",
                             "item": {
@@ -262,7 +284,7 @@ class Block(Blockchain):
             },
         },
         "required": ["version", "currency", "nonce", "number", "time", "medianTime", "dividend", "monetaryMass",
-                     "issuer", "previousHash", "previousIssuer", "membersCount", "hash", "identities",
+                     "issuer", "previousHash", "previousIssuer", "membersCount", "hash", "inner_hash", "identities",
                      "joiners", "leavers", "excluded", "certifications", "transactions", "signature"]
     }
 
@@ -358,7 +380,7 @@ class Newcomers(Blockchain):
 
     async def __get__(self, session, **kwargs):
         r = await self.requests_get(session, '/with/newcomers', **kwargs)
-        return (await self.parse_response(r))
+        return await self.parse_response(r)
 
 
 class Certifications(Blockchain):
@@ -368,7 +390,7 @@ class Certifications(Blockchain):
 
     async def __get__(self, session, **kwargs):
         r = await self.requests_get(session, '/with/certs', **kwargs)
-        return (await self.parse_response(r))
+        return await self.parse_response(r)
 
 
 class Joiners(Blockchain):
@@ -378,7 +400,7 @@ class Joiners(Blockchain):
 
     async def __get__(self, session, **kwargs):
         r = await self.requests_get(session, '/with/joiners', **kwargs)
-        return (await self.parse_response(r))
+        return await self.parse_response(r)
 
 
 class Actives(Blockchain):
@@ -388,7 +410,7 @@ class Actives(Blockchain):
 
     async def __get__(self, session, **kwargs):
         r = await self.requests_get(session, '/with/actives', **kwargs)
-        return (await self.parse_response(r))
+        return await self.parse_response(r)
 
 
 class Leavers(Blockchain):
@@ -398,7 +420,7 @@ class Leavers(Blockchain):
 
     async def __get__(self, session, **kwargs):
         r = await self.requests_get(session, '/with/leavers', **kwargs)
-        return (await self.parse_response(r))
+        return await self.parse_response(r)
 
 
 class Excluded(Blockchain):
@@ -408,7 +430,7 @@ class Excluded(Blockchain):
 
     async def __get__(self, session, **kwargs):
         r = await self.requests_get(session, '/with/excluded', **kwargs)
-        return (await self.parse_response(r))
+        return await self.parse_response(r)
 
 
 class UD(Blockchain):
@@ -418,7 +440,7 @@ class UD(Blockchain):
 
     async def __get__(self, session, **kwargs):
         r = await self.requests_get(session, '/with/ud', **kwargs)
-        return (await self.parse_response(r))
+        return await self.parse_response(r)
 
 
 class TX(Blockchain):
@@ -428,4 +450,4 @@ class TX(Blockchain):
 
     async def __get__(self, session, **kwargs):
         r = await self.requests_get(session, '/with/tx', **kwargs)
-        return (await self.parse_response(r))
+        return await self.parse_response(r)

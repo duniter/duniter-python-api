@@ -83,6 +83,12 @@ class History(Tx):
                                 "type": "string"
                             }
                         },
+                        "unlocks": {
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            }
+                        },
                         "comment": {
                             "type": "string"
                         },
@@ -132,6 +138,12 @@ class History(Tx):
                                 "type": "string"
                             }
                         },
+                        "unlocks": {
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            }
+                        },
                         "comment": {
                             "type": "string"
                         },
@@ -160,7 +172,7 @@ class History(Tx):
     async def __get__(self, session, **kwargs):
         assert self.pubkey is not None
         r = await self.requests_get(session, '/history/%s' % self.pubkey, **kwargs)
-        return (await self.parse_response(r))
+        return await self.parse_response(r)
 
 
 class Process(Tx):
@@ -195,17 +207,20 @@ class Sources(Tx):
                         "type": {
                             "type": "string"
                         },
-                        "number": {
+                        "noffset": {
                             "type": "number"
                         },
-                        "fingerprint": {
+                        "identifier": {
                             "type": "string"
                         },
                         "amount": {
                             "type": "number"
+                        },
+                        "base": {
+                            "type": "number"
                         }
                     },
-                    "required": ["pubkey", "type", "number", "fingerprint", "amount"]
+                    "required": ["pubkey", "type", "noffset", "identifier", "amount", "base"]
                 }
             }
         },
@@ -219,7 +234,7 @@ class Sources(Tx):
     async def __get__(self, session, **kwargs):
         assert self.pubkey is not None
         r = await self.requests_get(session, '/sources/%s' % self.pubkey, **kwargs)
-        return (await self.parse_response(r))
+        return await self.parse_response(r)
 
 
 from . import history
