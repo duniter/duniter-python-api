@@ -90,6 +90,12 @@ class Lookup(WOT):
                                 "self": {
                                     "type": "string",
                                 },
+                                "revokation_sig": {
+                                    "type": "string"
+                                },
+                                "revoked": {
+                                    "type": "boolean"
+                                },
                                 "others": {
                                     "type": "array",
                                     "items": {
@@ -108,7 +114,7 @@ class Lookup(WOT):
                                     }
                                 }
                             },
-                            "required": ["uid", "meta", "self", "others"]
+                            "required": ["uid", "meta", "self", "revokation_sig", "revoked", "others"]
                         }
                     },
                     "signed": {
@@ -127,9 +133,15 @@ class Lookup(WOT):
                                 },
                                 "signature": {
                                     "type": "string"
+                                },
+                                "revokation_sig": {
+                                    "type": "string"
+                                },
+                                "revoked": {
+                                    "type": "boolean"
                                 }
                             },
-                            "required": ["uid", "pubkey", "meta", "signature"]
+                            "required": ["uid", "pubkey", "meta", "revokation_sig", "revoked", "signature"]
                         }
                     },
                     "required": ["uids", "signed"]
