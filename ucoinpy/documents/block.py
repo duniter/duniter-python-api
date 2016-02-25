@@ -147,7 +147,7 @@ The class Block handles Block documents.
             }
       }
 
-    Empty_Hash = "DA39A3EE5E6B4B0D3255BFEF95601890AFD80709"
+    Empty_Hash = "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
 
     def __init__(self, version, currency, number, powmin, time,
                  mediantime, ud, unit_base, issuer, prev_hash, prev_issuer,
