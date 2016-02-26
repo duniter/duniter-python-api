@@ -4,7 +4,7 @@ Created on 12 déc. 2014
 @author: inso
 '''
 import unittest
-from ucoinpy.documents.block import Block
+from ucoinpy.documents.block import Block, BlockUID
 
 raw_block = """Version: 2
 Type: Block
@@ -307,6 +307,12 @@ class Test_Block(unittest.TestCase):
 
         self.assertEqual(block.signed_raw(), raw_block_with_leavers)
 
+    def test_block_uid__compare(self):
+        lower = BlockUID(10, "8101618234DBE5AAD529C13C8BE45E2F9BBE1150CD2FAA25095671F56C1DCDA5")
+        higher = BlockUID(14, "E1C0AD728983D8A57335E52CF1064F1AFFD1D454173D8CEBD3ED8B4A72B48704")
+        self.assertTrue(lower < higher)
+        self.assertFalse(lower > higher)
+        self.assertFalse(lower == higher)
 
 if __name__ == '__main__':
     unittest.main()

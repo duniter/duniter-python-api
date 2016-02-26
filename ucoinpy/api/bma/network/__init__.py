@@ -54,7 +54,7 @@ class Peering(Network):
     }
 
     async def __get__(self, session, **kwargs):
-        r = await self.requests_get('/peering', **kwargs)
+        r = await self.requests_get(session, '/peering', **kwargs)
         return (await self.parse_response(r))
 
 from . import peering

@@ -107,7 +107,7 @@ class Membership(Blockchain):
                 "type": "string",
             },
             "sigDate": {
-                "type": "number"
+                "type": "string"
             },
             "memberships": {
                 "type": "array",

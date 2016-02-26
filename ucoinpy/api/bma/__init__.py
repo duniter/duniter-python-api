@@ -19,7 +19,7 @@
 
 __all__ = ['api']
 
-PROTOCOL_VERSION = "1"
+PROTOCOL_VERSION = 2
 
 import logging
 

@@ -49,6 +49,18 @@ class BlockUID:
     def __eq__(self, other):
         return self.number == other.number and self.sha_hash == other.sha_hash
 
+    def __lt__(self, other):
+        return self.number < other.number
+
+    def __gt__(self, other):
+        return self.number > other.number
+
+    def __le__(self, other):
+        return self.number <= other.number
+
+    def __ge__(self, other):
+        return self.number >= other.number
+
 
 class Block(Document):
     """
