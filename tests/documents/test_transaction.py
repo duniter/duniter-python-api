@@ -6,7 +6,7 @@ Created on 12 déc. 2014
 import unittest
 import pypeg2
 from ucoinpy.grammars import output
-from ucoinpy.documents.transaction import Transaction
+from ucoinpy.documents.transaction import Transaction, reduce_base
 
 
 tx_compact = """TX:2:3:6:3:1:0
@@ -262,3 +262,17 @@ class Test_Transaction(unittest.TestCase):
         self.assertEqual(tx.signatures[0], "42yQm4hGTJYWkPg39hQAUgP6S6EQ4vTfXdJuxKEHL1ih6YHiDL2hcwrFgBHjXLRgxRhj2VNVqqc6b4JayKqTE14r")
         self.assertEqual(tx.signatures[1], "2D96KZwNUvVtcapQPq2mm7J9isFcDCfykwJpVEZwBc7tCgL4qPyu17BT5ePozAE9HS6Yvj51f62Mp4n9d9dkzJoX")
         self.assertEqual(tx.signatures[2], "2XiBDpuUdu6zCPWGzHXXy8c4ATSscfFQG9DjmqMZUxDZVt1Dp4m2N5oHYVUfoPdrU9SLk4qxi65RNrfCVnvQtQJk")
+
+    def test_reduce_base(self):
+        amount = 1200
+        base = 0
+        computed = reduce_base(amount, base)
+        self.assertEqual(computed[0], 12)
+        self.assertEqual(computed[1], 2)
+
+    def test_reduce_base_2(self):
+        amount = 120
+        base = 4
+        computed = reduce_base(amount, base)
+        self.assertEqual(computed[0], 12)
+        self.assertEqual(computed[1], 5)

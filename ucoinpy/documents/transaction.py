@@ -5,6 +5,24 @@ import pypeg2
 import re
 
 
+def reduce_base(amount, base):
+    """
+    Compute the reduced base of the given parameters
+    :param int amount: the amount value
+    :param int base: current base value
+    :return: tuple containing computed (amount, base)
+    :rtype: tuple
+    """
+    next_amount = amount
+    next_base = base
+    while int(next_amount) == next_amount:
+        amount = next_amount
+        base = next_base
+        next_amount /= 10
+        next_base += 1
+    return amount, base
+
+
 class Transaction(Document):
     """
 .. note:: A transaction document is specified by the following format :
