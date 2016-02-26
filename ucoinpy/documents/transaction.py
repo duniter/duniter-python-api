@@ -13,6 +13,9 @@ def reduce_base(amount, base):
     :return: tuple containing computed (amount, base)
     :rtype: tuple
     """
+    if amount == 0:
+        return 0, 0
+
     next_amount = amount
     next_base = base
     while int(next_amount) == next_amount:
@@ -20,7 +23,7 @@ def reduce_base(amount, base):
         base = next_base
         next_amount /= 10
         next_base += 1
-    return amount, base
+    return int(amount), int(base)
 
 
 class Transaction(Document):
