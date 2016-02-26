@@ -58,3 +58,20 @@ class Test_OutputGrammar(unittest.TestCase):
         self.assertEqual(result.left.right.op.name, "AND")
         self.assertEqual(result.left.right.right.sha_hash, "309BC5E644F797F53E5A2065EAF38A173437F2E6")
         self.assertEqual(pypeg2.compose(result, output.Condition), condition)
+
+    def test_instanciate_condition(self):
+        inst = output.Condition.token(output.SIG.token("HgTTJLAQ5sqfknMq7yLPZbehtuLSsKj9CxWN7k8QvYJd"),
+                                           output.Operator.token("OR"),
+                                           output.Condition.token(
+                                               output.SIG.token("DNann1Lh55eZMEDXeYt59bzHbA3NJR46DeQYCS2qQdLV"),
+                                               output.Operator.token("AND"),
+                                               output.XHX.token("309BC5E644F797F53E5A2065EAF38A173437F2E6")
+                                           ))
+        condition = "(SIG(HgTTJLAQ5sqfknMq7yLPZbehtuLSsKj9CxWN7k8QvYJd) OR (SIG(DNann1Lh55eZMEDXeYt59bzHbA3NJR46DeQYCS2qQdLV) AND XHX(309BC5E644F797F53E5A2065EAF38A173437F2E6)))"
+        inst = pypeg2.parse(condition, output.Condition)
+        self.assertEqual(inst.left.left.pubkey, "HgTTJLAQ5sqfknMq7yLPZbehtuLSsKj9CxWN7k8QvYJd")
+        self.assertEqual(inst.left.op.name, "OR")
+        self.assertEqual(inst.left.right.left.pubkey, "DNann1Lh55eZMEDXeYt59bzHbA3NJR46DeQYCS2qQdLV")
+        self.assertEqual(inst.left.right.op.name, "AND")
+        self.assertEqual(inst.left.right.right.sha_hash, "309BC5E644F797F53E5A2065EAF38A173437F2E6")
+        self.assertEqual(pypeg2.compose(inst, output.Condition), condition)
