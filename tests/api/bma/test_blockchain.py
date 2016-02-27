@@ -197,14 +197,14 @@ class Test_BMA_Blockchain(WebFunctionalSetupMixin, unittest.TestCase):
         json_sample = {
             "pubkey": "8Fi1VSTbjkXguwThF4v2ZxC5whK7pwG2vcGTkPUPjPGU",
             "uid": "inso",
-            "sigDate": 1421787800,
+            "sigDate": "0-E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
             "memberships": [
                 {
                     "version": 1,
                     "currency": "meta_brouzouf",
                     "membership": "IN",
                     "blockNumber": 0,
-                    "blockHash": "DA39A3EE5E6B4B0D3255BFEF95601890AFD80709",
+                    "blockHash": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
                     "written": 10005
                 },
                 {

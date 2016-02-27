@@ -25,7 +25,7 @@ class TestPeer(unittest.TestCase):
         peer = Peer.from_signed_raw(rawpeer)
         self.assertEqual(peer.currency, "beta_brousouf")
         self.assertEqual(peer.pubkey, "HsLShAtzXTVxeUtQd7yi5Z5Zh4zNvbu8sTEZ53nfKcqY")
-        self.assertEqual(str(peer.blockid), "8-1922C324ABC4AF7EF7656734A31F5197888DDD52")
+        self.assertEqual(str(peer.blockUID), "8-1922C324ABC4AF7EF7656734A31F5197888DDD52")
         self.assertEqual(len(peer.endpoints), 3)
         self.assertTrue(type(peer.endpoints[0]) is BMAEndpoint)
         self.assertTrue(type(peer.endpoints[1]) is BMAEndpoint)
@@ -50,7 +50,7 @@ class TestPeer(unittest.TestCase):
 
         self.assertEqual(from_rendered_peer.currency, "beta_brousouf")
         self.assertEqual(from_rendered_peer.pubkey, "HsLShAtzXTVxeUtQd7yi5Z5Zh4zNvbu8sTEZ53nfKcqY")
-        self.assertEqual(str(from_rendered_peer.blockid), "8-1922C324ABC4AF7EF7656734A31F5197888DDD52")
+        self.assertEqual(str(from_rendered_peer.blockUID), "8-1922C324ABC4AF7EF7656734A31F5197888DDD52")
         self.assertEqual(len(from_rendered_peer.endpoints), 3)
         self.assertTrue(type(from_rendered_peer.endpoints[0]) is BMAEndpoint)
         self.assertTrue(type(from_rendered_peer.endpoints[1]) is BMAEndpoint)

@@ -117,9 +117,8 @@ The class Block handles Block documents.
     re_issuer = re.compile("Issuer: ({pubkey_regex})\n".format(pubkey_regex=pubkey_regex))
     re_previoushash = re.compile("PreviousHash: ({block_hash_regex})\n".format(block_hash_regex=block_hash_regex))
     re_previousissuer = re.compile("PreviousIssuer: ({pubkey_regex})\n".format(pubkey_regex=pubkey_regex))
-    re_parameters = re.compile("Parameters: ([0-9]+\.[0-9]+):([0-9]+):([0-9]+):([0-9]+):\
-([0-9]+):([0-9]+):([0-9]+):([0-9]+):([0-9]+):([0-9]+):([0-9]+):([0-9]+):([0-9]+):\
-([0-9]+\.[0-9]+)\n")
+    re_parameters = re.compile("Parameters: ([0-9]+\.[0-9]+):([0-9]+):([0-9]+):([0-9]+):([0-9]+):([0-9]+):([0-9]+):\
+([0-9]+):([0-9]+):([0-9]+):([0-9]+):([0-9]+):([0-9]+):([0-9]+):([0-9]+):([0-9]+\.[0-9]+)\n")
     re_memberscount = re.compile("MembersCount: ([0-9]+)\n")
     re_identities = re.compile("Identities:\n")
     re_joiners = re.compile("Joiners:\n")
@@ -218,7 +217,7 @@ The class Block handles Block documents.
         self.noonce = noonce
 
     @property
-    def blockid(self):
+    def blockUID(self):
         return BlockUID(self.number, self.inner_hash)
     
     @classmethod
@@ -270,8 +269,11 @@ The class Block handles Block documents.
 
         parameters = None
         if number == 0:
-            parameters = Block.re_parameters.match(lines[n]).groups()
-            n += 1
+            try:
+                parameters = Block.re_parameters.match(lines[n]).groups()
+                n += 1
+            except AttributeError:
+                raise MalformedDocumentError("Parameters")
 
         members_count = int(Block.parse_field("MembersCount", lines[n]))
         n += 1
@@ -341,7 +343,7 @@ The class Block handles Block documents.
                 tx_lines = ""
                 header_data = Transaction.re_header.match(lines[n])
                 if header_data is None:
-                    raise MalformedDocumentError("Inline transaction ({0})".format(lines[n]))
+                    raise MalformedDocumentError("Compact transaction ({0})".format(lines[n]))
                 version = int(header_data.group(1))
                 issuers_num = int(header_data.group(2))
                 inputs_num = int(header_data.group(3))

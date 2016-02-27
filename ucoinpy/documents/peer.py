@@ -35,12 +35,12 @@ class Peer(Document):
         "Endpoints": re_endpoints
     }}
 
-    def __init__(self, version, currency, pubkey, blockid,
+    def __init__(self, version, currency, pubkey, blockUID,
                  endpoints, signature):
         super().__init__(version, currency, [signature])
 
         self.pubkey = pubkey
-        self.blockid = blockid
+        self.blockUID = blockUID
         self.endpoints = endpoints
 
     @classmethod
@@ -60,7 +60,7 @@ class Peer(Document):
         pubkey = Peer.parse_field("Pubkey", lines[n])
         n += 1
 
-        blockid = BlockUID.from_str(Peer.parse_field("Block", lines[n]))
+        blockUID = BlockUID.from_str(Peer.parse_field("Block", lines[n]))
         n += 1
 
         Peer.parse_field("Endpoints", lines[n])
@@ -74,7 +74,7 @@ class Peer(Document):
 
         signature = Peer.re_signature.match(lines[n]).group(1)
 
-        return cls(version, currency, pubkey, blockid, endpoints, signature)
+        return cls(version, currency, pubkey, blockUID, endpoints, signature)
 
     def raw(self):
         doc = """Version: {0}
@@ -83,7 +83,7 @@ Currency: {1}
 PublicKey: {2}
 Block: {3}
 Endpoints:
-""".format(self.version, self.currency, self.pubkey, self.blockid)
+""".format(self.version, self.currency, self.pubkey, self.blockUID)
 
         for endpoint in self.endpoints:
             doc += "{0}\n".format(endpoint.inline())
