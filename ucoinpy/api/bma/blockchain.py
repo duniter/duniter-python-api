@@ -44,7 +44,7 @@ class Parameters(Blockchain):
               "ud0": {
                   "type": "number"
               },
-              "sigDelay": {
+              "sigPeriod": {
                   "type": "number"
               },
               "sigValidity": {
@@ -84,7 +84,7 @@ class Parameters(Blockchain):
                   "type": "number"
               },
             },
-        "required": ["currency", "c", "dt", "ud0","sigDelay", "sigValidity", "sigQty", "sigWoT", "sigStock",
+        "required": ["currency", "c", "dt", "ud0","sigPeriod", "sigValidity", "sigQty", "sigWoT", "sigStock",
                      "sigWindow", "msValidity","stepMax", "medianTimeBlocks",
                      "avgGenTime", "dtDiffEval", "blocksRot", "percentRot"]
     }

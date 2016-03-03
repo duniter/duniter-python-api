@@ -13,7 +13,7 @@ class Test_BMA_Blockchain(WebFunctionalSetupMixin, unittest.TestCase):
           "c": 0.1,
           "dt": 86400,
           "ud0": 100,
-          "sigDelay": 604800,
+          "sigPeriod": 604800,
           "sigValidity": 2629800,
           "sigQty": 3,
           "sigWoT": 3,
