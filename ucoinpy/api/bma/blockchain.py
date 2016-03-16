@@ -181,7 +181,7 @@ class Block(Blockchain):
                 "type": ["number", "null"]
             },
             "monetaryMass": {
-                "type": "number"
+                "type": ["number", "null"]
             },
             "issuer": {
                 "type": "string"
