@@ -184,7 +184,7 @@ class API(object):
             response = await aiohttp.post(self.reverse_url("http", path), data=kwargs, headers=self.headers)
             return response
 
-    def connect_ws(self, path):
+    def connect_ws(self, path, autoping=True, autoclose=True):
         """
         Connect to a websocket in order to use API parameters
 
@@ -192,7 +192,7 @@ class API(object):
         :return:
         """
         url = self.reverse_url("ws", path)
-        return aiohttp.ws_connect(url)
+        return aiohttp.ws_connect(url, autoping=autoping, autoclose=autoclose)
 
 
 from . import network, blockchain, tx, wot, node, ud, ws

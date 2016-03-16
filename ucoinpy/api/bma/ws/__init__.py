@@ -32,8 +32,8 @@ class Block(Websocket):
     """Connect to block websocket."""
     schema = _Block.schema
 
-    def connect(self):
-        r = self.connect_ws('/block')
+    def connect(self, autoping=True, autoclose=True):
+        r = self.connect_ws('/block', autoping=autoping, autoclose=autoclose)
         return r
 
 
@@ -64,6 +64,6 @@ class Peer(Websocket):
         "required": ["version", "currency", "pubkey", "endpoints", "signature"]
     }
 
-    def connect(self):
-        r = self.connect_ws('/peer')
+    def connect(self, autoping=True, autoclose=True):
+        r = self.connect_ws('/peer', autoping=autoping, autoclose=autoclose)
         return r
