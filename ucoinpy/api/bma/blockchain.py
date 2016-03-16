@@ -47,19 +47,19 @@ class Parameters(Blockchain):
               "sigPeriod": {
                   "type": "number"
               },
+              "sigStock": {
+                  "type": "number"
+              },
+              "sigWindow": {
+                  "type": "number"
+              },
               "sigValidity": {
                   "type": "number"
               },
               "sigQty": {
                   "type": "number"
               },
-              "sigWoT": {
-                  "type": "number"
-              },
-              "sigStock": {
-                  "type": "number"
-              },
-              "sigWindow": {
+              "xpercent": {
                   "type": "number"
               },
               "msValidity": {
@@ -84,7 +84,7 @@ class Parameters(Blockchain):
                   "type": "number"
               },
             },
-        "required": ["currency", "c", "dt", "ud0","sigPeriod", "sigValidity", "sigQty", "sigWoT", "sigStock",
+        "required": ["currency", "c", "dt", "ud0","sigPeriod", "sigValidity", "sigQty", "xpercent", "sigStock",
                      "sigWindow", "msValidity","stepMax", "medianTimeBlocks",
                      "avgGenTime", "dtDiffEval", "blocksRot", "percentRot"]
     }

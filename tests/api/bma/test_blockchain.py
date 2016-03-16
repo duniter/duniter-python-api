@@ -9,24 +9,24 @@ from ucoinpy.api.bma.blockchain import Parameters, Block, Current, Hardship, Mem
 class Test_BMA_Blockchain(WebFunctionalSetupMixin, unittest.TestCase):
     def test_parameters(self):
         json_sample = {
-          "currency": "meta_brouzouf",
-          "c": 0.1,
-          "dt": 86400,
-          "ud0": 100,
-          "sigPeriod": 604800,
-          "sigValidity": 2629800,
-          "sigQty": 3,
-          "sigWoT": 3,
-          "sigStock": 10,
-          "sigWindow": 10203044,
-          "msValidity": 2629800,
-          "stepMax": 3,
-          "medianTimeBlocks": 11,
-          "avgGenTime": 600,
-          "dtDiffEval": 20,
-          "blocksRot": 144,
-          "percentRot": 0.67
-        }
+              "currency": "super_currency",
+              "c": 0.007376575,
+              "dt": 36000,
+              "ud0": 100,
+              "sigPeriod": 0,
+              "sigStock": 0,
+              "sigWindow": 1209600,
+              "sigValidity": 31536000,
+              "sigQty": 0,
+              "xpercent": 0.9,
+              "msValidity": 31536000,
+              "stepMax": 3,
+              "medianTimeBlocks": 20,
+              "avgGenTime": 960,
+              "dtDiffEval": 10,
+              "blocksRot": 20,
+              "percentRot": 0.66
+            }
         jsonschema.validate(json_sample, Parameters.schema)
 
     def test_parameters_bad(self):
