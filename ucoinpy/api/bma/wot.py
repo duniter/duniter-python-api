@@ -27,14 +27,22 @@ class WOT(API):
 
 
 class Add(WOT):
-    """POST Public key data."""
+    """POST Identity data."""
 
     async def __post__(self, session, **kwargs):
-        assert 'pubkey' in kwargs
-        assert 'self_' in kwargs
-        assert 'other' in kwargs
+        assert 'identity' in kwargs
 
         r = await self.requests_post(session, '/add', **kwargs)
+        return r
+
+
+class Certify(WOT):
+    """POST Certification data."""
+
+    async def __post__(self, session, **kwargs):
+        assert 'cert' in kwargs
+
+        r = await self.requests_post(session, '/certify', **kwargs)
         return r
 
 
