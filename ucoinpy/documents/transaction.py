@@ -62,7 +62,7 @@ class Transaction(Document):
     """
 
     re_type = re.compile("Type: (Transaction)\n")
-    re_header = re.compile("TX:([0-9]+):([0-9]+):([0-9]+):([0-9]+):(0|1):([0-9]+)\n")
+    re_header = re.compile("TX:([0-9]+):([0-9]+):([0-9]+):([0-9]+):([0-9]+):(0|1):([0-9]+)\n")
     re_locktime = re.compile("Locktime: ([0-9]+)\n")
     re_issuers = re.compile("Issuers:\n")
     re_inputs = re.compile("Inputs:\n")
@@ -111,9 +111,10 @@ class Transaction(Document):
         version = int(header_data.group(1))
         issuers_num = int(header_data.group(2))
         inputs_num = int(header_data.group(3))
-        outputs_num = int(header_data.group(4))
-        has_comment = int(header_data.group(5))
-        locktime = int(header_data.group(6))
+        unlocks_num = int(header_data.group(4))
+        outputs_num = int(header_data.group(5))
+        has_comment = int(header_data.group(6))
+        locktime = int(header_data.group(7))
         n += 1
 
         issuers = []
@@ -131,7 +132,7 @@ class Transaction(Document):
             inputs.append(input_source)
             n += 1
 
-        for i in range(0, inputs_num):
+        for i in range(0, unlocks_num):
             unlock = Unlock.from_inline(lines[n])
             unlocks.append(unlock)
             n += 1
