@@ -201,9 +201,6 @@ class Sources(Tx):
                 "items": {
                     "type": "object",
                     "properties": {
-                        "pubkey": {
-                            "type": "string"
-                        },
                         "type": {
                             "type": "string"
                         },
@@ -220,7 +217,7 @@ class Sources(Tx):
                             "type": "number"
                         }
                     },
-                    "required": ["pubkey", "type", "noffset", "identifier", "amount", "base"]
+                    "required": ["type", "noffset", "identifier", "amount", "base"]
                 }
             }
         },
