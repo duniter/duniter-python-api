@@ -117,8 +117,8 @@ The class Block handles Block documents.
     re_issuer = re.compile("Issuer: ({pubkey_regex})\n".format(pubkey_regex=pubkey_regex))
     re_previoushash = re.compile("PreviousHash: ({block_hash_regex})\n".format(block_hash_regex=block_hash_regex))
     re_previousissuer = re.compile("PreviousIssuer: ({pubkey_regex})\n".format(pubkey_regex=pubkey_regex))
-    re_parameters = re.compile("Parameters: ([0-9]+\.[0-9]+):([0-9]+):([0-9]+):([0-9]+):([0-9]+):([0-9]+):([0-9]+):\
-([0-9]+):([0-9]+):([0-9]+):([0-9]+):([0-9]+):([0-9]+):([0-9]+):([0-9]+):([0-9]+\.[0-9]+)\n")
+    re_parameters = re.compile("Parameters: ([0-9]+\.[0-9]+):([0-9]+):([0-9]+):([0-9]+):([0-9]+):([0-9]+):\
+([0-9]+):([0-9]+):([0-9]+\.[0-9]+):([0-9]+):([0-9]+):([0-9]+):([0-9]+):([0-9]+):([0-9]+):([0-9]+\.[0-9]+)\n")
     re_memberscount = re.compile("MembersCount: ([0-9]+)\n")
     re_identities = re.compile("Identities:\n")
     re_joiners = re.compile("Joiners:\n")
@@ -218,7 +218,7 @@ The class Block handles Block documents.
 
     @property
     def blockUID(self):
-        return BlockUID(self.number, self.inner_hash)
+        return BlockUID(self.number, self.sha_hash)
     
     @classmethod
     def from_signed_raw(cls, raw):

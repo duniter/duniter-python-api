@@ -99,7 +99,7 @@ PoWMin: 3
 Time: 1418077277
 MedianTime: 1418077277
 Issuer: HnFcSms8jzwngtVomTTnzudZx7SHUQY8sVE1y8yBmULk
-Parameters: 0.1:86400:100:604800:15:604800:2629800:3:3:2629800:3:11:600:20:144:0.67
+Parameters: 0.007376575:300:10:0:40:1209600:31536000:0:0.9:31536000:3:20:60:10:20:0.66
 MembersCount: 4
 Identities:
 HnFcSms8jzwngtVomTTnzudZx7SHUQY8sVE1y8yBmULk:h/H8tDIEbfA4yxMQcvfOXVDQhi1sUa9qYtPKrM59Bulv97ouwbAvAsEkC1Uyit1IOpeAV+CQQs4IaAyjE8F1Cw==:0-DA39A3EE5E6B4B0D3255BFEF95601890AFD80709:cgeek
@@ -193,8 +193,9 @@ class Test_Block(unittest.TestCase):
         self.assertEqual(block.time, 1418077277)
         self.assertEqual(block.mediantime, 1418077277)
         self.assertEqual(block.issuer, "HnFcSms8jzwngtVomTTnzudZx7SHUQY8sVE1y8yBmULk")
-        self.assertEqual(block.parameters, ('0.1','86400','100','604800','15', '604800', '2629800','3','3',
-                                    '2629800','3','11','600','20','144','0.67'))
+        self.assertEqual(block.parameters, ("0.007376575",
+                                            "300","10","0","40","1209600","31536000","0","0.9","31536000",
+                                            "3","20","60","10","20","0.66"))
         self.assertEqual(block.members_count, 4)
         self.assertEqual(len(block.identities), 4)
         self.assertEqual(len(block.joiners), 4)
