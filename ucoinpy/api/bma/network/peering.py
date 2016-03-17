@@ -91,7 +91,7 @@ class Peers(Base):
         assert 'entry' in kwargs
         assert 'signature' in kwargs
 
-        r = await self.requests_post('/peers', **kwargs)
+        r = await self.requests_post(session, '/peers', **kwargs)
         return r
 
 
@@ -102,5 +102,5 @@ class Status(Base):
         assert 'status' in kwargs
         assert 'signature' in kwargs
 
-        r = await self.requests_post('/status', **kwargs)
+        r = await self.requests_post(session, '/status', **kwargs)
         return r

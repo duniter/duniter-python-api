@@ -35,5 +35,5 @@ class History(Ud):
 
     async def __get__(self, session, **kwargs):
         assert self.pubkey is not None
-        r = await self.requests_get('/history/%s' % self.pubkey, **kwargs)
+        r = await self.requests_get(session, '/history/%s' % self.pubkey, **kwargs)
         return await r.json()

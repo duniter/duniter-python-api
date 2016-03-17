@@ -144,7 +144,7 @@ class Membership(Blockchain):
     async def __post__(self, session, **kwargs):
         assert 'membership' in kwargs
 
-        r = await self.requests_post('/membership', **kwargs)
+        r = await self.requests_post(session, '/membership', **kwargs)
         return r
 
     async def __get__(self, session, **kwargs):
@@ -309,7 +309,7 @@ class Block(Blockchain):
         assert 'block' in kwargs
         assert 'signature' in kwargs
 
-        r = await self.requests_post('/block', **kwargs)
+        r = await self.requests_post(session, '/block', **kwargs)
         return r
 
 
