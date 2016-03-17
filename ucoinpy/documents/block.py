@@ -34,7 +34,7 @@ class BlockUID:
         try:
             number = int(data.group(1))
         except AttributeError:
-            raise MalformedDocumentError("BlockId")
+            raise MalformedDocumentError("BlockUID")
 
         try:
             sha_hash = data.group(2)
@@ -347,9 +347,10 @@ The class Block handles Block documents.
                 version = int(header_data.group(1))
                 issuers_num = int(header_data.group(2))
                 inputs_num = int(header_data.group(3))
-                outputs_num = int(header_data.group(4))
-                has_comment = int(header_data.group(5))
-                tx_max = n + issuers_num * 2 + inputs_num * 2 + outputs_num + has_comment + 1
+                unlocks_num = int(header_data.group(4))
+                outputs_num = int(header_data.group(5))
+                has_comment = int(header_data.group(6))
+                tx_max = n + 1 + issuers_num * 2 + inputs_num + unlocks_num + outputs_num + has_comment
                 for i in range(n, tx_max):
                     tx_lines += lines[n]
                     n += 1

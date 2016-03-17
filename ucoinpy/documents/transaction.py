@@ -144,12 +144,18 @@ class Transaction(Document):
 
         comment = ""
         if has_comment == 1:
-            comment = Transaction.re_compact_comment.match(lines[n]).group(1)
-            n += 1
+            if Transaction.re_compact_comment.match(lines[n]):
+                comment = Transaction.re_compact_comment.match(lines[n]).group(1)
+                n += 1
+            else:
+                raise MalformedDocumentError("Compact TX Comment")
 
         while n < len(lines):
-            signatures.append(Transaction.re_signature.match(lines[n]).group(1))
-            n += 1
+            if Transaction.re_signature.match(lines[n]):
+                signatures.append(Transaction.re_signature.match(lines[n]).group(1))
+                n += 1
+            else:
+                raise MalformedDocumentError("Compact TX Signatures")
 
         return cls(version, currency, locktime, issuers, inputs, unlocks, outputs, comment, signatures)
 
@@ -250,7 +256,7 @@ Issuers:
         """
         Return a transaction in its compact format.
         """
-        """TX:VERSION:NB_ISSUERS:NB_INPUTS:NB_OUTPUTS:HAS_COMMENT:LOCKTIME
+        """TX:VERSION:NB_ISSUERS:NB_INPUTS:NB_UNLOCKS:NB_OUTPUTS:HAS_COMMENT:LOCKTIME
 PUBLIC_KEY:INDEX
 ...
 INDEX:SOURCE:FINGERPRINT:AMOUNT
@@ -259,9 +265,10 @@ PUBLIC_KEY:AMOUNT
 ...
 COMMENT
 """
-        doc = "TX:{0}:{1}:{2}:{3}:{4}:{5}\n".format(self.version,
+        doc = "TX:{0}:{1}:{2}:{3}:{4}:{5}:{6}\n".format(self.version,
                                               len(self.issuers),
                                               len(self.inputs),
+                                              len(self.unlocks),
                                               len(self.outputs),
                                               '1' if self.comment != "" else '0',
                                                self.locktime)
