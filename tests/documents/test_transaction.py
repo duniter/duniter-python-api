@@ -9,7 +9,7 @@ from ucoinpy.grammars import output
 from ucoinpy.documents.transaction import Transaction, reduce_base
 
 
-tx_compact = """TX:2:3:6:3:1:0
+tx_compact = """TX:2:3:6:6:3:1:0
 HsLShAtzXTVxeUtQd7yi5Z5Zh4zNvbu8sTEZ53nfKcqY
 CYYjHsNyg3HMRMpTHqCJAN9McjH5BwFLmDKGV3PmCuKp
 9WYHTavL1pmhunFCzUwiiq4pXwvgGG5ysjZnjz9H8yB
