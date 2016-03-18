@@ -3,11 +3,11 @@ from ..documents.constants import block_hash_regex as hash_regex
 from pypeg2 import *
 
 
-class Pubkey(Symbol):
+class Pubkey(str):
     regex = re.compile(pubkey_regex)
 
 
-class Hash(Symbol):
+class Hash(str):
     regex = re.compile(hash_regex)
 
 
