@@ -290,8 +290,8 @@ COMMENT
 
 class SimpleTransaction(Transaction):
     """
-As transaction class, but for only one issuer.
-...
+    As transaction class, but for only one issuer.
+    ...
     """
     def __init__(self, version, currency, issuer,
                  single_input, outputs, comment, signature):
@@ -300,6 +300,32 @@ As transaction class, but for only one issuer.
         """
         super().__init__(version, currency, [issuer], [single_input],
               outputs, comment, [signature])
+
+    @staticmethod
+    def is_simple(tx):
+        """
+        Filter a transaction and checks if it is a basic one
+        A simple transaction is a tx which has only one issuer
+        and two outputs maximum. The unlocks must be done with
+        simple "SIG" functions, and the outputs must be simple
+        SIG conditions.
+        :param ucoinpy.documents.Transaction tx: the transaction to check
+        :return: True if a simple transaction
+        """
+        simple = True
+        if len(tx.issuers) != 1:
+            simple = False
+        for unlock in tx.unlocks:
+            if len(unlock.parameters) != 1:
+                simple = False
+            elif type(unlock.parameters[0]) is not SIGParameter:
+                simple = False
+        for o in tx.outputs:
+            if getattr('right', o.conditions, None):
+                simple = False
+            elif type(o.conditions.left) is not output.SIG:
+                simple = False
+        return simple
 
 
 class InputSource:

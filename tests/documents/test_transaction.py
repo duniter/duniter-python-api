@@ -6,7 +6,7 @@ Created on 12 déc. 2014
 import unittest
 import pypeg2
 from ucoinpy.grammars import output
-from ucoinpy.documents.transaction import Transaction, reduce_base
+from ucoinpy.documents.transaction import Transaction, reduce_base, SimpleTransaction
 
 
 tx_compact = """TX:2:3:6:6:3:1:0
@@ -32,6 +32,15 @@ D:9WYHTavL1pmhunFCzUwiiq4pXwvgGG5ysjZnjz9H8yB:46
 42yQm4hGTJYWkPg39hQAUgP6S6EQ4vTfXdJuxKEHL1ih6YHiDL2hcwrFgBHjXLRgxRhj2VNVqqc6b4JayKqTE14r
 2D96KZwNUvVtcapQPq2mm7J9isFcDCfykwJpVEZwBc7tCgL4qPyu17BT5ePozAE9HS6Yvj51f62Mp4n9d9dkzJoX
 2XiBDpuUdu6zCPWGzHXXy8c4ATSscfFQG9DjmqMZUxDZVt1Dp4m2N5oHYVUfoPdrU9SLk4qxi65RNrfCVnvQtQJk
+"""
+
+tx_compact_2 = """TX:2:1:1:1:2:0:0
+GNPdPNwSJAYw7ixkDeibo3YpdELgLmrZ2Q86HF4cyg92
+D:GNPdPNwSJAYw7ixkDeibo3YpdELgLmrZ2Q86HF4cyg92:471
+0:SIG(0)
+90:0:SIG(5zDvFjJB1PGDQNiExpfzL9c1tQGs6xPA8mf1phr3VoVi)
+10:0:SIG(GNPdPNwSJAYw7ixkDeibo3YpdELgLmrZ2Q86HF4cyg92)
+XDQeEMcJDd+XVGaFIZc8d4kKRJgsPuWAPVNG5UKNk8mDZx2oE1kTP/hbxiFx6yDouBELCswuf/X6POK9ES7JCA==
 """
 
 tx_raw = """Version: 2
@@ -131,6 +140,34 @@ class Test_Transaction(unittest.TestCase):
         self.assertEqual(tx.signatures[0], "42yQm4hGTJYWkPg39hQAUgP6S6EQ4vTfXdJuxKEHL1ih6YHiDL2hcwrFgBHjXLRgxRhj2VNVqqc6b4JayKqTE14r")
         self.assertEqual(tx.signatures[1], "2D96KZwNUvVtcapQPq2mm7J9isFcDCfykwJpVEZwBc7tCgL4qPyu17BT5ePozAE9HS6Yvj51f62Mp4n9d9dkzJoX")
         self.assertEqual(tx.signatures[2], "2XiBDpuUdu6zCPWGzHXXy8c4ATSscfFQG9DjmqMZUxDZVt1Dp4m2N5oHYVUfoPdrU9SLk4qxi65RNrfCVnvQtQJk")
+
+    def test_fromcompact2(self):
+        tx = Transaction.from_compact("zeta_brousouf", tx_compact_2)
+        self.assertEqual(tx.version, 2)
+        self.assertEqual(tx.currency, "zeta_brousouf")
+        self.assertEqual(len(tx.issuers), 1)
+        self.assertEqual(len(tx.inputs), 1)
+        self.assertEqual(len(tx.unlocks), 1)
+        self.assertEqual(len(tx.outputs), 2)
+
+        self.assertEqual(tx.issuers[0], "GNPdPNwSJAYw7ixkDeibo3YpdELgLmrZ2Q86HF4cyg92")
+
+        self.assertEqual(tx.inputs[0].source, 'D')
+        self.assertEqual(tx.inputs[0].origin_id, "GNPdPNwSJAYw7ixkDeibo3YpdELgLmrZ2Q86HF4cyg92")
+        self.assertEqual(tx.inputs[0].index, 471)
+
+        self.assertEqual(tx.unlocks[0].index, 0)
+        self.assertEqual(str(tx.unlocks[0].parameters[0]), "SIG(0)")
+
+        self.assertEqual(tx.outputs[0].amount, 90)
+        self.assertEqual(tx.outputs[0].base, 0)
+        self.assertEqual(pypeg2.compose(tx.outputs[0].conditions, output.Condition), "SIG(5zDvFjJB1PGDQNiExpfzL9c1tQGs6xPA8mf1phr3VoVi)")
+        self.assertEqual(type(tx.outputs[0].conditions.left), output.SIG)
+        self.assertEqual(tx.outputs[1].amount, 10)
+        self.assertEqual(tx.outputs[1].base, 0)
+        self.assertEqual(pypeg2.compose(tx.outputs[1].conditions, output.Condition), "SIG(GNPdPNwSJAYw7ixkDeibo3YpdELgLmrZ2Q86HF4cyg92)")
+        self.assertEqual(type(tx.outputs[1].conditions.left), output.SIG)
+        self.assertEqual(tx.signatures[0], "XDQeEMcJDd+XVGaFIZc8d4kKRJgsPuWAPVNG5UKNk8mDZx2oE1kTP/hbxiFx6yDouBELCswuf/X6POK9ES7JCA==")
 
     def test_fromraw(self):
         tx = Transaction.from_signed_raw(tx_raw)
@@ -276,3 +313,10 @@ class Test_Transaction(unittest.TestCase):
         computed = reduce_base(amount, base)
         self.assertEqual(computed[0], 12)
         self.assertEqual(computed[1], 5)
+
+    def test_is_simple(self):
+        tx = Transaction.from_compact("zeta_brousouf", tx_compact_2)
+        self.assertTrue(SimpleTransaction.is_simple(tx))
+
+        tx = Transaction.from_compact("zeta_brousouf", tx_compact)
+        self.assertFalse(SimpleTransaction.is_simple(tx))
