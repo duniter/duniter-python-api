@@ -20,16 +20,9 @@
 
 import aiohttp, json, logging, jsonschema
 
+from ..errors import UcoinError
+
 logger = logging.getLogger("ucoin")
-
-
-class UcoinError(Exception):
-    """
-    UCoin error
-    """
-    def __init__(self, data):
-        super().__init__("Error code {0} - {1}".format(data["ucode"], data["message"]))
-        self.error = data
 
 
 class ConnectionHandler(object):
