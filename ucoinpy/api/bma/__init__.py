@@ -26,5 +26,5 @@ import logging
 logger = logging.getLogger("ucoin")
 
 
-from .api import API, ConnectionHandler
+from .api import API, ConnectionHandler, UcoinError
 from . import network, blockchain, tx, wot, node, ud, ws

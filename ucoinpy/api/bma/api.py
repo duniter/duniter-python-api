@@ -23,6 +23,15 @@ import aiohttp, json, logging, jsonschema
 logger = logging.getLogger("ucoin")
 
 
+class UcoinError(Exception):
+    """
+    UCoin error
+    """
+    def __init__(self, data):
+        super().__init__("Error code {0} - {1}".format(data["ucode"], data["message"]))
+        self.error = data
+
+
 class ConnectionHandler(object):
     """Helper class used by other API classes to ease passing server connection information."""
 
@@ -162,7 +171,11 @@ class API(object):
         with aiohttp.Timeout(15):
             response = await session.get(self.reverse_url("http", path), params=kwargs,headers=self.headers)
             if response.status != 200:
-                raise ValueError('status code != 200 => %d (%s)' % (response.status, (await response.text())))
+                try:
+                    error_data = self.parse_error(await response.text())
+                    raise UcoinError(error_data)
+                except TypeError:
+                    raise ValueError('status code != 200 => %d (%s)' % (response.status, (await response.text())))
 
             return response
 
