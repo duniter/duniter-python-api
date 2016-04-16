@@ -84,7 +84,7 @@ class Peers(Base):
     async def __get__(self, session, **kwargs):
         """creates a generator with one peering entry per iteration."""
 
-        r = await self.requests_get('/peers', **kwargs)
+        r = await self.requests_get(session, '/peers', **kwargs)
         return (await self.parse_response(r))
 
     async def __post__(self, session, **kwargs):
