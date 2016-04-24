@@ -136,7 +136,7 @@ class API(object):
             data = json.loads(text)
             jsonschema.validate(data, self.error_schema)
             return data
-        except TypeError:
+        except (TypeError, json.decoder.JSONDecodeError):
             raise jsonschema.ValidationError("Could not parse json")
 
     async def parse_response(self, response):
