@@ -1,6 +1,6 @@
 import unittest
 from tests.api.webserver import WebFunctionalSetupMixin
-from ucoinpy.api.bma.ws import Block, Peer
+from duniterpy.api.bma.ws import Block, Peer
 
 
 class Test_BMA_Websocket(WebFunctionalSetupMixin, unittest.TestCase):

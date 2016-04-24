@@ -5,8 +5,8 @@ Created on 12 déc. 2014
 '''
 import unittest
 import pypeg2
-from ucoinpy.grammars import output
-from ucoinpy.documents.transaction import Transaction, reduce_base, SimpleTransaction
+from duniterpy.grammars import output
+from duniterpy.documents.transaction import Transaction, reduce_base, SimpleTransaction
 
 
 tx_compact = """TX:2:3:6:6:3:1:0

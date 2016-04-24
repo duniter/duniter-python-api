@@ -1,37 +1,37 @@
 Documents methods
 =================
 
-.. automodule:: ucoinpy.documents.block
+.. automodule:: duniterpy.documents.block
    :members:
    :special-members:
    :exclude-members: __dict__,__weakref__
 
-.. automodule:: ucoinpy.documents.certification
+.. automodule:: duniterpy.documents.certification
    :members:
    :special-members:
    :exclude-members: __dict__,__weakref__
 
-.. automodule:: ucoinpy.documents.document
+.. automodule:: duniterpy.documents.document
    :members:
    :special-members:
    :exclude-members: __dict__,__weakref__
 
-.. automodule:: ucoinpy.documents.membership
+.. automodule:: duniterpy.documents.membership
    :members:
    :special-members:
    :exclude-members: __dict__,__weakref__
 
-.. automodule:: ucoinpy.documents.peer
+.. automodule:: duniterpy.documents.peer
    :members:
    :special-members:
    :exclude-members: __dict__,__weakref__
 
-.. automodule:: ucoinpy.documents.status
+.. automodule:: duniterpy.documents.status
    :members:
    :special-members:
    :exclude-members: __dict__,__weakref__
 
-.. automodule:: ucoinpy.documents.transaction
+.. automodule:: duniterpy.documents.transaction
    :members:
    :special-members:
    :exclude-members: __dict__,__weakref__

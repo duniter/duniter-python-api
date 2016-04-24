@@ -3,7 +3,7 @@ import unittest
 import jsonschema
 import json
 from tests.api.webserver import WebFunctionalSetupMixin, web, asyncio
-from ucoinpy.api.bma.wot import Lookup, Members, CertifiedBy, CertifiersOf
+from duniterpy.api.bma.wot import Lookup, Members, CertifiedBy, CertifiersOf
 
 
 class Test_BMA_Wot(WebFunctionalSetupMixin, unittest.TestCase):

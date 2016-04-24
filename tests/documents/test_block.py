@@ -4,7 +4,7 @@ Created on 12 déc. 2014
 @author: inso
 '''
 import unittest
-from ucoinpy.documents.block import Block, BlockUID
+from duniterpy.documents.block import Block, BlockUID
 
 raw_block = """Version: 2
 Type: Block

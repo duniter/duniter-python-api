@@ -1,6 +1,6 @@
 import unittest
-from ucoinpy.api.bma import API
-from ucoinpy.documents.peer import BMAEndpoint
+from duniterpy.api.bma import API
+from duniterpy.documents.peer import BMAEndpoint
 
 
 class Test_BMA_API(unittest.TestCase):

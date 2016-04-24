@@ -4,7 +4,7 @@ Created on 13 déc. 2014
 @author: inso
 '''
 import unittest
-from ucoinpy.documents.peer import Peer, BMAEndpoint, UnknownEndpoint
+from duniterpy.documents.peer import Peer, BMAEndpoint, UnknownEndpoint
 
 
 rawpeer = """Version: 2

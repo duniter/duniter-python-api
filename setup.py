@@ -1,5 +1,5 @@
 from setuptools import setup, find_packages
-import ucoinpy
+import duniterpy
 import os
 import re
 
@@ -39,9 +39,9 @@ for requirement in (l.strip() for l in open('requirements.txt')):
         install_requires.append(requirement)
 
 setup(
-    name='ucoinpy',
+    name='duniterpy',
 
-    version=ucoinpy.__version__,
+    version=duniterpy.__version__,
 
     packages=find_packages(),
 
@@ -49,13 +49,13 @@ setup(
 
     author_email="insomniak.fr@gmail.com",
 
-    description="A python implementation of [uCoin](https://github.com/ucoin-io/ucoin) API",
+    description="A python implementation of [duniter](https://github.com/duniter-io/duniter) API",
 
     long_description=open('README.md').read(),
 
     # Active la prise en compte du fichier MANIFEST.in
     include_package_data=True,
-    url='https://github.com/ucoin-io/ucoin-python-api',
+    url='https://github.com/duniter-io/duniter-python-api',
     test_suite="tests",
 
     classifiers=[

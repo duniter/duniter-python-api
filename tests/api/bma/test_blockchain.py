@@ -2,7 +2,7 @@ import unittest
 import jsonschema
 import aiohttp
 from tests.api.webserver import WebFunctionalSetupMixin, web, asyncio
-from ucoinpy.api.bma.blockchain import Parameters, Block, Current, Hardship, Membership, Newcomers, \
+from duniterpy.api.bma.blockchain import Parameters, Block, Current, Hardship, Membership, Newcomers, \
     Certifications, Joiners, Actives, Leavers, UD, TX
 
 

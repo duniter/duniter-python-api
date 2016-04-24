@@ -1,9 +1,9 @@
 import unittest
 import jsonschema
 import aiohttp
-from ucoinpy.api.bma.tx import History, Sources
+from duniterpy.api.bma.tx import History, Sources
 from tests.api.webserver import WebFunctionalSetupMixin, web, asyncio
-from ucoinpy.api.bma.tx.history import Blocks
+from duniterpy.api.bma.tx.history import Blocks
 
 
 class Test_BMA_TX(WebFunctionalSetupMixin, unittest.TestCase):

@@ -1,4 +1,4 @@
-from ucoinpy.grammars import output
+from duniterpy.grammars import output
 import unittest
 import pypeg2
 

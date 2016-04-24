@@ -9,6 +9,6 @@ install:
  - pip install -r requirements.txt
 # command to run tests
 script:
- - coverage run --source=ucoinpy setup.py test
+ - coverage run --source=duniterpy setup.py test
 after_success:
  - coveralls

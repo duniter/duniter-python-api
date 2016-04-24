@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 #
-# ucoinpy documentation build configuration file, created by
+# duniterpy documentation build configuration file, created by
 # sphinx-quickstart on Tue Oct  6 16:34:46 2015.
 #
 # This file is execfile()d with the current directory set to its
@@ -62,7 +62,7 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General information about the project.
-project = 'ucoinpy'
+project = 'duniterpy'
 copyright = '2015, caner & inso'
 author = 'caner & inso'
 
@@ -216,7 +216,7 @@ html_static_path = ['_static']
 #html_search_scorer = 'scorer.js'
 
 # Output file base name for HTML help builder.
-htmlhelp_basename = 'ucoinpydoc'
+htmlhelp_basename = 'duniterpydoc'
 
 # -- Options for LaTeX output ---------------------------------------------
 
@@ -238,7 +238,7 @@ latex_elements = {
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
-  (master_doc, 'ucoinpy.tex', 'ucoinpy Documentation',
+  (master_doc, 'duniterpy.tex', 'duniterpy Documentation',
    'caner \\& inso', 'manual'),
 ]
 
@@ -268,7 +268,7 @@ latex_documents = [
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    (master_doc, 'ucoinpy', 'ucoinpy Documentation',
+    (master_doc, 'duniterpy', 'duniterpy Documentation',
      [author], 1)
 ]
 
@@ -282,8 +282,8 @@ man_pages = [
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-  (master_doc, 'ucoinpy', 'ucoinpy Documentation',
-   author, 'ucoinpy', 'One line description of project.',
+  (master_doc, 'duniterpy', 'duniterpy Documentation',
+   author, 'duniterpy', 'One line description of project.',
    'Miscellaneous'),
 ]
 

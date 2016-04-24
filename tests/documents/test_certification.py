@@ -5,8 +5,8 @@ Created on 6 déc. 2014
 '''
 
 import unittest
-from ucoinpy.documents.certification import SelfCertification, Certification, Revokation
-from ucoinpy.documents import Block, BlockUID
+from duniterpy.documents.certification import SelfCertification, Certification, Revokation
+from duniterpy.documents import Block, BlockUID
 
 selfcert_inlines = ["HnFcSms8jzwngtVomTTnzudZx7SHUQY8sVE1y8yBmULk:\
 h/H8tDIEbfA4yxMQcvfOXVDQhi1sUa9qYtPKrM59Bulv97ouwbAvAsEkC1Uyit1IOpeAV+CQQs4IaAyjE8F1Cw==:\

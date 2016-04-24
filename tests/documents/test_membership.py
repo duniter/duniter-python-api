@@ -4,7 +4,7 @@ Created on 12 déc. 2014
 @author: inso
 '''
 import unittest
-from ucoinpy.documents.membership import Membership
+from duniterpy.documents.membership import Membership
 
 membership_inline = "HnFcSms8jzwngtVomTTnzudZx7SHUQY8sVE1y8yBmULk:\
 dkaXIiCYUJtCg8Feh/BKvPYf4uFH9CJ/zY6J4MlA9BsjmcMe4YAblvNt/gJy31b1aGq3ue3h14mLMCu84rraDg==:\
