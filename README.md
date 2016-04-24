@@ -1,7 +1,7 @@
 #duniter-python-api
-[![Build Status](https://travis-ci.org/duniter-io/duniter-python-api.svg)](https://travis-ci.org/duniter-io/duniter-python-api) [![Coverage Status](https://coveralls.io/repos/duniter-io/duniter-python-api/badge.svg?branch=master&service=github)](https://coveralls.io/github/duniter-io/duniter-python-api?branch=master)
+[![Build Status](https://travis-ci.org/duniter/duniter-python-api.svg)](https://travis-ci.org/duniter/duniter-python-api) [![Coverage Status](https://coveralls.io/repos/duniter/duniter-python-api/badge.svg?branch=master&service=github)](https://coveralls.io/github/duniter/duniter-python-api?branch=master)
 
-A python implementation of [duniter](https://github.com/duniter-io/duniter) API
+A python implementation of [duniter](https://github.com/duniter/duniter) API
 
 ## Features
  * Supports duniter's Basic Merkle Api
@@ -19,4 +19,4 @@ A python implementation of [duniter](https://github.com/duniter-io/duniter) API
 You can install duniter-python-api and all its dependencies via the following pip install :
 `pip install duniterpy`
 
-Please take a look at the document [HTTP API](https://github.com/duniter-io/duniter/blob/master/doc/HTTP_API.md) to learn about the API.
+Please take a look at the document [HTTP API](https://github.com/duniter/duniter/blob/master/doc/HTTP_API.md) to learn about the API.
