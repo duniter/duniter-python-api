@@ -59,6 +59,12 @@ class Document:
             logging.debug("Signature : \n{0}".format(signing.decode("ascii")))
             self.signatures.append(signing.decode("ascii"))
 
+    def raw(self):
+        """
+        Returns the raw document in string format
+        """
+        raise NotImplementedError()
+
     def signed_raw(self):
         """
         If keys are None, returns the raw + current signatures

@@ -22,7 +22,7 @@ Simply type::
 Source code
 -----------
 
-Sources can be found at https://github.com/duniter-io/duniter-python-api
+Sources can be found at https://github.com/duniter/duniter-python-api
 
 Contributions are welcome.
 

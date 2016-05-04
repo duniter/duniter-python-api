@@ -4,10 +4,9 @@ duniter public and private keys
 @author: inso
 """
 
-import base58
-import base64
 import libnacl.sign
 from pylibscrypt import scrypt
+from .base58 import Base58Encoder
 
 
 SEED_LENGTH = 32  # Length of the key
@@ -35,12 +34,3 @@ class SigningKey(libnacl.sign.Signer):
 
         super().__init__(seed)
         self.pubkey = Base58Encoder.encode(self.vk)
-
-class Base58Encoder(object):
-    @staticmethod
-    def encode(data):
-        return base58.b58encode(data)
-
-    @staticmethod
-    def decode(data):
-        return base58.b58decode(data)

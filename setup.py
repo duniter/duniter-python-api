@@ -49,13 +49,13 @@ setup(
 
     author_email="insomniak.fr@gmail.com",
 
-    description="A python implementation of [duniter](https://github.com/duniter-io/duniter) API",
+    description="A python implementation of [duniter](https://github.com/duniter/duniter) API",
 
     long_description=open('README.md').read(),
 
     # Active la prise en compte du fichier MANIFEST.in
     include_package_data=True,
-    url='https://github.com/duniter-io/duniter-python-api',
+    url='https://github.com/duniter/duniter-python-api',
     test_suite="tests",
 
     classifiers=[
