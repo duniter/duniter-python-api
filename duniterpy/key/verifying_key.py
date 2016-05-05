@@ -32,4 +32,8 @@ class VerifyingKey(libnacl.sign.Verifier):
         signature = base64.b64decode(document.signatures[0])
         prepended = signature + bytes(document.raw(**kwargs), 'ascii')
 
-        return self.verify(prepended)
+        try:
+            self.verify(prepended)
+            return True
+        except ValueError:
+            return False
