@@ -21,7 +21,7 @@ PROTOCOL_VERSION="1"
 MANAGED_API=["BASIC_MERKLED_API"]
 
 __author__      = 'Caner Candan & inso'
-__version__     = '0.20.1dev8'
+__version__     = '0.20.1dev9'
 __nonsense__    = 'duniter'
 
 from . import api, documents, key
