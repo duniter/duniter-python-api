@@ -3,7 +3,7 @@ import unittest
 import jsonschema
 import json
 from tests.api.webserver import WebFunctionalSetupMixin, web, asyncio
-from duniterpy.api.bma.wot import Lookup, Members, CertifiedBy, CertifiersOf
+from duniterpy.api.bma.wot import Lookup, Members, CertifiedBy, CertifiersOf, Requirements
 
 
 class Test_BMA_Wot(WebFunctionalSetupMixin, unittest.TestCase):
@@ -169,24 +169,24 @@ class Test_BMA_Wot(WebFunctionalSetupMixin, unittest.TestCase):
         async def handler(request):
             await request.read()
             return web.Response(body=bytes(json.dumps({
-    "pubkey": "7Aqw6Efa9EzE7gtsc8SveLLrM7gm6NEGoywSv4FJx6pZ",
-    "uid": "john",
-    "isMember": True,
-    "certifications": [
-        {
-            "pubkey": "FADxcH5LmXGmGFgdixSes6nWnC4Vb4pRUBYT81zQRhjn",
-            "meta": {
-                "block_number": 38580
-            },
-            "uids": [
-                "doe"
-            ],
-            "isMember": True,
-            "wasMember": True,
-            "signature": "8XYmBdElqNkkl4AeFjJnC5oj/ujBrzH9FNgPZvK8Cicp8Du0PQa0yYFG95EQ46MJhdV0fUT2g5xyH8N3/OGhDA=="
-        },
-    ]
-}), "utf-8"), content_type='application/json')
+                "pubkey": "7Aqw6Efa9EzE7gtsc8SveLLrM7gm6NEGoywSv4FJx6pZ",
+                "uid": "john",
+                "isMember": True,
+                "certifications": [
+                    {
+                        "pubkey": "FADxcH5LmXGmGFgdixSes6nWnC4Vb4pRUBYT81zQRhjn",
+                        "meta": {
+                            "block_number": 38580
+                        },
+                        "uids": [
+                            "doe"
+                        ],
+                        "isMember": True,
+                        "wasMember": True,
+                        "signature": "8XYmBdElqNkkl4AeFjJnC5oj/ujBrzH9FNgPZvK8Cicp8Du0PQa0yYFG95EQ46MJhdV0fUT2g5xyH8N3/OGhDA=="
+                    },
+                ]
+            }), "utf-8"), content_type='application/json')
 
         async def go():
             _, srv, url = await self.create_server('GET', '/pubkey', handler)
@@ -212,3 +212,42 @@ class Test_BMA_Wot(WebFunctionalSetupMixin, unittest.TestCase):
                     await certby.get(session)
 
         self.loop.run_until_complete(go())
+
+    def test_bma_wot_requirements(self):
+        json_sample = {
+            "identities": [
+                {
+                    "pubkey": "8Fi1VSTbjkXguwThF4v2ZxC5whK7pwG2vcGTkPUPjPGU",
+                    "uid": "inso",
+                    "meta": {
+                        "timestamp": "1470-46221DE81776D8382F6DE595105386ADEDD291BEC33D238C506F56EA3721B012"
+                    },
+                    "outdistanced": False,
+                    "certifications": [
+                        {
+                            "from": "J78bPUvLjxmjaEkdjxWLeENQtcfXm7iobqB49uT1Bgp3",
+                            "to": "8Fi1VSTbjkXguwThF4v2ZxC5whK7pwG2vcGTkPUPjPGU",
+                            "expiresIn": 30423649
+                        },
+                        {
+                            "from": "9bZEATXBGPUSsk8oAYi4KAChg3rHKwNt67hVdErbNGCW",
+                            "to": "8Fi1VSTbjkXguwThF4v2ZxC5whK7pwG2vcGTkPUPjPGU",
+                            "expiresIn": 30488510
+                        },
+                        {
+                            "from": "HGYV5C16mrdvE9vpb1S9nMDHkVPsubBgANs9pSb6HWCV",
+                            "to": "8Fi1VSTbjkXguwThF4v2ZxC5whK7pwG2vcGTkPUPjPGU",
+                            "expiresIn": 30505972
+                        },
+                        {
+                            "from": "5ocqzyDMMWf1V8bsoNhWb1iNwax1e9M7VTUN6navs8of",
+                            "to": "8Fi1VSTbjkXguwThF4v2ZxC5whK7pwG2vcGTkPUPjPGU",
+                            "expiresIn": 30923721
+                        }
+                    ],
+                    "membershipPendingExpiresIn": 0,
+                    "membershipExpiresIn": 14707940
+                }
+            ]
+        }
+        jsonschema.validate(Requirements.schema, json_sample)

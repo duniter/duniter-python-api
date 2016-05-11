@@ -304,4 +304,74 @@ class Members(WOT):
 
     async def __get__(self, session, **kwargs):
         r = await self.requests_get(session, '/members', **kwargs)
-        return (await self.parse_response(r))
+        return await self.parse_response(r)
+
+
+class Requirements(WOT):
+    """
+    Get list of requirements for a given pubkey
+    """
+    schema = {
+        "type": "object",
+        "properties": {
+            "identities": {
+                "type": "array",
+                "items": {
+                    "type": "object",
+                    "properties": {
+                        "pubkey": {
+                            "type": "string"
+                        },
+                        "uid": {
+                            "type": "string"
+                        },
+                        "meta": {
+                            "type": "object",
+                            "properties": {
+                                "timestamp": {
+                                    "type": "string"
+                                }
+                            }
+                        },
+                        "outdistanced": {
+                            "type": "boolean"
+                        },
+                        "certifications": {
+                            "type": "array",
+                            "items": {
+                                "type": "object",
+                                "properties": {
+                                    "from": {
+                                        "type": "string"
+                                    },
+                                    "to": {
+                                        "type": "string"
+                                    },
+                                    "expiresIn": {
+                                        "type": "number"
+                                    }
+                                }
+                            }
+                        },
+                        "membershipPendingExpiresIn": {
+                            "type": "number"
+                        },
+                        "membershipExpiresIn": {
+                            "type": "number"
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    def __init__(self, connection_handler, search, module='wot'):
+        super(WOT, self).__init__(connection_handler, module)
+
+        self.search = search
+
+    async def __get__(self, session, **kwargs):
+        assert self.search is not None
+
+        r = await self.requests_get(session, '/requirements/%s' % self.search, **kwargs)
+        return await self.parse_response(r)
