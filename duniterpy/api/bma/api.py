@@ -122,7 +122,7 @@ class API(object):
             data = json.loads(text)
             jsonschema.validate(data, self.schema)
             return data
-        except TypeError:
+        except (TypeError, json.decoder.JSONDecodeError):
             raise jsonschema.ValidationError("Could not parse json")
 
     def parse_error(self, text):
@@ -150,7 +150,7 @@ class API(object):
             data = await response.json()
             jsonschema.validate(data, self.schema)
             return data
-        except TypeError:
+        except (TypeError, json.decoder.JSONDecodeError):
             raise jsonschema.ValidationError("Could not parse json")
 
     async def requests_get(self, session, path, **kwargs):
