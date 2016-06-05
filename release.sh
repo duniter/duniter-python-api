@@ -7,7 +7,7 @@ echo "Current version: $current"
 if [[ $1 =~ ^[0-9]+.[0-9]+.[0-9]+[0-9a-z]+$ ]]; then
   sed -i "s/__version__     = '$current'/__version__     = '$1'/g" duniterpy/__init__.py
   git commit duniterpy/__init__.py -m "$1"
-  git tag "$1"
+  git tag -a -m "$1"
 else
   echo "Wrong version format"
 fi
