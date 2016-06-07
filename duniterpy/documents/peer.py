@@ -157,4 +157,4 @@ class BMAEndpoint(Endpoint):
         elif self.ipv4:
             return ConnectionHandler(self.ipv4, self.port)
         else:
-            return ConnectionHandler(self.ipv6, self.port)
+            return ConnectionHandler("[{0}]".format(self.ipv6), self.port)
