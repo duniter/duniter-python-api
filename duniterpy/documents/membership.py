@@ -71,9 +71,9 @@ class Membership(Document):
         return cls(version, currency, issuer, membership_ts, membership_type, uid, identity_ts, signature)
 
     @classmethod
-    def from_signed_raw(cls, raw, signature=None):
+    def from_signed_raw(cls, signed_raw):
         from .block import BlockUID
-        lines = raw.splitlines(True)
+        lines = signed_raw.splitlines(True)
         n = 0
 
         version = int(Membership.parse_field("Version", lines[n]))

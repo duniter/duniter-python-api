@@ -50,8 +50,7 @@ class Revoke(WOT):
     """POST Public key data."""
 
     async def __post__(self, session, **kwargs):
-        assert 'pubkey' in kwargs
-        assert 'self_' in kwargs
+        assert 'revocation' in kwargs
 
         r = await self.requests_post(session, '/revoke', **kwargs)
         return r

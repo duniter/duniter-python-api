@@ -1,5 +1,5 @@
 from .document import Document, MalformedDocumentError
-from .certification import SelfCertification, Certification, Revokation
+from .certification import SelfCertification, Certification, Revocation
 from .membership import Membership
 from .transaction import Transaction
 from .constants import pubkey_regex, block_id_regex, block_hash_regex
@@ -184,7 +184,7 @@ The class Block handles Block documents.
         :param list[duniterpy.documents.Membership] joiners: the joiners memberships via "IN" documents
         :param list[duniterpy.documents.Membership] actives: renewed memberships via "IN" documents
         :param list[duniterpy.documents.Membership] leavers: the leavers memberships via "OUT" documents
-        :param list[duniterpy.documents.Revokation] revokations: revokations
+        :param list[duniterpy.documents.Revocation] revokations: revokations
         :param list[duniterpy.documents.Membership] excluded: members excluded because of missing certifications
         :param list[duniterpy.documents.Membership] actives: renewed memberships via "IN" documents
         :param list[duniterpy.documents.Certification] certifications: certifications documents
@@ -221,8 +221,8 @@ The class Block handles Block documents.
         return BlockUID(self.number, self.sha_hash)
     
     @classmethod
-    def from_signed_raw(cls, raw):
-        lines = raw.splitlines(True)
+    def from_signed_raw(cls, signed_raw):
+        lines = signed_raw.splitlines(True)
         n = 0
 
         version = int(Block.parse_field("Version", lines[n]))
@@ -318,7 +318,7 @@ The class Block handles Block documents.
         if Block.re_revoked.match(lines[n]):
             n += 1
             while Block.re_excluded.match(lines[n]) is None:
-                revokation = Revokation.from_inline(version, currency, lines[n])
+                revokation = Revocation.from_inline(version, currency, lines[n])
                 revoked.append(revokation)
                 n += 1
 

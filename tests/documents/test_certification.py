@@ -5,7 +5,7 @@ Created on 6 déc. 2014
 '''
 
 import unittest
-from duniterpy.documents.certification import SelfCertification, Certification, Revokation
+from duniterpy.documents.certification import SelfCertification, Certification, Revocation
 from duniterpy.documents import Block, BlockUID
 
 selfcert_inlines = ["HnFcSms8jzwngtVomTTnzudZx7SHUQY8sVE1y8yBmULk:\
@@ -111,7 +111,7 @@ SoKwoa8PFfCDJWZ6dNCv7XstezHcc2BbKiJgVDXv82R5zYR83nis9dShLgWJ5w48noVUHimdngzYQneN
     def test_revokation_from_inline(self):
         version = 2
         currency = "zeta_brousouf"
-        revokation = Revokation.from_inline(version, currency, revokation_inline)
+        revokation = Revocation.from_inline(version, currency, revokation_inline)
         self.assertEqual(revokation.pubkey, "8Fi1VSTbjkXguwThF4v2ZxC5whK7pwG2vcGTkPUPjPGU")
         self.assertEqual(revokation.signatures[0], "TgmDuMxZdyutroj9jiLJA8tQp/389JIzDKuxW5+h7GIfjDu1ZbwI7HNm5rlUDhR2KreaV/QJjEaItT4Cf75rCQ==")
 
@@ -121,7 +121,7 @@ SoKwoa8PFfCDJWZ6dNCv7XstezHcc2BbKiJgVDXv82R5zYR83nis9dShLgWJ5w48noVUHimdngzYQneN
         currency = "beta_brousouf"
         pubkey = "HgTTJLAQ5sqfknMq7yLPZbehtuLSsKj9CxWN7k8QvYJd"
         signature = "SoKwoa8PFfCDJWZ6dNCv7XstezHcc2BbKiJgVDXv82R5zYR83nis9dShLgWJ5w48noVUHimdngzYQneNYSMV3rk"
-        revokation = Revokation(version, currency, pubkey, signature)
+        revokation = Revocation(version, currency, pubkey, signature)
         selfcert = SelfCertification(version, currency, pubkey, "lolcat",
                                      BlockUID(32, "DB30D958EE5CB75186972286ED3F4686B8A1C2CD"),
                                      "J3G9oM5AKYZNLAB5Wx499w61NuUoS57JVccTShUbGpCMjCqj9yXXqNq7dyZpDWA6BxipsiaMZhujMeBfCznzyci")
@@ -136,3 +136,17 @@ IdtySignature: J3G9oM5AKYZNLAB5Wx499w61NuUoS57JVccTShUbGpCMjCqj9yXXqNq7dyZpDWA6B
 SoKwoa8PFfCDJWZ6dNCv7XstezHcc2BbKiJgVDXv82R5zYR83nis9dShLgWJ5w48noVUHimdngzYQneNYSMV3rk
 """
         self.assertEqual(revokation.signed_raw(selfcert), result)
+
+    def test_revokation_from_signed_raw(self):
+        signed_raw = """Version: 2
+Type: Revocation
+Currency: beta_brousouf
+Issuer: HgTTJLAQ5sqfknMq7yLPZbehtuLSsKj9CxWN7k8QvYJd
+IdtyUniqueID: lolcat
+IdtyTimestamp: 32-DB30D958EE5CB75186972286ED3F4686B8A1C2CD
+IdtySignature: J3G9oM5AKYZNLAB5Wx499w61NuUoS57JVccTShUbGpCMjCqj9yXXqNq7dyZpDWA6BxipsiaMZhujMeBfCznzyci
+SoKwoa8PFfCDJWZ6dNCv7XstezHcc2BbKiJgVDXv82R5zYR83nis9dShLgWJ5w48noVUHimdngzYQneNYSMV3rk
+"""
+        revocation = Revocation.from_signed_raw(signed_raw)
+        selfcert = Revocation.extract_self_cert(signed_raw)
+        self.assertEqual(revocation.signed_raw(selfcert), signed_raw)

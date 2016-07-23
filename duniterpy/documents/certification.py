@@ -163,7 +163,7 @@ CertTimestamp: {timestamp}
                                         self.timestamp.number, self.signatures[0])
 
 
-class Revokation(Document):
+class Revocation(Document):
     """
     A document describing a self-revocation.
     """
@@ -171,6 +171,20 @@ class Revokation(Document):
                                 pubkey_regex=pubkey_regex,
                                 signature_regex=signature_regex
                     ))
+
+    re_type = re.compile("Type: (Revocation)")
+    re_issuer = re.compile("Issuer: ({pubkey_regex})\n".format(pubkey_regex=pubkey_regex))
+    re_uniqueid = re.compile("IdtyUniqueID: ([^\n]+)\n")
+    re_timestamp = re.compile("IdtyTimestamp: ({block_uid_regex})\n".format(block_uid_regex=block_uid_regex))
+    re_idtysignature = re.compile("IdtySignature: ({signature_regex})\n".format(signature_regex=signature_regex))
+
+    fields_parsers = {**Document.fields_parsers, **{
+        "Type": re_type,
+        "Issuer": re_issuer,
+        "IdtyUniqueID": re_uniqueid,
+        "IdtyTimestamp": re_timestamp,
+        "IdtySignature": re_idtysignature,
+    }}
 
     def __init__(self, version, currency, pubkey, signature):
         """
@@ -189,13 +203,67 @@ class Revokation(Document):
         :param str signature:
         :return:
         """
-        cert_data = Revokation.re_inline.match(inline)
+        cert_data = Revocation.re_inline.match(inline)
         if cert_data is None:
             raise MalformedDocumentError("Revokation")
         pubkey = cert_data.group(1)
         signature = cert_data.group(2)
         return cls(version, currency, pubkey, signature)
 
+    @classmethod
+    def from_signed_raw(cls, signed_raw):
+        """
+        Instanciates a revocation from a signed raw file
+        :param str signed_raw: raw document file in duniter format
+        :return: a revocation instance
+        """
+        lines = signed_raw.splitlines(True)
+        n = 0
+
+        version = int(Revocation.parse_field("Version", lines[n]))
+        n += 1
+
+        Revocation.parse_field("Type", lines[n])
+        n += 1
+
+        currency = Revocation.parse_field("Currency", lines[n])
+        n += 1
+
+        issuer = Revocation.parse_field("Issuer", lines[n])
+        n += 4
+
+        signature = Revocation.parse_field("Signature", lines[n])
+        n += 1
+
+        return cls(version, currency, issuer, signature)
+
+    @staticmethod
+    def extract_self_cert(signed_raw):
+        lines = signed_raw.splitlines(True)
+        n = 0
+
+        version = int(Revocation.parse_field("Version", lines[n]))
+        n += 1
+
+        Revocation.parse_field("Type", lines[n])
+        n += 1
+
+        currency = Revocation.parse_field("Currency", lines[n])
+        n += 1
+
+        issuer = Revocation.parse_field("Issuer", lines[n])
+        n += 1
+
+        unique_id = Revocation.parse_field("IdtyUniqueID", lines[n])
+        n += 1
+
+        timestamp = Revocation.parse_field("IdtyTimestamp", lines[n])
+        n += 1
+
+        signature = Revocation.parse_field("IdtySignature", lines[n])
+        n += 1
+
+        return SelfCertification(version, currency, issuer, unique_id, timestamp, signature)
 
     def raw(self, selfcert):
         """
