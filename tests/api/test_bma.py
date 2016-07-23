@@ -18,7 +18,7 @@ class Test_BMA_API(unittest.TestCase):
     def test_reverse_url_only_ipv6(self):
         endpoint = BMAEndpoint(None, None, "2001:0db8:0000:85a3:0000:0000:ac1f:8001", 9092)
         api = API(endpoint.conn_handler(), "any")
-        self.assertEqual(api.reverse_url("http", "/test/url"), "http://2001:0db8:0000:85a3:0000:0000:ac1f:8001:9092/any/test/url")
+        self.assertEqual(api.reverse_url("http", "/test/url"), "http://[2001:0db8:0000:85a3:0000:0000:ac1f:8001]:9092/any/test/url")
 
     def test_parse_error(self):
         api = API(None, "any")
