@@ -3,7 +3,7 @@ from duniterpy.documents import Peer
 import unittest
 
 
-class Test_VerifyingKey(unittest.TestCase):
+class TestVerifyingKey(unittest.TestCase):
     def test_from_sign_to_verify(self):
         sign_key = SigningKey("saltsalt", "passwordpassword")
         verify_key = VerifyingKey(sign_key.pubkey)
