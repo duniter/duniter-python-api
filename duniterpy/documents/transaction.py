@@ -1,5 +1,5 @@
 from .document import Document, MalformedDocumentError
-from .constants import pubkey_regex, transaction_hash_regex, block_id_regex
+from .constants import pubkey_regex, transaction_hash_regex, block_id_regex, block_uid_regex
 from ..grammars import output
 import pypeg2
 import re
@@ -63,6 +63,8 @@ class Transaction(Document):
 
     re_type = re.compile("Type: (Transaction)\n")
     re_header = re.compile("TX:([0-9]+):([0-9]+):([0-9]+):([0-9]+):([0-9]+):(0|1):([0-9]+)\n")
+    re_compact_blockstamp = re.compile("({block_uid_regex})\n".format(block_uid_regex=block_uid_regex))
+    re_blockstamp = re.compile("Blockstamp: ({block_uid_regex})\n".format(block_uid_regex=block_uid_regex))
     re_locktime = re.compile("Locktime: ([0-9]+)\n")
     re_issuers = re.compile("Issuers:\n")
     re_inputs = re.compile("Inputs:\n")
@@ -74,6 +76,8 @@ class Transaction(Document):
 
     fields_parsers = {**Document.fields_parsers, **{
             "Type": re_type,
+            "Blockstamp": re_blockstamp,
+            "CompactBlockstamp": re_compact_blockstamp,
             "Locktime": re_locktime,
             "TX": re_header,
             "Issuers": re_issuers,
@@ -86,13 +90,23 @@ class Transaction(Document):
         }
     }
 
-    def __init__(self, version, currency, locktime, issuers, inputs, unlocks, outputs,
+    def __init__(self, version, currency, blockstamp, locktime, issuers, inputs, unlocks, outputs,
                  comment, signatures):
         """
-        Constructor
+
+        :param int version:
+        :param str currency:
+        :param BlockUID blockstamp:
+        :param int locktime:
+        :param str issuers:
+        :param inputs:
+        :param unlocks:
+        :param outputs:
+        :param comment:
+        :param signatures:
         """
         super().__init__(version, currency, signatures)
-
+        self.blockstamp = blockstamp
         self.locktime = locktime
         self.issuers = issuers
         self.inputs = inputs
@@ -102,6 +116,7 @@ class Transaction(Document):
 
     @classmethod
     def from_compact(cls, currency, compact):
+        from .block import BlockUID
         lines = compact.splitlines(True)
         n = 0
 
@@ -117,6 +132,12 @@ class Transaction(Document):
         locktime = int(header_data.group(7))
         n += 1
 
+        if version >= 3:
+            blockstamp = BlockUID.from_str(Transaction.parse_field("CompactBlockstamp", lines[n]))
+            n += 1
+        else:
+            blockstamp = None
+
         issuers = []
         inputs = []
         unlocks = []
@@ -128,7 +149,7 @@ class Transaction(Document):
             n += 1
 
         for i in range(0, inputs_num):
-            input_source = InputSource.from_inline(lines[n])
+            input_source = InputSource.from_inline(version, lines[n])
             inputs.append(input_source)
             n += 1
 
@@ -157,10 +178,11 @@ class Transaction(Document):
             else:
                 raise MalformedDocumentError("Compact TX Signatures")
 
-        return cls(version, currency, locktime, issuers, inputs, unlocks, outputs, comment, signatures)
+        return cls(version, currency, blockstamp, locktime, issuers, inputs, unlocks, outputs, comment, signatures)
 
     @classmethod
     def from_signed_raw(cls, raw):
+        from .block import BlockUID
         lines = raw.splitlines(True)
         n = 0
 
@@ -172,6 +194,12 @@ class Transaction(Document):
 
         currency = Transaction.parse_field("Currency", lines[n])
         n += 1
+
+        if version >= 3:
+            blockstamp = BlockUID.from_str(Transaction.parse_field("Blockstamp", lines[n]))
+            n += 1
+        else:
+            blockstamp = None
 
         locktime = Transaction.parse_field("Locktime", lines[n])
         n += 1
@@ -192,7 +220,7 @@ class Transaction(Document):
         if Transaction.re_inputs.match(lines[n]):
             n += 1
             while Transaction.re_unlocks.match(lines[n]) is None:
-                input_source = InputSource.from_inline(lines[n])
+                input_source = InputSource.from_inline(version, lines[n])
                 inputs.append(input_source)
                 n += 1
 
@@ -219,25 +247,28 @@ class Transaction(Document):
                 signatures.append(sign)
                 n += 1
 
-        return cls(version, currency, locktime, issuers, inputs, unlocks, outputs,
+        return cls(version, currency, blockstamp, locktime, issuers, inputs, unlocks, outputs,
                    comment, signatures)
 
     def raw(self):
         doc = """Version: {0}
 Type: Transaction
 Currency: {1}
-Locktime: {2}
-Issuers:
 """.format(self.version,
-           self.currency,
-           self.locktime)
+           self.currency)
 
+        if self.version >= 3:
+            doc += "Blockstamp: {0}\n".format(self.blockstamp)
+
+        doc += "Locktime: {0}\n".format(self.locktime)
+
+        doc += "Issuers:\n"
         for p in self.issuers:
             doc += "{0}\n".format(p)
 
         doc += "Inputs:\n"
         for i in self.inputs:
-            doc += "{0}\n".format(i.inline())
+            doc += "{0}\n".format(i.inline(self.version))
 
         doc += "Unlocks:\n"
         for u in self.unlocks:
@@ -272,10 +303,13 @@ COMMENT
                                               len(self.outputs),
                                               '1' if self.comment != "" else '0',
                                                self.locktime)
+        if self.version >= 3:
+            doc += "{0}\n".format(self.blockstamp)
+
         for pubkey in self.issuers:
             doc += "{0}\n".format(pubkey)
         for i in self.inputs:
-            doc += "{0}\n".format(i.inline())
+            doc += "{0}\n".format(i.inline(self.version))
         for u in self.unlocks:
             doc += "{0}\n".format(u.inline())
         for o in self.outputs:
@@ -340,40 +374,66 @@ class InputSource:
                            .format(pubkey_regex=pubkey_regex,
                                    block_id_regex=block_id_regex,
                                     transaction_hash_regex=transaction_hash_regex))
-    re_compact = re.compile("([0-9]+):(D|T):([0-9a-fA-F]{5,40}):([0-9]+)\n")
+    re_inline_v3 = re.compile("([0-9]+):([0-9]+):(?:(?:(D):({pubkey_regex}):({block_id_regex}))|(?:(T):({transaction_hash_regex}):([0-9]+)))\n"
+                           .format(pubkey_regex=pubkey_regex,
+                                   block_id_regex=block_id_regex,
+                                    transaction_hash_regex=transaction_hash_regex))
 
-    def __init__(self, source, origin_id, index):
+    def __init__(self, amount, base, source, origin_id, index):
         """
         An input source can come from a dividend or a transaction.
 
+        :param int amount: amount of the input
+        :param int base: base of the input
         :param str source: D if dividend, T if transaction
         :param str origin_id: a Public key if a dividend, a tx hash if a transaction
         :param int index: a block id if a dividend, an tx index if a transaction
         :return:
         """
+        self.amount = amount
+        self.base = base
         self.source = source
         self.origin_id = origin_id
         self.index = index
 
     @classmethod
-    def from_inline(cls, inline):
-        data = InputSource.re_inline.match(inline)
-        if data is None:
-            raise MalformedDocumentError("Inline input")
-        if data.group(1):
-            source = data.group(1)
-            origin_id = data.group(2)
-            index = int(data.group(3))
+    def from_inline(cls, tx_version, inline):
+        if tx_version == 2:
+            data = InputSource.re_inline.match(inline)
+            if data is None:
+                raise MalformedDocumentError("Inline input")
+            source_offset = 0
+            amount = 0
+            base = 0
         else:
-            source = data.group(4)
-            origin_id = data.group(5)
-            index = int(data.group(6))
-        return cls(source, origin_id, index)
+            data = InputSource.re_inline_v3.match(inline)
+            if data is None:
+                raise MalformedDocumentError("Inline input")
+            source_offset = 2
+            amount = data.group(1)
+            base = data.group(2)
+        if data.group(1 + source_offset):
+            source = data.group(1 + source_offset)
+            origin_id = data.group(2 + source_offset)
+            index = int(data.group(3 + source_offset))
+        else:
+            source = data.group(4 + source_offset)
+            origin_id = data.group(5 + source_offset)
+            index = int(data.group(6 + source_offset))
 
-    def inline(self):
-        return "{0}:{1}:{2}".format(self.source,
-                                            self.origin_id,
-                                            self.index)
+        return cls(amount, base, source, origin_id, index)
+
+    def inline(self, tx_version):
+        if tx_version == 2:
+            return "{0}:{1}:{2}".format(self.source,
+                                        self.origin_id,
+                                        self.index)
+        else:
+            return "{0}:{1}:{2}:{3}:{4}".format(self.amount,
+                                        self.base,
+                                        self.source,
+                                        self.origin_id,
+                                        self.index)
 
 
 class UnlockParameter:

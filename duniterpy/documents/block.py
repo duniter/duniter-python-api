@@ -194,6 +194,13 @@ The class Block handles Block documents.
         :param list[str] signatures: the block signaturezs
         """
         super().__init__(version, currency, [signature])
+        documents_versions = max(max([1] + [i.version for i in identities]),
+                               max([1] + [m.version for m in actives + leavers + joiners + excluded + actives]),
+                               max([1] + [r.version for r in revokations]),
+                               max([1] + [c.version for c in certifications]),
+                               max([1] + [t.version for t in transactions]))
+        if self.version < documents_versions:
+            raise MalformedDocumentError("Block version is too low : {0} < {1}".format(self.version, documents_versions))
         self.number = number
         self.powmin = powmin
         self.time = time
@@ -344,13 +351,19 @@ The class Block handles Block documents.
                 header_data = Transaction.re_header.match(lines[n])
                 if header_data is None:
                     raise MalformedDocumentError("Compact transaction ({0})".format(lines[n]))
-                version = int(header_data.group(1))
+                tx_version = int(header_data.group(1))
                 issuers_num = int(header_data.group(2))
                 inputs_num = int(header_data.group(3))
                 unlocks_num = int(header_data.group(4))
                 outputs_num = int(header_data.group(5))
                 has_comment = int(header_data.group(6))
-                tx_max = n + 1 + issuers_num * 2 + inputs_num + unlocks_num + outputs_num + has_comment
+                if version > 2:
+                    if tx_version <= 2:
+                        raise MalformedDocumentError("TX document is using wrong version")
+                    sup_lines = 2
+                else:
+                    sup_lines = 1
+                tx_max = n + sup_lines + issuers_num * 2 + inputs_num + unlocks_num + outputs_num + has_comment
                 for i in range(n, tx_max):
                     tx_lines += lines[n]
                     n += 1
