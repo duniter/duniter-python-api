@@ -115,6 +115,9 @@ The class Block handles Block documents.
     re_universaldividend = re.compile("UniversalDividend: ([0-9]+)\n")
     re_unitbase = re.compile("UnitBase: ([0-6])\n")
     re_issuer = re.compile("Issuer: ({pubkey_regex})\n".format(pubkey_regex=pubkey_regex))
+    re_issuers_frame = re.compile("IssuersFrame: ([0-9]+)\n")
+    re_issuers_frame_var = re.compile("IssuersFrameVar: ([0-9]+)\n")
+    re_different_issuers_count = re.compile("DifferentIssuersCount: ([0-9]+)\n")
     re_previoushash = re.compile("PreviousHash: ({block_hash_regex})\n".format(block_hash_regex=block_hash_regex))
     re_previousissuer = re.compile("PreviousIssuer: ({pubkey_regex})\n".format(pubkey_regex=pubkey_regex))
     re_parameters = re.compile("Parameters: ([0-9]+\.[0-9]+):([0-9]+):([0-9]+):([0-9]+):([0-9]+):([0-9]+):\
@@ -141,6 +144,9 @@ The class Block handles Block documents.
                 'UD': re_universaldividend,
                 'UnitBase': re_unitbase,
                 'Issuer': re_issuer,
+                'IssuersFrame': re_issuers_frame,
+                'IssuersFrameVar': re_issuers_frame_var,
+                'DifferentIssuersCount': re_different_issuers_count,
                 'PreviousIssuer': re_previousissuer,
                 'PreviousHash': re_previoushash,
                 'Parameters': re_parameters,
@@ -161,7 +167,8 @@ The class Block handles Block documents.
     Empty_Hash = "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
 
     def __init__(self, version, currency, number, powmin, time,
-                 mediantime, ud, unit_base, issuer, prev_hash, prev_issuer,
+                 mediantime, ud, unit_base, issuer, issuers_frame, issuers_frame_var,
+                 different_issuers_count, prev_hash, prev_issuer,
                  parameters, members_count, identities, joiners,
                  actives, leavers, revokations, excluded, certifications,
                  transactions, inner_hash, noonce, signature):
@@ -176,6 +183,9 @@ The class Block handles Block documents.
         :param int ud: the dividend amount, or None if no dividend present in this block
         :param int unit_base: the unit_base of the dividend, or None if no dividend present in this block
         :param str issuer: the pubkey of the issuer of the block
+        :param int issuers__frame:
+        :param int issuers_frame_var:
+        :param int different_issuers_count: the count of issuers
         :param str prev_hash: the previous block hash
         :param str prev_issuer: the previous block issuer
         :param tuple parameters: the parameters of the currency. Should only be present in block 0.
@@ -208,6 +218,9 @@ The class Block handles Block documents.
         self.ud = ud
         self.unit_base = unit_base
         self.issuer = issuer
+        self.issuers_frame = issuers_frame
+        self.issuers_frame_var = issuers_frame_var
+        self.different_issuers_count = different_issuers_count
         self.prev_hash = prev_hash
         self.prev_issuer = prev_issuer
         self.parameters = parameters
@@ -259,11 +272,24 @@ The class Block handles Block documents.
             ud = int(Block.parse_field("UD", lines[n]))
             n += 1
 
+        if version >= 3 or ud:
             unit_base = int(Block.parse_field("UnitBase", lines[n]))
             n += 1
 
         issuer = Block.parse_field("Issuer", lines[n])
         n += 1
+
+        if version >= 3:
+            issuers_frame = Block.parse_field("IssuersFrame", lines[n])
+            n += 1
+            issuers_frame_var = Block.parse_field("IssuersFrameVar", lines[n])
+            n += 1
+            different_issuers_count = Block.parse_field("DifferentIssuersCount", lines[n])
+            n += 1
+        else:
+            issuers_frame = None
+            issuers_frame_var = None
+            different_issuers_count = None
 
         prev_hash = None
         prev_issuer = None
@@ -379,7 +405,8 @@ The class Block handles Block documents.
         signature = Block.parse_field("Signature", lines[n])
 
         return cls(version, currency, number, powmin, time,
-                   mediantime, ud, unit_base, issuer, prev_hash, prev_issuer,
+                   mediantime, ud, unit_base, issuer, issuers_frame, issuers_frame_var,
+                   different_issuers_count, prev_hash, prev_issuer,
                    parameters, members_count, identities, joiners,
                    actives, leavers, revoked, excluded, certifications,
                    transactions, inner_hash, noonce, signature)
@@ -400,9 +427,17 @@ MedianTime: {mediantime}
                       mediantime=self.mediantime)
         if self.ud:
             doc += "UniversalDividend: {0}\n".format(self.ud)
+
+        if self.version >= 3 or self.ud:
             doc += "UnitBase: {0}\n".format(self.unit_base)
 
         doc += "Issuer: {0}\n".format(self.issuer)
+
+        if self.version >= 3:
+            doc += """IssuersFrame: {0}
+IssuersFrameVar: {1}
+DifferentIssuersCount: {2}
+""".format(self.issuers_frame, self.issuers_frame_var, self.different_issuers_count)
 
         if self.number == 0:
             str_params = ":".join(self.parameters)

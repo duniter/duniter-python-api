@@ -98,7 +98,7 @@ class Transaction(Document):
         :param str currency:
         :param BlockUID blockstamp:
         :param int locktime:
-        :param str issuers:
+        :param list[str] issuers:
         :param inputs:
         :param unlocks:
         :param outputs:

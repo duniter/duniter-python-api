@@ -167,7 +167,11 @@ Number: 34436
 PoWMin: 5
 Time: 1443896211
 MedianTime: 1443881811
+UnitBase: 3
 Issuer: HnFcSms8jzwngtVomTTnzudZx7SHUQY8sVE1y8yBmULk
+IssuersFrame: 43
+IssuersFrameVar: 2
+DifferentIssuersCount: 8
 PreviousHash: 000002B06C990DEBD5C1D947289C2CF4F4396FB2
 PreviousIssuer: HnFcSms8jzwngtVomTTnzudZx7SHUQY8sVE1y8yBmULk
 MembersCount: 19
