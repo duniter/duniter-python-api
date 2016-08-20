@@ -116,7 +116,7 @@ The class Block handles Block documents.
     re_unitbase = re.compile("UnitBase: ([0-6])\n")
     re_issuer = re.compile("Issuer: ({pubkey_regex})\n".format(pubkey_regex=pubkey_regex))
     re_issuers_frame = re.compile("IssuersFrame: ([0-9]+)\n")
-    re_issuers_frame_var = re.compile("IssuersFrameVar: ([0-9]+)\n")
+    re_issuers_frame_var = re.compile("IssuersFrameVar: (0|-?[1-9]+)\n")
     re_different_issuers_count = re.compile("DifferentIssuersCount: ([0-9]+)\n")
     re_previoushash = re.compile("PreviousHash: ({block_hash_regex})\n".format(block_hash_regex=block_hash_regex))
     re_previousissuer = re.compile("PreviousIssuer: ({pubkey_regex})\n".format(pubkey_regex=pubkey_regex))
