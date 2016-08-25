@@ -433,7 +433,7 @@ class Test_Block(unittest.TestCase):
         block = Block.from_signed_raw(raw_block_with_leavers)
         rendered_raw = block.signed_raw()
         from_rendered_raw = block.from_signed_raw(rendered_raw)
-        self.assertEqual(from_rendered_raw.version, 3)
+        self.assertEqual(from_rendered_raw.version, 2)
         self.assertEqual(from_rendered_raw.currency, "meta_brouzouf")
         self.assertEqual(from_rendered_raw.noonce, 9906)
         self.assertEqual(from_rendered_raw.number, 34895)
