@@ -265,6 +265,9 @@ class Revocation(Document):
 
         return SelfCertification(version, currency, issuer, unique_id, timestamp, signature)
 
+    def inline(self):
+        return "{0}:{1}".format(self.pubkey, self.signatures[0])
+
     def raw(self, selfcert):
         """
 

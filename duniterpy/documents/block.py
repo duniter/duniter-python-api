@@ -195,7 +195,7 @@ The class Block handles Block documents.
         :param list[duniterpy.documents.Membership] actives: renewed memberships via "IN" documents
         :param list[duniterpy.documents.Membership] leavers: the leavers memberships via "OUT" documents
         :param list[duniterpy.documents.Revocation] revokations: revokations
-        :param list[duniterpy.documents.Membership] excluded: members excluded because of missing certifications
+        :param list[str] excluded: members excluded because of missing certifications
         :param list[duniterpy.documents.Membership] actives: renewed memberships via "IN" documents
         :param list[duniterpy.documents.Certification] certifications: certifications documents
         :param list[duniterpy.documents.Transaction] transactions: transactions documents
@@ -205,7 +205,7 @@ The class Block handles Block documents.
         """
         super().__init__(version, currency, [signature])
         documents_versions = max(max([1] + [i.version for i in identities]),
-                               max([1] + [m.version for m in actives + leavers + joiners + excluded + actives]),
+                               max([1] + [m.version for m in actives + leavers + joiners]),
                                max([1] + [r.version for r in revokations]),
                                max([1] + [c.version for c in certifications]),
                                max([1] + [t.version for t in transactions]))
@@ -358,8 +358,8 @@ The class Block handles Block documents.
         if Block.re_excluded.match(lines[n]):
             n += 1
             while Block.re_certifications.match(lines[n]) is None:
-                membership = Block.re_exclusion.match(lines[n]).group(1)
-                excluded.append(membership)
+                exclusion = Block.re_exclusion.match(lines[n]).group(1)
+                excluded.append(exclusion)
                 n += 1
 
         if Block.re_certifications.match(lines[n]):
@@ -466,7 +466,7 @@ PreviousIssuer: {1}\n".format(self.prev_hash, self.prev_issuer)
 
         doc += "Revoked:\n"
         for revokation in self.revoked:
-            doc += "{0}\n".format(revokation)
+            doc += "{0}\n".format(revokation.inline())
 
         doc += "Excluded:\n"
         for exclude in self.excluded:

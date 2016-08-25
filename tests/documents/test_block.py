@@ -227,6 +227,62 @@ nY/MsFU2luiohLmSiOOimL1RIqbriOBgc22ua03Z2dhxtSJxKZeGNGDvl1jaXgmEBRnXU87yXbZ7ioOS
 """
 
 
+raw_block_with_excluded = """Version: 3
+Type: Block
+Currency: test_net
+Number: 33365
+PoWMin: 76
+Time: 1472075456
+MedianTime: 1472072569
+UnitBase: 3
+Issuer: HnFcSms8jzwngtVomTTnzudZx7SHUQY8sVE1y8yBmULk
+IssuersFrame: 50
+IssuersFrameVar: 0
+DifferentIssuersCount: 9
+PreviousHash: 0000338C775613399FA508A8F8B22EB60F525884730639E2A707299E373F43C0
+PreviousIssuer: DesHja7gonANRJB7YUkfCgQpnDjgGeDXAeArdhcbXPmJ
+MembersCount: 128
+Identities:
+Joiners:
+Actives:
+Leavers:
+Revoked:
+2VAxjr8QoJtSzhE7APno4AkR2RAQNySpNNvDzMgPotSF:DGXpXwnxIP+j6fyLeaa8Toys9TN/fzumIrAslzAf+Tv50PTIrzBkxjE5oHGtI4AvytApW14rFWgWljmbtrVDAw==
+Excluded:
+2VAxjr8QoJtSzhE7APno4AkR2RAQNySpNNvDzMgPotSF
+Certifications:
+Transactions:
+TX:3:1:4:4:12:1:0
+33363-000021C4B5BE2DA996F953DC09482F4FA2FA68774B1A38FAB03B2AAB4A08EBE0
+TENGx7WtzFsTXwnbrPEvb6odX2WnqYcnnrjiiLvp1mS
+5:0:T:D25272F1D778B52798B7A51CF0CE21F7C5812F841374508F4367872D4A47F0F7:0
+6:1:T:D25272F1D778B52798B7A51CF0CE21F7C5812F841374508F4367872D4A47F0F7:1
+7:2:T:D25272F1D778B52798B7A51CF0CE21F7C5812F841374508F4367872D4A47F0F7:2
+2300962:3:T:D25272F1D778B52798B7A51CF0CE21F7C5812F841374508F4367872D4A47F0F7:10
+0:SIG(0)
+1:SIG(0)
+2:SIG(0)
+3:SIG(0)
+5:0:SIG(TENGx7WtzFsTXwnbrPEvb6odX2WnqYcnnrjiiLvp1mS)
+6:1:SIG(TENGx7WtzFsTXwnbrPEvb6odX2WnqYcnnrjiiLvp1mS)
+7:2:SIG(TENGx7WtzFsTXwnbrPEvb6odX2WnqYcnnrjiiLvp1mS)
+10000:3:SIG(5ocqzyDMMWf1V8bsoNhWb1iNwax1e9M7VTUN6navs8of)
+13000:3:SIG(XeBpJwRLkF5J4mnwyEDriEcNB13iFpe1MAKR4mH3fzN)
+8000:3:SIG(9bZEATXBGPUSsk8oAYi4KAChg3rHKwNt67hVdErbNGCW)
+2250:3:SIG(J78bPUvLjxmjaEkdjxWLeENQtcfXm7iobqB49uT1Bgp3)
+4750:3:SIG(HnFcSms8jzwngtVomTTnzudZx7SHUQY8sVE1y8yBmULk)
+3000:3:SIG(6KXBjAFceD1gp8RBVZfy5YQyKFXG8GaX8tKaLAyPWHrj)
+500:3:SIG(ACkHkjDj1SPUu8LhtSAWJLRLoWEXWFuzFPL65zFbe7Yb)
+500:3:SIG(5bxtdmC7RGGJEmcdnJ3ut5zg7KdUH2pYZepSHbwNYs7z)
+2258962:3:SIG(TENGx7WtzFsTXwnbrPEvb6odX2WnqYcnnrjiiLvp1mS)
+REMU:30244:30411
+Yo5waBymzDRd0AAMPH8dBj/GnSjtCJUn4EKWaze/4CaU39lf7JAysYmc6yoQGSnGUKZwKT0P0/FvJr9kzX6RBA==
+InnerHash: EB2926354963AA21E99E4D304B7765811BA385C9A1976B9A5FACBBCB12F4C969
+Nonce: 137387
+GmgYhWrwCtsK7t2B/omPpxZ8EfJgv9UYzJIFo++Za+A0Mo70xRfZG7kywxbQTTxDk/V7r90P946N89vdVjv1Bg==
+"""
+
+
 class Test_Block(unittest.TestCase):
     def test_fromraw(self):
         block = Block.from_signed_raw(raw_block)
@@ -377,7 +433,7 @@ class Test_Block(unittest.TestCase):
         block = Block.from_signed_raw(raw_block_with_leavers)
         rendered_raw = block.signed_raw()
         from_rendered_raw = block.from_signed_raw(rendered_raw)
-        self.assertEqual(from_rendered_raw.version, 2)
+        self.assertEqual(from_rendered_raw.version, 3)
         self.assertEqual(from_rendered_raw.currency, "meta_brouzouf")
         self.assertEqual(from_rendered_raw.noonce, 9906)
         self.assertEqual(from_rendered_raw.number, 34895)
@@ -405,6 +461,13 @@ class Test_Block(unittest.TestCase):
         self.assertTrue(lower < higher)
         self.assertFalse(lower > higher)
         self.assertFalse(lower == higher)
+
+    def test_parse_with_excluded(self):
+        block = Block.from_signed_raw(raw_block_with_excluded)
+        rendered_raw = block.signed_raw()
+        from_rendered_raw = block.from_signed_raw(rendered_raw)
+        self.assertEqual(from_rendered_raw.signed_raw(), raw_block_with_excluded)
+
 
 if __name__ == '__main__':
     unittest.main()
