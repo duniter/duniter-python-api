@@ -283,6 +283,50 @@ GmgYhWrwCtsK7t2B/omPpxZ8EfJgv9UYzJIFo++Za+A0Mo70xRfZG7kywxbQTTxDk/V7r90P946N89vd
 """
 
 
+negative_issuers_frame_var = """Version: 3
+Type: Block
+Currency: test_net
+Number: 34662
+PoWMin: 78
+Time: 1472499945
+MedianTime: 1472496896
+UnitBase: 3
+Issuer: ATkjQPa4sn4LBF69jqEPzFtRdHYJs6MJQjvP8JdN7MtN
+IssuersFrame: 65
+IssuersFrameVar: 10
+DifferentIssuersCount: 14
+PreviousHash: 0000069B5B8B86220D5AAF7E4912FA06860FD72A3C9E2A00E0FE11EA0BDD977C
+PreviousIssuer: E2uioubZeK5SDMoxkTkizRnhE8qDL24v5oUNNa1sQKMH
+MembersCount: 129
+Identities:
+Joiners:
+Actives:
+Leavers:
+Revoked:
+Excluded:
+Certifications:
+Transactions:
+TX:3:1:4:4:2:1:0
+34660-00001EEB3FDCEB2F9F39F931ED8F6D419C4C64B4D3F7EA52C35FB6B07A085664
+5ocqzyDMMWf1V8bsoNhWb1iNwax1e9M7VTUN6navs8of
+765201:3:T:636150D38D565DA0B9717E93C2AD8D6270FA032BF963360ECFCDD55F44493F08:1
+435871:3:D:5ocqzyDMMWf1V8bsoNhWb1iNwax1e9M7VTUN6navs8of:34596
+5500:3:T:84BB2ADBB690F9204E1139DC4967F364847E68B910D6DA52CD71E09F59A4FB9A:5
+5500:3:T:A47000FA1B1DE4E72EF18D77033E2B97D815C39A2D7F132418CB3BEDD1A55D6F:5
+0:SIG(0)
+1:SIG(0)
+2:SIG(0)
+3:SIG(0)
+217935:3:SIG(BnSRjMjJ7gWy13asCRz9rQ6G5Njytdf3pvR1GMkJgtu6)
+994137:3:SIG(5ocqzyDMMWf1V8bsoNhWb1iNwax1e9M7VTUN6navs8of)
+tu peux maintenant supprimer les annonces dans cesium - nouveau bouton
+PkCYSNLQaM1m6cRzgRTknrQ1BjvoyUYO5XRMNNYfjwUigg62guPd79QXZqmBIlUb5RPPI6EF1SMdArhaoYc7Cg==
+InnerHash: 96C3CBEC2EF6C7AD768EC787EADEA41B0ADA80FBC611EED6976BBCEDA3D2D6CE
+Nonce: 202829
+WnJvw204wccmSBQK9UE2rCFw0EG34zf+b58n2KTLwSIhTpgmGsnr5ohkSyYZYcLEKjisLXKNCmMl7D1Q9bJiBQ==
+"""
+
+
 class Test_Block(unittest.TestCase):
     def test_fromraw(self):
         block = Block.from_signed_raw(raw_block)
@@ -467,6 +511,12 @@ class Test_Block(unittest.TestCase):
         rendered_raw = block.signed_raw()
         from_rendered_raw = block.from_signed_raw(rendered_raw)
         self.assertEqual(from_rendered_raw.signed_raw(), raw_block_with_excluded)
+
+    def test_parse_negative_issuers_frame_var(self):
+        block = Block.from_signed_raw(negative_issuers_frame_var)
+        rendered_raw = block.signed_raw()
+        from_rendered_raw = block.from_signed_raw(rendered_raw)
+        self.assertEqual(from_rendered_raw.signed_raw(), negative_issuers_frame_var)
 
 
 if __name__ == '__main__':
