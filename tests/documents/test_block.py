@@ -4,7 +4,7 @@ Created on 12 déc. 2014
 @author: inso
 '''
 import unittest
-from duniterpy.documents.block import Block, BlockUID
+from duniterpy.documents.block import Block, BlockUID, block_uid
 
 raw_block = """Version: 2
 Type: Block
@@ -518,6 +518,19 @@ class Test_Block(unittest.TestCase):
         from_rendered_raw = block.from_signed_raw(rendered_raw)
         self.assertEqual(from_rendered_raw.signed_raw(), negative_issuers_frame_var)
 
+    def test_block_uid_converter(self):
+        buid = block_uid("1345-0000338C775613399FA508A8F8B22EB60F525884730639E2A707299E373F43C0")
+        self.assertEqual(buid.number, 1345)
+        self.assertEqual(buid.sha_hash, "0000338C775613399FA508A8F8B22EB60F525884730639E2A707299E373F43C0")
+
+    def test_block_uid_converter_error(self):
+        with self.assertRaises(TypeError):
+            buid = block_uid(1235654)
+
+    def test_block_uid_no_convert(self):
+        buid = block_uid(BlockUID(1345, "0000338C775613399FA508A8F8B22EB60F525884730639E2A707299E373F43C0"))
+        self.assertEqual(buid.number, 1345)
+        self.assertEqual(buid.sha_hash, "0000338C775613399FA508A8F8B22EB60F525884730639E2A707299E373F43C0")
 
 if __name__ == '__main__':
     unittest.main()

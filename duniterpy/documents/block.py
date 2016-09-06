@@ -7,6 +7,17 @@ from .constants import pubkey_regex, block_id_regex, block_hash_regex
 import re
 
 
+def block_uid(value):
+    if isinstance(value, BlockUID):
+        return value
+    elif isinstance(value, str):
+        return BlockUID.from_str(value)
+    elif value is None:
+        return BlockUID.empty()
+    else:
+        raise TypeError("Cannot convert {0} to BlockUID".format(type(value)))
+
+
 class BlockUID:
     """
     A simple block id
