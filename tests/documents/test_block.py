@@ -532,6 +532,13 @@ class Test_Block(unittest.TestCase):
         self.assertEqual(buid.number, 1345)
         self.assertEqual(buid.sha_hash, "0000338C775613399FA508A8F8B22EB60F525884730639E2A707299E373F43C0")
 
+    def test_block_uid_non_zero(self):
+        buid = BlockUID(1345, "0000338C775613399FA508A8F8B22EB60F525884730639E2A707299E373F43C0")
+        if not buid:
+            self.fail("__nonzero__ comparison failed")
+        elif BlockUID.empty():
+            self.fail("Empty blockuid __nonzero__ comparison failed")
+
 if __name__ == '__main__':
     unittest.main()
 

@@ -72,6 +72,9 @@ class BlockUID:
     def __ge__(self, other):
         return self.number >= other.number
 
+    def __bool__(self):
+        return self != BlockUID.empty()
+
 
 class Block(Document):
     """
