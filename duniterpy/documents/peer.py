@@ -68,8 +68,7 @@ class Peer(Document):
 
         endpoints = []
         while not Peer.re_signature.match(lines[n]):
-            endpoint = Endpoint.from_inline(lines[n])
-            endpoints.append(endpoint)
+            endpoints.append(endpoint(lines[n]))
             n += 1
 
         signature = Peer.re_signature.match(lines[n]).group(1)
@@ -91,22 +90,15 @@ Endpoints:
         return doc
 
 
-class Endpoint:
-    """
-    Describing endpoints
-    """
-
-    @staticmethod
-    def from_inline(inline):
-        for api in MANAGED_API:
-            if (inline.startswith(api)):
-                if (api == "BASIC_MERKLED_API"):
-                    return BMAEndpoint.from_inline(inline)
-        return UnknownEndpoint.from_inline(inline)
+def endpoint(inline):
+    for api in MANAGED_API:
+        if (inline.startswith(api)):
+            if (api == "BASIC_MERKLED_API"):
+                return BMAEndpoint.from_inline(inline)
+    return UnknownEndpoint.from_inline(inline)
 
 
-class UnknownEndpoint(Endpoint):
-
+class UnknownEndpoint:
     def __init__(self, api, properties):
         self.api = api
         self.properties = properties
@@ -124,8 +116,14 @@ class UnknownEndpoint(Endpoint):
         return doc
 
 
-class BMAEndpoint(Endpoint):
+class BMAEndpoint:
     re_inline = re.compile('^BASIC_MERKLED_API(?: ([a-z0-9-_.]*(?:.[a-zA-Z])))?(?: ((?:[0-9.]{1,4}){4}))?(?: ((?:[0-9a-f:]{4,5}){4,8}))?(?: ([0-9]+))$')
+
+    def __init__(self, server, ipv4, ipv6, port):
+        self.server = server
+        self.ipv4 = ipv4
+        self.ipv6 = ipv6
+        self.port = port
 
     @classmethod
     def from_inline(cls, inline):
@@ -137,12 +135,6 @@ class BMAEndpoint(Endpoint):
         ipv6 = m.group(3)
         port = int(m.group(4))
         return cls(server, ipv4, ipv6, port)
-
-    def __init__(self, server, ipv4, ipv6, port):
-        self.server = server
-        self.ipv4 = ipv4
-        self.ipv6 = ipv6
-        self.port = port
 
     def inline(self):
         return "BASIC_MERKLED_API{DNS}{IPv4}{IPv6}{PORT}" \
