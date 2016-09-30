@@ -323,6 +323,35 @@ class Current(Blockchain):
         return (await self.parse_response(r))
 
 
+
+class Blocks(Blockchain):
+    """GET list of blocks from the blockchain."""
+
+    schema = {
+        "type": "array",
+        "items": Block.schema
+    }
+
+    def __init__(self, connection_handler, count=None, from_=None):
+        """
+        Use the number parameter in order to select a block number.
+
+        Arguments:
+        - `count`: block count to select
+        - `from_`: first block to select
+        """
+
+        super(Blocks, self).__init__(connection_handler)
+        self.count = count
+        self.from_ = from_
+
+    async def __get__(self, session, **kwargs):
+        assert self.count is not None
+        assert self.from_ is not None
+        r = await self.requests_get(session, '/blocks/%d/%d' % self.count, self.from_, **kwargs)
+        return (await self.parse_response(r))
+
+
 class Hardship(Blockchain):
     """GET hardship level for given member's fingerprint for writing next block."""
     schema = {

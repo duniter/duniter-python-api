@@ -3,7 +3,7 @@ import jsonschema
 import aiohttp
 from tests.api.webserver import WebFunctionalSetupMixin, web, asyncio
 from duniterpy.api.bma.blockchain import Parameters, Block, Current, Hardship, Membership, Newcomers, \
-    Certifications, Joiners, Actives, Leavers, UD, TX
+    Certifications, Joiners, Actives, Leavers, UD, TX, Blocks
 
 
 class Test_BMA_Blockchain(WebFunctionalSetupMixin, unittest.TestCase):
@@ -356,6 +356,107 @@ class Test_BMA_Blockchain(WebFunctionalSetupMixin, unittest.TestCase):
             }
         }
         jsonschema.validate(json_sample, UD.schema)
+
+    def test_schema_blocks(self):
+        json_sample = [
+          {
+            "version": 2,
+            "nonce": 1,
+            "number": 100,
+            "powMin": 4,
+            "time": 1461847414,
+            "medianTime": 1461847412,
+            "membersCount": 2,
+            "monetaryMass": 0,
+            "unitbase": 0,
+            "issuersCount": 0,
+            "issuersFrame": 0,
+            "issuersFrameVar": 0,
+            "currency": "test_net",
+            "issuer": "HnFcSms8jzwngtVomTTnzudZx7SHUQY8sVE1y8yBmULk",
+            "signature": "R6XzQ7DDTam+koGCoEeygxFAuy9Uh/by6GS8mMx5rFWqusxaUYRJW4QkeGmqT9yHTpXCbHwZZbpIgm3SbrrVDg==",
+            "hash": "2C49A15983AEA3EBFD6B430876933A72C11D8D20E49ED94C4066557C1B528973",
+            "parameters": "",
+            "previousHash": "12DD8737F97BD3AC0B7E4B10F770F101A0D3EB3EEC858023CBCA06BB4AA9EBE6",
+            "previousIssuer": "HnFcSms8jzwngtVomTTnzudZx7SHUQY8sVE1y8yBmULk",
+            "inner_hash": "0C9002C192ADB5D913C78D813216E56677CCF53A4DE0764C30E46E858D4854A5",
+            "dividend": None,
+            "identities": [],
+            "joiners": [],
+            "actives": [],
+            "leavers": [],
+            "revoked": [],
+            "excluded": [],
+            "certifications": [],
+            "transactions": [],
+            "raw": "Version: 2\nType: Block\nCurrency: test_net\nNumber: 100\nPoWMin: 4\nTime: 1461847414\nMedianTime: 1461847412\nIssuer: HnFcSms8jzwngtVomTTnzudZx7SHUQY8sVE1y8yBmULk\nPreviousHash: 12DD8737F97BD3AC0B7E4B10F770F101A0D3EB3EEC858023CBCA06BB4AA9EBE6\nPreviousIssuer: HnFcSms8jzwngtVomTTnzudZx7SHUQY8sVE1y8yBmULk\nMembersCount: 2\nIdentities:\nJoiners:\nActives:\nLeavers:\nRevoked:\nExcluded:\nCertifications:\nTransactions:\nInnerHash: 0C9002C192ADB5D913C78D813216E56677CCF53A4DE0764C30E46E858D4854A5\nNonce: 1\n"
+          },
+          {
+            "version": 2,
+            "nonce": 1,
+            "number": 101,
+            "powMin": 4,
+            "time": 1461847414,
+            "medianTime": 1461847412,
+            "membersCount": 2,
+            "monetaryMass": 0,
+            "unitbase": 0,
+            "issuersCount": 0,
+            "issuersFrame": 0,
+            "issuersFrameVar": 0,
+            "currency": "test_net",
+            "issuer": "HnFcSms8jzwngtVomTTnzudZx7SHUQY8sVE1y8yBmULk",
+            "signature": "IDWQCVtI8XxRVqakKc822ayZ8qNzm0kYK3ew1heqMf8aqsMhiS/1IKBi4gBFBXMpO49bX8GkZW/R/TDxiYsUAg==",
+            "hash": "9A29E79EC06444EEC4ADC9F7C9B720A91A9FC1B66219F641EF71661BD2F28F8F",
+            "parameters": "",
+            "previousHash": "2C49A15983AEA3EBFD6B430876933A72C11D8D20E49ED94C4066557C1B528973",
+            "previousIssuer": "HnFcSms8jzwngtVomTTnzudZx7SHUQY8sVE1y8yBmULk",
+            "inner_hash": "A91B10BA4EEB7CF712DC92CAE7F6FF761571929B8BF1A13E1FF5CC402442A10A",
+            "dividend": None,
+            "identities": [],
+            "joiners": [],
+            "actives": [],
+            "leavers": [],
+            "revoked": [],
+            "excluded": [],
+            "certifications": [],
+            "transactions": [],
+            "raw": "Version: 2\nType: Block\nCurrency: test_net\nNumber: 101\nPoWMin: 4\nTime: 1461847414\nMedianTime: 1461847412\nIssuer: HnFcSms8jzwngtVomTTnzudZx7SHUQY8sVE1y8yBmULk\nPreviousHash: 2C49A15983AEA3EBFD6B430876933A72C11D8D20E49ED94C4066557C1B528973\nPreviousIssuer: HnFcSms8jzwngtVomTTnzudZx7SHUQY8sVE1y8yBmULk\nMembersCount: 2\nIdentities:\nJoiners:\nActives:\nLeavers:\nRevoked:\nExcluded:\nCertifications:\nTransactions:\nInnerHash: A91B10BA4EEB7CF712DC92CAE7F6FF761571929B8BF1A13E1FF5CC402442A10A\nNonce: 1\n"
+          },
+          {
+            "version": 2,
+            "nonce": 1,
+            "number": 102,
+            "powMin": 4,
+            "time": 1461847414,
+            "medianTime": 1461847413,
+            "membersCount": 2,
+            "monetaryMass": 0,
+            "unitbase": 0,
+            "issuersCount": 0,
+            "issuersFrame": 0,
+            "issuersFrameVar": 0,
+            "currency": "test_net",
+            "issuer": "HnFcSms8jzwngtVomTTnzudZx7SHUQY8sVE1y8yBmULk",
+            "signature": "jUfBfFwzsXyPGi/seEonWHOfq5/lAudASpnpiHhfr7OQhOTYL3RRECy2RVlZAoqJ9FqlcdTSaj+I+FFPBomoBA==",
+            "hash": "8B6F0E8EA4B9D5A078D679E6004F891CAB5BDE827B51B1090E6B71B1FFB3E727",
+            "parameters": "",
+            "previousHash": "9A29E79EC06444EEC4ADC9F7C9B720A91A9FC1B66219F641EF71661BD2F28F8F",
+            "previousIssuer": "HnFcSms8jzwngtVomTTnzudZx7SHUQY8sVE1y8yBmULk",
+            "inner_hash": "301236A7771CBDE30F253E2A42E34BF758450DADDDB37A832328701B04213A59",
+            "dividend": None,
+            "identities": [],
+            "joiners": [],
+            "actives": [],
+            "leavers": [],
+            "revoked": [],
+            "excluded": [],
+            "certifications": [],
+            "transactions": [],
+            "raw": "Version: 2\nType: Block\nCurrency: test_net\nNumber: 102\nPoWMin: 4\nTime: 1461847414\nMedianTime: 1461847413\nIssuer: HnFcSms8jzwngtVomTTnzudZx7SHUQY8sVE1y8yBmULk\nPreviousHash: 9A29E79EC06444EEC4ADC9F7C9B720A91A9FC1B66219F641EF71661BD2F28F8F\nPreviousIssuer: HnFcSms8jzwngtVomTTnzudZx7SHUQY8sVE1y8yBmULk\nMembersCount: 2\nIdentities:\nJoiners:\nActives:\nLeavers:\nRevoked:\nExcluded:\nCertifications:\nTransactions:\nInnerHash: 301236A7771CBDE30F253E2A42E34BF758450DADDDB37A832328701B04213A59\nNonce: 1\n"
+          }
+        ]
+        jsonschema.validate(json_sample, Blocks.schema)
 
     def test_ud_bad(self):
         async def handler(request):
