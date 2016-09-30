@@ -90,15 +90,37 @@ Endpoints:
         return doc
 
 
-def endpoint(inline):
-    for api in MANAGED_API:
-        if (inline.startswith(api)):
-            if (api == "BASIC_MERKLED_API"):
-                return BMAEndpoint.from_inline(inline)
-    return UnknownEndpoint.from_inline(inline)
+def endpoint(value):
+    if isinstance(value, UnknownEndpoint):
+        return value
+    elif isinstance(value, BMAEndpoint):
+        return value
+    elif isinstance(value, str):
+        for api in MANAGED_API:
+            if value.startswith(api):
+                if api == "BASIC_MERKLED_API":
+                    return BMAEndpoint.from_inline(value)
+        return UnknownEndpoint.from_inline(value)
+    else:
+        raise TypeError("Cannot convert {0} to endpoint".format(value))
 
 
-class UnknownEndpoint:
+class Endpoint():
+    @classmethod
+    def from_inline(cls, inline):
+        raise NotImplementedError("from_inline(..) is not implemented")
+
+    def inline(self):
+        raise NotImplementedError("inline() is not implemented")
+
+    def __str__(self):
+        raise NotImplementedError("__str__ is not implemented")
+
+    def __eq__(self, other):
+        raise NotImplementedError("__eq__ is not implemented")
+
+
+class UnknownEndpoint(Endpoint):
     def __init__(self, api, properties):
         self.api = api
         self.properties = properties
@@ -115,8 +137,20 @@ class UnknownEndpoint:
             doc += " {0}".format(p)
         return doc
 
+    def __str__(self):
+        return "{0} {1}".format(self.api, ' '.join(["{0}".format(p) for p in self.properties]))
 
-class BMAEndpoint:
+    def __eq__(self, other):
+        if isinstance(other, UnknownEndpoint):
+            return self.api == other.api and self.properties == other.properties
+        else:
+            return False
+
+    def __hash__(self):
+        return hash((self.api, self.properties))
+
+
+class BMAEndpoint(Endpoint):
     re_inline = re.compile('^BASIC_MERKLED_API(?: ([a-z0-9-_.]*(?:.[a-zA-Z])))?(?: ((?:[0-9.]{1,4}){4}))?(?: ((?:[0-9a-f:]{4,5}){4,8}))?(?: ([0-9]+))$')
 
     def __init__(self, server, ipv4, ipv6, port):
@@ -150,3 +184,16 @@ class BMAEndpoint:
             return ConnectionHandler(self.ipv4, self.port)
         else:
             return ConnectionHandler("[{0}]".format(self.ipv6), self.port)
+
+    def __str__(self):
+        return self.inline()
+
+    def __eq__(self, other):
+        if isinstance(other, BMAEndpoint):
+            return self.server == other.server and self.ipv4 == other.ipv4 \
+                    and self.ipv6 == other.ipv6 and self.port == other.port
+        else:
+            return False
+
+    def __hash__(self):
+        return hash((self.server, self.ipv4, self.ipv6, self.port))
