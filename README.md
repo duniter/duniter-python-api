@@ -15,8 +15,12 @@ A python implementation of [duniter](https://github.com/duniter/duniter) API
  * [libnacl](https://pypi.python.org/pypi/libnacl "libnacl")
  * [base58](https://pypi.python.org/pypi/base58 "base58")
 
-##Installation
+## Installation
 You can install duniter-python-api and all its dependencies via the following pip install :
 `pip install duniterpy`
 
 Please take a look at the document [HTTP API](https://github.com/duniter/duniter/blob/master/doc/HTTP_API.md) to learn about the API.
+
+## Documentation
+
+- [Outdated documentation](https://ucoin-python-api.readthedocs.io/en/latest)
