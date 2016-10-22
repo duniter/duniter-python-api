@@ -4,7 +4,7 @@
    contain the root `toctree` directive.
 
 duniterpy : A python implementation of duniter API
-==============================================
+==================================================
 
 duniterpy is a library to develop an application for duniter.
 duniterpy helps to handle the following problem :
@@ -28,13 +28,12 @@ Contributions are welcome.
 
 
 Contents:
-========
+=========
 
 .. toctree::
-   :maxdepth: 2
+   :glob:
 
-   documents
-
+   modules
 
 Indices and tables
 ==================

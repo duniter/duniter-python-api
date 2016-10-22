@@ -80,7 +80,7 @@ class Certification(Document):
         """
         Constructor
 
-        :param str version: the UCP version
+        :param int version: the UCP version
         :param str currency: the currency of the blockchain
         :param str pubkey_from:
         :param str pubkey_to:
