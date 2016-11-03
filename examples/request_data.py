@@ -1,6 +1,5 @@
 import asyncio
 import aiohttp
-from aiohttp.client_reqrep import ClientResponse
 import duniterpy.api.bma as bma
 from duniterpy.documents import BMAEndpoint
 
@@ -17,46 +16,24 @@ BMA_ENDPOINT = "BASIC_MERKLED_API cgeek.fr 9330"
 # ( http://pythonhosted.org/aiohttp )
 AIOHTTP_SESSION = aiohttp.ClientSession()
 
-async def get_summary_info():
-    """
-    Get the node info
-
-    :rtype: ClientResponse
-    """
-    # Here we request for the path /node/summary
-    return await bma.node.Summary(BMAEndpoint.from_inline(BMA_ENDPOINT).conn_handler()).get(AIOHTTP_SESSION)
-
-async def get_current_block():
-    """
-    Get the current block data
-
-    :rtype: ClientResponse
-    """
-    # Here we request for the path blockchain/current
-    return await bma.blockchain.Current(BMAEndpoint.from_inline(BMA_ENDPOINT).conn_handler()) \
-        .get(AIOHTTP_SESSION)
-
-async def get_block(block_number):
-    """
-    Get the a block data
-    :param: int block_number Number of the block
-
-    :rtype: ClientResponse
-    """
-    # Here we request for the path blockchain/block/N
-    return await bma.blockchain.Block(BMAEndpoint.from_inline(BMA_ENDPOINT).conn_handler(), block_number)\
-        .get(AIOHTTP_SESSION)
-
-
 async def main():
     """
     Main code
     """
-    print(await get_summary_info())
+    # connection handler from BMA endpoint
+    connection = BMAEndpoint.from_inline(BMA_ENDPOINT).conn_handler()
 
-    print(await get_current_block())
+    # Get the node summary infos
+    response = await bma.node.Summary(connection).get(AIOHTTP_SESSION)
+    print(response)
 
-    print(await get_block(0))
+    # Get the current block data
+    response = await bma.blockchain.Current(connection).get(AIOHTTP_SESSION)
+    print(response)
+
+    # Get the block number 0
+    response = await bma.blockchain.Block(connection, 0).get(AIOHTTP_SESSION)
+    print(response)
 
 with AIOHTTP_SESSION:
 

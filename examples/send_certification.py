@@ -30,28 +30,28 @@ TO_PUBKEY = "YYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYY"
 # ( http://pythonhosted.org/aiohttp )
 AIOHTTP_SESSION = aiohttp.ClientSession()
 
-async def get_current_block():
+async def get_current_block(connection):
     """
     Get the current block data
 
+    :param bma.api.ConnectionHandler connection: Connection handler
     :rtype: dict
     """
     # Here we request for the path blockchain/block/N
-    return await bma.blockchain.Current(BMAEndpoint.from_inline(BMA_ENDPOINT).conn_handler()) \
-        .get(AIOHTTP_SESSION)
+    return await bma.blockchain.Current(connection).get(AIOHTTP_SESSION)
 
-async def get_identity_document(current_block, pubkey):
+async def get_identity_document(connection, current_block, pubkey):
     """
     Get the identity document of the pubkey
 
+    :param bma.api.ConnectionHandler connection: Connection handler
     :param dict current_block: Current block data
     :param str pubkey: Public key
 
     :rtype: SelfCertification
     """
     # Here we request for the path wot/lookup/pubkey
-    lookup_data = await bma.wot.Lookup(BMAEndpoint.from_inline(BMA_ENDPOINT).conn_handler(), pubkey)\
-        .get(AIOHTTP_SESSION)
+    lookup_data = await bma.wot.Lookup(connection, pubkey).get(AIOHTTP_SESSION)
 
     # init vars
     uid = None
@@ -110,11 +110,14 @@ async def main():
     """
     Main code
     """
+    # connection handler from BMA endpoint
+    connection = BMAEndpoint.from_inline(BMA_ENDPOINT).conn_handler()
+
     # capture current block to get version and currency and blockstamp
-    current_block = await get_current_block()
+    current_block = await get_current_block(connection)
 
     # create our SelfCertification document to sign the Certification document
-    identity = await get_identity_document(current_block, TO_PUBKEY)
+    identity = await get_identity_document(connection, current_block, TO_PUBKEY)
 
     # load credentials from a text file
     salt, password = open(FROM_CREDENTIALS_FILE).readlines()
@@ -127,8 +130,7 @@ async def main():
 
     # Here we request for the path wot/certify
     data = {'cert': certification.signed_raw(identity)}
-    response = await bma.wot.Certify(BMAEndpoint.from_inline(BMA_ENDPOINT).conn_handler()) \
-        .post(AIOHTTP_SESSION, **data)
+    response = await bma.wot.Certify(connection).post(AIOHTTP_SESSION, **data)
 
     print(response)
 

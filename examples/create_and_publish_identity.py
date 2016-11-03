@@ -27,15 +27,16 @@ UID = "MyIdentity"
 # ( http://pythonhosted.org/aiohttp )
 AIOHTTP_SESSION = aiohttp.ClientSession()
 
-async def get_current_block():
+async def get_current_block(connection):
     """
     Get the current block data
+
+    :param bma.api.ConnectionHandler connection: Connection handler
 
     :rtype: dict
     """
     # Here we request for the path blockchain/block/N
-    return await bma.blockchain.Current(BMAEndpoint.from_inline(BMA_ENDPOINT).conn_handler()) \
-        .get(AIOHTTP_SESSION)
+    return await bma.blockchain.Current(connection).get(AIOHTTP_SESSION)
 
 
 def get_identity_document(current_block, uid, salt, password):
@@ -75,8 +76,11 @@ async def main():
     """
     Main code
     """
+    # connection handler from BMA endpoint
+    connection = BMAEndpoint.from_inline(BMA_ENDPOINT).conn_handler()
+
     # capture current block to get version and currency and blockstamp
-    current_block = await get_current_block()
+    current_block = await get_current_block(connection)
 
     # load credentials from a text file
     salt, password = open(FROM_CREDENTIALS_FILE).readlines()
@@ -89,7 +93,7 @@ async def main():
 
     # send the identity document to the node
     data = {identity: identity.signed_raw()}
-    response = await bma.wot.Add(BMAEndpoint.from_inline(BMA_ENDPOINT).conn_handler()).post(AIOHTTP_SESSION, **data)
+    response = await bma.wot.Add(connection).post(AIOHTTP_SESSION, **data)
 
     print(response)
 
