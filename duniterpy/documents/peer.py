@@ -6,6 +6,7 @@ from . import BlockUID
 from .. import PROTOCOL_VERSION, MANAGED_API
 from .constants import block_hash_regex, pubkey_regex
 
+
 class Peer(Document):
     """
 .. note:: A peer document is specified by the following format :
@@ -177,13 +178,13 @@ class BMAEndpoint(Endpoint):
                             IPv6=(" {0}".format(self.ipv6) if self.ipv6 else ""),
                             PORT=(" {0}".format(self.port) if self.port else ""))
 
-    def conn_handler(self):
+    def conn_handler(self, session=None):
         if self.server:
-            return ConnectionHandler(self.server, self.port)
+            return ConnectionHandler(self.server, self.port, session)
         elif self.ipv4:
-            return ConnectionHandler(self.ipv4, self.port)
+            return ConnectionHandler(self.ipv4, self.port, session)
         else:
-            return ConnectionHandler("[{0}]".format(self.ipv6), self.port)
+            return ConnectionHandler("[{0}]".format(self.ipv6), self.port, session)
 
     def __str__(self):
         return self.inline()

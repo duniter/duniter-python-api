@@ -17,8 +17,7 @@
 #
 
 from duniterpy.api.bma import API, logging
-from duniterpy.api.bma.blockchain import Block as _Block
-from duniterpy.api.bma.network.peering import Peers as _Peers
+from duniterpy.api.bma.blockchain import BLOCK_SCHEMA
 
 logger = logging.getLogger("duniter/ws")
 
@@ -30,7 +29,7 @@ class Websocket(API):
 
 class Block(Websocket):
     """Connect to block websocket."""
-    schema = _Block.schema
+    schema = BLOCK_SCHEMA
 
     def connect(self, session):
         r = self.connect_ws(session, '/block')

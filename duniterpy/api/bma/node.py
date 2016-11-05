@@ -20,14 +20,15 @@ from duniterpy.api.bma import API, logging
 
 logger = logging.getLogger("duniter/node")
 
+URL_PATH = 'node'
 
-class Node(API):
-    def __init__(self, connection_handler, module='node'):
-        super(Node, self).__init__(connection_handler, module)
+async def summary(connection):
+    """
+    GET Certification data over a member
 
-
-class Summary(Node):
-    """GET Certification data over a member."""
+    :param API.ConnectionHandler connection: Connection handler instance
+    :return: dict
+    """
     schema = {
         "type": "object",
         "properties": {
@@ -49,11 +50,6 @@ class Summary(Node):
         },
         "required": ["duniter"]
     }
-
-    def __init__(self, connection_handler, module='node'):
-        super(Summary, self).__init__(connection_handler, module)
-
-    async def __get__(self, session, **kwargs):
-        r = await self.requests_get(session, '/summary', **kwargs)
-        return await self.parse_response(r)
-
+    client = API(connection, URL_PATH)
+    r = await client.requests_get('/summary')
+    return await client.parse_response(r, schema)
