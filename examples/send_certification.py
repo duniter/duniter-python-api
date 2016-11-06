@@ -1,7 +1,7 @@
 import asyncio
 import aiohttp
 import duniterpy.api.bma as bma
-from duniterpy.documents import BMAEndpoint, BlockUID, SelfCertification, Certification
+from duniterpy.documents import BMAEndpoint, BlockUID, Identity, Certification
 from duniterpy.key import SigningKey
 
 
@@ -25,20 +25,9 @@ TO_PUBKEY = "YYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYY"
 
 ################################################
 
-
 # Latest duniter-python-api is asynchronous and you have to create an aiohttp session to send request
 # ( http://pythonhosted.org/aiohttp )
 AIOHTTP_SESSION = aiohttp.ClientSession()
-
-async def get_current_block(connection):
-    """
-    Get the current block data
-
-    :param bma.api.ConnectionHandler connection: Connection handler
-    :rtype: dict
-    """
-    # Here we request for the path blockchain/block/N
-    return await bma.blockchain.Current(connection).get(AIOHTTP_SESSION)
 
 async def get_identity_document(connection, current_block, pubkey):
     """
@@ -46,12 +35,12 @@ async def get_identity_document(connection, current_block, pubkey):
 
     :param bma.api.ConnectionHandler connection: Connection handler
     :param dict current_block: Current block data
-    :param str pubkey: Public key
+    :param str pubkey: UID/Public key
 
-    :rtype: SelfCertification
+    :rtype: Identity
     """
     # Here we request for the path wot/lookup/pubkey
-    lookup_data = await bma.wot.Lookup(connection, pubkey).get(AIOHTTP_SESSION)
+    lookup_data = await bma.wot.lookup(connection, pubkey)
 
     # init vars
     uid = None
@@ -69,7 +58,7 @@ async def get_identity_document(connection, current_block, pubkey):
                 signature = uid_data["self"]
 
             # return self-certification document
-            return SelfCertification(
+            return Identity(
                 version=2,
                 currency=current_block['currency'],
                 pubkey=pubkey,
@@ -84,7 +73,7 @@ def get_certification_document(current_block, self_cert_document, from_pubkey, s
     Create and return a Certification document
 
     :param dict current_block: Current block data
-    :param SelfCertification self_cert_document: SelfCertification document
+    :param Identity self_cert_document: SelfCertification document
     :param str from_pubkey: Pubkey of the certifier
     :param str salt: Secret salt (DO NOT SHOW IT ANYWHERE, IT IS SECRET !!!)
     :param str password: Secret password (DO NOT SHOW IT ANYWHERE, IT IS SECRET !!!)
@@ -114,7 +103,7 @@ async def main():
     connection = BMAEndpoint.from_inline(BMA_ENDPOINT).conn_handler()
 
     # capture current block to get version and currency and blockstamp
-    current_block = await get_current_block(connection)
+    current_block = await bma.blockchain.current(connection)
 
     # create our SelfCertification document to sign the Certification document
     identity = await get_identity_document(connection, current_block, TO_PUBKEY)
@@ -129,8 +118,7 @@ async def main():
     certification = get_certification_document(current_block, identity, FROM_PUBKEY, salt, password)
 
     # Here we request for the path wot/certify
-    data = {'cert': certification.signed_raw(identity)}
-    response = await bma.wot.Certify(connection).post(AIOHTTP_SESSION, **data)
+    response = await bma.wot.certify(connection, certification.signed_raw(identity))
 
     print(response)
 

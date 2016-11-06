@@ -1,5 +1,5 @@
 from .document import Document, MalformedDocumentError
-from .certification import SelfCertification, Certification, Revocation
+from .certification import Identity, Certification, Revocation
 from .membership import Membership
 from .transaction import Transaction
 from .constants import pubkey_regex, block_id_regex, block_hash_regex
@@ -207,7 +207,7 @@ The class Block handles Block documents.
         :param str prev_issuer: the previous block issuer
         :param tuple parameters: the parameters of the currency. Should only be present in block 0.
         :param int members_count: the number of members found in this block
-        :param list[duniterpy.documents.SelfCertification] identities: the self certifications declared in this block
+        :param list[duniterpy.documents.Identity] identities: the self certifications declared in this block
         :param list[duniterpy.documents.Membership] joiners: the joiners memberships via "IN" documents
         :param list[duniterpy.documents.Membership] actives: renewed memberships via "IN" documents
         :param list[duniterpy.documents.Membership] leavers: the leavers memberships via "OUT" documents
@@ -256,7 +256,7 @@ The class Block handles Block documents.
     @property
     def blockUID(self):
         return BlockUID(self.number, self.sha_hash)
-    
+
     @classmethod
     def from_signed_raw(cls, signed_raw):
         lines = signed_raw.splitlines(True)
@@ -340,7 +340,7 @@ The class Block handles Block documents.
         if Block.re_identities.match(lines[n]) is not None:
             n += 1
             while Block.re_joiners.match(lines[n]) is None:
-                selfcert = SelfCertification.from_inline(version, currency, lines[n])
+                selfcert = Identity.from_inline(version, currency, lines[n])
                 identities.append(selfcert)
                 n += 1
 

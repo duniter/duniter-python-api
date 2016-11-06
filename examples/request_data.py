@@ -35,8 +35,8 @@ async def main():
     response = await bma.blockchain.current(connection)
     print(response)
 
-    # Get the block number 0
-    response = await bma.blockchain.block(connection, number=10)
+    # Get the block number 10
+    response = await bma.blockchain.block(connection, 10)
     print(response)
 
 with AIOHTTP_SESSION:

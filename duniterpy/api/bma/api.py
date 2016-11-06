@@ -18,8 +18,10 @@
 # Inso <insomniak.fr at gmail.com>
 
 
-import aiohttp, json, logging, jsonschema
-import warnings
+import aiohttp
+import json
+import logging
+import jsonschema
 from ..errors import DuniterError
 
 logger = logging.getLogger("duniter")
@@ -140,7 +142,8 @@ class API(object):
         """
         Requests GET wrapper in order to use API parameters.
 
-        :params str path: the request path
+        :param str path: the request path
+        :rtype: aiohttp.ClientResponse
         """
         logging.debug("Request : {0}".format(self.reverse_url("http", path)))
         with aiohttp.Timeout(15):
@@ -159,6 +162,7 @@ class API(object):
         Requests POST wrapper in order to use API parameters.
 
         :param str path: the request path
+        :rtype: aiohttp.ClientResponse
         """
         if 'self_' in kwargs:
             kwargs['self'] = kwargs.pop('self_')
@@ -172,13 +176,12 @@ class API(object):
             )
             return response
 
-    def connect_ws(self, session, path):
+    def connect_ws(self, path):
         """
         Connect to a websocket in order to use API parameters
 
-        :param aiohttp.ClientSession session: the session of the connection
         :param str path: the url path
-        :return:
+        :rtype: aiohttp.ClientWebSocketResponse
         """
         url = self.reverse_url("ws", path)
-        return session.ws_connect(url)
+        return self.connection_handler.session.ws_connect(url)

@@ -179,6 +179,12 @@ class BMAEndpoint(Endpoint):
                             PORT=(" {0}".format(self.port) if self.port else ""))
 
     def conn_handler(self, session=None):
+        """
+        Return connection handler instance for the endpoint
+
+        :param aiohttp.ClientSession session: AIOHTTP client session instance
+        :rtype: ConnectionHandler
+        """
         if self.server:
             return ConnectionHandler(self.server, self.port, session)
         elif self.ipv4:

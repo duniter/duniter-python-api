@@ -1,7 +1,7 @@
 import asyncio
 import aiohttp
 import duniterpy.api.bma as bma
-from duniterpy.documents import BMAEndpoint, BlockUID, SelfCertification
+from duniterpy.documents import BMAEndpoint, BlockUID, Identity
 from duniterpy.documents import Revocation
 from duniterpy.key import SigningKey
 
@@ -34,17 +34,6 @@ AIOHTTP_SESSION = aiohttp.ClientSession()
 # Current protocole version
 PROTOCOL_VERSION = 2
 
-async def get_current_block(connection):
-    """
-    Get the current block data
-
-    :param bma.api.ConnectionHandler connection: Connection handler
-
-    :rtype: dict
-    """
-    # Here we request for the path blockchain/current
-    return await bma.blockchain.Current(connection).get(AIOHTTP_SESSION)
-
 async def get_identity_document(connection, currency, pubkey):
     """
     Get the SelfCertification document of the pubkey
@@ -53,10 +42,10 @@ async def get_identity_document(connection, currency, pubkey):
     :param str currency: Currency name
     :param str pubkey: Public key
 
-    :rtype: SelfCertification
+    :rtype: Identity
     """
     # Here we request for the path wot/lookup/pubkey
-    lookup_data = await bma.wot.Lookup(connection, pubkey).get(AIOHTTP_SESSION)
+    lookup_data = await bma.wot.lookup(connection, pubkey)
 
     # init vars
     uid = None
@@ -74,7 +63,7 @@ async def get_identity_document(connection, currency, pubkey):
                 signature = uid_data["self"]
 
             # return self-certification document
-            return SelfCertification(
+            return Identity(
                 version=PROTOCOL_VERSION,
                 currency=currency,
                 pubkey=pubkey,
@@ -88,7 +77,7 @@ async def get_revoke_document(identity, salt, password):
     """
     Generate account revocation document for given identity
 
-    :param SelfCertification identity: Self Certification of the identity
+    :param Identity identity: Self Certification of the identity
     :param str salt: Salt
     :param str password: Password
 
@@ -109,7 +98,7 @@ async def main():
     connection = BMAEndpoint.from_inline(BMA_ENDPOINT).conn_handler()
 
     # capture current block to get currency name
-    current_block = await get_current_block(connection)
+    current_block = await bma.blockchain.current(connection)
 
     # create our SelfCertification document to sign the revoke document
     identity_document = await get_identity_document(connection, current_block['currency'], PUBKEY)

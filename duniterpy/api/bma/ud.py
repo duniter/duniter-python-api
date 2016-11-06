@@ -16,24 +16,64 @@
 # Caner Candan <caner@candan.fr>, http://caner.candan.fr
 #
 
-from duniterpy.api.bma import API, logging
+from duniterpy.api.bma import logging, API
 
 logger = logging.getLogger("duniter/ud")
 
+URL_PATH = 'ud'
 
-class Ud(API):
-    def __init__(self, conn_handler, module='ud'):
-        super(Ud, self).__init__(conn_handler, module)
+async def history(connection, pubkey):
+    """
+    Get UD history of a member account
 
+    :param duniterpy.api.bma.ConnectionHandler connection: Connection handler instance
+    :param str pubkey:  Public key of the member
 
-class History(Ud):
-    """Get UD history."""
+    :rtype: dict
+    """
+    schema = {
+        "type": "object",
+        "properties": {
+            "currency": {
+                "type": "string"
+            },
+            "pubkey": {
+                "type": "string"
+            },
+            "history": {
+                "type": "object",
+                "properties": {
+                    "history": {
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "properties": {
+                                "block_number": {
+                                    "type": "number"
+                                },
 
-    def __init__(self, conn_handler, pubkey, module='ud'):
-        super(Ud, self).__init__(conn_handler, module)
-        self.pubkey = pubkey
+                                "consumed": {
+                                    "type": "boolean"
+                                },
+                                "time": {
+                                    "type": "number"
+                                },
+                                "amount": {
+                                    "type": "number"
+                                },
+                                "base": {
+                                    "type": "number"
+                                },
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "required": ["currency", "pubkey", "history"]
+    }
 
-    async def __get__(self, session, **kwargs):
-        assert self.pubkey is not None
-        r = await self.requests_get(session, '/history/%s' % self.pubkey, **kwargs)
-        return await r.json()
+    client = API(connection, URL_PATH)
+
+    r = await client.requests_get('/history/%s' % pubkey)
+    return await client.parse_response(r, schema)

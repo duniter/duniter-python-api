@@ -26,8 +26,8 @@ async def summary(connection):
     """
     GET Certification data over a member
 
-    :param API.ConnectionHandler connection: Connection handler instance
-    :return: dict
+    :param duniterpy.api.bma.ConnectionHandler connection: Connection handler instance
+    :rtype: dict
     """
     schema = {
         "type": "object",
@@ -51,5 +51,6 @@ async def summary(connection):
         "required": ["duniter"]
     }
     client = API(connection, URL_PATH)
+
     r = await client.requests_get('/summary')
     return await client.parse_response(r, schema)

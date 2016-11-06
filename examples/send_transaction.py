@@ -37,28 +37,6 @@ AIOHTTP_SESSION = aiohttp.ClientSession()
 # Version of the transaction document
 TRANSACTION_VERSION = 3
 
-async def get_current_block(connection):
-    """
-    Get the current block data
-
-    :param bma.api.ConnectionHandler connection: Connection handler
-    :rtype: dict
-    """
-    # Here we request for the path blockchain/block/N
-    return await bma.blockchain.Current(connection).get(AIOHTTP_SESSION)
-
-async def get_sources(connection, pubkey):
-    """
-    Get the current block data
-
-    :param bma.api.ConnectionHandler connection: Connection handler
-    :param str pubkey: Public key of the sources account
-
-    :rtype: dict
-    """
-    # Here we request for the path blockchain/block/N
-    return await bma.tx.Sources(connection, pubkey).get(AIOHTTP_SESSION)
-
 
 def get_transaction_document(current_block, source, from_pubkey, to_pubkey):
     """
@@ -130,9 +108,10 @@ async def main():
     connection = BMAEndpoint.from_inline(BMA_ENDPOINT).conn_handler()
 
     # capture current block to get version and currency and blockstamp
-    current_block = await get_current_block(connection)
+    current_block = await bma.blockchain.current(connection)
 
-    response = await get_sources(connection, FROM_PUBKEY)
+    # capture sources of account
+    response = await bma.tx.sources(connection, FROM_PUBKEY)
 
     if len(response['sources']) == 0:
         print("no sources found for account %s" % FROM_PUBKEY)
@@ -157,8 +136,7 @@ async def main():
     transaction.sign([key])
 
     # send the Transaction document to the node
-    data = {'transaction': transaction.signed_raw()}
-    response = await bma.tx.Process(connection).post(AIOHTTP_SESSION, **data)
+    response = await bma.tx.process(connection, transaction.signed_raw())
 
     print(response)
 

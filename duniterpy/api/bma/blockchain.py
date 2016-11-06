@@ -177,8 +177,8 @@ async def parameters(connection):
     """
     GET the blockchain parameters used by this node
 
-    :param API.ConnectionHandler connection: Connection handler instance
-    :return: dict
+    :param duniterpy.api.bma.ConnectionHandler connection: Connection handler instance
+    :rtype: dict
     """
     schema = {
         "type": "object",
@@ -245,12 +245,13 @@ async def parameters(connection):
     r = await client.requests_get('/parameters')
     return await client.parse_response(r, schema)
 
-async def membership(connection, **kwargs):
+async def memberships(connection, search):
     """
-    GET/POST a Membership document
+    GET list of Membership documents for UID/Public key
 
-    :param API.ConnectionHandler connection: Connection handler instance
-    :return: dict
+    :param duniterpy.api.bma.ConnectionHandler connection: Connection handler instance
+    :param str search: UID/Public key
+    :rtype: dict
     """
     schema = {
         "type": "object",
@@ -292,31 +293,38 @@ async def membership(connection, **kwargs):
         },
         "required": ["pubkey", "uid", "sigDate", "memberships"]
     }
-
     client = API(connection, URL_PATH)
-    if 'membership' in kwargs:
-        r = await client.requests_post('/membership')
-    else:
-        r = await client.requests_get('/memberships/%s' % kwargs[0])
 
+    r = await client.requests_get('/memberships/%s' % search)
     return await client.parse_response(r, schema)
+
+async def membership(connection, membership):
+    """
+    POST a Membership document
+
+    :param duniterpy.api.bma.ConnectionHandler connection: Connection handler instance
+    :param str membership: Membership signed raw document
+    :rtype: dict
+    """
+    client = API(connection, URL_PATH)
+
+    return await client.requests_post('/membership', membership=membership)
 
 async def block(connection, number=0, block=None, signature=None):
     """
     GET/POST a block from/to the blockchain
 
-    :param API.ConnectionHandler connection: Connection handler instance
+    :param duniterpy.api.bma.ConnectionHandler connection: Connection handler instance
     :param int number: Block number to get
     :param dict block: Block document to post
     :param str signature: Signature of the block document issuer
-    :return: dict
+    :rtype: dict
     """
 
     client = API(connection, URL_PATH)
     # POST block
     if block is not None and signature is not None:
-        r = await client.requests_post('/block', block=block, signature=signature)
-        return r
+        return await client.requests_post('/block', block=block, signature=signature)
 
     # GET block
     r = await client.requests_get('/block/%d' % number)
@@ -326,8 +334,8 @@ async def current(connection):
     """
     GET, return last accepted block
 
-    :param API.ConnectionHandler connection: Connection handler instance
-    :return: dict
+    :param duniterpy.api.bma.ConnectionHandler connection: Connection handler instance
+    :rtype: dict
     """
 
     client = API(connection, URL_PATH)
@@ -340,10 +348,10 @@ async def blocks(connection, count, start):
     """
     GET list of blocks from the blockchain
 
-    :param API.ConnectionHandler connection: Connection handler instance
+    :param duniterpy.api.bma.ConnectionHandler connection: Connection handler instance
     :param int count: Number of blocks
     :param int start: First block number
-    :return: list
+    :rtype: list
     """
 
     schema = {
@@ -361,9 +369,9 @@ async def hardship(connection, pubkey):
     """
     GET hardship level for given member's public key for writing next block
 
-    :param API.ConnectionHandler connection: Connection handler instance
+    :param duniterpy.api.bma.ConnectionHandler connection: Connection handler instance
     :param str pubkey:  Public key of the member
-    :return: dict
+    :rtype: dict
     """
     schema = {
         "type": "object",
@@ -386,8 +394,8 @@ async def newcomers(connection):
     """
     GET, return block numbers containing newcomers
 
-    :param API.ConnectionHandler connection: Connection handler instance
-    :return: dict
+    :param duniterpy.api.bma.ConnectionHandler connection: Connection handler instance
+    :rtype: dict
     """
 
     client = API(connection, URL_PATH)
@@ -398,8 +406,8 @@ async def certifications(connection):
     """
     GET, return block numbers containing certifications
 
-    :param API.ConnectionHandler connection: Connection handler instance
-    :return: dict
+    :param duniterpy.api.bma.ConnectionHandler connection: Connection handler instance
+    :rtype: dict
     """
 
     client = API(connection, URL_PATH)
@@ -410,8 +418,8 @@ async def joiners(connection):
     """
     GET, return block numbers containing joiners
 
-    :param API.ConnectionHandler connection: Connection handler instance
-    :return: dict
+    :param duniterpy.api.bma.ConnectionHandler connection: Connection handler instance
+    :rtype: dict
     """
 
     client = API(connection, URL_PATH)
@@ -422,8 +430,8 @@ async def actives(connection):
     """
     GET, return block numbers containing actives
 
-    :param API.ConnectionHandler connection: Connection handler instance
-    :return: dict
+    :param duniterpy.api.bma.ConnectionHandler connection: Connection handler instance
+    :rtype: dict
     """
 
     client = API(connection, URL_PATH)
@@ -434,8 +442,8 @@ async def leavers(connection):
     """
     GET, return block numbers containing leavers
 
-    :param API.ConnectionHandler connection: Connection handler instance
-    :return: dict
+    :param duniterpy.api.bma.ConnectionHandler connection: Connection handler instance
+    :rtype: dict
     """
 
     client = API(connection, URL_PATH)
@@ -446,8 +454,8 @@ async def excluded(connection):
     """
     GET, return block numbers containing excluded
 
-    :param API.ConnectionHandler connection: Connection handler instance
-    :return: dict
+    :param duniterpy.api.bma.ConnectionHandler connection: Connection handler instance
+    :rtype: dict
     """
 
     client = API(connection, URL_PATH)
@@ -458,8 +466,8 @@ async def ud(connection):
     """
     GET, return block numbers containing universal dividend
 
-    :param API.ConnectionHandler connection: Connection handler instance
-    :return: dict
+    :param duniterpy.api.bma.ConnectionHandler connection: Connection handler instance
+    :rtype: dict
     """
     client = API(connection, URL_PATH)
     r = await client.requests_get('/with/ud')
@@ -469,8 +477,8 @@ async def tx(connection):
     """
     GET, return block numbers containing transactions
 
-    :param API.ConnectionHandler connection: Connection handler instance
-    :return: dict
+    :param duniterpy.api.bma.ConnectionHandler connection: Connection handler instance
+    :rtype: dict
     """
 
     client = API(connection, URL_PATH)

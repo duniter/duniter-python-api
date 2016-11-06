@@ -6,7 +6,7 @@ from .document import Document, MalformedDocumentError
 from .constants import pubkey_regex, signature_regex, block_id_regex, block_uid_regex
 
 
-class SelfCertification(Document):
+class Identity(Document):
     """
     A document describing a self certification.
     """
@@ -41,7 +41,7 @@ class SelfCertification(Document):
     def from_inline(cls, version, currency, inline):
         from .block import BlockUID
 
-        selfcert_data = SelfCertification.re_inline.match(inline)
+        selfcert_data = Identity.re_inline.match(inline)
         if selfcert_data is None:
             raise MalformedDocumentError("Inline self certification")
         pubkey = selfcert_data.group(1)
@@ -130,7 +130,7 @@ class Certification(Document):
     def raw(self, selfcert):
         """
 
-        :param SelfCertification selfcert:
+        :param Identity selfcert:
         :return:
         """
         return """Version: {version}
@@ -273,7 +273,7 @@ class Revocation(Document):
         signature = Revocation.parse_field("IdtySignature", lines[n])
         n += 1
 
-        return SelfCertification(version, currency, issuer, unique_id, timestamp, signature)
+        return Identity(version, currency, issuer, unique_id, timestamp, signature)
 
     def inline(self):
         return "{0}:{1}".format(self.pubkey, self.signatures[0])
@@ -281,7 +281,7 @@ class Revocation(Document):
     def raw(self, selfcert):
         """
 
-        :param SelfCertification selfcert:
+        :param Identity selfcert:
         :return:
         """
         return """Version: {version}
