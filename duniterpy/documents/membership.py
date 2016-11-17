@@ -48,7 +48,16 @@ class Membership(Document):
     def __init__(self, version, currency, issuer, membership_ts,
                  membership_type, uid, identity_ts, signature):
         """
-        Constructor
+        Create a membership document
+
+        :param int version: Version of the document
+        :param currency: Name of the currency
+        :param issuer: Public key of the issuer
+        :param BlockUID membership_ts: BlockUID of this membership
+        :param membership_type: "IN" or "OUT" to enter or quit the community
+        :param str uid: Unique identifier of the identity
+        :param BlockUID identity_ts:  BlockUID of the identity
+        :param str|None signature: Signature of the document
         """
         super().__init__(version, currency, [signature])
         self.issuer = issuer
