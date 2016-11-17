@@ -348,7 +348,7 @@ class Blocks(Blockchain):
     async def __get__(self, session, **kwargs):
         assert self.count is not None
         assert self.from_ is not None
-        r = await self.requests_get(session, '/blocks/%d/%d' % self.count, self.from_, **kwargs)
+        r = await self.requests_get(session, '/blocks/%d/%d' % (self.count, self.from_), **kwargs)
         return (await self.parse_response(r))
 
 
