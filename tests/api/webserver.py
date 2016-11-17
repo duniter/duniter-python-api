@@ -43,4 +43,4 @@ class WebFunctionalSetupMixin:
         protocol = "https" if ssl_ctx else "http"
         url = "{}://127.0.0.1:{}".format(protocol, port) + path
         self.addCleanup(srv.close)
-        return app, srv, url
+        return app, srv, port, url
