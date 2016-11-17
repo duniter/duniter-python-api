@@ -18,8 +18,10 @@
 # Inso <insomniak.fr at gmail.com>
 
 
-import aiohttp, json, logging, jsonschema
-
+import aiohttp
+import json
+import logging
+import jsonschema
 from ..errors import DuniterError
 
 logger = logging.getLogger("duniter")
@@ -28,15 +30,20 @@ logger = logging.getLogger("duniter")
 class ConnectionHandler(object):
     """Helper class used by other API classes to ease passing server connection information."""
 
-    def __init__(self, server, port):
+    def __init__(self, server, port, session=None):
         """
-        Arguments:
-        - `server`: server hostname
-        - `port`: port number
-        """
+        Init instance of connection handler
 
+        :param str server: Server IP or domaine name
+        :param int port: Port
+        :param aiohttp.ClientSession|None session: Session AIOHTTP
+        """
         self.server = server
         self.port = port
+        if session is None:
+            self.session = aiohttp.ClientSession()
+        else:
+            self.session = session
 
     def __str__(self):
         return 'connection info: %s:%d' % (self.server, self.port)
@@ -45,6 +52,7 @@ class ConnectionHandler(object):
 class API(object):
     """APIRequest is a class used as an interface. The intermediate derivated classes are the modules and the leaf classes are the API requests."""
 
+    schema = {}
     error_schema = {
         "type": "object",
         "properties": {
@@ -62,21 +70,20 @@ class API(object):
         """
         Asks a module in order to create the url used then by derivated classes.
 
-        Arguments:
-        - `module`: module name
-        - `connection_handler`: connection handler
+        :param ConnectionHandler connection_handler: Connection handler
+        :param str module: Module path
         """
-
         self.module = module
         self.connection_handler = connection_handler
         self.headers = {}
 
     def reverse_url(self, scheme, path):
         """
-        Reverses the url using self.url and path given in parameter.
+        Reverses the url using scheme and path given in parameter.
 
-        Arguments:
-        - `path`: the request path
+        :param str scheme: Scheme of the url
+        :param str path: Path of the url
+        :return: str
         """
 
         server, port = self.connection_handler.server, self.connection_handler.port
@@ -86,30 +93,6 @@ class API(object):
                                                            port=port,
                                                            module=self.module)
         return url + path
-
-    def get(self, session, **kwargs):
-        """wrapper of overloaded __get__ method."""
-
-        return self.__get__(session, **kwargs)
-
-    def post(self, session, **kwargs):
-        """wrapper of overloaded __post__ method."""
-
-        logger.debug('do some work with')
-
-        data = self.__post__(session, **kwargs)
-
-        logger.debug('and send back')
-
-        return data
-
-    async def __get__(self, session, **kwargs):
-        """interface purpose for GET request"""
-        pass
-
-    async def __post__(self, session, **kwargs):
-        """interface purpose for POST request"""
-        pass
 
     def parse_text(self, text):
         """
@@ -139,30 +122,32 @@ class API(object):
         except (TypeError, json.decoder.JSONDecodeError):
             raise jsonschema.ValidationError("Could not parse json")
 
-    async def parse_response(self, response):
+    async def parse_response(self, response, schema=None):
         """
         Validate and parse the BMA answer
 
-        :param response:
+        :param aiohttp.ClientResponse response: Response of aiohttp request
+        :param dict schema: The expected response structure
         :return: the json data
         """
         try:
             data = await response.json()
-            jsonschema.validate(data, self.schema)
+            if schema is not None:
+                jsonschema.validate(data, schema)
             return data
         except (TypeError, json.decoder.JSONDecodeError):
             raise jsonschema.ValidationError("Could not parse json")
 
-    async def requests_get(self, session, path, **kwargs):
+    async def requests_get(self, path, **kwargs):
         """
         Requests GET wrapper in order to use API parameters.
 
-        :params aiohttp.ClientSession session: the client session
-        :params str path: the request path
+        :param str path: the request path
+        :rtype: aiohttp.ClientResponse
         """
         logging.debug("Request : {0}".format(self.reverse_url("http", path)))
         with aiohttp.Timeout(15):
-            response = await session.get(self.reverse_url("http", path), params=kwargs,headers=self.headers)
+            response = await self.connection_handler.session.get(self.reverse_url("http", path), params=kwargs,headers=self.headers)
             if response.status != 200:
                 try:
                     error_data = self.parse_error(await response.text())
@@ -172,28 +157,31 @@ class API(object):
 
             return response
 
-    async def requests_post(self, session, path, **kwargs):
+    async def requests_post(self, path, **kwargs):
         """
         Requests POST wrapper in order to use API parameters.
 
-        :param aiohttp.ClientSession session: the request session
         :param str path: the request path
+        :rtype: aiohttp.ClientResponse
         """
         if 'self_' in kwargs:
             kwargs['self'] = kwargs.pop('self_')
 
         logging.debug("POST : {0}".format(kwargs))
         with aiohttp.Timeout(15):
-            response = await session.post(self.reverse_url("http", path), data=kwargs, headers=self.headers)
+            response = await self.connection_handler.session.post(
+                self.reverse_url("http", path),
+                data=kwargs,
+                headers=self.headers
+            )
             return response
 
-    def connect_ws(self, session, path):
+    def connect_ws(self, path):
         """
         Connect to a websocket in order to use API parameters
 
-        :param aiohttp.ClientSession session: the session of the connection
         :param str path: the url path
-        :return:
+        :rtype: aiohttp.ClientWebSocketResponse
         """
         url = self.reverse_url("ws", path)
-        return session.ws_connect(url)
+        return self.connection_handler.session.ws_connect(url)

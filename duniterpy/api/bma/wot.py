@@ -15,49 +15,59 @@
 # Authors:
 # Caner Candan <caner@candan.fr>, http://caner.candan.fr
 #
-
 from duniterpy.api.bma import API, logging
 
 logger = logging.getLogger("duniter/wot")
 
+URL_PATH = 'wot'
 
-class WOT(API):
-    def __init__(self, connection_handler, module='wot'):
-        super(WOT, self).__init__(connection_handler, module)
+async def add(connection, identity):
+    """
+    POST identity document
 
+    :param duniterpy.api.bma.ConnectionHandler connection: Connection handler instance
+    :param duniterpy.documents.certification.Identity identity: Identity document
+    :rtype: aiohttp.ClientResponse
+    """
+    client = API(connection, URL_PATH)
 
-class Add(WOT):
-    """POST Identity data."""
+    r = await client.requests_post('/add', identity=identity)
+    return r
 
-    async def __post__(self, session, **kwargs):
-        assert 'identity' in kwargs
+async def certify(connection, certification):
+    """
+    POST certification document
 
-        r = await self.requests_post(session, '/add', **kwargs)
-        return r
+    :param duniterpy.api.bma.ConnectionHandler connection: Connection handler instance
+    :param duniterpy.documents.certification.Certification certification: Certification document
+    :rtype: aiohttp.ClientResponse
+    """
+    client = API(connection, URL_PATH)
 
+    r = await client.requests_post('/certify', cert=certification)
+    return r
 
-class Certify(WOT):
-    """POST Certification data."""
+async def revoke(connection, revocation):
+    """
+    POST revocation document
 
-    async def __post__(self, session, **kwargs):
-        assert 'cert' in kwargs
+    :param duniterpy.api.bma.ConnectionHandler connection: Connection handler instance
+    :param duniterpy.documents.certification.Revocation revocation: Certification document
+    :rtype: aiohttp.ClientResponse
+    """
+    client = API(connection, URL_PATH)
 
-        r = await self.requests_post(session, '/certify', **kwargs)
-        return r
+    r = await client.requests_post('/revoke', revocation=revocation)
+    return r
 
+async def lookup(connection, search):
+    """
+    GET UID/Public key data
 
-class Revoke(WOT):
-    """POST Public key data."""
-
-    async def __post__(self, session, **kwargs):
-        assert 'revocation' in kwargs
-
-        r = await self.requests_post(session, '/revoke', **kwargs)
-        return r
-
-
-class Lookup(WOT):
-    """GET Public key data."""
+    :param duniterpy.api.bma.ConnectionHandler connection: Connection handler instance
+    :param str search: UID or public key
+    :rtype: dict
+    """
     schema = {
         "type": "object",
         "definitions": {
@@ -158,127 +168,121 @@ class Lookup(WOT):
         "required": ["partial", "results"]
     }
 
-    def __init__(self, connection_handler, search, module='wot'):
-        super(WOT, self).__init__(connection_handler, module)
+    client = API(connection, URL_PATH)
 
-        self.search = search
-
-    async def __get__(self, session, **kwargs):
-        assert self.search is not None
-
-        r = await self.requests_get(session, '/lookup/%s' % self.search, **kwargs)
-        return await self.parse_response(r)
+    r = await client.requests_get('/lookup/%s' % search)
+    return await client.parse_response(r, schema)
 
 
-class CertifiersOf(WOT):
-    """GET Certification data over a member."""
-
-    schema = {
-        "type": "object",
-        "properties": {
-            "pubkey": {
-                "type": "string"
-            },
-            "uid": {
-                "type": "string"
-            },
-            "isMember": {
-                "type": "boolean"
-            },
-            "certifications": {
-                "type": "array",
-                "items": {
-                    "type": "object",
-                    "properties": {
-                        "pubkey": {
-                            "type": "string"
-                        },
-                        "uid": {
-                            "type": "string"
-                        },
-                        "cert_time": {
-                            "type": "object",
-                            "properties": {
-                                "block": {
-                                    "type": "number"
-                                },
-                                "medianTime": {
-                                    "type": "number"
-                                }
-                            },
-                            "required": ["block", "medianTime"]
-                        },
-                        "sigDate": {
-                            "type": "string"
-                        },
-                        "written": {
-                            "oneOf": [
-                                {
-                                    "type": "object",
-                                    "properties": {
-                                        "number": {
-                                            "type": "number",
-                                        },
-                                        "hash": {
-                                            "type": "string"
-                                        }
-                                    },
-                                    "required": ["number", "hash"]
-                                },
-                                {
-                                    "type": "null"
-                                }
-                            ]
-                        },
-                        "isMember": {
-                            "type": "boolean"
-                        },
-                        "wasMember": {
-                            "type": "boolean"
-                        },
-                        "signature": {
-                            "type": "string"
-                        }
-                    },
-                    "required": ["pubkey", "uid", "cert_time", "sigDate",
-                                 "written", "wasMember", "isMember", "signature"]
-                }
-            }
+CERTIFICATIONS_SCHEMA = {
+    "type": "object",
+    "properties": {
+        "pubkey": {
+            "type": "string"
         },
-        "required": ["pubkey", "uid", "isMember", "certifications"]
-    }
+        "uid": {
+            "type": "string"
+        },
+        "isMember": {
+            "type": "boolean"
+        },
+        "certifications": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "pubkey": {
+                        "type": "string"
+                    },
+                    "uid": {
+                        "type": "string"
+                    },
+                    "cert_time": {
+                        "type": "object",
+                        "properties": {
+                            "block": {
+                                "type": "number"
+                            },
+                            "medianTime": {
+                                "type": "number"
+                            }
+                        },
+                        "required": ["block", "medianTime"]
+                    },
+                    "sigDate": {
+                        "type": "string"
+                    },
+                    "written": {
+                        "oneOf": [
+                            {
+                                "type": "object",
+                                "properties": {
+                                    "number": {
+                                        "type": "number",
+                                    },
+                                    "hash": {
+                                        "type": "string"
+                                    }
+                                },
+                                "required": ["number", "hash"]
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ]
+                    },
+                    "isMember": {
+                        "type": "boolean"
+                    },
+                    "wasMember": {
+                        "type": "boolean"
+                    },
+                    "signature": {
+                        "type": "string"
+                    }
+                },
+                "required": ["pubkey", "uid", "cert_time", "sigDate",
+                             "written", "wasMember", "isMember", "signature"]
+            }
+        }
+    },
+    "required": ["pubkey", "uid", "isMember", "certifications"]
+}
 
-    def __init__(self, connection_handler, search, module='wot'):
-        super(WOT, self).__init__(connection_handler, module)
+async def certifiers_of(connection, search):
+    """
+    GET UID/Public key certifiers
 
-        self.search = search
+    :param duniterpy.api.bma.ConnectionHandler connection: Connection handler instance
+    :param str search: UID or public key
+    :rtype: dict
+    """
 
-    async def __get__(self, session, **kwargs):
-        assert self.search is not None
+    client = API(connection, URL_PATH)
 
-        r = await self.requests_get(session, '/certifiers-of/%s' % self.search, **kwargs)
-        return await self.parse_response(r)
+    r = await client.requests_get('/certifiers-of/%s' % search)
+    return await client.parse_response(r, CERTIFICATIONS_SCHEMA)
 
+async def certified_by(connection, search):
+    """
+    GET identities certified by UID/Public key
 
-class CertifiedBy(WOT):
-    """GET Certification data from a member."""
+    :param duniterpy.api.bma.ConnectionHandler connection: Connection handler instance
+    :param str search: UID or public key
+    :rtype: dict
+    """
+    client = API(connection, URL_PATH)
 
-    schema = CertifiersOf.schema
+    r = await client.requests_get('/certified-by/%s' % search)
+    return await client.parse_response(r, CERTIFICATIONS_SCHEMA)
 
-    def __init__(self, connection_handler, search, module='wot'):
-        super(WOT, self).__init__(connection_handler, module)
+async def members(connection):
+    """
+    GET list of all current members of the Web of Trust
 
-        self.search = search
-
-    async def __get__(self, session, **kwargs):
-        assert self.search is not None
-
-        r = await self.requests_get(session, '/certified-by/%s' % self.search, **kwargs)
-        return await self.parse_response(r)
-
-
-class Members(WOT):
-    """GET List all current members of the Web of Trust."""
+    :param duniterpy.api.bma.ConnectionHandler connection: Connection handler instance
+    :rtype: dict
+    """
     schema = {
         "type": "object",
         "properties": {
@@ -298,17 +302,19 @@ class Members(WOT):
         "required": ["results"]
     }
 
-    def __init__(self, connection_handler, module='wot'):
-        super(WOT, self).__init__(connection_handler, module)
+    client = API(connection, URL_PATH)
 
-    async def __get__(self, session, **kwargs):
-        r = await self.requests_get(session, '/members', **kwargs)
-        return await self.parse_response(r)
+    r = await client.requests_get('/members')
+    return await client.parse_response(r, schema)
 
 
-class Requirements(WOT):
+async def requirements(connection, search):
     """
-    Get list of requirements for a given pubkey
+    GET list of requirements for a given UID/Public key
+
+    :param duniterpy.api.bma.ConnectionHandler connection: Connection handler instance
+    :param str search: UID or public key
+    :rtype: dict
     """
     schema = {
         "type": "object",
@@ -364,13 +370,7 @@ class Requirements(WOT):
         }
     }
 
-    def __init__(self, connection_handler, search, module='wot'):
-        super(WOT, self).__init__(connection_handler, module)
+    client = API(connection, URL_PATH)
 
-        self.search = search
-
-    async def __get__(self, session, **kwargs):
-        assert self.search is not None
-
-        r = await self.requests_get(session, '/requirements/%s' % self.search, **kwargs)
-        return await self.parse_response(r)
+    r = await client.requests_get('/requirements/%s' % search)
+    return await client.parse_response(r, schema)

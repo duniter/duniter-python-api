@@ -21,18 +21,22 @@ async def main():
     Main code
     """
     # connection handler from BMA endpoint
-    connection = BMAEndpoint.from_inline(BMA_ENDPOINT).conn_handler()
+    connection = BMAEndpoint.from_inline(BMA_ENDPOINT).conn_handler(AIOHTTP_SESSION)
 
     # Get the node summary infos
-    response = await bma.node.Summary(connection).get(AIOHTTP_SESSION)
+    response = await bma.node.summary(connection)
     print(response)
 
     # Get the current block data
-    response = await bma.blockchain.Current(connection).get(AIOHTTP_SESSION)
+    response = await bma.blockchain.parameters(connection)
     print(response)
 
-    # Get the block number 0
-    response = await bma.blockchain.Block(connection, 0).get(AIOHTTP_SESSION)
+    # Get the current block data
+    response = await bma.blockchain.current(connection)
+    print(response)
+
+    # Get the block number 10
+    response = await bma.blockchain.block(connection, 10)
     print(response)
 
 with AIOHTTP_SESSION:
