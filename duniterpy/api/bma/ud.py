@@ -16,11 +16,53 @@
 # Caner Candan <caner@candan.fr>, http://caner.candan.fr
 #
 
-from duniterpy.api.bma import logging, API
+from duniterpy.api.bma import logging, API, parse_response
 
 logger = logging.getLogger("duniter/ud")
 
 URL_PATH = 'ud'
+
+UD_SCHEMA = {
+    "type": "object",
+    "properties": {
+        "currency": {
+            "type": "string"
+        },
+        "pubkey": {
+            "type": "string"
+        },
+        "history": {
+            "type": "object",
+            "properties": {
+                "history": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "block_number": {
+                                "type": "number"
+                            },
+
+                            "consumed": {
+                                "type": "boolean"
+                            },
+                            "time": {
+                                "type": "number"
+                            },
+                            "amount": {
+                                "type": "number"
+                            },
+                            "base": {
+                                "type": "number"
+                            },
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "required": ["currency", "pubkey", "history"]
+}
 
 async def history(connection, pubkey):
     """
@@ -31,49 +73,7 @@ async def history(connection, pubkey):
 
     :rtype: dict
     """
-    schema = {
-        "type": "object",
-        "properties": {
-            "currency": {
-                "type": "string"
-            },
-            "pubkey": {
-                "type": "string"
-            },
-            "history": {
-                "type": "object",
-                "properties": {
-                    "history": {
-                        "type": "array",
-                        "items": {
-                            "type": "object",
-                            "properties": {
-                                "block_number": {
-                                    "type": "number"
-                                },
-
-                                "consumed": {
-                                    "type": "boolean"
-                                },
-                                "time": {
-                                    "type": "number"
-                                },
-                                "amount": {
-                                    "type": "number"
-                                },
-                                "base": {
-                                    "type": "number"
-                                },
-                            }
-                        }
-                    }
-                }
-            }
-        },
-        "required": ["currency", "pubkey", "history"]
-    }
-
     client = API(connection, URL_PATH)
 
     r = await client.requests_get('/history/%s' % pubkey)
-    return await client.parse_response(r, schema)
+    return await parse_response(r, UD_SCHEMA)

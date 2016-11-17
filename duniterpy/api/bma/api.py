@@ -26,6 +26,18 @@ from ..errors import DuniterError
 
 logger = logging.getLogger("duniter")
 
+ERROR_SCHEMA = {
+    "type": "object",
+    "properties": {
+        "ucode": {
+            "type": "number"
+        },
+        "message": {
+            "type": "string"
+        }
+    },
+    "required": ["ucode", "message"]
+}
 
 class ConnectionHandler(object):
     """Helper class used by other API classes to ease passing server connection information."""
@@ -49,22 +61,57 @@ class ConnectionHandler(object):
         return 'connection info: %s:%d' % (self.server, self.port)
 
 
+def parse_text(text, schema):
+    """
+    Validate and parse the BMA answer from websocket
+
+    :param str text: the bma answer
+    :return: the json data
+    """
+    try:
+        data = json.loads(text)
+        jsonschema.validate(data, schema)
+        return data
+    except (TypeError, json.decoder.JSONDecodeError):
+        raise jsonschema.ValidationError("Could not parse json")
+
+
+def parse_error(text):
+    """
+    Validate and parse the BMA answer from websocket
+
+    :param str text: the bma error
+    :return: the json data
+    """
+    try:
+        data = json.loads(text)
+        jsonschema.validate(data, ERROR_SCHEMA)
+        return data
+    except (TypeError, json.decoder.JSONDecodeError):
+        raise jsonschema.ValidationError("Could not parse json")
+
+
+async def parse_response(response, schema):
+    """
+    Validate and parse the BMA answer
+
+    :param aiohttp.ClientResponse response: Response of aiohttp request
+    :param dict schema: The expected response structure
+    :return: the json data
+    """
+    try:
+        data = await response.json()
+        if schema is not None:
+            jsonschema.validate(data, schema)
+        return data
+    except (TypeError, json.decoder.JSONDecodeError):
+        raise jsonschema.ValidationError("Could not parse json")
+
+
 class API(object):
     """APIRequest is a class used as an interface. The intermediate derivated classes are the modules and the leaf classes are the API requests."""
 
     schema = {}
-    error_schema = {
-        "type": "object",
-        "properties": {
-            "ucode": {
-                "type": "number"
-            },
-            "message": {
-                "type": "string"
-            }
-        },
-        "required": ["ucode", "message"]
-    }
 
     def __init__(self, connection_handler, module):
         """
@@ -94,50 +141,6 @@ class API(object):
                                                            module=self.module)
         return url + path
 
-    def parse_text(self, text):
-        """
-        Validate and parse the BMA answer from websocket
-
-        :param str text: the bma answer
-        :return: the json data
-        """
-        try:
-            data = json.loads(text)
-            jsonschema.validate(data, self.schema)
-            return data
-        except (TypeError, json.decoder.JSONDecodeError):
-            raise jsonschema.ValidationError("Could not parse json")
-
-    def parse_error(self, text):
-        """
-        Validate and parse the BMA answer from websocket
-
-        :param str text: the bma error
-        :return: the json data
-        """
-        try:
-            data = json.loads(text)
-            jsonschema.validate(data, self.error_schema)
-            return data
-        except (TypeError, json.decoder.JSONDecodeError):
-            raise jsonschema.ValidationError("Could not parse json")
-
-    async def parse_response(self, response, schema=None):
-        """
-        Validate and parse the BMA answer
-
-        :param aiohttp.ClientResponse response: Response of aiohttp request
-        :param dict schema: The expected response structure
-        :return: the json data
-        """
-        try:
-            data = await response.json()
-            if schema is not None:
-                jsonschema.validate(data, schema)
-            return data
-        except (TypeError, json.decoder.JSONDecodeError):
-            raise jsonschema.ValidationError("Could not parse json")
-
     async def requests_get(self, path, **kwargs):
         """
         Requests GET wrapper in order to use API parameters.
@@ -150,7 +153,7 @@ class API(object):
             response = await self.connection_handler.session.get(self.reverse_url("http", path), params=kwargs,headers=self.headers)
             if response.status != 200:
                 try:
-                    error_data = self.parse_error(await response.text())
+                    error_data = parse_error(await response.text())
                     raise DuniterError(error_data)
                 except TypeError:
                     raise ValueError('status code != 200 => %d (%s)' % (response.status, (await response.text())))

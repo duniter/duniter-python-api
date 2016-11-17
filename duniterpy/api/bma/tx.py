@@ -16,7 +16,7 @@
 # Caner Candan <caner@candan.fr>, http://caner.candan.fr
 #
 
-from duniterpy.api.bma import API, logging
+from duniterpy.api.bma import API, logging, parse_response
 
 logger = logging.getLogger("duniter/tx")
 
@@ -159,43 +159,7 @@ HISTORY_SCHEMA = {
     "required": ["currency", "pubkey", "history"]
 }
 
-async def history(connection, pubkey):
-    """
-    Get transactions history of public key
-
-    :param duniterpy.api.bma.ConnectionHandler connection: Connection handler instance
-    :param str pubkey: Public key
-    :rtype: dict
-    """
-
-    client = API(connection, URL_PATH)
-
-    r = await client.requests_get( '/history/%s' % pubkey)
-    return await client.parse_response(r, HISTORY_SCHEMA)
-
-async def process(connection, transaction):
-    """
-    POST a transaction
-
-    :param duniterpy.api.bma.ConnectionHandler connection: Connection handler instance
-    :param duniterpy.documents.Transaction transaction: Transaction document
-    :rtype: aiohttp.ClientResponse
-    """
-    client = API(connection, URL_PATH)
-
-    r = await client.requests_post('/process', transaction=transaction)
-    return r
-
-
-async def sources(connection, pubkey):
-    """
-    GET transaction sources
-
-    :param duniterpy.api.bma.ConnectionHandler connection: Connection handler instance
-    :param str pubkey: Public key
-    :rtype: dict
-    """
-    schema = {
+SOURCES_SCHEMA = {
         "type": "object",
         "properties": {
             "currency": {
@@ -231,10 +195,47 @@ async def sources(connection, pubkey):
         },
         "required": ["currency", "pubkey", "sources"]
     }
+
+async def history(connection, pubkey):
+    """
+    Get transactions history of public key
+
+    :param duniterpy.api.bma.ConnectionHandler connection: Connection handler instance
+    :param str pubkey: Public key
+    :rtype: dict
+    """
+
+    client = API(connection, URL_PATH)
+
+    r = await client.requests_get( '/history/%s' % pubkey)
+    return await parse_response(r, HISTORY_SCHEMA)
+
+async def process(connection, transaction):
+    """
+    POST a transaction
+
+    :param duniterpy.api.bma.ConnectionHandler connection: Connection handler instance
+    :param duniterpy.documents.Transaction transaction: Transaction document
+    :rtype: aiohttp.ClientResponse
+    """
+    client = API(connection, URL_PATH)
+
+    r = await client.requests_post('/process', transaction=transaction)
+    return r
+
+
+async def sources(connection, pubkey):
+    """
+    GET transaction sources
+
+    :param duniterpy.api.bma.ConnectionHandler connection: Connection handler instance
+    :param str pubkey: Public key
+    :rtype: dict
+    """
     client = API(connection, URL_PATH)
 
     r = await client.requests_get( '/sources/%s' % pubkey)
-    return await client.parse_response(r, schema)
+    return await parse_response(r, SOURCES_SCHEMA)
 
 async def blocks(connection, pubkey, start, end):
     """
@@ -249,7 +250,7 @@ async def blocks(connection, pubkey, start, end):
     client = API(connection, URL_PATH)
 
     r = await client.requests_get('/history/%s/blocks/%s/%s' % (pubkey, start, end))
-    return await client.parse_response(r, HISTORY_SCHEMA)
+    return await parse_response(r, HISTORY_SCHEMA)
 
 async def times(connection, pubkey, start, end):
     """
@@ -264,4 +265,4 @@ async def times(connection, pubkey, start, end):
     client = API(connection, URL_PATH)
 
     r = await client.requests_get('/history/%s/times/%s/%s' % (pubkey, start, end))
-    return await client.parse_response(r, HISTORY_SCHEMA)
+    return await parse_response(r, HISTORY_SCHEMA)

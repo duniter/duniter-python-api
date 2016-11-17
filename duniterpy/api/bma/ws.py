@@ -24,6 +24,33 @@ logger = logging.getLogger("duniter/ws")
 URL_PATH = 'ws'
 
 
+WS_BLOCk_SCHEMA = BLOCK_SCHEMA
+WS_PEER_SCHEMA = {
+    "type": "object",
+    "properties": {
+        "version": {
+            "type": "number"
+        },
+        "currency": {
+            "type": "string"
+        },
+        "pubkey": {
+            "type": "string"
+        },
+        "endpoints": {
+            "type": "array",
+            "items": {
+                "type": "string"
+            }
+        },
+        "signature": {
+            "type": "string"
+        }
+    },
+    "required": ["version", "currency", "pubkey", "endpoints", "signature"]
+}
+
+
 def block(connection):
     """
     Connect to block websocket
@@ -31,7 +58,6 @@ def block(connection):
     :param duniterpy.api.bma.ConnectionHandler connection: Connection handler instance
     :rtype: aiohttp.ClientWebSocketResponse
     """
-    schema = BLOCK_SCHEMA
     client = API(connection, URL_PATH)
     return client.connect_ws('/block')
 
@@ -43,29 +69,5 @@ def peer(connection):
     :param duniterpy.api.bma.ConnectionHandler connection: Connection handler instance
     :rtype: aiohttp.ClientWebSocketResponse
     """
-    schema = {
-        "type": "object",
-        "properties": {
-            "version": {
-                "type": "number"
-            },
-            "currency": {
-                "type": "string"
-            },
-            "pubkey": {
-                "type": "string"
-            },
-            "endpoints": {
-                "type": "array",
-                "items": {
-                    "type": "string"
-                }
-            },
-            "signature": {
-                "type": "string"
-            }
-        },
-        "required": ["version", "currency", "pubkey", "endpoints", "signature"]
-    }
     client = API(connection, URL_PATH)
     return client.connect_ws('/peer')

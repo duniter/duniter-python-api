@@ -16,7 +16,7 @@
 # Caner Candan <caner@candan.fr>, http://caner.candan.fr
 #
 
-from duniterpy.api.bma import API, logging
+from duniterpy.api.bma import API, logging, parse_response
 
 logger = logging.getLogger("duniter/blockchain")
 
@@ -173,14 +173,7 @@ BLOCK_NUMBERS_SCHEMA = {
     "required": ["result"]
 }
 
-async def parameters(connection):
-    """
-    GET the blockchain parameters used by this node
-
-    :param duniterpy.api.bma.ConnectionHandler connection: Connection handler instance
-    :rtype: dict
-    """
-    schema = {
+PARAMETERS_SCHEMA = {
         "type": "object",
         "properties":
         {
@@ -241,19 +234,8 @@ async def parameters(connection):
                      "avgGenTime", "dtDiffEval", "blocksRot", "percentRot"]
     }
 
-    client = API(connection, URL_PATH)
-    r = await client.requests_get('/parameters')
-    return await client.parse_response(r, schema)
 
-async def memberships(connection, search):
-    """
-    GET list of Membership documents for UID/Public key
-
-    :param duniterpy.api.bma.ConnectionHandler connection: Connection handler instance
-    :param str search: UID/Public key
-    :rtype: dict
-    """
-    schema = {
+MEMBERSHIPS_SCHEMA = {
         "type": "object",
         "properties":
         {
@@ -293,10 +275,50 @@ async def memberships(connection, search):
         },
         "required": ["pubkey", "uid", "sigDate", "memberships"]
     }
+
+
+BLOCKS_SCHEMA = {
+    "type": "array",
+    "items": BLOCK_SCHEMA
+}
+
+HARDSHIP_SCHEMA = {
+    "type": "object",
+    "properties": {
+        "block": {
+            "type": "number"
+        },
+        "level": {
+            "type": "number"
+        }
+    },
+    "required": ["block", "level"]
+}
+
+
+async def parameters(connection):
+    """
+    GET the blockchain parameters used by this node
+
+    :param duniterpy.api.bma.ConnectionHandler connection: Connection handler instance
+    :rtype: dict
+    """
+    client = API(connection, URL_PATH)
+    r = await client.requests_get('/parameters')
+    return await parse_response(r, PARAMETERS_SCHEMA)
+
+async def memberships(connection, search):
+    """
+    GET list of Membership documents for UID/Public key
+
+    :param duniterpy.api.bma.ConnectionHandler connection: Connection handler instance
+    :param str search: UID/Public key
+    :rtype: dict
+    """
     client = API(connection, URL_PATH)
 
     r = await client.requests_get('/memberships/%s' % search)
-    return await client.parse_response(r, schema)
+    return await parse_response(r, MEMBERSHIPS_SCHEMA)
 
 async def membership(connection, membership):
     """
@@ -328,7 +350,7 @@ async def block(connection, number=0, block=None, signature=None):
 
     # GET block
     r = await client.requests_get('/block/%d' % number)
-    return await client.parse_response(r, BLOCK_SCHEMA)
+    return await parse_response(r, BLOCK_SCHEMA)
 
 async def current(connection):
     """
@@ -341,7 +363,7 @@ async def current(connection):
     client = API(connection, URL_PATH)
 
     r = await client.requests_get('/current')
-    return await client.parse_response(r, BLOCK_SCHEMA)
+    return await parse_response(r, BLOCK_SCHEMA)
 
 
 async def blocks(connection, count, start):
@@ -354,16 +376,11 @@ async def blocks(connection, count, start):
     :rtype: list
     """
 
-    schema = {
-        "type": "array",
-        "items": BLOCK_SCHEMA
-    }
-
     client = API(connection, URL_PATH)
     assert count is int
     assert start is int
     r = await client.requests_get('/blocks/%d/%d' % (count, start))
-    return await client.parse_response(r, schema)
+    return await parse_response(r, BLOCKS_SCHEMA)
 
 async def hardship(connection, pubkey):
     """
@@ -373,22 +390,9 @@ async def hardship(connection, pubkey):
     :param str pubkey:  Public key of the member
     :rtype: dict
     """
-    schema = {
-        "type": "object",
-        "properties": {
-          "block": {
-              "type": "number"
-          },
-          "level": {
-              "type": "number"
-          }
-        },
-        "required": ["block", "level"]
-    }
-
     client = API(connection, URL_PATH)
     r = await client.requests_get('/hardship/%s' % pubkey)
-    return await client.parse_response(r, schema)
+    return await parse_response(r, HARDSHIP_SCHEMA)
 
 async def newcomers(connection):
     """
@@ -400,7 +404,7 @@ async def newcomers(connection):
 
     client = API(connection, URL_PATH)
     r = await client.requests_get('/with/newcomers')
-    return await client.parse_response(r, BLOCK_NUMBERS_SCHEMA)
+    return await parse_response(r, BLOCK_NUMBERS_SCHEMA)
 
 async def certifications(connection):
     """
@@ -412,7 +416,7 @@ async def certifications(connection):
 
     client = API(connection, URL_PATH)
     r = await client.requests_get('/with/certs')
-    return await client.parse_response(r, BLOCK_NUMBERS_SCHEMA)
+    return await parse_response(r, BLOCK_NUMBERS_SCHEMA)
 
 async def joiners(connection):
     """
@@ -424,7 +428,7 @@ async def joiners(connection):
 
     client = API(connection, URL_PATH)
     r = await client.requests_get('/with/joiners')
-    return await client.parse_response(r, BLOCK_NUMBERS_SCHEMA)
+    return await parse_response(r, BLOCK_NUMBERS_SCHEMA)
 
 async def actives(connection):
     """
@@ -436,7 +440,7 @@ async def actives(connection):
 
     client = API(connection, URL_PATH)
     r = await client.requests_get('/with/actives')
-    return await client.parse_response(r, BLOCK_NUMBERS_SCHEMA)
+    return await parse_response(r, BLOCK_NUMBERS_SCHEMA)
 
 async def leavers(connection):
     """
@@ -448,7 +452,7 @@ async def leavers(connection):
 
     client = API(connection, URL_PATH)
     r = await client.requests_get('/with/leavers')
-    return await client.parse_response(r, BLOCK_NUMBERS_SCHEMA)
+    return await parse_response(r, BLOCK_NUMBERS_SCHEMA)
 
 async def excluded(connection):
     """
@@ -460,7 +464,7 @@ async def excluded(connection):
 
     client = API(connection, URL_PATH)
     r = await client.requests_get('/with/excluded')
-    return await client.parse_response(r, BLOCK_NUMBERS_SCHEMA)
+    return await parse_response(r, BLOCK_NUMBERS_SCHEMA)
 
 async def ud(connection):
     """
@@ -471,7 +475,7 @@ async def ud(connection):
     """
     client = API(connection, URL_PATH)
     r = await client.requests_get('/with/ud')
-    return await client.parse_response(r, BLOCK_NUMBERS_SCHEMA)
+    return await parse_response(r, BLOCK_NUMBERS_SCHEMA)
 
 async def tx(connection):
     """
@@ -483,4 +487,4 @@ async def tx(connection):
 
     client = API(connection, URL_PATH)
     r = await client.requests_get('/with/tx')
-    return await client.parse_response(r, BLOCK_NUMBERS_SCHEMA)
+    return await parse_response(r, BLOCK_NUMBERS_SCHEMA)

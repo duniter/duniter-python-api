@@ -1,6 +1,7 @@
 import unittest
 from tests.api.webserver import WebFunctionalSetupMixin
-from duniterpy.api.bma.ws import Block, Peer
+from duniterpy.api.bma.ws import block, peer, WS_BLOCk_SCHEMA, WS_PEER_SCHEMA
+from duniterpy.api.bma import parse_text
 
 
 class Test_BMA_Websocket(WebFunctionalSetupMixin, unittest.TestCase):
@@ -80,8 +81,7 @@ class Test_BMA_Websocket(WebFunctionalSetupMixin, unittest.TestCase):
   "signature": "H41/8OGV2W4CLKbE35kk5t1HJQsb3jEM0/QGLUf80CwJvGZf3HvVCcNtHPUFoUBKEDQO9mPK3KJkqOoxHpqHCw=="
 }
 """
-        block = Block(None)
-        block.parse_text(json_sample)
+        parse_text(json_sample, WS_BLOCk_SCHEMA)
 
     def test_peer(self):
         json_sample = """{
@@ -96,8 +96,7 @@ class Test_BMA_Websocket(WebFunctionalSetupMixin, unittest.TestCase):
   "signature": "42yQm4hGTJYWkPg39hQAUgP6S6EQ4vTfXdJuxKEHL1ih6YHiDL2hcwrFgBHjXLRgxRhj2VNVqqc6b4JayKqTE14r"
 }
 """
-        peer = Peer(None)
-        data = peer.parse_text(json_sample)
+        data = parse_text(json_sample, WS_PEER_SCHEMA)
         self.assertEqual(data["version"], 1)
         self.assertEqual(data["currency"], "beta_brouzouf")
         self.assertEqual(data["pubkey"], "HsLShAtzXTVxeUtQd7yi5Z5Zh4zNvbu8sTEZ53nfKcqY")

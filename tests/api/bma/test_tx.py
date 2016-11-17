@@ -1,9 +1,9 @@
 import unittest
 import jsonschema
 import aiohttp
-from duniterpy.api.bma.tx import History, Sources
+from duniterpy.documents import BMAEndpoint
+from duniterpy.api.bma.tx import history, sources, blocks, HISTORY_SCHEMA, SOURCES_SCHEMA
 from tests.api.webserver import WebFunctionalSetupMixin, web, asyncio
-from duniterpy.api.bma.tx.history import Blocks
 
 
 class Test_BMA_TX(WebFunctionalSetupMixin, unittest.TestCase):
@@ -118,8 +118,7 @@ class Test_BMA_TX(WebFunctionalSetupMixin, unittest.TestCase):
             ]
           }
         }
-        jsonschema.validate(json_sample, History.schema)
-        jsonschema.validate(json_sample, Blocks.schema)
+        jsonschema.validate(json_sample, HISTORY_SCHEMA)
 
     def test_bma_tx_history_bad(self):
         async def handler(request):
@@ -127,12 +126,11 @@ class Test_BMA_TX(WebFunctionalSetupMixin, unittest.TestCase):
             return web.Response(body=b'{}', content_type='application/json')
 
         async def go():
-            _, srv, url = await self.create_server('GET', '/pubkey', handler)
-            history = History(None, 'pubkey')
-            history.reverse_url = lambda scheme, path: url
+            _, srv, port, url = await self.create_server('GET', '/pubkey', handler)
             with self.assertRaises(jsonschema.exceptions.ValidationError):
                 with aiohttp.ClientSession() as session:
-                    await history.get(session)
+                    connection = BMAEndpoint("127.0.0.1", None, None, port).conn_handler(session)
+                    await history(connection, 'pubkey')
 
         self.loop.run_until_complete(go())
 
@@ -142,12 +140,11 @@ class Test_BMA_TX(WebFunctionalSetupMixin, unittest.TestCase):
             return web.Response(body=b'{}', content_type='application/json')
 
         async def go():
-            _, srv, url = await self.create_server('GET', '/pubkey/0/100', handler)
-            blocks = Blocks(None, 'pubkey', 0, 100)
-            blocks.reverse_url = lambda scheme, path: url
+            _, srv, port, url = await self.create_server('GET', '/pubkey/0/100', handler)
             with self.assertRaises(jsonschema.exceptions.ValidationError):
                 with aiohttp.ClientSession() as session:
-                    await blocks.get(session)
+                    connection = BMAEndpoint("127.0.0.1", None, None, port).conn_handler(session)
+                    await blocks(connection, 'pubkey', 0, 100)
 
         self.loop.run_until_complete(go())
 
@@ -174,7 +171,7 @@ class Test_BMA_TX(WebFunctionalSetupMixin, unittest.TestCase):
             }
           ]
         }
-        jsonschema.validate(json_sample, Sources.schema)
+        jsonschema.validate(json_sample, SOURCES_SCHEMA)
 
     def test_bma_tx_sources_bad(self):
         async def handler(request):
@@ -182,11 +179,10 @@ class Test_BMA_TX(WebFunctionalSetupMixin, unittest.TestCase):
             return web.Response(body=b'{}', content_type='application/json')
 
         async def go():
-            _, srv, url = await self.create_server('GET', '/pubkey', handler)
-            sources = Sources(None, 'pubkey')
-            sources.reverse_url = lambda scheme, path: url
+            _, srv, port, url = await self.create_server('GET', '/pubkey', handler)
             with self.assertRaises(jsonschema.exceptions.ValidationError):
                 with aiohttp.ClientSession() as session:
-                    await sources.get(session)
+                    connection = BMAEndpoint("127.0.0.1", None, None, port).conn_handler(session)
+                    await sources(connection, 'pubkey')
 
         self.loop.run_until_complete(go())

@@ -1,5 +1,5 @@
 import unittest
-from duniterpy.api.bma import API
+from duniterpy.api.bma import API, parse_error
 from duniterpy.documents.peer import BMAEndpoint
 
 
@@ -22,7 +22,7 @@ class Test_BMA_API(unittest.TestCase):
 
     def test_parse_error(self):
         api = API(None, "any")
-        error = api.parse_error("""{
+        error = parse_error("""{
 "ucode": 1005,
 "message": "Document has unkown fields or wrong line ending format"
 }""")

@@ -3,7 +3,9 @@ import unittest
 import jsonschema
 import json
 from tests.api.webserver import WebFunctionalSetupMixin, web, asyncio
-from duniterpy.api.bma.wot import Lookup, Members, CertifiedBy, CertifiersOf, Requirements
+from duniterpy.documents import BMAEndpoint
+from duniterpy.api.bma.wot import lookup, members, certified_by, certifiers_of, requirements, \
+    REQUIREMENTS_SCHEMA, CERTIFICATIONS_SCHEMA, LOOKUP_SCHEMA, MEMBERS_SCHEMA
 
 
 class Test_BMA_Wot(WebFunctionalSetupMixin, unittest.TestCase):
@@ -68,7 +70,7 @@ class Test_BMA_Wot(WebFunctionalSetupMixin, unittest.TestCase):
                 }
             ]
         }
-        jsonschema.validate(json_sample, Lookup.schema)
+        jsonschema.validate(json_sample, LOOKUP_SCHEMA)
 
     def test_bma_wot_lookup_bad(self):
         async def handler(request):
@@ -76,12 +78,11 @@ class Test_BMA_Wot(WebFunctionalSetupMixin, unittest.TestCase):
             return web.Response(body=b'{}', content_type='application/json')
 
         async def go():
-            _, srv, url = await self.create_server('GET', '/pubkey', handler)
-            lookup = Lookup(None, "pubkey")
-            lookup.reverse_url = lambda scheme, path: url
+            _, srv, port, url = await self.create_server('GET', '/pubkey', handler)
             with self.assertRaises(jsonschema.exceptions.ValidationError):
                 with aiohttp.ClientSession() as session:
-                    await lookup.get(session)
+                    connection = BMAEndpoint("127.0.0.1", None, None, port).conn_handler(session)
+                    await lookup(connection, 'pubkey')
 
         self.loop.run_until_complete(go())
 
@@ -93,7 +94,7 @@ class Test_BMA_Wot(WebFunctionalSetupMixin, unittest.TestCase):
                 {"pubkey": "9HJ9VXa9wc6EKC6NkCi8b5TKWBot68VhYDg7kDk5T8Cz", "uid": "toc"}
             ]
         }
-        jsonschema.validate(Members.schema, json_sample)
+        jsonschema.validate(MEMBERS_SCHEMA, json_sample)
 
     def test_bma_wot_members_bad(self):
         async def handler(request):
@@ -101,12 +102,11 @@ class Test_BMA_Wot(WebFunctionalSetupMixin, unittest.TestCase):
             return web.Response(body=b'{}', content_type='application/json')
 
         async def go():
-            _, srv, url = await self.create_server('GET', '/', handler)
-            members = Members(None)
-            members.reverse_url = lambda scheme, path: url
+            _, srv, port, url = await self.create_server('GET', '/', handler)
             with self.assertRaises(jsonschema.exceptions.ValidationError):
                 with aiohttp.ClientSession() as session:
-                    await members.get(session)
+                    connection = BMAEndpoint("127.0.0.1", None, None, port).conn_handler(session)
+                    await members(connection)
 
         self.loop.run_until_complete(go())
 
@@ -147,8 +147,8 @@ class Test_BMA_Wot(WebFunctionalSetupMixin, unittest.TestCase):
                 }
             ]
         }
-        jsonschema.validate(json_sample, CertifiersOf.schema)
-        jsonschema.validate(json_sample, CertifiedBy.schema)
+        jsonschema.validate(json_sample, CERTIFICATIONS_SCHEMA)
+        jsonschema.validate(json_sample, CERTIFICATIONS_SCHEMA)
 
     def test_bma_wot_certifiers_bad(self):
         async def handler(request):
@@ -156,12 +156,11 @@ class Test_BMA_Wot(WebFunctionalSetupMixin, unittest.TestCase):
             return web.Response(body=b'{}', content_type='application/json')
 
         async def go():
-            _, srv, url = await self.create_server('GET', '/pubkey', handler)
-            certsof = CertifiersOf(None, 'pubkey')
-            certsof.reverse_url = lambda scheme, path: url
+            _, srv, port, url = await self.create_server('GET', '/pubkey', handler)
             with self.assertRaises(jsonschema.exceptions.ValidationError):
                 with aiohttp.ClientSession() as session:
-                    await certsof.get(session)
+                    connection = BMAEndpoint("127.0.0.1", None, None, port).conn_handler(session)
+                    await certifiers_of(connection, 'pubkey')
 
         self.loop.run_until_complete(go())
 
@@ -189,12 +188,11 @@ class Test_BMA_Wot(WebFunctionalSetupMixin, unittest.TestCase):
             }), "utf-8"), content_type='application/json')
 
         async def go():
-            _, srv, url = await self.create_server('GET', '/pubkey', handler)
-            certsof = CertifiersOf(None, 'pubkey')
-            certsof.reverse_url = lambda scheme, path: url
+            _, srv, port, url = await self.create_server('GET', '/pubkey', handler)
             with self.assertRaises(jsonschema.exceptions.ValidationError):
                 with aiohttp.ClientSession() as session:
-                    await certsof.get(session)
+                    connection = BMAEndpoint("127.0.0.1", None, None, port).conn_handler(session)
+                    await certifiers_of(connection, 'pubkey')
 
         self.loop.run_until_complete(go())
 
@@ -204,12 +202,11 @@ class Test_BMA_Wot(WebFunctionalSetupMixin, unittest.TestCase):
             return web.Response(body=b'{}', content_type='application/json')
 
         async def go():
-            _, srv, url = await self.create_server('GET', '/pubkey', handler)
-            certby = CertifiedBy(None, 'pubkey')
-            certby.reverse_url = lambda scheme, path: url
+            _, srv, port, url = await self.create_server('GET', '/pubkey', handler)
             with self.assertRaises(jsonschema.exceptions.ValidationError):
                 with aiohttp.ClientSession() as session:
-                    await certby.get(session)
+                    connection = BMAEndpoint("127.0.0.1", None, None, port).conn_handler(session)
+                    await certified_by(connection, 'pubkey')
 
         self.loop.run_until_complete(go())
 
@@ -250,4 +247,4 @@ class Test_BMA_Wot(WebFunctionalSetupMixin, unittest.TestCase):
                 }
             ]
         }
-        jsonschema.validate(Requirements.schema, json_sample)
+        jsonschema.validate(REQUIREMENTS_SCHEMA, json_sample)
