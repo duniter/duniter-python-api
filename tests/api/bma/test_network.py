@@ -1,11 +1,14 @@
 import unittest
+
+import aiohttp
 import jsonschema
-from duniterpy.api.bma.network import Peering
-from tests.api.webserver import WebFunctionalSetupMixin, web, asyncio
-from duniterpy.api.bma.network.peering import Peers
+
+from duniterpy.documents import BMAEndpoint
+from tests.api.webserver import WebFunctionalSetupMixin, web
+from duniterpy.api.bma import network
 
 
-class Test_BMA_Network(WebFunctionalSetupMixin, unittest.TestCase):
+class TestBMANetwork(WebFunctionalSetupMixin, unittest.TestCase):
 
     def test_peering(self):
         json_sample = {
@@ -19,19 +22,21 @@ class Test_BMA_Network(WebFunctionalSetupMixin, unittest.TestCase):
           ],
           "signature": "42yQm4hGTJYWkPg39hQAUgP6S6EQ4vTfXdJuxKEHL1ih6YHiDL2hcwrFgBHjXLRgxRhj2VNVqqc6b4JayKqTE14r"
         }
-        jsonschema.validate(json_sample, Peering.schema)
+        jsonschema.validate(json_sample, network.PEERING_SCHEMA)
 
     def test_peering_bad(self):
-        async        def handler(request):
+        async def handler(request):
             await request.read()
             return web.Response(body=b'{}', content_type='application/json')
 
-        async        def go():
-            _, srv, url = await self.create_server('GET', '/', handler)
-            peering = Peering(None)
-            peering.reverse_url = lambda path: url
+        async def go():
+            _, srv, port, url = await self.create_server('GET', '/blockchain/block/100', handler)
             with self.assertRaises(jsonschema.exceptions.ValidationError):
-                await peering.get()
+                with aiohttp.ClientSession() as session:
+                    connection = BMAEndpoint("127.0.0.1", None, None, port).conn_handler(session)
+                    await network.peering(connection)
+
+        self.loop.run_until_complete(go())
 
     def test_peers_root(self):
         json_sample = {
@@ -40,7 +45,7 @@ class Test_BMA_Network(WebFunctionalSetupMixin, unittest.TestCase):
           "leavesCount": 5,
           "root": "114B6E61CB5BB93D862CA3C1DFA8B99E313E66E9"
         }
-        jsonschema.validate(json_sample, Peers.schema)
+        jsonschema.validate(json_sample, network.PEERS_SCHEMA)
 
     def test_peers_leaf(self):
         json_sample = {
@@ -57,16 +62,18 @@ class Test_BMA_Network(WebFunctionalSetupMixin, unittest.TestCase):
             "signature": "42yQm4hGTJYWkPg39hQAUgP6S6EQ4vTfXdJuxKEHL1ih6YHiDL2hcwrFgBHjXLRgxRhj2VNVqqc6b4JayKqTE14r"
           }
         }
-        jsonschema.validate(json_sample, Peers.schema)
+        jsonschema.validate(json_sample, network.PEERS_SCHEMA)
 
     def test_peers_bad(self):
-        async        def handler(request):
+        async def handler(request):
             await request.read()
             return web.Response(body=b'{}', content_type='application/json')
 
-        async        def go():
-            _, srv, url = await self.create_server('GET', '/', handler)
-            peers = Peers(None)
-            peers.reverse_url = lambda path: url
+        async def go():
+            _, srv, port, url = await self.create_server('GET', '/blockchain/block/100', handler)
             with self.assertRaises(jsonschema.exceptions.ValidationError):
-                await peers.get()
+                with aiohttp.ClientSession() as session:
+                    connection = BMAEndpoint("127.0.0.1", None, None, port).conn_handler(session)
+                    await network.peers(connection)
+
+        self.loop.run_until_complete(go())
