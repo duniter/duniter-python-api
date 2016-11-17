@@ -8,7 +8,7 @@ from .constants import pubkey_regex, signature_regex, block_id_regex, block_uid_
 
 class SelfCertification(Document):
     """
-    A document discribing a self certification.
+    A document describing a self certification.
     """
 
     re_inline = re.compile("({pubkey_regex}):({signature_regex}):({block_uid_regex}):([^\n]+)\n"
@@ -19,6 +19,16 @@ class SelfCertification(Document):
     re_timestamp = re.compile("META:TS:({block_uid_regex})\n".format(block_uid_regex=block_uid_regex))
 
     def __init__(self, version, currency, pubkey, uid, ts, signature):
+        """
+        Create an identity document
+
+        :param int version: Version of the document
+        :param str currency: Name of the currency
+        :param str pubkey:  Public key of the account linked to the identity
+        :param str uid: Unique identifier
+        :param BlockUID ts: Block timestamp
+        :param str|None signature: Signature of the document
+        """
         if signature:
             super().__init__(version, currency, [signature])
         else:
@@ -80,7 +90,7 @@ class Certification(Document):
         """
         Constructor
 
-        :param str version: the UCP version
+        :param int version: the UCP version
         :param str currency: the currency of the blockchain
         :param str pubkey_from:
         :param str pubkey_to:

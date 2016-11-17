@@ -1,0 +1,29 @@
+duniterpy.api package
+=====================
+
+Subpackages
+-----------
+
+.. toctree::
+
+    duniterpy.api.bma
+
+Submodules
+----------
+
+duniterpy.api.errors module
+---------------------------
+
+.. automodule:: duniterpy.api.errors
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+
+Module contents
+---------------
+
+.. automodule:: duniterpy.api
+    :members:
+    :undoc-members:
+    :show-inheritance:
