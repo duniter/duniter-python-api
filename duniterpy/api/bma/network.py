@@ -22,14 +22,7 @@ logger = logging.getLogger("duniter/network")
 
 URL_PATH = 'network'
 
-async def peering(connection):
-    """
-    GET peering information about a peer
-
-    :param duniterpy.api.bma.ConnectionHandler connection: Connection handler instance
-    :rtype: dict
-    """
-    schema = {
+PEERING_SCHEMA = {
         "type": "object",
         "properties": {
           "version": {
@@ -54,20 +47,7 @@ async def peering(connection):
         "required": ["version", "currency", "pubkey", "endpoints", "signature"]
     }
 
-    client = API(connection, URL_PATH)
-    r = await client.requests_get('/peering')
-    return await client.parse_response(r, schema)
-
-async def peers(connection, entry=None, signature=None):
-    """
-    GET peering entries of every node inside the currency network
-
-    :param duniterpy.api.bma.ConnectionHandler connection: Connection handler instance
-    :param duniterpy.documents.peer.Peer entry: Peer document
-    :param str signature: Signature of the document issuer
-    :rtype: dict
-    """
-    schema = {
+PEERS_SCHEMA = schema = {
         "type": ["object"],
         "properties": {
             "depth": {
@@ -120,6 +100,28 @@ async def peers(connection, entry=None, signature=None):
         ]
     }
 
+async def peering(connection):
+    """
+    GET peering information about a peer
+
+    :param duniterpy.api.bma.ConnectionHandler connection: Connection handler instance
+    :rtype: dict
+    """
+
+    client = API(connection, URL_PATH)
+    r = await client.requests_get('/peering')
+    return await client.parse_response(r, PEERING_SCHEMA)
+
+async def peers(connection, entry=None, signature=None):
+    """
+    GET peering entries of every node inside the currency network
+
+    :param duniterpy.api.bma.ConnectionHandler connection: Connection handler instance
+    :param duniterpy.documents.peer.Peer entry: Peer document
+    :param str signature: Signature of the document issuer
+    :rtype: dict
+    """
+
     client = API(connection, URL_PATH)
     # POST Peer
     if entry is not None and signature is not None:
@@ -128,7 +130,7 @@ async def peers(connection, entry=None, signature=None):
 
     # GET Peers
     r = await client.requests_get('/peering/peers')
-    return await client.parse_response(r, schema)
+    return await client.parse_response(r, PEERS_SCHEMA)
 
 # async def status(connection):
 #     """
