@@ -35,7 +35,7 @@ signer = SigningKey(salt, password)\
 # check public key
 if signer.pubkey != pubkey:
     print("Bad credentials !")
-    exit(0)
+    exit(1)
 
 # save private keys in a file (json format)
 signer.save(PRIVATE_KEYS_FILE_PATH)
