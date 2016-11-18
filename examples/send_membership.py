@@ -1,5 +1,6 @@
 import asyncio
 import aiohttp
+import getpass
 
 import duniterpy.api.bma as bma
 from duniterpy.documents import BMAEndpoint, BlockUID, Identity, Membership
@@ -103,16 +104,16 @@ async def main():
     Main code
     """
     # connection handler from BMA endpoint
-    connection = BMAEndpoint.from_inline(BMA_ENDPOINT).conn_handler()
+    connection = BMAEndpoint.from_inline(BMA_ENDPOINT).conn_handler(AIOHTTP_SESSION)
 
     # capture current block to get version and currency and blockstamp
     current_block = await bma.blockchain.current(connection)
 
-    # load credentials from a text file
-    salt, password = open(FROM_CREDENTIALS_FILE).readlines()
+    # prompt hidden user entry
+    salt = getpass.getpass("Enter your passphrase (salt): ")
 
-    # cleanup newlines
-    salt, password = salt.strip(), password.strip()
+    # prompt hidden user entry
+    password = getpass.getpass("Enter your password: ")
 
     # create our signed identity document
     identity = get_identity_document(current_block, UID, salt, password)
@@ -123,7 +124,11 @@ async def main():
     # send the membership document to the node
     response = await bma.blockchain.membership(connection, membership.signed_raw())
 
-    print(response)
+    if response.status == 200:
+        print(await response.text())
+    else:
+        print("Error while publishing membership : {0}".format(response.text()))
+
     response.close()
 
 

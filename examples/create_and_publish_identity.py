@@ -1,5 +1,6 @@
 import asyncio
 import aiohttp
+import getpass
 
 import duniterpy.api.bma as bma
 from duniterpy.documents import BMAEndpoint, BlockUID, Identity
@@ -13,16 +14,10 @@ from duniterpy.key import SigningKey
 # Here we use the BASIC_MERKLED_API
 BMA_ENDPOINT = "BASIC_MERKLED_API cgeek.fr 9330"
 
-# Credentials should be prompted or kept in a separate secure file
-# create a file with the salt on the first line and the password on the second line
-# the script will load them from the file
-FROM_CREDENTIALS_FILE = "/home/username/.credentials.txt"
-
 # Your unique identifier in the Web of Trust
 UID = "MyIdentity"
 
 ################################################
-
 # Latest duniter-python-api is asynchronous and you have to create an aiohttp session to send request
 # ( http://pythonhosted.org/aiohttp )
 AIOHTTP_SESSION = aiohttp.ClientSession()
@@ -65,30 +60,31 @@ async def main():
     """
     Main code
     """
-    # connection handler from BMA endpoint
-    connection = BMAEndpoint.from_inline(BMA_ENDPOINT).conn_handler()
 
+    # connection handler from BMA endpoint
+    connection = BMAEndpoint.from_inline(BMA_ENDPOINT).conn_handler(AIOHTTP_SESSION)
     # capture current block to get version and currency and blockstamp
     current_block = await bma.blockchain.current(connection)
 
-    # load credentials from a text file
-    salt, password = open(FROM_CREDENTIALS_FILE).readlines()
+    # prompt hidden user entry
+    salt = getpass.getpass("Enter your passphrase (salt): ")
 
-    # cleanup newlines
-    salt, password = salt.strip(), password.strip()
+    # prompt hidden user entry
+    password = getpass.getpass("Enter your password: ")
 
     # create our signed identity document
     identity = get_identity_document(current_block, UID, salt, password)
 
     # send the identity document to the node
     response = await bma.wot.add(connection, identity.signed_raw())
-
-    print(response)
-
+    if response.status == 200:
+        print(await response.text())
+    else:
+        print("Error while publishing identity : {0}".format(response.text()))
     response.close()
 
-with AIOHTTP_SESSION:
+# Latest duniter-python-api is asynchronous and you have to use asyncio, an asyncio loop and a "as" on the data.
+# ( https://docs.python.org/3/library/asyncio.html )
 
-    # Latest duniter-python-api is asynchronous and you have to use asyncio, an asyncio loop and a "as" on the data.
-    # ( https://docs.python.org/3/library/asyncio.html )
+with AIOHTTP_SESSION:
     asyncio.get_event_loop().run_until_complete(main())

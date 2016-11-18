@@ -326,7 +326,7 @@ async def membership(connection, membership):
 
     :param duniterpy.api.bma.ConnectionHandler connection: Connection handler instance
     :param str membership: Membership signed raw document
-    :rtype: dict
+    :rtype: aiohttp.ClientResponse
     """
     client = API(connection, URL_PATH)
 
@@ -350,7 +350,8 @@ async def block(connection, number=0, block=None, signature=None):
 
     # GET block
     r = await client.requests_get('/block/%d' % number)
-    return await parse_response(r, BLOCK_SCHEMA)
+    data = await parse_response(r, BLOCK_SCHEMA)
+    return data
 
 async def current(connection):
     """

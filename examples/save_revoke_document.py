@@ -29,9 +29,6 @@ BMA_ENDPOINT = "BASIC_MERKLED_API cgeek.fr 9330"
 REVOKE_DOCUMENT_FILE_PATH = os.path.join(home_path, "duniter_account_revoke_document.txt")
 
 ################################################
-
-# Latest duniter-python-api is asynchronous and you have to create an aiohttp session to send request
-# ( http://pythonhosted.org/aiohttp )
 AIOHTTP_SESSION = aiohttp.ClientSession()
 
 # Current protocole version
@@ -76,7 +73,7 @@ async def get_identity_document(connection, currency, pubkey):
             )
 
 
-async def get_revoke_document(identity, salt, password):
+def get_revoke_document(identity, salt, password):
     """
     Generate account revocation document for given identity
 
@@ -115,8 +112,7 @@ async def main():
         exit(0)
 
     # connection handler from BMA endpoint
-    connection = BMAEndpoint.from_inline(BMA_ENDPOINT).conn_handler()
-
+    connection = BMAEndpoint.from_inline(BMA_ENDPOINT).conn_handler(AIOHTTP_SESSION)
     # capture current block to get currency name
     current_block = await bma.blockchain.current(connection)
 
@@ -124,7 +120,7 @@ async def main():
     identity_document = await get_identity_document(connection, current_block['currency'], pubkey)
 
     # get the revoke document
-    revoke_document = await get_revoke_document(identity_document, salt, password)
+    revoke_document = get_revoke_document(identity_document, salt, password)
 
     # save revoke document in a file
     fp = open(REVOKE_DOCUMENT_FILE_PATH, 'w')
@@ -134,8 +130,8 @@ async def main():
     # document saved
     print("Revoke document saved in %s" % REVOKE_DOCUMENT_FILE_PATH)
 
-with AIOHTTP_SESSION:
 
+with AIOHTTP_SESSION:
     # Latest duniter-python-api is asynchronous and you have to use asyncio, an asyncio loop and a "as" on the data.
     # ( https://docs.python.org/3/library/asyncio.html )
     asyncio.get_event_loop().run_until_complete(main())

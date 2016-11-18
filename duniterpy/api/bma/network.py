@@ -16,7 +16,7 @@
 # Caner Candan <caner@candan.fr>, http://caner.candan.fr
 #
 
-from duniterpy.api.bma import API, logging
+from duniterpy.api.bma import API, logging, parse_response
 
 logger = logging.getLogger("duniter/network")
 
@@ -110,7 +110,7 @@ async def peering(connection):
 
     client = API(connection, URL_PATH)
     r = await client.requests_get('/peering')
-    return await client.parse_response(r, PEERING_SCHEMA)
+    return await parse_response(r, PEERING_SCHEMA)
 
 async def peers(connection, entry=None, signature=None):
     """
@@ -130,7 +130,7 @@ async def peers(connection, entry=None, signature=None):
 
     # GET Peers
     r = await client.requests_get('/peering/peers')
-    return await client.parse_response(r, PEERS_SCHEMA)
+    return await parse_response(r, PEERS_SCHEMA)
 
 # async def status(connection):
 #     """

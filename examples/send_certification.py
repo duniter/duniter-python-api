@@ -1,5 +1,6 @@
 import asyncio
 import aiohttp
+import getpass
 import duniterpy.api.bma as bma
 from duniterpy.documents import BMAEndpoint, BlockUID, Identity, Certification
 from duniterpy.key import SigningKey
@@ -100,7 +101,7 @@ async def main():
     Main code
     """
     # connection handler from BMA endpoint
-    connection = BMAEndpoint.from_inline(BMA_ENDPOINT).conn_handler()
+    connection = BMAEndpoint.from_inline(BMA_ENDPOINT).conn_handler(AIOHTTP_SESSION)
 
     # capture current block to get version and currency and blockstamp
     current_block = await bma.blockchain.current(connection)
@@ -108,11 +109,11 @@ async def main():
     # create our SelfCertification document to sign the Certification document
     identity = await get_identity_document(connection, current_block, TO_PUBKEY)
 
-    # load credentials from a text file
-    salt, password = open(FROM_CREDENTIALS_FILE).readlines()
+    # prompt hidden user entry
+    salt = getpass.getpass("Enter your passphrase (salt): ")
 
-    # cleanup newlines
-    salt, password = salt.strip(), password.strip()
+    # prompt hidden user entry
+    password = getpass.getpass("Enter your password: ")
 
     # send the Certification document to the node
     certification = get_certification_document(current_block, identity, FROM_PUBKEY, salt, password)
@@ -120,8 +121,10 @@ async def main():
     # Here we request for the path wot/certify
     response = await bma.wot.certify(connection, certification.signed_raw(identity))
 
-    print(response)
-
+    if response.status_code == 200:
+        print(await response.text())
+    else:
+        print("Error while publishing certification : {0}".format(response.text()))
     response.close()
 
 with AIOHTTP_SESSION:

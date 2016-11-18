@@ -101,11 +101,12 @@ async def parse_response(response, schema):
     """
     try:
         data = await response.json()
+        response.close()
         if schema is not None:
             jsonschema.validate(data, schema)
         return data
-    except (TypeError, json.decoder.JSONDecodeError):
-        raise jsonschema.ValidationError("Could not parse json")
+    except (TypeError, json.decoder.JSONDecodeError) as e:
+        raise jsonschema.ValidationError("Could not parse json : {0}".format(str(e)))
 
 
 class API(object):

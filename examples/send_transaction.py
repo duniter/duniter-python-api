@@ -1,8 +1,8 @@
 import asyncio
-
+import getpass
 import aiohttp
 
-import duniterpy.api.bma as bma
+from duniterpy.api import bma
 from duniterpy.documents import BMAEndpoint, BlockUID, Transaction
 from duniterpy.documents.transaction import InputSource, OutputSource, Unlock, SIGParameter
 from duniterpy.grammars.output import Condition, SIG
@@ -105,7 +105,7 @@ async def main():
     Main code
     """
     # connection handler from BMA endpoint
-    connection = BMAEndpoint.from_inline(BMA_ENDPOINT).conn_handler()
+    connection = BMAEndpoint.from_inline(BMA_ENDPOINT).conn_handler(AIOHTTP_SESSION)
 
     # capture current block to get version and currency and blockstamp
     current_block = await bma.blockchain.current(connection)
@@ -138,9 +138,12 @@ async def main():
     # send the Transaction document to the node
     response = await bma.tx.process(connection, transaction.signed_raw())
 
-    print(response)
-
+    if response.status == 200:
+        print(await response.text())
+    else:
+        print("Error while publishing transaction : {0}".format(response.text()))
     response.close()
+
 
 with AIOHTTP_SESSION:
 

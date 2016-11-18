@@ -16,7 +16,7 @@
 # Caner Candan <caner@candan.fr>, http://caner.candan.fr
 #
 
-from duniterpy.api.bma import API, logging
+from duniterpy.api.bma import API, logging, parse_response
 
 logger = logging.getLogger("duniter/node")
 
@@ -53,4 +53,4 @@ async def summary(connection):
     client = API(connection, URL_PATH)
 
     r = await client.requests_get('/summary')
-    return await client.parse_response(r, schema)
+    return await parse_response(r, schema)
