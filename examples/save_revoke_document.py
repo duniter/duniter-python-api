@@ -4,6 +4,17 @@ import duniterpy.api.bma as bma
 from duniterpy.documents import BMAEndpoint, BlockUID, Identity
 from duniterpy.documents import Revocation
 from duniterpy.key import SigningKey
+import getpass
+import os
+
+if "XDG_CONFIG_HOME" in os.environ:
+    home_path = os.environ["XDG_CONFIG_HOME"]
+elif "HOME" in os.environ:
+    home_path = os.environ["HOME"]
+elif "APPDATA" in os.environ:
+    home_path = os.environ["APPDATA"]
+else:
+    home_path = os.path.dirname(__file__)
 
 # CONFIG #######################################
 
@@ -12,18 +23,10 @@ from duniterpy.key import SigningKey
 # Here we use the BASIC_MERKLED_API
 BMA_ENDPOINT = "BASIC_MERKLED_API cgeek.fr 9330"
 
-# Credentials should be prompted or kept in a separate secure file
-# create a file with the salt on the first line and the password on the second line
-# the script will load them from the file
-CREDENTIALS_FILE_PATH = "/home/username/.credentials.txt"
-
-# Public key of the revoked identity account
-PUBKEY = "XXXXXXXX"
-
 # WARNING : Hide this file in a safe and secure place
 # If one day you forget your credentials,
 # you'll have to use your private key instead
-REVOKE_DOCUMENT_FILE_PATH = "/home/username/duniter_account_revoke_document.txt"
+REVOKE_DOCUMENT_FILE_PATH = os.path.join(home_path, "duniter_account_revoke_document.txt")
 
 ################################################
 
@@ -94,6 +97,23 @@ async def main():
     """
     Main code
     """
+    # prompt hidden user entry
+    salt = getpass.getpass("Enter your passphrase (salt): ")
+
+    # prompt hidden user entry
+    password = getpass.getpass("Enter your password: ")
+
+    # prompt public key
+    pubkey = input("Enter your public key: ")
+
+    # init signer instance
+    signer = SigningKey(salt, password)
+
+    # check public key
+    if signer.pubkey != pubkey:
+        print("Bad credentials !")
+        exit(0)
+
     # connection handler from BMA endpoint
     connection = BMAEndpoint.from_inline(BMA_ENDPOINT).conn_handler()
 
@@ -101,13 +121,7 @@ async def main():
     current_block = await bma.blockchain.current(connection)
 
     # create our SelfCertification document to sign the revoke document
-    identity_document = await get_identity_document(connection, current_block['currency'], PUBKEY)
-
-    # load credentials from a text file
-    salt, password = open(CREDENTIALS_FILE_PATH).readlines()
-
-    # cleanup newlines
-    salt, password = salt.strip(), password.strip()
+    identity_document = await get_identity_document(connection, current_block['currency'], pubkey)
 
     # get the revoke document
     revoke_document = await get_revoke_document(identity_document, salt, password)

@@ -1,12 +1,22 @@
 from duniterpy.key import SigningKey
 import getpass
+import os
+
+if "XDG_CONFIG_HOME" in os.environ:
+    home_path = os.environ["XDG_CONFIG_HOME"]
+elif "HOME" in os.environ:
+    home_path = os.environ["HOME"]
+elif "APPDATA" in os.environ:
+    home_path = os.environ["APPDATA"]
+else:
+    home_path = os.path.dirname(__file__)
 
 # CONFIG #######################################
 
 # WARNING : Hide this file in a safe and secure place
 # If one day you forget your credentials,
 # you'll have to use one of your private keys instead
-PRIVATE_KEYS_FILE_PATH = "/home/vit/.duniter_account_private_keys.txt"
+PRIVATE_KEYS_FILE_PATH = os.path.join(home_path, ".duniter_account_private_keys.txt")
 
 ################################################
 
