@@ -122,7 +122,7 @@ async def main():
     if response.status == 200:
         print(await response.text())
     else:
-        print("Error while publishing membership : {0}".format(response.text()))
+        print("Error while publishing membership : {0}".format(await response.text()))
 
     response.close()
 

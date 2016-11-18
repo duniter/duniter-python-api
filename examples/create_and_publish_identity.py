@@ -80,7 +80,7 @@ async def main():
     if response.status == 200:
         print(await response.text())
     else:
-        print("Error while publishing identity : {0}".format(response.text()))
+        print("Error while publishing identity : {0}".format(await response.text()))
     response.close()
 
 # Latest duniter-python-api is asynchronous and you have to use asyncio, an asyncio loop and a "as" on the data.
