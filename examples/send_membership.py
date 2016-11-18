@@ -14,14 +14,6 @@ from duniterpy.key import SigningKey
 # Here we use the BASIC_MERKLED_API
 BMA_ENDPOINT = "BASIC_MERKLED_API cgeek.fr 9330"
 
-# Credentials should be prompted or kept in a separate secure file
-# create a file with the salt on the first line and the password on the second line
-# the script will load them from the file
-FROM_CREDENTIALS_FILE = "/home/username/.credentials.txt"
-
-# Your unique identifier in the Web of Trust
-UID = "MyIdentity"
-
 ################################################
 
 # Latest duniter-python-api is asynchronous and you have to create an aiohttp session to send request
@@ -114,6 +106,9 @@ async def main():
 
     # prompt hidden user entry
     password = getpass.getpass("Enter your password: ")
+
+    # prompt hidden user entry
+    UID = getpass.getpass("Enter your UID: ")
 
     # create our signed identity document
     identity = get_identity_document(current_block, UID, salt, password)

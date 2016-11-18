@@ -15,17 +15,6 @@ from duniterpy.key import SigningKey
 # Here we use the BASIC_MERKLED_API
 BMA_ENDPOINT = "BASIC_MERKLED_API cgeek.fr 9330"
 
-# Credentials should be prompted or kept in a separate secure file
-# create a file with the salt on the first line and the password on the second line
-# the script will load them from the file
-FROM_CREDENTIALS_FILE = "/home/username/.credentials.txt"
-
-# Public key of the source account
-FROM_PUBKEY = "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
-
-# Public key of the target account
-TO_PUBKEY = "YYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYY"
-
 
 ################################################
 
@@ -107,27 +96,33 @@ async def main():
     # connection handler from BMA endpoint
     connection = BMAEndpoint.from_inline(BMA_ENDPOINT).conn_handler(AIOHTTP_SESSION)
 
+    # prompt hidden user entry
+    salt = getpass.getpass("Enter your passphrase (salt): ")
+
+    # prompt hidden user entry
+    password = getpass.getpass("Enter your password : ")
+
+    # prompt hidden user entry
+    pubkey_from = getpass.getpass("Enter your pubkey : ")
+
+    # prompt hidden user entry
+    pubkey_to = getpass.getpass("Enter recipient pubkey : ")
+
     # capture current block to get version and currency and blockstamp
     current_block = await bma.blockchain.current(connection)
 
     # capture sources of account
-    response = await bma.tx.sources(connection, FROM_PUBKEY)
+    response = await bma.tx.sources(connection, pubkey_from)
 
     if len(response['sources']) == 0:
-        print("no sources found for account %s" % FROM_PUBKEY)
+        print("no sources found for account %s" % pubkey_to)
         exit(1)
 
     # get the first source
     source = response['sources'][0]
 
     # create the transaction document
-    transaction = get_transaction_document(current_block, source, FROM_PUBKEY, TO_PUBKEY)
-
-    # load credentials from a text file
-    salt, password = open(FROM_CREDENTIALS_FILE).readlines()
-
-    # cleanup newlines
-    salt, password = salt.strip(), password.strip()
+    transaction = get_transaction_document(current_block, source, pubkey_from, pubkey_to)
 
     # create keys from credentials
     key = SigningKey(salt, password)
@@ -141,7 +136,7 @@ async def main():
     if response.status == 200:
         print(await response.text())
     else:
-        print("Error while publishing transaction : {0}".format(response.text()))
+        print("Error while publishing transaction : {0}".format(await response.text()))
     response.close()
 
 
