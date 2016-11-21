@@ -112,11 +112,28 @@ async def peering(connection):
     r = await client.requests_get('/peering')
     return await parse_response(r, PEERING_SCHEMA)
 
-async def peers(connection, leaves=False, entry=None, signature=None):
+async def peers(connection, leaves=False, leaf=""):
     """
     GET peering entries of every node inside the currency network
 
     :param bool leaves: True if leaves should be requested
+    :param str leaf: True if leaf should be requested
+    :rtype: dict
+    """
+
+    client = API(connection, URL_PATH)
+    # GET Peers
+    if leaves:
+        r = await client.requests_get('/peering/peers', leaves=leaves)
+    else:
+        r = await client.requests_get('/peering/peers', leaf=leaf)
+
+    return await parse_response(r, PEERS_SCHEMA)
+
+async def peer(connection, entry=None, signature=None):
+    """
+    GET peering entries of every node inside the currency network
+
     :param duniterpy.api.bma.ConnectionHandler connection: Connection handler instance
     :param duniterpy.documents.peer.Peer entry: Peer document
     :param str signature: Signature of the document issuer
@@ -124,14 +141,8 @@ async def peers(connection, leaves=False, entry=None, signature=None):
     """
 
     client = API(connection, URL_PATH)
-    # POST Peer
-    if entry is not None and signature is not None:
-        r = await client.requests_post('/peering/peers', entry=entry, signature=signature)
-        return r
-
-    # GET Peers
-    r = await client.requests_get('/peering/peers', leaves=leaves)
-    return await parse_response(r, PEERS_SCHEMA)
+    r = await client.requests_post('/peering/peers', entry=entry, signature=signature)
+    return r
 
 # async def status(connection):
 #     """
