@@ -63,7 +63,7 @@ def get_certification_document(current_block, self_cert_document, from_pubkey, s
     Create and return a Certification document
 
     :param dict current_block: Current block data
-    :param Identity self_cert_document: SelfCertification document
+    :param Identity self_cert_document: Identity document
     :param str from_pubkey: Pubkey of the certifier
     :param str salt: Secret salt (DO NOT SHOW IT ANYWHERE, IT IS SECRET !!!)
     :param str password: Secret password (DO NOT SHOW IT ANYWHERE, IT IS SECRET !!!)
@@ -107,7 +107,7 @@ async def main():
     # capture current block to get version and currency and blockstamp
     current_block = await bma.blockchain.current(connection)
 
-    # create our SelfCertification document to sign the Certification document
+    # create our Identity document to sign the Certification document
     identity = await get_identity_document(connection, current_block, pubkey_to)
 
     # send the Certification document to the node

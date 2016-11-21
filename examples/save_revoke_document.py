@@ -36,7 +36,7 @@ PROTOCOL_VERSION = 2
 
 async def get_identity_document(connection, currency, pubkey):
     """
-    Get the SelfCertification document of the pubkey
+    Get the Identity document of the pubkey
 
     :param bma.api.ConnectionHandler connection: Connection handler
     :param str currency: Currency name
@@ -116,7 +116,7 @@ async def main():
     # capture current block to get currency name
     current_block = await bma.blockchain.current(connection)
 
-    # create our SelfCertification document to sign the revoke document
+    # create our Identity document to sign the revoke document
     identity_document = await get_identity_document(connection, current_block['currency'], pubkey)
 
     # get the revoke document
