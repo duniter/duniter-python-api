@@ -6,6 +6,7 @@ import attr
 import logging
 import random
 from ._user_identity import UserIdentity
+from ._cert import Cert
 
 
 @attr.s()
@@ -97,6 +98,8 @@ class BlockForge:
         self._logger.info("Set {0} ({1}) as member : {2}".format(self.user_identities[pubkey].uid,
                                                                  pubkey[:5], member))
         self.user_identities[pubkey].member = member
+        self.user_identities[pubkey].was_member = self.user_identities[pubkey].was_member or member
+
 
     def generate_dividend(self):
         self._logger.info("Generate dividend")
@@ -142,4 +145,16 @@ class BlockForge:
             for identity in self.user_identities.values():
                 if identity.member:
                     identity.sources.append(InputSource(block.ud, block.unit_base, 'D', identity.pubkey, block.number))
+
+        for certification in block.certifications:
+            cert = Cert(from_identity=self.user_identities[certification.pubkey_from],
+                        to_identity=self.user_identities[certification.pubkey_to],
+                        signature=certification.signatures[0],
+                        written_on=block.blockUID,
+                        block=certification.timestamp.number,
+                        mediantime=next(b.mediantime
+                                        for b in self.blocks if b.number == certification.timestamp.number))
+            self.user_identities[certification.pubkey_from].certs_sent.append(cert)
+            self.user_identities[certification.pubkey_to].certs_received.append(cert)
+
         self._pool = []

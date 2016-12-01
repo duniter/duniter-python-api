@@ -22,7 +22,9 @@ class Node:
             '/network/peering': node.peering,
             '/blockchain/block/{number}': node.block_by_number,
             '/blockchain/current': node.current_block,
-            '/blockchain/sources/{pubkey}': node.sources
+            '/blockchain/sources/{pubkey}': node.sources,
+            '/wot/certifiers-of/{search}': node.certifiers_of,
+            '/wot/certified-by/{search}': node.certified_by
         }
         for r, h in get_routes.items():
             node.http.add_route("GET", r, h)
@@ -147,6 +149,84 @@ class Node:
             "signature": self.peer_doc().signatures[0],
             "raw": self.peer_doc().raw(),
             "pubkey": self.peer_doc().pubkey
+        }, 200
+
+    def certifiers_of(self, request):
+        search = str(request.match_info['search'])
+        try:
+            user_identity = self.forge.user_identities[search]
+        except KeyError:
+            try:
+                user_identity = next(i for i in self.forge.user_identities.values() if i.uid == search)
+            except StopIteration:
+                return {
+                    'error': errors.NO_MEMBER_MATCHING_PUB_OR_UID,
+                    'message': "No member matching this pubkey or uid"
+                }, 200
+
+        return {
+            "pubkey": user_identity.pubkey,
+            "uid": user_identity.uid,
+            "sigDate": str(user_identity.blockstamp),
+            "isMember": user_identity.member,
+            "certifications": [
+                {
+                    "pubkey": c.from_identity.pubkey,
+                    "uid": c.from_identity.uid,
+                    "isMember": c.from_identity.member,
+                    "wasMember": c.from_identity.was_member,
+                    "cert_time": {
+                        "block": c.block,
+                        "medianTime": c.mediantime
+                    },
+                    "sigDate": str(c.from_identity.blockstamp),
+                    "written": {
+                        "number": c.written_on.number,
+                        "hash": c.written_on.sha_hash
+                    },
+                    "signature": c.signature
+                }
+                for c in user_identity.certs_received
+            ]
+        }, 200
+
+    def certified_by(self, request):
+        search = str(request.match_info['search'])
+        try:
+            user_identity = self.forge.user_identities[search]
+        except KeyError:
+            try:
+                user_identity = next(i for i in self.forge.user_identities.values() if i.uid == search)
+            except StopIteration:
+                return {
+                    'error': errors.NO_MEMBER_MATCHING_PUB_OR_UID,
+                    'message': "No member matching this pubkey or uid"
+                }, 200
+
+        return {
+            "pubkey": user_identity.pubkey,
+            "uid": user_identity.uid,
+            "sigDate": str(user_identity.blockstamp),
+            "isMember": user_identity.member,
+            "certifications": [
+                {
+                    "pubkey": c.from_identity.pubkey,
+                    "uid": c.from_identity.uid,
+                    "isMember": c.from_identity.member,
+                    "wasMember": c.from_identity.was_member,
+                    "cert_time": {
+                        "block": c.block,
+                        "medianTime": c.mediantime
+                    },
+                    "sigDate": str(c.from_identity.blockstamp),
+                    "written": {
+                        "number": c.written_on.number,
+                        "hash": c.written_on.sha_hash
+                    },
+                    "signature": c.signature
+                }
+                for c in user_identity.certs_sent
+            ]
         }, 200
 
     def peer_doc(self):
