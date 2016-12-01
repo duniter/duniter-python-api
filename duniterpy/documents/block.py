@@ -3,8 +3,10 @@ from .certification import Identity, Certification, Revocation
 from .membership import Membership
 from .transaction import Transaction
 from .constants import pubkey_regex, block_id_regex, block_hash_regex
+import hashlib
 
 import re
+import base64
 
 
 def block_uid(value):
@@ -502,3 +504,18 @@ PreviousIssuer: {1}\n".format(self.prev_hash, self.prev_issuer)
         doc += "Nonce: {0}\n".format(self.noonce)
 
         return doc
+
+    def computed_inner_hash(self):
+        doc = self.signed_raw()
+        inner_doc = '\n'.join(doc.split('\n')[:-2]) + '\n'
+        return hashlib.sha256(inner_doc.encode("ascii")).hexdigest().upper()
+
+    def sign(self, keys):
+        """
+        Sign the current document.
+        Warning : current signatures will be replaced with the new ones.
+        """
+        key = keys[0]
+        signed = self.raw()[-2:]
+        signing = base64.b64encode(key.signature(bytes(signed, 'ascii')))
+        self.signatures = [signing.decode("ascii")]
