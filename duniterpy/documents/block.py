@@ -459,7 +459,7 @@ DifferentIssuersCount: {2}
 """.format(self.issuers_frame, self.issuers_frame_var, self.different_issuers_count)
 
         if self.number == 0:
-            str_params = ":".join(self.parameters)
+            str_params = ":".join([str(p) for p in self.parameters])
             doc += "Parameters: {0}\n".format(str_params)
         else:
             doc += "PreviousHash: {0}\n\
