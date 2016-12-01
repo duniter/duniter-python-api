@@ -21,7 +21,8 @@ class Node:
         get_routes = {
             '/network/peering': node.peering,
             '/blockchain/block/{number}': node.block_by_number,
-            '/blockchain/current': node.current_block
+            '/blockchain/current': node.current_block,
+            '/blockchain/sources/{pubkey}': node.sources
         }
         for r, h in get_routes.items():
             node.http.add_route("GET", r, h)
@@ -111,6 +112,28 @@ class Node:
                 "ucode": errors.NO_CURRENT_BLOCK,
                 "message": "No current block"
             }, 404
+
+    def sources(self, request):
+        pubkey = str(request.match_info['pubkey'])
+        try:
+            sources = self.forge.user_identities[pubkey].sources
+            return {
+                       "currency": self.forge.currency,
+                       "pubkey": pubkey,
+                       "sources": [{
+                           'type': s.source,
+                           'noffset': s.index,
+                           'identifier': s.origin_id,
+                           'amount': s.amount,
+                           'base': s.base
+                       } for s in sources]
+                   }, 200
+        except IndexError:
+            return {
+                      "currency": self.forge.currency,
+                      "pubkey": pubkey,
+                      "sources": []
+                   }, 200
 
     def peering(self, request):
         return {
