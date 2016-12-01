@@ -23,6 +23,7 @@ class Node:
             '/blockchain/block/{number}': node.block_by_number,
             '/blockchain/current': node.current_block,
             '/blockchain/sources/{pubkey}': node.sources,
+            '/wot/lookup/{search}': node.lookup,
             '/wot/certifiers-of/{search}': node.certifiers_of,
             '/wot/certified-by/{search}': node.certified_by
         }
@@ -226,6 +227,52 @@ class Node:
                     "signature": c.signature
                 }
                 for c in user_identity.certs_sent
+            ]
+        }, 200
+
+    def lookup(self, request):
+        search = str(request.match_info['search'])
+        matched = [i for i in self.forge.user_identities.values() if search in i.pubkey or search in i.uid]
+
+        return {
+            "partial": False,
+            "results":  [
+                {
+                    "pubkey": m.pubkey,
+                    "uid": m.uid,
+                    "meta": {
+                        "timestamp": str(m.blockstamp),
+                    },
+                    "revoked": m.revoked,
+                    "revoked_on": m.revoked_on,
+                    "revocation_sig": m.revocation_sig,
+                    "self": m.signature,
+                    "others": [
+                        {
+                            "pubkey": c.to_identity.pubkey,
+                            "meta": {
+                                "block_number": c.block,
+                            },
+                            "uids": [c.to_identity.uid],
+                            "isMember": c.to_identity.member,
+                            "wasMember": c.to_identity.was_member,
+                            "signature": c.signature
+                        } for c in m.certs_received
+                    ],
+                    "signed": [
+                        {
+                            "pubkey": c.to_identity.pubkey,
+                            "meta": {
+                                "block_number": c.block,
+                            },
+                            "uids": [c.to_identity.uid],
+                            "isMember": c.to_identity.member,
+                            "wasMember": c.to_identity.was_member,
+                            "signature": c.signature
+                        } for c in m.certs_sent
+                    ]
+                }
+                for m in matched
             ]
         }, 200
 

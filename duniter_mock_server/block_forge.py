@@ -138,7 +138,9 @@ class BlockForge:
 
         self.blocks.append(block)
         for identity in block.identities:
-            self.user_identities[identity.pubkey] = UserIdentity(identity.pubkey, identity.uid, identity.timestamp, False)
+            self.user_identities[identity.pubkey] = UserIdentity(pubkey=identity.pubkey, uid=identity.uid,
+                                                                 blockstamp=identity.timestamp,
+                                                                 signature=identity.signatures[0])
             self._logger.info("New identity : {0}".format(self.user_identities[identity.pubkey]))
 
         if block.ud:
