@@ -378,8 +378,8 @@ async def blocks(connection, count, start):
     """
 
     client = API(connection, URL_PATH)
-    assert count is int
-    assert start is int
+    assert type(count) is int
+    assert type(start) is int
     r = await client.requests_get('/blocks/%d/%d' % (count, start))
     return await parse_response(r, BLOCKS_SCHEMA)
 
