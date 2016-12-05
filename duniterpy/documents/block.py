@@ -5,6 +5,7 @@ from .transaction import Transaction
 from .constants import pubkey_regex, block_id_regex, block_hash_regex
 
 import re
+import hashlib
 
 
 def block_uid(value):
@@ -255,7 +256,7 @@ The class Block handles Block documents.
 
     @property
     def blockUID(self):
-        return BlockUID(self.number, self.sha_hash)
+        return BlockUID(self.number, self.proof_of_work())
     
     @classmethod
     def from_signed_raw(cls, signed_raw):
@@ -502,3 +503,10 @@ PreviousIssuer: {1}\n".format(self.prev_hash, self.prev_issuer)
         doc += "Nonce: {0}\n".format(self.noonce)
 
         return doc
+
+    def proof_of_work(self):
+        doc_str = """InnerHash: {inner_hash}
+Nonce: {nonce}
+{signature}
+""".format(inner_hash=self.inner_hash, nonce=self.noonce, signature=self.signatures[0])
+        return hashlib.sha256(doc_str.encode('ascii')).hexdigest().upper()

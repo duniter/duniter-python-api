@@ -539,6 +539,37 @@ class Test_Block(unittest.TestCase):
         elif BlockUID.empty():
             self.fail("Empty blockuid __nonzero__ comparison failed")
 
+    def test_proof_of_work(self):
+        block = """Version: 5
+Type: Block
+Currency: test_net
+Number: 60803
+PoWMin: 80
+Time: 1480979125
+MedianTime: 1480975879
+UnitBase: 7
+Issuer: 9bZEATXBGPUSsk8oAYi4KAChg3rHKwNt67hVdErbNGCW
+IssuersFrame: 120
+IssuersFrameVar: 0
+DifferentIssuersCount: 18
+PreviousHash: 0000083FB6E3435ADCDF0F86B0A1BCA108B6B47D4B4BA61D0B4FDC21A262CF4C
+PreviousIssuer: BnSRjMjJ7gWy13asCRz9rQ6G5Njytdf3pvR1GMkJgtu6
+MembersCount: 187
+Identities:
+Joiners:
+Actives:
+Leavers:
+Revoked:
+Excluded:
+Certifications:
+Transactions:
+InnerHash: 310F57575EA865EF47BFA236108B2B1CAEBFBF8EF70960E32E214E413E9C836B
+Nonce: 10200000037440
+AywstQpC0S5iaA/YQvbz2alpP6zTYG3tjkWpxy1jgeCo028Te2V327bBZbfDGDzsjxOrF4UVmEBiGsgbqhL9CA==
+"""
+        block_doc = Block.from_signed_raw(block)
+        self.assertEqual(block_doc.proof_of_work(), "00000A84839226046082E2B1AD49664E382D98C845644945D133D4A90408813A")
+
 if __name__ == '__main__':
     unittest.main()
 
