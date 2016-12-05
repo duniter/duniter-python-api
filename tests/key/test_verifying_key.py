@@ -1,11 +1,11 @@
-from duniterpy.key import VerifyingKey, SigningKey
+from duniterpy.key import VerifyingKey, SigningKey, ScryptParams
 from duniterpy.documents import Peer
 import unittest
 
 
 class TestVerifyingKey(unittest.TestCase):
     def test_from_sign_to_verify(self):
-        sign_key = SigningKey("saltsalt", "passwordpassword")
+        sign_key = SigningKey("saltsalt", "passwordpassword", ScryptParams(4096, 16, 1))
         verify_key = VerifyingKey(sign_key.pubkey)
         self.assertEqual(verify_key.vk, sign_key.vk)
 
