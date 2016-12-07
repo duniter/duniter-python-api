@@ -18,7 +18,7 @@
 
 PROTOCOL_VERSION="1"
 
-MANAGED_API=["BASIC_MERKLED_API"]
+MANAGED_API=["BASIC_MERKLED_API", "BMAS"]
 
 __author__      = 'Caner Candan & inso'
 __version__     = '0.30.6'

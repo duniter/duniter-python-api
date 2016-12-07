@@ -101,6 +101,8 @@ def endpoint(value):
             if value.startswith(api):
                 if api == "BASIC_MERKLED_API":
                     return BMAEndpoint.from_inline(value)
+                if api == "BMAS":
+                    return SecuredBMAEndpoint.from_inline(value)
         return UnknownEndpoint.from_inline(value)
     else:
         raise TypeError("Cannot convert {0} to endpoint".format(value))
@@ -186,11 +188,11 @@ class BMAEndpoint(Endpoint):
         :rtype: ConnectionHandler
         """
         if self.server:
-            return ConnectionHandler(self.server, self.port, session)
+            return ConnectionHandler("http", "ws", self.server, self.port, session)
         elif self.ipv4:
-            return ConnectionHandler(self.ipv4, self.port, session)
+            return ConnectionHandler("http", "ws", self.ipv4, self.port, session)
         else:
-            return ConnectionHandler("[{0}]".format(self.ipv6), self.port, session)
+            return ConnectionHandler("http", "ws", "[{0}]".format(self.ipv6), self.port, session)
 
     def __str__(self):
         return self.inline()
@@ -204,3 +206,45 @@ class BMAEndpoint(Endpoint):
 
     def __hash__(self):
         return hash((self.server, self.ipv4, self.ipv6, self.port))
+
+
+class SecuredBMAEndpoint(BMAEndpoint):
+    re_inline = re.compile('^BMAS(?: ([a-z0-9-_.]*(?:.[a-zA-Z])))?(?: ((?:[0-9.]{1,4}){4}))?(?: ((?:[0-9a-f:]{4,5}){4,8}))?(?: ([0-9]+))$')
+
+    def __init__(self, server, ipv4, ipv6, port):
+        self.server = server
+        self.ipv4 = ipv4
+        self.ipv6 = ipv6
+        self.port = port
+
+    @classmethod
+    def from_inline(cls, inline):
+        m = SecuredBMAEndpoint.re_inline.match(inline)
+        if m is None:
+            raise MalformedDocumentError("BMAEndpoint")
+        server = m.group(1)
+        ipv4 = m.group(2)
+        ipv6 = m.group(3)
+        port = int(m.group(4))
+        return cls(server, ipv4, ipv6, port)
+
+    def inline(self):
+        return "BASIC_MERKLED_API{DNS}{IPv4}{IPv6}{PORT}" \
+                    .format(DNS=(" {0}".format(self.server) if self.server else ""),
+                            IPv4=(" {0}".format(self.ipv4) if self.ipv4 else ""),
+                            IPv6=(" {0}".format(self.ipv6) if self.ipv6 else ""),
+                            PORT=(" {0}".format(self.port) if self.port else ""))
+
+    def conn_handler(self, session=None):
+        """
+        Return connection handler instance for the endpoint
+
+        :param aiohttp.ClientSession session: AIOHTTP client session instance
+        :rtype: ConnectionHandler
+        """
+        if self.server:
+            return ConnectionHandler("https", "wss", self.server, self.port, session)
+        elif self.ipv4:
+            return ConnectionHandler("https", "wss", self.ipv4, self.port, session)
+        else:
+            return ConnectionHandler("https", "wss", "[{0}]".format(self.ipv6), self.port, session)

@@ -39,10 +39,11 @@ ERROR_SCHEMA = {
     "required": ["ucode", "message"]
 }
 
+
 class ConnectionHandler(object):
     """Helper class used by other API classes to ease passing server connection information."""
 
-    def __init__(self, server, port, session=None):
+    def __init__(self, http_scheme, ws_scheme, server, port, session=None):
         """
         Init instance of connection handler
 
@@ -50,6 +51,8 @@ class ConnectionHandler(object):
         :param int port: Port
         :param aiohttp.ClientSession|None session: Session AIOHTTP
         """
+        self.http_scheme = http_scheme
+        self.ws_scheme = ws_scheme
         self.server = server
         self.port = port
         if session is None:
@@ -149,9 +152,10 @@ class API(object):
         :param str path: the request path
         :rtype: aiohttp.ClientResponse
         """
-        logging.debug("Request : {0}".format(self.reverse_url("http", path)))
+        logging.debug("Request : {0}".format(self.reverse_url(self.connection_handler.http_scheme, path)))
         with aiohttp.Timeout(15):
-            response = await self.connection_handler.session.get(self.reverse_url("http", path), params=kwargs,headers=self.headers)
+            url = self.reverse_url(self.connection_handler.http_scheme, path)
+            response = await self.connection_handler.session.get(url, params=kwargs,headers=self.headers)
             if response.status != 200:
                 try:
                     error_data = parse_error(await response.text())
@@ -174,7 +178,7 @@ class API(object):
         logging.debug("POST : {0}".format(kwargs))
         with aiohttp.Timeout(15):
             response = await self.connection_handler.session.post(
-                self.reverse_url("http", path),
+                self.reverse_url(self.connection_handler.http_scheme, path),
                 data=kwargs,
                 headers=self.headers
             )
@@ -187,5 +191,5 @@ class API(object):
         :param str path: the url path
         :rtype: aiohttp.ClientWebSocketResponse
         """
-        url = self.reverse_url("ws", path)
+        url = self.reverse_url(self.connection_handler.ws_scheme, path)
         return self.connection_handler.session.ws_connect(url)
