@@ -25,7 +25,7 @@ class Node:
             '/blockchain/sources/{pubkey}': node.sources,
             '/wot/lookup/{search}': node.lookup,
             '/wot/certifiers-of/{search}': node.certifiers_of,
-            '/wot/certified-by/{search}': node.certified_by
+            '/wot/certified-by/{search}': node.certified_by,
             '/blockchain/parameters': node.parameters,
             '/blockchain/with/ud': node.with_ud
         }
