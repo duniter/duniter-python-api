@@ -22,6 +22,10 @@ class Node:
             '/network/peering': node.peering,
             '/blockchain/block/{number}': node.block_by_number,
             '/blockchain/current': node.current_block,
+            '/blockchain/sources/{pubkey}': node.sources,
+            '/wot/lookup/{search}': node.lookup,
+            '/wot/certifiers-of/{search}': node.certifiers_of,
+            '/wot/certified-by/{search}': node.certified_by
             '/blockchain/parameters': node.parameters,
             '/blockchain/with/ud': node.with_ud
         }
@@ -114,6 +118,28 @@ class Node:
                 "message": "No current block"
             }, 404
 
+    def sources(self, request):
+        pubkey = str(request.match_info['pubkey'])
+        try:
+            sources = self.forge.user_identities[pubkey].sources
+            return {
+                       "currency": self.forge.currency,
+                       "pubkey": pubkey,
+                       "sources": [{
+                           'type': s.source,
+                           'noffset': s.index,
+                           'identifier': s.origin_id,
+                           'amount': s.amount,
+                           'base': s.base
+                       } for s in sources]
+                   }, 200
+        except IndexError:
+            return {
+                      "currency": self.forge.currency,
+                      "pubkey": pubkey,
+                      "sources": []
+                   }, 200
+
     def peering(self, request):
         return {
             "version": 2,
@@ -156,6 +182,130 @@ class Node:
             "result": {
                 "blocks": [b.number for b in self.forge.blocks if b.ud]
             }
+        }, 200
+
+    def certifiers_of(self, request):
+        search = str(request.match_info['search'])
+        try:
+            user_identity = self.forge.user_identities[search]
+        except KeyError:
+            try:
+                user_identity = next(i for i in self.forge.user_identities.values() if i.uid == search)
+            except StopIteration:
+                return {
+                    'error': errors.NO_MEMBER_MATCHING_PUB_OR_UID,
+                    'message': "No member matching this pubkey or uid"
+                }, 200
+
+        return {
+            "pubkey": user_identity.pubkey,
+            "uid": user_identity.uid,
+            "sigDate": str(user_identity.blockstamp),
+            "isMember": user_identity.member,
+            "certifications": [
+                {
+                    "pubkey": c.from_identity.pubkey,
+                    "uid": c.from_identity.uid,
+                    "isMember": c.from_identity.member,
+                    "wasMember": c.from_identity.was_member,
+                    "cert_time": {
+                        "block": c.block,
+                        "medianTime": c.mediantime
+                    },
+                    "sigDate": str(c.from_identity.blockstamp),
+                    "written": {
+                        "number": c.written_on.number,
+                        "hash": c.written_on.sha_hash
+                    },
+                    "signature": c.signature
+                }
+                for c in user_identity.certs_received
+            ]
+        }, 200
+
+    def certified_by(self, request):
+        search = str(request.match_info['search'])
+        try:
+            user_identity = self.forge.user_identities[search]
+        except KeyError:
+            try:
+                user_identity = next(i for i in self.forge.user_identities.values() if i.uid == search)
+            except StopIteration:
+                return {
+                    'error': errors.NO_MEMBER_MATCHING_PUB_OR_UID,
+                    'message': "No member matching this pubkey or uid"
+                }, 200
+
+        return {
+            "pubkey": user_identity.pubkey,
+            "uid": user_identity.uid,
+            "sigDate": str(user_identity.blockstamp),
+            "isMember": user_identity.member,
+            "certifications": [
+                {
+                    "pubkey": c.from_identity.pubkey,
+                    "uid": c.from_identity.uid,
+                    "isMember": c.from_identity.member,
+                    "wasMember": c.from_identity.was_member,
+                    "cert_time": {
+                        "block": c.block,
+                        "medianTime": c.mediantime
+                    },
+                    "sigDate": str(c.from_identity.blockstamp),
+                    "written": {
+                        "number": c.written_on.number,
+                        "hash": c.written_on.sha_hash
+                    },
+                    "signature": c.signature
+                }
+                for c in user_identity.certs_sent
+            ]
+        }, 200
+
+    def lookup(self, request):
+        search = str(request.match_info['search'])
+        matched = [i for i in self.forge.user_identities.values() if search in i.pubkey or search in i.uid]
+
+        return {
+            "partial": False,
+            "results":  [
+                {
+                    "pubkey": m.pubkey,
+                    "uid": m.uid,
+                    "meta": {
+                        "timestamp": str(m.blockstamp),
+                    },
+                    "revoked": m.revoked,
+                    "revoked_on": m.revoked_on,
+                    "revocation_sig": m.revocation_sig,
+                    "self": m.signature,
+                    "others": [
+                        {
+                            "pubkey": c.to_identity.pubkey,
+                            "meta": {
+                                "block_number": c.block,
+                            },
+                            "uids": [c.to_identity.uid],
+                            "isMember": c.to_identity.member,
+                            "wasMember": c.to_identity.was_member,
+                            "signature": c.signature
+                        } for c in m.certs_received
+                    ],
+                    "signed": [
+                        {
+                            "pubkey": c.to_identity.pubkey,
+                            "meta": {
+                                "block_number": c.block,
+                            },
+                            "uids": [c.to_identity.uid],
+                            "isMember": c.to_identity.member,
+                            "wasMember": c.to_identity.was_member,
+                            "signature": c.signature
+                        } for c in m.certs_sent
+                    ]
+                }
+                for m in matched
+            ]
         }, 200
 
     def peer_doc(self):
