@@ -18,7 +18,7 @@ class BlockForge:
     blocks = attr.ib(default=attr.Factory(list), validator=attr.validators.instance_of(list))
     _identities = attr.ib(default=attr.Factory(dict), validator=attr.validators.instance_of(dict))
     _ud = attr.ib(default=False, validator=attr.validators.instance_of(bool))
-    _logger = attr.ib(default=attr.Factory(lambda: logging.getLogger('duniter_mock_server')))
+    _logger = attr.ib(default=attr.Factory(lambda: logging.getLogger('mirage')))
 
     @classmethod
     def start(cls, currency, salt, password, loop):
@@ -125,7 +125,7 @@ class BlockForge:
         block.inner_hash = block.computed_inner_hash()
         return block
 
-    async def forge_block(self):
+    def forge_block(self):
         block = self.build_data()
         block.sign([self.key])
 
