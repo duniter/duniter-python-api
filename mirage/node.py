@@ -135,7 +135,7 @@ class Node:
                            'base': s.base
                        } for s in sources]
                    }, 200
-        except IndexError:
+        except KeyError:
             return {
                       "currency": self.forge.currency,
                       "pubkey": pubkey,
@@ -195,9 +195,9 @@ class Node:
                 user_identity = next(i for i in self.forge.user_identities.values() if i.uid == search)
             except StopIteration:
                 return {
-                    'error': errors.NO_MEMBER_MATCHING_PUB_OR_UID,
+                    'ucode': errors.NO_MEMBER_MATCHING_PUB_OR_UID,
                     'message': "No member matching this pubkey or uid"
-                }, 200
+                }, 404
 
         return {
                "pubkey": user_identity.pubkey,
@@ -225,9 +225,9 @@ class Node:
                 user_identity = next(i for i in self.forge.user_identities.values() if i.uid == search)
             except StopIteration:
                 return {
-                    'error': errors.NO_MEMBER_MATCHING_PUB_OR_UID,
+                    'ucode': errors.NO_MEMBER_MATCHING_PUB_OR_UID,
                     'message': "No member matching this pubkey or uid"
-                }, 200
+                }, 404
 
         return {
             "pubkey": user_identity.pubkey,
@@ -264,7 +264,7 @@ class Node:
                 user_identity = next(i for i in self.forge.user_identities.values() if i.uid == search)
             except StopIteration:
                 return {
-                    'error': errors.NO_MEMBER_MATCHING_PUB_OR_UID,
+                    'ucode': errors.NO_MEMBER_MATCHING_PUB_OR_UID,
                     'message': "No member matching this pubkey or uid"
                 }, 200
 
@@ -349,8 +349,15 @@ class Node:
                 user_identity = next(i for i in self.forge.user_identities.values() if i.uid == search)
             except StopIteration:
                 return {
-                    'error': errors.NO_MEMBER_MATCHING_PUB_OR_UID,
-                    'message': "No member matching this pubkey or uid"
+                    "currency": self.forge.currency,
+                    "pubkey": search,
+                    "history": {
+                        "sent": [],
+                        "received": [],
+                        "sending": [],
+                        "receiving": [],
+                        "pending": []
+                    }
                 }, 200
         return {
                 "currency": self.forge.currency,
