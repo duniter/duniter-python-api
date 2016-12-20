@@ -15,4 +15,7 @@ class UserIdentity:
     sources = attr.ib(default=attr.Factory(list))
     certs_sent = attr.ib(default=attr.Factory(list))
     certs_received = attr.ib(default=attr.Factory(list))
+    memberships = attr.ib(default=attr.Factory(list))
+    tx_sent = attr.ib(default=attr.Factory(list))
+    tx_received = attr.ib(default=attr.Factory(list))
 

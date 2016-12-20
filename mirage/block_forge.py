@@ -7,6 +7,7 @@ import logging
 import random
 from ._user_identity import UserIdentity
 from ._cert import Cert
+from ._ms import MS
 
 
 @attr.s()
@@ -100,7 +101,6 @@ class BlockForge:
         self.user_identities[pubkey].member = member
         self.user_identities[pubkey].was_member = self.user_identities[pubkey].was_member or member
 
-
     def generate_dividend(self):
         self._logger.info("Generate dividend")
         self._ud = True
@@ -158,5 +158,17 @@ class BlockForge:
                                         for b in self.blocks if b.number == certification.timestamp.number))
             self.user_identities[certification.pubkey_from].certs_sent.append(cert)
             self.user_identities[certification.pubkey_to].certs_received.append(cert)
+
+        for membership in block.joiners + block.actives + block.leavers:
+            self.user_identities[membership.issuer].memberships.append(MS(pubkey=membership.issuer,
+                                                                          type=membership.membership_type,
+                                                                          written_on=block.number,
+                                                                          blockstamp=membership.membership_ts))
+
+        for tx in block.transactions:
+            receivers = [o.conditions.left.pubkey for o in tx.outputs
+                         if o.conditions.left.pubkey != tx.issuers[0]]
+            self.user_identities[tx.issuers[0]].tx_sent.append(tx)
+            self.user_identities[receivers[0]].tx_received.append(tx)
 
         self._pool = []

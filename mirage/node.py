@@ -22,12 +22,14 @@ class Node:
             '/network/peering': node.peering,
             '/blockchain/block/{number}': node.block_by_number,
             '/blockchain/current': node.current_block,
-            '/blockchain/sources/{pubkey}': node.sources,
+            '/tx/sources/{pubkey}': node.sources,
             '/wot/lookup/{search}': node.lookup,
             '/wot/certifiers-of/{search}': node.certifiers_of,
             '/wot/certified-by/{search}': node.certified_by,
             '/blockchain/parameters': node.parameters,
-            '/blockchain/with/ud': node.with_ud
+            '/blockchain/with/ud': node.with_ud,
+            '/blockchain/memberships/{search}': node.memberships,
+            '/tx/history/{search}': node.tx_history,
         }
         for r, h in get_routes.items():
             node.http.add_route("GET", r, h)
@@ -184,6 +186,36 @@ class Node:
             }
         }, 200
 
+    def memberships(self, request):
+        search = str(request.match_info['search'])
+        try:
+            user_identity = self.forge.user_identities[search]
+        except KeyError:
+            try:
+                user_identity = next(i for i in self.forge.user_identities.values() if i.uid == search)
+            except StopIteration:
+                return {
+                    'error': errors.NO_MEMBER_MATCHING_PUB_OR_UID,
+                    'message': "No member matching this pubkey or uid"
+                }, 200
+
+        return {
+               "pubkey": user_identity.pubkey,
+               "uid": user_identity.uid,
+               "sigDate": str(user_identity.blockstamp),
+               "memberships": [
+                {
+                    "version": 2,
+                    "currency": self.forge.currency,
+                    "membership": m.type,
+                    "blockNumber": m.blockstamp.number,
+                    "blockHash": m.blockstamp.sha_hash,
+                    "written": m.written_on
+                }
+                for m in user_identity.memberships
+               ]
+           }, 200
+
     def certifiers_of(self, request):
         search = str(request.match_info['search'])
         try:
@@ -307,6 +339,60 @@ class Node:
                 for m in matched
             ]
         }, 200
+
+    def tx_history(self, request):
+        search = str(request.match_info['search'])
+        try:
+            user_identity = self.forge.user_identities[search]
+        except KeyError:
+            try:
+                user_identity = next(i for i in self.forge.user_identities.values() if i.uid == search)
+            except StopIteration:
+                return {
+                    'error': errors.NO_MEMBER_MATCHING_PUB_OR_UID,
+                    'message': "No member matching this pubkey or uid"
+                }, 200
+        return {
+                "currency": self.forge.currency,
+                "pubkey": user_identity.pubkey,
+                "history": {
+                    "sent": [
+                        {
+                            "version": 2,
+                            "issuers": tx.issuers,
+                            "inputs": [i.inline() for i in tx.inputs],
+                            "unlocks": [u.inline() for u in tx.unlocks],
+                            "outputs": [o.inline() for o in tx.outputs],
+                            "comment": tx.comment,
+                            "locktime": tx.locktime,
+                            "blockstamp": str(tx.blockstamp),
+                            "blockstampTime": next([b.medianTime for b in self.forge.blocks
+                                                    if b.number == tx.blockstamp.number]),
+                            "signatures": tx.signatures
+                        }
+                        for tx in user_identity.tx_sent
+                    ],
+                    "received": [
+                        {
+                            "version": 2,
+                            "issuers": tx.issuers,
+                            "inputs": [i.inline() for i in tx.inputs],
+                            "unlocks": [u.inline() for u in tx.unlocks],
+                            "outputs": [o.inline() for o in tx.outputs],
+                            "comment": tx.comment,
+                            "locktime": tx.locktime,
+                            "blockstamp": str(tx.blockstamp),
+                            "blockstampTime": next([b.medianTime for b in self.forge.blocks
+                                                    if b.number == tx.blockstamp.number]),
+                            "signatures": tx.signatures
+                        }
+                        for tx in user_identity.tx_received
+                    ],
+                    "sending": [],
+                    "receiving": [],
+                    "pending": []
+                }
+            }, 200
 
     def peer_doc(self):
         peer = Peer(2, self.forge.currency, self.forge.key.pubkey, BlockUID.empty(),
