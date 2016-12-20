@@ -1,1 +1,0 @@
-git+https://github.com/duniter/duniter-python-api.git@dev
