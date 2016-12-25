@@ -406,3 +406,6 @@ class Node:
                     [BMAEndpoint(None, "127.0.0.1", None, self.http.port)], None)
         peer.sign([self.forge.key])
         return peer
+
+    async def close(self):
+        await self.http.close()
