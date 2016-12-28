@@ -63,6 +63,9 @@ J3G9oM5AKYZNLAB5Wx499w61NuUoS57JVccTShUbGpCMjCqj9yXXqNq7dyZpDWA6BxipsiaMZhujMeBf
 """
         self.assertEqual(selfcert.signed_raw(), result)
 
+        from_raw = Identity.from_signed_raw(result)
+        self.assertEqual(from_raw.signed_raw(), result)
+
     def test_certifications_from_inline(self):
         version = 2
         currency = "zeta_brousouf"
@@ -106,7 +109,8 @@ SoKwoa8PFfCDJWZ6dNCv7XstezHcc2BbKiJgVDXv82R5zYR83nis9dShLgWJ5w48noVUHimdngzYQneN
 """
         self.assertEqual(certification.signed_raw(selfcert), result)
 
-
+        from_raw = Certification.from_signed_raw(certification.signed_raw(selfcert))
+        self.assertEqual(from_raw.signed_raw(selfcert), result)
 
     def test_revokation_from_inline(self):
         version = 2
