@@ -2,6 +2,7 @@ from aiohttp import web, log, errors
 import json
 import socket
 from duniterpy.documents import Peer
+import asyncio
 
 
 class Request:
@@ -40,7 +41,7 @@ class HTTPServer:
     async def _handler(self, request, handle):
         await request.read()
         self.requests.append(Request(request.method, request.path, request.content))
-        json_data, http_code = handle(request)
+        json_data, http_code = await handle(request)
         return web.Response(body=bytes(json.dumps(json_data), "utf-8"),
                             headers={'Content-Type': 'application/json'},
                             status=http_code)

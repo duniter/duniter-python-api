@@ -1,5 +1,5 @@
 import attr
-from duniterpy.documents import Peer, BMAEndpoint, BlockUID
+from duniterpy.documents import Peer, BMAEndpoint, BlockUID, Identity, Certification
 from duniterpy.api import errors
 from duniterpy.key import SigningKey, ScryptParams
 from .http import HTTPServer
@@ -26,18 +26,73 @@ class Node:
             '/wot/lookup/{search}': node.lookup,
             '/wot/certifiers-of/{search}': node.certifiers_of,
             '/wot/certified-by/{search}': node.certified_by,
+            '/wot/requirements/{pubkey}': node.requirements,
             '/blockchain/parameters': node.parameters,
             '/blockchain/with/ud': node.with_ud,
             '/blockchain/memberships/{search}': node.memberships,
             '/tx/history/{search}': node.tx_history,
         }
+        post_routes = {
+            '/wot/add': node.add,
+            '/wot/certify': node.certify
+        }
         for r, h in get_routes.items():
             node.http.add_route("GET", r, h)
+        for r, h in post_routes.items():
+            node.http.add_route("POST", r, h)
         srv, port, url = await node.http.create_server()
         print("Server started on {0}".format(url))
         return node
 
-    def block_by_number(self, request):
+    async def add(self, request):
+        data = await request.post()
+        identity = Identity.from_signed_raw(data["identity"])
+        self.forge.pool.append(identity)
+        return {}, 200
+
+    async def certify(self, request):
+        data = await request.post()
+        certification = Certification.from_signed_raw(data["cert"])
+        self.forge.pool.append(certification)
+        return {}, 200
+
+    async def requirements(self, request):
+        pubkey = request.match_info['pubkey']
+        try:
+            user_identity = self.forge.user_identities[pubkey]
+        except KeyError:
+            try:
+                user_identity = next(i for i in self.forge.user_identities.values() if i.uid == pubkey)
+            except StopIteration:
+                return {
+                    'ucode': errors.NO_MEMBER_MATCHING_PUB_OR_UID,
+                    'message': "No member matching this pubkey or uid"
+                }, 404
+        return {
+                    "identities": [
+                            {
+                              "pubkey": user_identity.pubkey,
+                              "uid": user_identity.uid,
+                              "meta": {
+                                "timestamp": str(user_identity.blockstamp),
+                              },
+                              "expired": user_identity.revoked,
+                              "outdistanced": not user_identity.member,
+                              "certifications": [
+                                {
+                                  "from": c.from_identity.pubkey,
+                                  "to": c.to_identity.pubkey,
+                                  "expiresIn": max(self.forge.blocks[-1].mediantime - 31557600 - c.mediantime, 0)
+                                } for c in user_identity.certs_received
+                                ],
+                                "membershipPendingExpiresIn": 0,
+                                "membershipExpiresIn": max(self.forge.blocks[-1].mediantime - 15778800
+                                                           - user_identity.memberships[-1].timestamp, 0)
+                            },
+                        ]
+                    }, 200
+
+    async def block_by_number(self, request):
         number = int(request.match_info['number'])
         try:
             block = self.forge.blocks[number]
@@ -49,7 +104,7 @@ class Node:
                 "time": block.time,
                 "medianTime": block.mediantime,
                 "membersCount": block.members_count,
-                "monetaryMass": self.forge.monetary_mass(),
+                "monetaryMass": self.forge.monetary_mass(number),
                 "unitbase": block.unit_base,
                 "issuersCount": block.different_issuers_count,
                 "issuersFrame": block.issuers_frame,
@@ -79,7 +134,7 @@ class Node:
                 "message": "Block not found"
             }, 404
 
-    def current_block(self, request):
+    async def current_block(self, request):
         try:
             block = self.forge.blocks[-1]
             return {
@@ -120,7 +175,7 @@ class Node:
                 "message": "No current block"
             }, 404
 
-    def sources(self, request):
+    async def sources(self, request):
         pubkey = str(request.match_info['pubkey'])
         try:
             sources = self.forge.user_identities[pubkey].sources
@@ -142,7 +197,7 @@ class Node:
                       "sources": []
                    }, 200
 
-    def peering(self, request):
+    async def peering(self, request):
         return {
             "version": 2,
             "currency": self.peer_doc().currency,
@@ -156,7 +211,7 @@ class Node:
             "pubkey": self.peer_doc().pubkey
         }, 200
 
-    def parameters(self, request):
+    async def parameters(self, request):
         return {
             "currency": self.forge.currency,
             "c": 0.0025,
@@ -179,14 +234,14 @@ class Node:
             "percentRot": 0.66
         }, 200
 
-    def with_ud(self, request):
+    async def with_ud(self, request):
         return {
             "result": {
                 "blocks": [b.number for b in self.forge.blocks if b.ud]
             }
         }, 200
 
-    def memberships(self, request):
+    async def memberships(self, request):
         search = str(request.match_info['search'])
         try:
             user_identity = self.forge.user_identities[search]
@@ -216,7 +271,7 @@ class Node:
                ]
            }, 200
 
-    def certifiers_of(self, request):
+    async def certifiers_of(self, request):
         search = str(request.match_info['search'])
         try:
             user_identity = self.forge.user_identities[search]
@@ -255,7 +310,7 @@ class Node:
             ]
         }, 200
 
-    def certified_by(self, request):
+    async def certified_by(self, request):
         search = str(request.match_info['search'])
         try:
             user_identity = self.forge.user_identities[search]
@@ -294,7 +349,7 @@ class Node:
             ]
         }, 200
 
-    def lookup(self, request):
+    async def lookup(self, request):
         search = str(request.match_info['search'])
         matched = [i for i in self.forge.user_identities.values() if search in i.pubkey or search in i.uid]
 
@@ -340,7 +395,7 @@ class Node:
             ]
         }, 200
 
-    def tx_history(self, request):
+    async def tx_history(self, request):
         search = str(request.match_info['search'])
         try:
             user_identity = self.forge.user_identities[search]

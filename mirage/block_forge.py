@@ -17,27 +17,27 @@ class BlockForge:
     """
     currency = attr.ib(validator=attr.validators.instance_of(str))
     key = attr.ib(validator=attr.validators.instance_of(SigningKey))
-    _pool = attr.ib(default=attr.Factory(list), validator=attr.validators.instance_of(list))
+    pool = attr.ib(default=attr.Factory(list), validator=attr.validators.instance_of(list))
     blocks = attr.ib(default=attr.Factory(list), validator=attr.validators.instance_of(list))
     user_identities = attr.ib(default=attr.Factory(dict), validator=attr.validators.instance_of(dict))
     _ud = attr.ib(default=False, validator=attr.validators.instance_of(bool))
     _logger = attr.ib(default=attr.Factory(lambda: logging.getLogger('mirage')))
 
     @classmethod
-    def start(cls, currency, salt, password, loop):
-        key = SigningKey(salt, password)
+    def start(cls, currency, salt, password, scrypt_params, loop):
+        key = SigningKey(salt, password, scrypt_params)
         return cls(currency, key)
 
     def push(self, document):
-        self._pool.append(document)
+        self.pool.append(document)
 
     def next_dividend(self):
         if self._ud:
             try:
-                latest_dividend = next(reversed([b for b in self.blocks if b.ud]))
+                latest_dividend = next(reversed([b.ud for b in self.blocks if b.ud]))
             except StopIteration:
                 return 100
-            return latest_dividend * 1.1
+            return int(latest_dividend * 1.1)
 
     def previous_hash(self):
         try:
@@ -57,41 +57,42 @@ class BlockForge:
         return len([i for i in self.user_identities.values() if i.member])
 
     def identities(self):
-        return [d for d in self._pool if type(d) is Identity]
+        return [d for d in self.pool if type(d) is Identity]
 
     def revocations(self):
-        return [r for r in self._pool if type(r) is Revocation]
+        return [r for r in self.pool if type(r) is Revocation]
 
     def joiners(self):
-        return [d for d in self._pool if type(d) is Membership and d.membership_type == 'IN'
-                and d.issuer in self.user_identities and not self.user_identities[d.issuer].member]
+        return [d for d in self.pool if type(d) is Membership and d.membership_type == 'IN'
+                and ((d.issuer in self.user_identities and not self.user_identities[d.issuer].member)
+                     or d.issuer in [d.pubkey for d in self.pool if type(d) is Identity])]
 
     def actives(self):
-        return [d for d in self._pool if type(d) is Membership and d.membership_type == 'IN'
+        return [d for d in self.pool if type(d) is Membership and d.membership_type == 'IN'
                 and d.issuer in self.user_identities and self.user_identities[d.issuer].member]
 
     def leavers(self):
-        return [d for d in self._pool if type(d) is Membership and d.membership_type == 'OUT'
+        return [d for d in self.pool if type(d) is Membership and d.membership_type == 'OUT'
                 and d.issuer in self.user_identities and self.user_identities[d.issuer].member]
 
     def excluded(self):
         return []
 
     def certifications(self):
-        return [d for d in self._pool if type(d) is Certification]
+        return [d for d in self.pool if type(d) is Certification]
 
     def transactions(self):
-        return [d for d in self._pool if type(d) is Transaction]
+        return [d for d in self.pool if type(d) is Transaction]
 
     def parameters(self):
         if not self.blocks:
             return 0.1, 86400, 100000, 10800, 40, 2629800, 31557600, 1, 604800, 604800,\
                                                 0.9, 15778800, 5, 12, 300, 25, 40, 0.66
 
-    def monetary_mass(self):
+    def monetary_mass(self, number=None):
         mass = 0
         for b in self.blocks:
-            if b.ud:
+            if b.ud and (not number or b.number <= number):
                 mass += b.ud * b.members_count
         return mass
 
@@ -163,7 +164,8 @@ class BlockForge:
             self.user_identities[membership.issuer].memberships.append(MS(pubkey=membership.issuer,
                                                                           type=membership.membership_type,
                                                                           written_on=block.number,
-                                                                          blockstamp=membership.membership_ts))
+                                                                          blockstamp=membership.membership_ts,
+                                                                          timestamp=block.mediantime))
 
         for tx in block.transactions:
             receivers = [o.conditions.left.pubkey for o in tx.outputs
@@ -171,4 +173,4 @@ class BlockForge:
             self.user_identities[tx.issuers[0]].tx_sent.append(tx)
             self.user_identities[receivers[0]].tx_received.append(tx)
 
-        self._pool = []
+        self.pool = []
