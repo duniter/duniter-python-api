@@ -358,25 +358,29 @@ class Node:
             "results":  [
                 {
                     "pubkey": m.pubkey,
-                    "uid": m.uid,
-                    "meta": {
-                        "timestamp": str(m.blockstamp),
-                    },
-                    "revoked": m.revoked,
-                    "revoked_on": m.revoked_on,
-                    "revocation_sig": m.revocation_sig,
-                    "self": m.signature,
-                    "others": [
+                    "uids": [
                         {
-                            "pubkey": c.to_identity.pubkey,
+                            "uid": m.uid,
                             "meta": {
-                                "block_number": c.block,
+                                "timestamp": str(m.blockstamp),
                             },
-                            "uids": [c.to_identity.uid],
-                            "isMember": c.to_identity.member,
-                            "wasMember": c.to_identity.was_member,
-                            "signature": c.signature
-                        } for c in m.certs_received
+                            "revoked": m.revoked,
+                            "revoked_on": m.revoked_on,
+                            "revocation_sig": m.revocation_sig,
+                            "self": m.signature,
+                            "others": [
+                                {
+                                    "pubkey": c.to_identity.pubkey,
+                                    "meta": {
+                                        "block_number": c.block,
+                                    },
+                                    "uids": [c.to_identity.uid],
+                                    "isMember": c.to_identity.member,
+                                    "wasMember": c.to_identity.was_member,
+                                    "signature": c.signature
+                                } for c in m.certs_received
+                            ],
+                        }
                     ],
                     "signed": [
                         {
