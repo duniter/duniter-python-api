@@ -285,17 +285,17 @@ async def add(connection, identity):
     r = await client.requests_post('/add', identity=identity)
     return r
 
-async def certify(connection, certification):
+async def certify(connection, cert):
     """
     POST certification document
 
     :param duniterpy.api.bma.ConnectionHandler connection: Connection handler instance
-    :param duniterpy.documents.certification.Certification certification: Certification document
+    :param duniterpy.documents.certification.Certification cert: Certification document
     :rtype: aiohttp.ClientResponse
     """
     client = API(connection, URL_PATH)
 
-    r = await client.requests_post('/certify', cert=certification)
+    r = await client.requests_post('/certify', cert=cert)
     return r
 
 async def revoke(connection, revocation):

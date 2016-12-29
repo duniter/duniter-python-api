@@ -16,7 +16,7 @@
 # Caner Candan <caner@candan.fr>, http://caner.candan.fr
 #
 
-PROTOCOL_VERSION="1"
+PROTOCOL_VERSION="6"
 
 MANAGED_API=["BASIC_MERKLED_API", "BMAS"]
 
