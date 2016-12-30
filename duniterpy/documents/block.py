@@ -133,7 +133,7 @@ The class Block handles Block documents.
     re_time = re.compile("Time: ([0-9]+)\n")
     re_mediantime = re.compile("MedianTime: ([0-9]+)\n")
     re_universaldividend = re.compile("UniversalDividend: ([0-9]+)\n")
-    re_unitbase = re.compile("UnitBase: ([0-9])\n")
+    re_unitbase = re.compile("UnitBase: ([0-9]+)\n")
     re_issuer = re.compile("Issuer: ({pubkey_regex})\n".format(pubkey_regex=pubkey_regex))
     re_issuers_frame = re.compile("IssuersFrame: ([0-9]+)\n")
     re_issuers_frame_var = re.compile("IssuersFrameVar: (0|-?[1-9]\d{0,18})\n")
