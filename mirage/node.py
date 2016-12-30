@@ -1,5 +1,5 @@
 import attr
-from duniterpy.documents import Peer, BMAEndpoint, BlockUID, Identity, Certification
+from duniterpy.documents import Peer, BMAEndpoint, BlockUID, Identity, Certification, Transaction
 from duniterpy.api import errors
 from duniterpy.key import SigningKey, ScryptParams
 from .http import HTTPServer
@@ -34,7 +34,8 @@ class Node:
         }
         post_routes = {
             '/wot/add': node.add,
-            '/wot/certify': node.certify
+            '/wot/certify': node.certify,
+            '/tx/process': node.process
         }
         for r, h in get_routes.items():
             node.http.add_route("GET", r, h)
@@ -48,6 +49,12 @@ class Node:
         data = await request.post()
         identity = Identity.from_signed_raw(data["identity"])
         self.forge.pool.append(identity)
+        return {}, 200
+
+    async def process(self, request):
+        data = await request.post()
+        transaction = Transaction.from_signed_raw(data["transaction"])
+        self.forge.pool.append(transaction)
         return {}, 200
 
     async def certify(self, request):
