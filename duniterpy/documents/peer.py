@@ -229,7 +229,7 @@ class SecuredBMAEndpoint(BMAEndpoint):
         return cls(server, ipv4, ipv6, port)
 
     def inline(self):
-        return "BASIC_MERKLED_API{DNS}{IPv4}{IPv6}{PORT}" \
+        return "BMAS{DNS}{IPv4}{IPv6}{PORT}" \
                     .format(DNS=(" {0}".format(self.server) if self.server else ""),
                             IPv4=(" {0}".format(self.ipv4) if self.ipv4 else ""),
                             IPv6=(" {0}".format(self.ipv6) if self.ipv6 else ""),

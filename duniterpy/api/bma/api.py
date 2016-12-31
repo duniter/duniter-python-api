@@ -55,10 +55,7 @@ class ConnectionHandler(object):
         self.ws_scheme = ws_scheme
         self.server = server
         self.port = port
-        if session is None:
-            self.session = aiohttp.ClientSession()
-        else:
-            self.session = session
+        self.session = session
 
     def __str__(self):
         return 'connection info: %s:%d' % (self.server, self.port)
