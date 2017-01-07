@@ -32,5 +32,6 @@ setup(
         "Programming Language :: Python :: 3.5",
         "Topic :: Communications",
     ],
+    dependency_links=("git+https://github.com/duniter/duniter-python-api.git@dev",)
 
 )
