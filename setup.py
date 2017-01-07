@@ -1,5 +1,4 @@
 from setuptools import setup, find_packages
-import mirage
 import os
 import re
 
@@ -7,7 +6,7 @@ import re
 setup(
     name='duniter-mirage',
 
-    version=mirage.__version__,
+    version="0.1.0",
 
     packages=find_packages(),
 
