@@ -120,7 +120,7 @@ class BlockForge:
         certifications = self.certifications()
         transactions = self.transactions()
 
-        block = Block(5, self.currency, len(self.blocks), 1, int(time.time()), 
+        block = Block(10, self.currency, len(self.blocks), 1, int(time.time()),
                       int(time.time()), self.next_dividend(), 0, 
                       self.key.pubkey, 5, 5, 5, previous_hash, previous_issuer, 
                       parameters, members_count, identities, 
