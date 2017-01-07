@@ -35,9 +35,11 @@ class BlockForge:
         if self._ud:
             try:
                 latest_dividend = next(reversed([b.ud for b in self.blocks if b.ud]))
+                return int(latest_dividend * 1.1)
             except StopIteration:
                 return 100
-            return int(latest_dividend * 1.1)
+            finally:
+                self._ud = False
 
     def previous_hash(self):
         try:
