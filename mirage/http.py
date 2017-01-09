@@ -63,7 +63,12 @@ class HTTPServer:
             access_log=log.access_logger,
         )
 
-        srv = await self.lp.create_server(self.handler, '127.0.0.1', self.port)
+        srv = None
+        while not srv:
+            try:
+                srv = await self.lp.create_server(self.handler, '127.0.0.1', self.port)
+            except OSError:
+                self.port = self.find_unused_port()
         protocol = "https" if ssl_ctx else "http"
         url = "{}://127.0.0.1:{}".format(protocol, self.port)
 

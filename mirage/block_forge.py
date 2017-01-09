@@ -8,6 +8,7 @@ import random
 from ._user_identity import UserIdentity
 from ._cert import Cert
 from ._ms import MS
+from ._ud import UD
 
 
 @attr.s()
@@ -150,6 +151,10 @@ class BlockForge:
             for identity in self.user_identities.values():
                 if identity.member:
                     identity.sources.append(InputSource(block.ud, block.unit_base, 'D', identity.pubkey, block.number))
+                    identity.ud_generated.append(UD(amount=block.ud,
+                                                    base=block.unit_base,
+                                                    block_number=block.number,
+                                                    time=block.mediantime))
 
         for certification in block.certifications:
             cert = Cert(from_identity=self.user_identities[certification.pubkey_from],

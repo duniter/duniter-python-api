@@ -31,6 +31,7 @@ class Node:
             '/blockchain/with/ud': node.with_ud,
             '/blockchain/memberships/{search}': node.memberships,
             '/tx/history/{search}': node.tx_history,
+            '/ud/history/{search}': node.ud_history,
         }
         post_routes = {
             '/wot/add': node.add,
@@ -328,7 +329,7 @@ class Node:
                 return {
                     'ucode': errors.NO_MEMBER_MATCHING_PUB_OR_UID,
                     'message': "No member matching this pubkey or uid"
-                }, 200
+                }, 404
 
         return {
             "pubkey": user_identity.pubkey,
@@ -464,6 +465,32 @@ class Node:
                     "sending": [],
                     "receiving": [],
                     "pending": []
+                }
+            }, 200
+
+    async def ud_history(self, request):
+        search = str(request.match_info['search'])
+        try:
+            user_identity = self.forge.user_identities[search]
+        except KeyError:
+            try:
+                user_identity = next(i for i in self.forge.user_identities.values() if i.uid == search)
+            except StopIteration:
+                return {
+                    "currency": self.forge.currency,
+                    "pubkey": search,
+                    "history": {
+                        "history": [],
+                    }
+                }, 200
+        return {
+                "currency": self.forge.currency,
+                "pubkey": user_identity.pubkey,
+                "history": {
+                    "history": [
+                        attr.asdict(ud)
+                        for ud in user_identity.ud_generated
+                    ]
                 }
             }, 200
 
