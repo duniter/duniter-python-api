@@ -180,7 +180,7 @@ class BMAEndpoint(Endpoint):
                             IPv6=(" {0}".format(self.ipv6) if self.ipv6 else ""),
                             PORT=(" {0}".format(self.port) if self.port else ""))
 
-    def conn_handler(self, session=None):
+    def conn_handler(self, session=None, proxy=None):
         """
         Return connection handler instance for the endpoint
 
@@ -188,11 +188,11 @@ class BMAEndpoint(Endpoint):
         :rtype: ConnectionHandler
         """
         if self.server:
-            return ConnectionHandler("http", "ws", self.server, self.port, session)
+            return ConnectionHandler("http", "ws", self.server, self.port, proxy, session)
         elif self.ipv4:
-            return ConnectionHandler("http", "ws", self.ipv4, self.port, session)
+            return ConnectionHandler("http", "ws", self.ipv4, self.port, proxy, session)
         else:
-            return ConnectionHandler("http", "ws", "[{0}]".format(self.ipv6), self.port, session)
+            return ConnectionHandler("http", "ws", "[{0}]".format(self.ipv6), self.port, proxy, session)
 
     def __str__(self):
         return self.inline()

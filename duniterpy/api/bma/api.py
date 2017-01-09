@@ -43,7 +43,7 @@ ERROR_SCHEMA = {
 class ConnectionHandler(object):
     """Helper class used by other API classes to ease passing server connection information."""
 
-    def __init__(self, http_scheme, ws_scheme, server, port, session=None):
+    def __init__(self, http_scheme, ws_scheme, server, port, proxy=None, session=None):
         """
         Init instance of connection handler
 
@@ -54,6 +54,7 @@ class ConnectionHandler(object):
         self.http_scheme = http_scheme
         self.ws_scheme = ws_scheme
         self.server = server
+        self.proxy = proxy
         self.port = port
         self.session = session
 
@@ -152,7 +153,8 @@ class API(object):
         logging.debug("Request : {0}".format(self.reverse_url(self.connection_handler.http_scheme, path)))
         with aiohttp.Timeout(15):
             url = self.reverse_url(self.connection_handler.http_scheme, path)
-            response = await self.connection_handler.session.get(url, params=kwargs,headers=self.headers)
+            response = await self.connection_handler.session.get(url, params=kwargs, headers=self.headers,
+                                                                 proxy=self.connection_handler.proxy)
             if response.status != 200:
                 try:
                     error_data = parse_error(await response.text())
@@ -177,7 +179,8 @@ class API(object):
             response = await self.connection_handler.session.post(
                 self.reverse_url(self.connection_handler.http_scheme, path),
                 data=kwargs,
-                headers=self.headers
+                headers=self.headers,
+                proxy=self.connection_handler.proxy
             )
             return response
 
@@ -189,4 +192,4 @@ class API(object):
         :rtype: aiohttp.ClientWebSocketResponse
         """
         url = self.reverse_url(self.connection_handler.ws_scheme, path)
-        return self.connection_handler.session.ws_connect(url)
+        return self.connection_handler.session.ws_connect(url, proxy=self.connection_handler.proxy)
