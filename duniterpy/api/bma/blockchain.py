@@ -16,19 +16,164 @@
 # Caner Candan <caner@candan.fr>, http://caner.candan.fr
 #
 
-from duniterpy.api.bma import API, logging
+from duniterpy.api.bma import API, logging, parse_response
 
 logger = logging.getLogger("duniter/blockchain")
 
+URL_PATH = 'blockchain'
 
-class Blockchain(API):
-    def __init__(self, connection_handler, module='blockchain'):
-        super(Blockchain, self).__init__(connection_handler, module)
+BLOCK_SCHEMA = {
+    "type": "object",
+    "properties": {
+        "version": {
+            "type": "number"
+        },
+        "currency": {
+            "type": "string"
+        },
+        "nonce": {
+            "type": "number"
+        },
+        "number": {
+            "type": "number"
+        },
+        "time": {
+            "type": "number"
+        },
+        "medianTime": {
+            "type": "number"
+        },
+        "dividend": {
+            "type": ["number", "null"]
+        },
+        "monetaryMass": {
+            "type": ["number", "null"]
+        },
+        "issuer": {
+            "type": "string"
+        },
+        "previousHash": {
+            "type": ["string", "null"]
+        },
+        "previousIssuer": {
+            "type": ["string", "null"]
+        },
+        "membersCount": {
+            "type": "number"
+        },
+        "hash": {
+            "type": "string"
+        },
+        "inner_hash": {
+            "type": "string"
+        },
+        "identities": {
+            "type": "array",
+            "items": {
+                "type": "string"
+            }
+        },
+        "joiners": {
+            "type": "array",
+            "items": {
+                "type": "string"
+            }
+        },
+        "leavers": {
+            "type": "array",
+            "items": {
+                "type": "string"
+            }
+        },
+        "revoked": {
+            "type": "array",
+            "items": {
+                "type": "string"
+            }
+        },
+        "excluded": {
+            "type": "array",
+            "items": {
+                "type": "string"
+            }
+        },
+        "certifications": {
+            "type": "array",
+            "items": {
+                "type": "string"
+            }
+        },
+        "transactions": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "signatures": {
+                        "type": "array"
+                    },
+                    "version": {
+                        "type": "number"
+                    },
+                    "currency": {
+                        "type": "string"
+                    },
+                    "issuers": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    "inputs": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    "unlocks": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    "outputs": {
+                        "type": "array",
+                        "item": {
+                            "type": "string"
+                        }
+                    }
+                },
+                "required": ["signatures", "version", "currency", "issuers", "inputs", "outputs"]
+            }
+        },
+        "signature": {
+            "type": "string"
+        },
+    },
+    "required": ["version", "currency", "nonce", "number", "time", "medianTime", "dividend", "monetaryMass",
+                 "issuer", "previousHash", "previousIssuer", "membersCount", "hash", "inner_hash", "identities",
+                 "joiners", "leavers", "excluded", "certifications", "transactions", "signature"]
+}
 
+BLOCK_NUMBERS_SCHEMA = {
+    "type": "object",
+    "properties": {
+        "result": {
+            "type": "object",
+            "properties": {
+                "blocks": {
+                    "type": "array",
+                    "items": {
+                        "type": "number"
+                    }
+                },
+            },
+            "required": ["blocks"]
+        }
+    },
+    "required": ["result"]
+}
 
-class Parameters(Blockchain):
-    """GET the blockchain parameters used by this node."""
-    schema = {
+PARAMETERS_SCHEMA = {
         "type": "object",
         "properties":
         {
@@ -77,26 +222,17 @@ class Parameters(Blockchain):
               "dtDiffEval": {
                   "type": "number"
               },
-              "blocksRot": {
-                  "type": "number"
-              },
               "percentRot": {
                   "type": "number"
               },
             },
         "required": ["currency", "c", "dt", "ud0","sigPeriod", "sigValidity", "sigQty", "xpercent", "sigStock",
                      "sigWindow", "msValidity","stepMax", "medianTimeBlocks",
-                     "avgGenTime", "dtDiffEval", "blocksRot", "percentRot"]
+                     "avgGenTime", "dtDiffEval", "percentRot"]
     }
 
-    async def __get__(self, session, **kwargs):
-        r = await self.requests_get(session, '/parameters', **kwargs)
-        return (await self.parse_response(r))
 
-
-class Membership(Blockchain):
-    """GET/POST a Membership document."""
-    schema = {
+MEMBERSHIPS_SCHEMA = {
         "type": "object",
         "properties":
         {
@@ -137,346 +273,216 @@ class Membership(Blockchain):
         "required": ["pubkey", "uid", "sigDate", "memberships"]
     }
 
-    def __init__(self, connection_handler, search=None):
-        super().__init__(connection_handler)
-        self.search = search
 
-    async def __post__(self, session, **kwargs):
-        assert 'membership' in kwargs
+BLOCKS_SCHEMA = {
+    "type": "array",
+    "items": BLOCK_SCHEMA
+}
 
-        r = await self.requests_post(session, '/membership', **kwargs)
-        return r
-
-    async def __get__(self, session, **kwargs):
-        assert self.search is not None
-        r = await self.requests_get(session, '/memberships/%s' % self.search, **kwargs)
-        return (await self.parse_response(r))
-
-
-class Block(Blockchain):
-    """GET/POST a block from/to the blockchain."""
-
-    schema = {
-        "type": "object",
-        "properties": {
-            "version": {
-                "type": "number"
-            },
-            "currency": {
-                "type": "string"
-            },
-            "nonce": {
-                "type": "number"
-            },
-            "number": {
-                "type": "number"
-            },
-            "time": {
-                "type": "number"
-            },
-            "medianTime": {
-                "type": "number"
-            },
-            "dividend": {
-                "type": ["number", "null"]
-            },
-            "monetaryMass": {
-                "type": ["number", "null"]
-            },
-            "issuer": {
-                "type": "string"
-            },
-            "previousHash": {
-                "type": ["string", "null"]
-            },
-            "previousIssuer": {
-                "type": ["string", "null"]
-            },
-            "membersCount": {
-                "type": "number"
-            },
-            "hash": {
-                "type": "string"
-            },
-            "inner_hash": {
-                "type": "string"
-            },
-            "identities": {
-                "type": "array",
-                "items": {
-                    "type": "string"
-                }
-            },
-            "joiners": {
-                "type": "array",
-                "items": {
-                    "type": "string"
-                }
-            },
-            "leavers": {
-                "type": "array",
-                "items": {
-                    "type": "string"
-                }
-            },
-            "revoked": {
-                "type": "array",
-                "items": {
-                    "type": "string"
-                }
-            },
-            "excluded": {
-                "type": "array",
-                "items": {
-                    "type": "string"
-                }
-            },
-            "certifications": {
-                "type": "array",
-                "items": {
-                    "type": "string"
-                }
-            },
-            "transactions": {
-                "type": "array",
-                "items": {
-                    "type": "object",
-                    "properties": {
-                        "signatures": {
-                            "type": "array"
-                        },
-                        "version": {
-                            "type": "number"
-                        },
-                        "currency": {
-                            "type": "string"
-                        },
-                        "issuers": {
-                            "type": "array",
-                            "items": {
-                                "type": "string"
-                            }
-                        },
-                        "inputs": {
-                            "type": "array",
-                            "items": {
-                                "type": "string"
-                            }
-                        },
-                        "unlocks": {
-                            "type": "array",
-                            "items": {
-                                "type": "string"
-                            }
-                        },
-                        "outputs": {
-                            "type": "array",
-                            "item": {
-                                "type": "string"
-                            }
-                        }
-                    },
-                    "required": ["signatures", "version", "currency", "issuers", "inputs", "outputs"]
-                }
-            },
-            "signature": {
-                "type": "string"
-            },
+HARDSHIP_SCHEMA = {
+    "type": "object",
+    "properties": {
+        "block": {
+            "type": "number"
         },
-        "required": ["version", "currency", "nonce", "number", "time", "medianTime", "dividend", "monetaryMass",
-                     "issuer", "previousHash", "previousIssuer", "membersCount", "hash", "inner_hash", "identities",
-                     "joiners", "leavers", "excluded", "certifications", "transactions", "signature"]
-    }
-
-    def __init__(self, connection_handler, number=None):
-        """
-        Use the number parameter in order to select a block number.
-
-        Arguments:
-        - `number`: block number to select
-        """
-
-        super(Block, self).__init__(connection_handler)
-
-        self.number = number
-
-    async def __get__(self, session, **kwargs):
-        assert self.number is not None
-        r = await self.requests_get(session, '/block/%d' % self.number, **kwargs)
-        return (await self.parse_response(r))
-
-    async def __post__(self, session, **kwargs):
-        assert 'block' in kwargs
-        assert 'signature' in kwargs
-
-        r = await self.requests_post(session, '/block', **kwargs)
-        return r
+        "level": {
+            "type": "number"
+        }
+    },
+    "required": ["block", "level"]
+}
 
 
-class Current(Blockchain):
-    """GET, same as block/[number], but return last accepted block."""
+async def parameters(connection):
+    """
+    GET the blockchain parameters used by this node
 
-    schema = Block.schema
+    :param duniterpy.api.bma.ConnectionHandler connection: Connection handler instance
+    :rtype: dict
+    """
+    client = API(connection, URL_PATH)
+    r = await client.requests_get('/parameters')
+    return await parse_response(r, PARAMETERS_SCHEMA)
 
-    async def __get__(self, session, **kwargs):
-        r = await self.requests_get(session, '/current', **kwargs)
-        return (await self.parse_response(r))
+async def memberships(connection, search):
+    """
+    GET list of Membership documents for UID/Public key
 
+    :param duniterpy.api.bma.ConnectionHandler connection: Connection handler instance
+    :param str search: UID/Public key
+    :rtype: dict
+    """
+    client = API(connection, URL_PATH)
 
+    r = await client.requests_get('/memberships/%s' % search)
+    return await parse_response(r, MEMBERSHIPS_SCHEMA)
 
-class Blocks(Blockchain):
-    """GET list of blocks from the blockchain."""
+async def membership(connection, membership):
+    """
+    POST a Membership document
 
-    schema = {
-        "type": "array",
-        "items": Block.schema
-    }
+    :param duniterpy.api.bma.ConnectionHandler connection: Connection handler instance
+    :param str membership: Membership signed raw document
+    :rtype: aiohttp.ClientResponse
+    """
+    client = API(connection, URL_PATH)
 
-    def __init__(self, connection_handler, count=None, from_=None):
-        """
-        Use the number parameter in order to select a block number.
+    return await client.requests_post('/membership', membership=membership)
 
-        Arguments:
-        - `count`: block count to select
-        - `from_`: first block to select
-        """
+async def block(connection, number=0, block=None, signature=None):
+    """
+    GET/POST a block from/to the blockchain
 
-        super(Blocks, self).__init__(connection_handler)
-        self.count = count
-        self.from_ = from_
+    :param duniterpy.api.bma.ConnectionHandler connection: Connection handler instance
+    :param int number: Block number to get
+    :param dict block: Block document to post
+    :param str signature: Signature of the block document issuer
+    :rtype: dict
+    """
 
-    async def __get__(self, session, **kwargs):
-        assert self.count is not None
-        assert self.from_ is not None
-        r = await self.requests_get(session, '/blocks/%d/%d' % (self.count, self.from_), **kwargs)
-        return (await self.parse_response(r))
+    client = API(connection, URL_PATH)
+    # POST block
+    if block is not None and signature is not None:
+        return await client.requests_post('/block', block=block, signature=signature)
 
+    # GET block
+    r = await client.requests_get('/block/%d' % number)
+    data = await parse_response(r, BLOCK_SCHEMA)
+    return data
 
-class Hardship(Blockchain):
-    """GET hardship level for given member's fingerprint for writing next block."""
-    schema = {
-        "type": "object",
-        "properties": {
-          "block": {
-              "type": "number"
-          },
-          "level": {
-              "type": "number"
-          }
-        },
-        "required": ["block", "level"]
-    }
+async def current(connection):
+    """
+    GET, return last accepted block
 
-    def __init__(self, connection_handler, fingerprint):
-        """
-        Use the number parameter in order to select a block number.
+    :param duniterpy.api.bma.ConnectionHandler connection: Connection handler instance
+    :rtype: dict
+    """
 
-        Arguments:
-        - `fingerprint`: member fingerprint
-        """
+    client = API(connection, URL_PATH)
 
-        super(Hardship, self).__init__(connection_handler)
-
-        self.fingerprint = fingerprint
-
-    async def __get__(self, session, **kwargs):
-        assert self.fingerprint is not None
-        r = await self.requests_get(session, '/hardship/%s' % self.fingerprint.upper(), **kwargs)
-        return (await self.parse_response(r))
-
-
-class Newcomers(Blockchain):
-    """GET, return block numbers containing newcomers."""
-
-    schema = {
-        "type": "object",
-        "properties": {
-            "result":{
-                "type": "object",
-                "properties": {
-                        "blocks": {
-                        "type": "array",
-                        "items": {
-                            "type": "number"
-                        }
-                    },
-                },
-                "required": ["blocks"]
-            }
-        },
-        "required": ["result"]
-    }
-
-    async def __get__(self, session, **kwargs):
-        r = await self.requests_get(session, '/with/newcomers', **kwargs)
-        return await self.parse_response(r)
+    r = await client.requests_get('/current')
+    return await parse_response(r, BLOCK_SCHEMA)
 
 
-class Certifications(Blockchain):
-    """GET, return block numbers containing certifications."""
+async def blocks(connection, count, start):
+    """
+    GET list of blocks from the blockchain
 
-    schema = Newcomers.schema
+    :param duniterpy.api.bma.ConnectionHandler connection: Connection handler instance
+    :param int count: Number of blocks
+    :param int start: First block number
+    :rtype: list
+    """
 
-    async def __get__(self, session, **kwargs):
-        r = await self.requests_get(session, '/with/certs', **kwargs)
-        return await self.parse_response(r)
+    client = API(connection, URL_PATH)
+    assert type(count) is int
+    assert type(start) is int
+    r = await client.requests_get('/blocks/%d/%d' % (count, start))
+    return await parse_response(r, BLOCKS_SCHEMA)
 
+async def hardship(connection, pubkey):
+    """
+    GET hardship level for given member's public key for writing next block
 
-class Joiners(Blockchain):
-    """GET, return block numbers containing joiners."""
+    :param duniterpy.api.bma.ConnectionHandler connection: Connection handler instance
+    :param str pubkey:  Public key of the member
+    :rtype: dict
+    """
+    client = API(connection, URL_PATH)
+    r = await client.requests_get('/hardship/%s' % pubkey)
+    return await parse_response(r, HARDSHIP_SCHEMA)
 
-    schema = Newcomers.schema
+async def newcomers(connection):
+    """
+    GET, return block numbers containing newcomers
 
-    async def __get__(self, session, **kwargs):
-        r = await self.requests_get(session, '/with/joiners', **kwargs)
-        return await self.parse_response(r)
+    :param duniterpy.api.bma.ConnectionHandler connection: Connection handler instance
+    :rtype: dict
+    """
 
+    client = API(connection, URL_PATH)
+    r = await client.requests_get('/with/newcomers')
+    return await parse_response(r, BLOCK_NUMBERS_SCHEMA)
 
-class Actives(Blockchain):
-    """GET, return block numbers containing actives."""
+async def certifications(connection):
+    """
+    GET, return block numbers containing certifications
 
-    schema = Newcomers.schema
+    :param duniterpy.api.bma.ConnectionHandler connection: Connection handler instance
+    :rtype: dict
+    """
 
-    async def __get__(self, session, **kwargs):
-        r = await self.requests_get(session, '/with/actives', **kwargs)
-        return await self.parse_response(r)
+    client = API(connection, URL_PATH)
+    r = await client.requests_get('/with/certs')
+    return await parse_response(r, BLOCK_NUMBERS_SCHEMA)
 
+async def joiners(connection):
+    """
+    GET, return block numbers containing joiners
 
-class Leavers(Blockchain):
-    """GET, return block numbers containing leavers."""
+    :param duniterpy.api.bma.ConnectionHandler connection: Connection handler instance
+    :rtype: dict
+    """
 
-    schema = Newcomers.schema
+    client = API(connection, URL_PATH)
+    r = await client.requests_get('/with/joiners')
+    return await parse_response(r, BLOCK_NUMBERS_SCHEMA)
 
-    async def __get__(self, session, **kwargs):
-        r = await self.requests_get(session, '/with/leavers', **kwargs)
-        return await self.parse_response(r)
+async def actives(connection):
+    """
+    GET, return block numbers containing actives
 
+    :param duniterpy.api.bma.ConnectionHandler connection: Connection handler instance
+    :rtype: dict
+    """
 
-class Excluded(Blockchain):
-    """GET, return block numbers containing excluded."""
+    client = API(connection, URL_PATH)
+    r = await client.requests_get('/with/actives')
+    return await parse_response(r, BLOCK_NUMBERS_SCHEMA)
 
-    schema = Newcomers.schema
+async def leavers(connection):
+    """
+    GET, return block numbers containing leavers
 
-    async def __get__(self, session, **kwargs):
-        r = await self.requests_get(session, '/with/excluded', **kwargs)
-        return await self.parse_response(r)
+    :param duniterpy.api.bma.ConnectionHandler connection: Connection handler instance
+    :rtype: dict
+    """
 
+    client = API(connection, URL_PATH)
+    r = await client.requests_get('/with/leavers')
+    return await parse_response(r, BLOCK_NUMBERS_SCHEMA)
 
-class UD(Blockchain):
-    """GET, return block numbers containing universal dividend."""
+async def excluded(connection):
+    """
+    GET, return block numbers containing excluded
 
-    schema = Newcomers.schema
+    :param duniterpy.api.bma.ConnectionHandler connection: Connection handler instance
+    :rtype: dict
+    """
 
-    async def __get__(self, session, **kwargs):
-        r = await self.requests_get(session, '/with/ud', **kwargs)
-        return await self.parse_response(r)
+    client = API(connection, URL_PATH)
+    r = await client.requests_get('/with/excluded')
+    return await parse_response(r, BLOCK_NUMBERS_SCHEMA)
 
+async def ud(connection):
+    """
+    GET, return block numbers containing universal dividend
 
-class TX(Blockchain):
-    """GET, return block numbers containing transactions."""
+    :param duniterpy.api.bma.ConnectionHandler connection: Connection handler instance
+    :rtype: dict
+    """
+    client = API(connection, URL_PATH)
+    r = await client.requests_get('/with/ud')
+    return await parse_response(r, BLOCK_NUMBERS_SCHEMA)
 
-    schema = Newcomers.schema
+async def tx(connection):
+    """
+    GET, return block numbers containing transactions
 
-    async def __get__(self, session, **kwargs):
-        r = await self.requests_get(session, '/with/tx', **kwargs)
-        return await self.parse_response(r)
+    :param duniterpy.api.bma.ConnectionHandler connection: Connection handler instance
+    :rtype: dict
+    """
+
+    client = API(connection, URL_PATH)
+    r = await client.requests_get('/with/tx')
+    return await parse_response(r, BLOCK_NUMBERS_SCHEMA)

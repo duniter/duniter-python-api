@@ -1,8 +1,9 @@
 import asyncio
 import aiohttp
+import getpass
 
 import duniterpy.api.bma as bma
-from duniterpy.documents import BMAEndpoint, BlockUID, SelfCertification, Membership
+from duniterpy.documents import BMAEndpoint, BlockUID, Identity, Membership
 from duniterpy.key import SigningKey
 
 
@@ -13,29 +14,11 @@ from duniterpy.key import SigningKey
 # Here we use the BASIC_MERKLED_API
 BMA_ENDPOINT = "BASIC_MERKLED_API cgeek.fr 9330"
 
-# Credentials should be prompted or kept in a separate secure file
-# create a file with the salt on the first line and the password on the second line
-# the script will load them from the file
-FROM_CREDENTIALS_FILE = "/home/username/.credentials.txt"
-
-# Your unique identifier in the Web of Trust
-UID = "MyIdentity"
-
 ################################################
 
 # Latest duniter-python-api is asynchronous and you have to create an aiohttp session to send request
 # ( http://pythonhosted.org/aiohttp )
 AIOHTTP_SESSION = aiohttp.ClientSession()
-
-async def get_current_block(connection):
-    """
-    Get the current block data
-
-    :param bma.api.ConnectionHandler connection: Connection handler
-    :rtype: dict
-    """
-    # Here we request for the path blockchain/block/N
-    return await bma.blockchain.Current(connection).get(AIOHTTP_SESSION)
 
 
 def get_identity_document(current_block, uid, salt, password):
@@ -47,7 +30,7 @@ def get_identity_document(current_block, uid, salt, password):
     :param str salt: Passphrase of the account
     :param str password: Password of the account
 
-    :rtype: SelfCertification
+    :rtype: Identity
     """
 
     # get current block BlockStamp
@@ -57,7 +40,7 @@ def get_identity_document(current_block, uid, salt, password):
     key = SigningKey(salt, password)
 
     # create identity document
-    identity = SelfCertification(
+    identity = Identity(
         version=2,
         currency=current_block['currency'],
         pubkey=key.pubkey,
@@ -72,13 +55,13 @@ def get_identity_document(current_block, uid, salt, password):
     return identity
 
 
-def get_membership_document(type, current_block, identity, salt, password):
+def get_membership_document(mtype, current_block, identity, salt, password):
     """
     Get a Membership document
 
-    :param str type: "IN" to ask for membership or "OUT" to cancel membership
+    :param str mtype: "IN" to ask for membership or "OUT" to cancel membership
     :param dict current_block: Current block data
-    :param SelfCertification identity: Identity document
+    :param Identity identity: Identity document
     :param str salt: Passphrase of the account
     :param str password: Password of the account
 
@@ -97,7 +80,7 @@ def get_membership_document(type, current_block, identity, salt, password):
         currency=current_block['currency'],
         issuer=key.pubkey,
         membership_ts=timestamp,
-        membership_type=type,
+        membership_type=mtype,
         uid=identity.uid,
         identity_ts=identity.timestamp,
         signature=None
@@ -113,16 +96,19 @@ async def main():
     Main code
     """
     # connection handler from BMA endpoint
-    connection = BMAEndpoint.from_inline(BMA_ENDPOINT).conn_handler()
+    connection = BMAEndpoint.from_inline(BMA_ENDPOINT).conn_handler(AIOHTTP_SESSION)
 
     # capture current block to get version and currency and blockstamp
-    current_block = await get_current_block(connection)
+    current_block = await bma.blockchain.current(connection)
 
-    # load credentials from a text file
-    salt, password = open(FROM_CREDENTIALS_FILE).readlines()
+    # prompt hidden user entry
+    salt = getpass.getpass("Enter your passphrase (salt): ")
 
-    # cleanup newlines
-    salt, password = salt.strip(), password.strip()
+    # prompt hidden user entry
+    password = getpass.getpass("Enter your password: ")
+
+    # prompt hidden user entry
+    UID = getpass.getpass("Enter your UID: ")
 
     # create our signed identity document
     identity = get_identity_document(current_block, UID, salt, password)
@@ -131,10 +117,13 @@ async def main():
     membership = get_membership_document("IN", current_block, identity, salt, password)
 
     # send the membership document to the node
-    data = {membership: membership.signed_raw()}
-    response = await bma.blockchain.Membership(connection).post(AIOHTTP_SESSION, **data)
+    response = await bma.blockchain.membership(connection, membership.signed_raw())
 
-    print(response)
+    if response.status == 200:
+        print(await response.text())
+    else:
+        print("Error while publishing membership : {0}".format(await response.text()))
+
     response.close()
 
 

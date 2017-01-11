@@ -17,53 +17,57 @@
 #
 
 from duniterpy.api.bma import API, logging
-from duniterpy.api.bma.blockchain import Block as _Block
-from duniterpy.api.bma.network.peering import Peers as _Peers
+from duniterpy.api.bma.blockchain import BLOCK_SCHEMA
 
 logger = logging.getLogger("duniter/ws")
 
-
-class Websocket(API):
-    def __init__(self, connection_handler, module='ws'):
-        super(Websocket, self).__init__(connection_handler, module)
+URL_PATH = 'ws'
 
 
-class Block(Websocket):
-    """Connect to block websocket."""
-    schema = _Block.schema
-
-    def connect(self, session):
-        r = self.connect_ws(session, '/block')
-        return r
-
-
-class Peer(Websocket):
-    """Connect to block websocket."""
-    schema = {
-        "type": "object",
-        "properties": {
-            "version": {
-                "type": "number"
-            },
-            "currency": {
-                "type": "string"
-            },
-            "pubkey": {
-                "type": "string"
-            },
-            "endpoints": {
-                "type": "array",
-                "items": {
-                    "type": "string"
-                }
-            },
-            "signature": {
+WS_BLOCk_SCHEMA = BLOCK_SCHEMA
+WS_PEER_SCHEMA = {
+    "type": "object",
+    "properties": {
+        "version": {
+            "type": "number"
+        },
+        "currency": {
+            "type": "string"
+        },
+        "pubkey": {
+            "type": "string"
+        },
+        "endpoints": {
+            "type": "array",
+            "items": {
                 "type": "string"
             }
         },
-        "required": ["version", "currency", "pubkey", "endpoints", "signature"]
-    }
+        "signature": {
+            "type": "string"
+        }
+    },
+    "required": ["version", "currency", "pubkey", "endpoints", "signature"]
+}
 
-    def connect(self, session):
-        r = self.connect_ws(session, '/peer')
-        return r
+
+def block(connection):
+    """
+    Connect to block websocket
+
+    :param duniterpy.api.bma.ConnectionHandler connection: Connection handler instance
+    :rtype: aiohttp.ClientWebSocketResponse
+    """
+    client = API(connection, URL_PATH)
+    return client.connect_ws('/block')
+
+
+def peer(connection):
+    """
+    Connect to peer websocket
+
+    :param duniterpy.api.bma.ConnectionHandler connection: Connection handler instance
+    :rtype: aiohttp.ClientWebSocketResponse
+    """
+    client = API(connection, URL_PATH)
+    return client.connect_ws('/peer')

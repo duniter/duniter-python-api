@@ -26,5 +26,5 @@ import logging
 logger = logging.getLogger("duniter")
 
 
-from .api import API, ConnectionHandler
+from .api import API, ConnectionHandler, parse_error, parse_response, parse_text
 from . import network, blockchain, tx, wot, node, ud, ws

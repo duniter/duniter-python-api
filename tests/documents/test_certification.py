@@ -5,7 +5,7 @@ Created on 6 déc. 2014
 '''
 
 import unittest
-from duniterpy.documents.certification import SelfCertification, Certification, Revocation
+from duniterpy.documents.certification import Identity, Certification, Revocation
 from duniterpy.documents import Block, BlockUID
 
 selfcert_inlines = ["HnFcSms8jzwngtVomTTnzudZx7SHUQY8sVE1y8yBmULk:\
@@ -31,13 +31,13 @@ class Test_Certification(unittest.TestCase):
     def test_self_certification_from_inline(self):
         version = 2
         currency = "beta_brousouf"
-        selfcert = SelfCertification.from_inline(version, currency, selfcert_inlines[0])
+        selfcert = Identity.from_inline(version, currency, selfcert_inlines[0])
         self.assertEqual(selfcert.pubkey, "HnFcSms8jzwngtVomTTnzudZx7SHUQY8sVE1y8yBmULk")
         self.assertEqual(selfcert.signatures[0], "h/H8tDIEbfA4yxMQcvfOXVDQhi1sUa9qYtPKrM59Bulv97ouwbAvAsEkC1Uyit1IOpeAV+CQQs4IaAyjE8F1Cw==")
         self.assertEqual(str(selfcert.timestamp), "32-DB30D958EE5CB75186972286ED3F4686B8A1C2CD")
         self.assertEqual(selfcert.uid, "lolcat")
 
-        selfcert = SelfCertification.from_inline(version, currency, selfcert_inlines[1])
+        selfcert = Identity.from_inline(version, currency, selfcert_inlines[1])
         self.assertEqual(selfcert.pubkey, "RdrHvL179Rw62UuyBrqy2M1crx7RPajaViBatS59EGS")
         self.assertEqual(selfcert.signatures[0], "Ah55O8cvdkGS4at6AGOKUjy+wrFwAq8iKRJ5xLIb6Xdi3M8WfGOUdMjwZA6GlSkdtlMgEhQPm+r2PMebxKrCBg==")
         self.assertEqual(str(selfcert.timestamp), "36-1076F10A7397715D2BEE82579861999EA1F274AC")
@@ -51,7 +51,7 @@ class Test_Certification(unittest.TestCase):
         timestamp = BlockUID(32, "DB30D958EE5CB75186972286ED3F4686B8A1C2CD")
         signature = "J3G9oM5AKYZNLAB5Wx499w61NuUoS57JVccTShUbGpCMjCqj9yXXqNq7dyZpDWA6BxipsiaMZhujMeBfCznzyci"
 
-        selfcert = SelfCertification(version, currency, issuer, uid, timestamp, signature)
+        selfcert = Identity(version, currency, issuer, uid, timestamp, signature)
 
         result = """Version: 2
 Type: Identity
@@ -62,6 +62,9 @@ Timestamp: 32-DB30D958EE5CB75186972286ED3F4686B8A1C2CD
 J3G9oM5AKYZNLAB5Wx499w61NuUoS57JVccTShUbGpCMjCqj9yXXqNq7dyZpDWA6BxipsiaMZhujMeBfCznzyci
 """
         self.assertEqual(selfcert.signed_raw(), result)
+
+        from_raw = Identity.from_signed_raw(result)
+        self.assertEqual(from_raw.signed_raw(), result)
 
     def test_certifications_from_inline(self):
         version = 2
@@ -87,8 +90,8 @@ J3G9oM5AKYZNLAB5Wx499w61NuUoS57JVccTShUbGpCMjCqj9yXXqNq7dyZpDWA6BxipsiaMZhujMeBf
         pubkey_to = "HgTTJLAQ5sqfknMq7yLPZbehtuLSsKj9CxWN7k8QvYJd"
         timestamp = BlockUID(36, "1076F10A7397715D2BEE82579861999EA1F274AC")
         signature = "SoKwoa8PFfCDJWZ6dNCv7XstezHcc2BbKiJgVDXv82R5zYR83nis9dShLgWJ5w48noVUHimdngzYQneNYSMV3rk"
-        selfcert = SelfCertification(version, currency, pubkey_to, "lolcat",
-                                     BlockUID(32, "DB30D958EE5CB75186972286ED3F4686B8A1C2CD"),
+        selfcert = Identity(version, currency, pubkey_to, "lolcat",
+                            BlockUID(32, "DB30D958EE5CB75186972286ED3F4686B8A1C2CD"),
                                      "J3G9oM5AKYZNLAB5Wx499w61NuUoS57JVccTShUbGpCMjCqj9yXXqNq7dyZpDWA6BxipsiaMZhujMeBfCznzyci")
 
         certification = Certification(version, currency, pubkey_from, pubkey_to, timestamp, signature)
@@ -106,7 +109,8 @@ SoKwoa8PFfCDJWZ6dNCv7XstezHcc2BbKiJgVDXv82R5zYR83nis9dShLgWJ5w48noVUHimdngzYQneN
 """
         self.assertEqual(certification.signed_raw(selfcert), result)
 
-
+        from_raw = Certification.from_signed_raw(certification.signed_raw(selfcert))
+        self.assertEqual(from_raw.signed_raw(selfcert), result)
 
     def test_revokation_from_inline(self):
         version = 2
@@ -122,8 +126,8 @@ SoKwoa8PFfCDJWZ6dNCv7XstezHcc2BbKiJgVDXv82R5zYR83nis9dShLgWJ5w48noVUHimdngzYQneN
         pubkey = "HgTTJLAQ5sqfknMq7yLPZbehtuLSsKj9CxWN7k8QvYJd"
         signature = "SoKwoa8PFfCDJWZ6dNCv7XstezHcc2BbKiJgVDXv82R5zYR83nis9dShLgWJ5w48noVUHimdngzYQneNYSMV3rk"
         revokation = Revocation(version, currency, pubkey, signature)
-        selfcert = SelfCertification(version, currency, pubkey, "lolcat",
-                                     BlockUID(32, "DB30D958EE5CB75186972286ED3F4686B8A1C2CD"),
+        selfcert = Identity(version, currency, pubkey, "lolcat",
+                            BlockUID(32, "DB30D958EE5CB75186972286ED3F4686B8A1C2CD"),
                                      "J3G9oM5AKYZNLAB5Wx499w61NuUoS57JVccTShUbGpCMjCqj9yXXqNq7dyZpDWA6BxipsiaMZhujMeBfCznzyci")
 
         result = """Version: 2

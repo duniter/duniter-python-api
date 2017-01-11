@@ -15,362 +15,366 @@
 # Authors:
 # Caner Candan <caner@candan.fr>, http://caner.candan.fr
 #
-
-from duniterpy.api.bma import API, logging
+from duniterpy.api.bma import API, logging, parse_response
 
 logger = logging.getLogger("duniter/wot")
 
-
-class WOT(API):
-    def __init__(self, connection_handler, module='wot'):
-        super(WOT, self).__init__(connection_handler, module)
+URL_PATH = 'wot'
 
 
-class Add(WOT):
-    """POST Identity data."""
-
-    async def __post__(self, session, **kwargs):
-        assert 'identity' in kwargs
-
-        r = await self.requests_post(session, '/add', **kwargs)
-        return r
-
-
-class Certify(WOT):
-    """POST Certification data."""
-
-    async def __post__(self, session, **kwargs):
-        assert 'cert' in kwargs
-
-        r = await self.requests_post(session, '/certify', **kwargs)
-        return r
-
-
-class Revoke(WOT):
-    """POST Public key data."""
-
-    async def __post__(self, session, **kwargs):
-        assert 'revocation' in kwargs
-
-        r = await self.requests_post(session, '/revoke', **kwargs)
-        return r
-
-
-class Lookup(WOT):
-    """GET Public key data."""
-    schema = {
-        "type": "object",
-        "definitions": {
-            "meta_data": {
+CERTIFICATIONS_SCHEMA = {
+    "type": "object",
+    "properties": {
+        "pubkey": {
+            "type": "string"
+        },
+        "uid": {
+            "type": "string"
+        },
+        "isMember": {
+            "type": "boolean"
+        },
+        "certifications": {
+            "type": "array",
+            "items": {
                 "type": "object",
                 "properties": {
-                    "timestamp": {
+                    "pubkey": {
                         "type": "string"
-                    }
-                }
-            },
-        },
-        "properties": {
-            "partial": {
-                "type": "boolean"
-            },
-            "results": {
-                "type": "array",
-                "items": {
-                    "type": "object",
-                    "properties": {
-                        "pubkey": {
-                            "type": "string"
-                        }
                     },
-                    "uids": {
-                        "type": "array",
-                        "items": {
-                            "type": "object",
-                            "properties": {
-                                "uid": {
-                                    "type": "string"
-                                },
-                                "meta": {
-                                    "$ref": "#/definitions/meta_data"
-                                },
-                                "self": {
-                                    "type": "string",
-                                },
-                                "revokation_sig": {
-                                    "type": "string"
-                                },
-                                "revoked": {
-                                    "type": "boolean"
-                                },
-                                "others": {
-                                    "type": "array",
-                                    "items": {
-                                        "type": "object",
-                                        "properties": {
-                                            "pubkey": {
-                                                "type": "string",
-                                            },
-                                            "meta": {
-                                                "$ref": "#/definitions/meta_data"
-                                            },
-                                            "signature": {
-                                                "type": "string"
-                                            }
-                                        }
-                                    }
-                                }
+                    "uid": {
+                        "type": "string"
+                    },
+                    "cert_time": {
+                        "type": "object",
+                        "properties": {
+                            "block": {
+                                "type": "number"
                             },
-                            "required": ["uid", "meta", "self", "revokation_sig", "revoked", "others"]
-                        }
-                    },
-                    "signed": {
-                        "type": "array",
-                        "items": {
-                            "type": "object",
-                            "properties": {
-                                "uid": {
-                                    "type": "string"
-                                },
-                                "pubkey": {
-                                    "type": "string"
-                                },
-                                "meta": {
-                                    "$ref": "#/definitions/meta_data"
-                                },
-                                "signature": {
-                                    "type": "string"
-                                },
-                                "revokation_sig": {
-                                    "type": "string"
-                                },
-                                "revoked": {
-                                    "type": "boolean"
-                                }
-                            },
-                            "required": ["uid", "pubkey", "meta", "revokation_sig", "revoked", "signature"]
-                        }
-                    },
-                    "required": ["uids", "signed"]
-                }
-            }
-        },
-        "required": ["partial", "results"]
-    }
-
-    def __init__(self, connection_handler, search, module='wot'):
-        super(WOT, self).__init__(connection_handler, module)
-
-        self.search = search
-
-    async def __get__(self, session, **kwargs):
-        assert self.search is not None
-
-        r = await self.requests_get(session, '/lookup/%s' % self.search, **kwargs)
-        return await self.parse_response(r)
-
-
-class CertifiersOf(WOT):
-    """GET Certification data over a member."""
-
-    schema = {
-        "type": "object",
-        "properties": {
-            "pubkey": {
-                "type": "string"
-            },
-            "uid": {
-                "type": "string"
-            },
-            "isMember": {
-                "type": "boolean"
-            },
-            "certifications": {
-                "type": "array",
-                "items": {
-                    "type": "object",
-                    "properties": {
-                        "pubkey": {
-                            "type": "string"
-                        },
-                        "uid": {
-                            "type": "string"
-                        },
-                        "cert_time": {
-                            "type": "object",
-                            "properties": {
-                                "block": {
-                                    "type": "number"
-                                },
-                                "medianTime": {
-                                    "type": "number"
-                                }
-                            },
-                            "required": ["block", "medianTime"]
-                        },
-                        "sigDate": {
-                            "type": "string"
-                        },
-                        "written": {
-                            "oneOf": [
-                                {
-                                    "type": "object",
-                                    "properties": {
-                                        "number": {
-                                            "type": "number",
-                                        },
-                                        "hash": {
-                                            "type": "string"
-                                        }
-                                    },
-                                    "required": ["number", "hash"]
-                                },
-                                {
-                                    "type": "null"
-                                }
-                            ]
-                        },
-                        "isMember": {
-                            "type": "boolean"
-                        },
-                        "wasMember": {
-                            "type": "boolean"
-                        },
-                        "signature": {
-                            "type": "string"
-                        }
-                    },
-                    "required": ["pubkey", "uid", "cert_time", "sigDate",
-                                 "written", "wasMember", "isMember", "signature"]
-                }
-            }
-        },
-        "required": ["pubkey", "uid", "isMember", "certifications"]
-    }
-
-    def __init__(self, connection_handler, search, module='wot'):
-        super(WOT, self).__init__(connection_handler, module)
-
-        self.search = search
-
-    async def __get__(self, session, **kwargs):
-        assert self.search is not None
-
-        r = await self.requests_get(session, '/certifiers-of/%s' % self.search, **kwargs)
-        return await self.parse_response(r)
-
-
-class CertifiedBy(WOT):
-    """GET Certification data from a member."""
-
-    schema = CertifiersOf.schema
-
-    def __init__(self, connection_handler, search, module='wot'):
-        super(WOT, self).__init__(connection_handler, module)
-
-        self.search = search
-
-    async def __get__(self, session, **kwargs):
-        assert self.search is not None
-
-        r = await self.requests_get(session, '/certified-by/%s' % self.search, **kwargs)
-        return await self.parse_response(r)
-
-
-class Members(WOT):
-    """GET List all current members of the Web of Trust."""
-    schema = {
-        "type": "object",
-        "properties": {
-            "results": {
-                "type": "array",
-                "items": {
-                    "type": "object",
-                    "properties": {
-                        "pubkey": {
-                            "type": "string"
-                        }
-                    },
-                    "required": ["pubkey"]
-                }
-            }
-        },
-        "required": ["results"]
-    }
-
-    def __init__(self, connection_handler, module='wot'):
-        super(WOT, self).__init__(connection_handler, module)
-
-    async def __get__(self, session, **kwargs):
-        r = await self.requests_get(session, '/members', **kwargs)
-        return await self.parse_response(r)
-
-
-class Requirements(WOT):
-    """
-    Get list of requirements for a given pubkey
-    """
-    schema = {
-        "type": "object",
-        "properties": {
-            "identities": {
-                "type": "array",
-                "items": {
-                    "type": "object",
-                    "properties": {
-                        "pubkey": {
-                            "type": "string"
-                        },
-                        "uid": {
-                            "type": "string"
-                        },
-                        "meta": {
-                            "type": "object",
-                            "properties": {
-                                "timestamp": {
-                                    "type": "string"
-                                }
+                            "medianTime": {
+                                "type": "number"
                             }
                         },
-                        "outdistanced": {
-                            "type": "boolean"
-                        },
-                        "certifications": {
-                            "type": "array",
-                            "items": {
+                        "required": ["block", "medianTime"]
+                    },
+                    "sigDate": {
+                        "type": "string"
+                    },
+                    "written": {
+                        "oneOf": [
+                            {
                                 "type": "object",
                                 "properties": {
-                                    "from": {
-                                        "type": "string"
+                                    "number": {
+                                        "type": "number",
                                     },
-                                    "to": {
+                                    "hash": {
                                         "type": "string"
-                                    },
-                                    "expiresIn": {
-                                        "type": "number"
                                     }
+                                },
+                                "required": ["number", "hash"]
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ]
+                    },
+                    "isMember": {
+                        "type": "boolean"
+                    },
+                    "wasMember": {
+                        "type": "boolean"
+                    },
+                    "signature": {
+                        "type": "string"
+                    }
+                },
+                "required": ["pubkey", "uid", "cert_time", "sigDate",
+                             "written", "wasMember", "isMember", "signature"]
+            }
+        }
+    },
+    "required": ["pubkey", "uid", "isMember", "certifications"]
+}
+
+
+MEMBERS_SCHEMA = {
+    "type": "object",
+    "properties": {
+        "results": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "pubkey": {
+                        "type": "string"
+                    }
+                },
+                "required": ["pubkey"]
+            }
+        }
+    },
+    "required": ["results"]
+}
+
+
+REQUIREMENTS_SCHEMA = {
+    "type": "object",
+    "properties": {
+        "identities": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "pubkey": {
+                        "type": "string"
+                    },
+                    "uid": {
+                        "type": "string"
+                    },
+                    "meta": {
+                        "type": "object",
+                        "properties": {
+                            "timestamp": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "outdistanced": {
+                        "type": "boolean"
+                    },
+                    "certifications": {
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "properties": {
+                                "from": {
+                                    "type": "string"
+                                },
+                                "to": {
+                                    "type": "string"
+                                },
+                                "expiresIn": {
+                                    "type": "number"
                                 }
                             }
-                        },
-                        "membershipPendingExpiresIn": {
-                            "type": "number"
-                        },
-                        "membershipExpiresIn": {
-                            "type": "number"
                         }
+                    },
+                    "membershipPendingExpiresIn": {
+                        "type": "number"
+                    },
+                    "membershipExpiresIn": {
+                        "type": "number"
                     }
                 }
             }
         }
     }
+}
 
-    def __init__(self, connection_handler, search, module='wot'):
-        super(WOT, self).__init__(connection_handler, module)
+LOOKUP_SCHEMA = {
+    "type": "object",
+    "definitions": {
+        "meta_data": {
+            "type": "object",
+            "properties": {
+                "timestamp": {
+                    "type": "string"
+                }
+            }
+        },
+    },
+    "properties": {
+        "partial": {
+            "type": "boolean"
+        },
+        "results": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "pubkey": {
+                        "type": "string"
+                    }
+                },
+                "uids": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "uid": {
+                                "type": "string"
+                            },
+                            "meta": {
+                                "$ref": "#/definitions/meta_data"
+                            },
+                            "self": {
+                                "type": "string",
+                            },
+                            "revokation_sig": {
+                                "type": "string"
+                            },
+                            "revoked": {
+                                "type": "boolean"
+                            },
+                            "others": {
+                                "type": "array",
+                                "items": {
+                                    "type": "object",
+                                    "properties": {
+                                        "pubkey": {
+                                            "type": "string",
+                                        },
+                                        "meta": {
+                                            "$ref": "#/definitions/meta_data"
+                                        },
+                                        "signature": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            }
+                        },
+                        "required": ["uid", "meta", "self", "revokation_sig", "revoked", "others"]
+                    }
+                },
+                "signed": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "uid": {
+                                "type": "string"
+                            },
+                            "pubkey": {
+                                "type": "string"
+                            },
+                            "meta": {
+                                "$ref": "#/definitions/meta_data"
+                            },
+                            "signature": {
+                                "type": "string"
+                            },
+                            "revokation_sig": {
+                                "type": "string"
+                            },
+                            "revoked": {
+                                "type": "boolean"
+                            }
+                        },
+                        "required": ["uid", "pubkey", "meta", "revokation_sig", "revoked", "signature"]
+                    }
+                },
+                "required": ["uids", "signed"]
+            }
+        }
+    },
+    "required": ["partial", "results"]
+}
 
-        self.search = search
+async def add(connection, identity):
+    """
+    POST identity document
 
-    async def __get__(self, session, **kwargs):
-        assert self.search is not None
+    :param duniterpy.api.bma.ConnectionHandler connection: Connection handler instance
+    :param duniterpy.documents.certification.Identity identity: Identity document
+    :rtype: aiohttp.ClientResponse
+    """
+    client = API(connection, URL_PATH)
 
-        r = await self.requests_get(session, '/requirements/%s' % self.search, **kwargs)
-        return await self.parse_response(r)
+    r = await client.requests_post('/add', identity=identity)
+    return r
+
+async def certify(connection, cert):
+    """
+    POST certification document
+
+    :param duniterpy.api.bma.ConnectionHandler connection: Connection handler instance
+    :param duniterpy.documents.certification.Certification cert: Certification document
+    :rtype: aiohttp.ClientResponse
+    """
+    client = API(connection, URL_PATH)
+
+    r = await client.requests_post('/certify', cert=cert)
+    return r
+
+async def revoke(connection, revocation):
+    """
+    POST revocation document
+
+    :param duniterpy.api.bma.ConnectionHandler connection: Connection handler instance
+    :param duniterpy.documents.certification.Revocation revocation: Certification document
+    :rtype: aiohttp.ClientResponse
+    """
+    client = API(connection, URL_PATH)
+
+    r = await client.requests_post('/revoke', revocation=revocation)
+    return r
+
+
+async def lookup(connection, search):
+    """
+    GET UID/Public key data
+
+    :param duniterpy.api.bma.ConnectionHandler connection: Connection handler instance
+    :param str search: UID or public key
+    :rtype: dict
+    """
+    client = API(connection, URL_PATH)
+
+    r = await client.requests_get('/lookup/%s' % search)
+    return await parse_response(r, LOOKUP_SCHEMA)
+
+
+async def certifiers_of(connection, search):
+    """
+    GET UID/Public key certifiers
+
+    :param duniterpy.api.bma.ConnectionHandler connection: Connection handler instance
+    :param str search: UID or public key
+    :rtype: dict
+    """
+
+    client = API(connection, URL_PATH)
+
+    r = await client.requests_get('/certifiers-of/%s' % search)
+    return await parse_response(r, CERTIFICATIONS_SCHEMA)
+
+async def certified_by(connection, search):
+    """
+    GET identities certified by UID/Public key
+
+    :param duniterpy.api.bma.ConnectionHandler connection: Connection handler instance
+    :param str search: UID or public key
+    :rtype: dict
+    """
+    client = API(connection, URL_PATH)
+
+    r = await client.requests_get('/certified-by/%s' % search)
+    return await parse_response(r, CERTIFICATIONS_SCHEMA)
+
+async def members(connection):
+    """
+    GET list of all current members of the Web of Trust
+
+    :param duniterpy.api.bma.ConnectionHandler connection: Connection handler instance
+    :rtype: dict
+    """
+    client = API(connection, URL_PATH)
+
+    r = await client.requests_get('/members')
+    return await parse_response(r, MEMBERS_SCHEMA)
+
+
+async def requirements(connection, search):
+    """
+    GET list of requirements for a given UID/Public key
+
+    :param duniterpy.api.bma.ConnectionHandler connection: Connection handler instance
+    :param str search: UID or public key
+    :rtype: dict
+    """
+    client = API(connection, URL_PATH)
+
+    r = await client.requests_get('/requirements/%s' % search)
+    return await parse_response(r, REQUIREMENTS_SCHEMA)

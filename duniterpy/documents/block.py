@@ -1,11 +1,12 @@
 from .document import Document, MalformedDocumentError
-from .certification import SelfCertification, Certification, Revocation
+from .certification import Identity, Certification, Revocation
 from .membership import Membership
 from .transaction import Transaction
 from .constants import pubkey_regex, block_id_regex, block_hash_regex
 
 import re
 import hashlib
+import base64
 
 
 def block_uid(value):
@@ -131,7 +132,7 @@ The class Block handles Block documents.
     re_time = re.compile("Time: ([0-9]+)\n")
     re_mediantime = re.compile("MedianTime: ([0-9]+)\n")
     re_universaldividend = re.compile("UniversalDividend: ([0-9]+)\n")
-    re_unitbase = re.compile("UnitBase: ([0-9])\n")
+    re_unitbase = re.compile("UnitBase: ([0-9]+)\n")
     re_issuer = re.compile("Issuer: ({pubkey_regex})\n".format(pubkey_regex=pubkey_regex))
     re_issuers_frame = re.compile("IssuersFrame: ([0-9]+)\n")
     re_issuers_frame_var = re.compile("IssuersFrameVar: (0|-?[1-9]\d{0,18})\n")
@@ -140,6 +141,8 @@ The class Block handles Block documents.
     re_previousissuer = re.compile("PreviousIssuer: ({pubkey_regex})\n".format(pubkey_regex=pubkey_regex))
     re_parameters = re.compile("Parameters: ([0-9]+\.[0-9]+):([0-9]+):([0-9]+):([0-9]+):([0-9]+):([0-9]+):\
 ([0-9]+):([0-9]+):([0-9]+\.[0-9]+):([0-9]+):([0-9]+):([0-9]+):([0-9]+):([0-9]+):([0-9]+):([0-9]+\.[0-9]+)\n")
+    re_parameters_v10 = re.compile("Parameters: ([0-9]+\.[0-9]+):([0-9]+):([0-9]+):([0-9]+):([0-9]+):([0-9]+):\
+([0-9]+):([0-9]+):([0-9]+\.[0-9]+):([0-9]+):([0-9]+):([0-9]+):([0-9]+):([0-9]+):([0-9]+\.[0-9]+)\n")
     re_memberscount = re.compile("MembersCount: ([0-9]+)\n")
     re_identities = re.compile("Identities:\n")
     re_joiners = re.compile("Joiners:\n")
@@ -208,7 +211,7 @@ The class Block handles Block documents.
         :param str prev_issuer: the previous block issuer
         :param tuple parameters: the parameters of the currency. Should only be present in block 0.
         :param int members_count: the number of members found in this block
-        :param list[duniterpy.documents.SelfCertification] identities: the self certifications declared in this block
+        :param list[duniterpy.documents.Identity] identities: the self certifications declared in this block
         :param list[duniterpy.documents.Membership] joiners: the joiners memberships via "IN" documents
         :param list[duniterpy.documents.Membership] actives: renewed memberships via "IN" documents
         :param list[duniterpy.documents.Membership] leavers: the leavers memberships via "OUT" documents
@@ -321,7 +324,10 @@ The class Block handles Block documents.
         parameters = None
         if number == 0:
             try:
-                parameters = Block.re_parameters.match(lines[n]).groups()
+                if version >= 10:
+                    parameters = Block.re_parameters_v10.match(lines[n]).groups()
+                else:
+                    parameters = Block.re_parameters.match(lines[n]).groups()
                 n += 1
             except AttributeError:
                 raise MalformedDocumentError("Parameters")
@@ -341,7 +347,7 @@ The class Block handles Block documents.
         if Block.re_identities.match(lines[n]) is not None:
             n += 1
             while Block.re_joiners.match(lines[n]) is None:
-                selfcert = SelfCertification.from_inline(version, currency, lines[n])
+                selfcert = Identity.from_inline(version, currency, lines[n])
                 identities.append(selfcert)
                 n += 1
 
@@ -458,7 +464,7 @@ DifferentIssuersCount: {2}
 """.format(self.issuers_frame, self.issuers_frame_var, self.different_issuers_count)
 
         if self.number == 0:
-            str_params = ":".join(self.parameters)
+            str_params = ":".join([str(p) for p in self.parameters])
             doc += "Parameters: {0}\n".format(str_params)
         else:
             doc += "PreviousHash: {0}\n\
@@ -510,3 +516,33 @@ Nonce: {nonce}
 {signature}
 """.format(inner_hash=self.inner_hash, nonce=self.noonce, signature=self.signatures[0])
         return hashlib.sha256(doc_str.encode('ascii')).hexdigest().upper()
+
+    def computed_inner_hash(self):
+        doc = self.signed_raw()
+        inner_doc = '\n'.join(doc.split('\n')[:-2]) + '\n'
+        return hashlib.sha256(inner_doc.encode("ascii")).hexdigest().upper()
+
+    def sign(self, keys):
+        """
+        Sign the current document.
+        Warning : current signatures will be replaced with the new ones.
+        """
+        key = keys[0]
+        signed = self.raw()[-2:]
+        signing = base64.b64encode(key.signature(bytes(signed, 'ascii')))
+        self.signatures = [signing.decode("ascii")]
+
+    def __eq__(self, other):
+        return self.blockUID == other.blockUID
+
+    def __lt__(self, other):
+        return self.blockUID < other.blockUID
+
+    def __gt__(self, other):
+        return self.blockUID > other.blockUID
+
+    def __le__(self, other):
+        return self.blockUID <= other.blockUID
+
+    def __ge__(self, other):
+        return self.blockUID >= other.blockUID

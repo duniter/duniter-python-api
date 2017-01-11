@@ -16,24 +16,64 @@
 # Caner Candan <caner@candan.fr>, http://caner.candan.fr
 #
 
-from duniterpy.api.bma import API, logging
+from duniterpy.api.bma import logging, API, parse_response
 
 logger = logging.getLogger("duniter/ud")
 
+URL_PATH = 'ud'
 
-class Ud(API):
-    def __init__(self, conn_handler, module='ud'):
-        super(Ud, self).__init__(conn_handler, module)
+UD_SCHEMA = {
+    "type": "object",
+    "properties": {
+        "currency": {
+            "type": "string"
+        },
+        "pubkey": {
+            "type": "string"
+        },
+        "history": {
+            "type": "object",
+            "properties": {
+                "history": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "block_number": {
+                                "type": "number"
+                            },
 
+                            "consumed": {
+                                "type": "boolean"
+                            },
+                            "time": {
+                                "type": "number"
+                            },
+                            "amount": {
+                                "type": "number"
+                            },
+                            "base": {
+                                "type": "number"
+                            },
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "required": ["currency", "pubkey", "history"]
+}
 
-class History(Ud):
-    """Get UD history."""
+async def history(connection, pubkey):
+    """
+    Get UD history of a member account
 
-    def __init__(self, conn_handler, pubkey, module='ud'):
-        super(Ud, self).__init__(conn_handler, module)
-        self.pubkey = pubkey
+    :param duniterpy.api.bma.ConnectionHandler connection: Connection handler instance
+    :param str pubkey:  Public key of the member
 
-    async def __get__(self, session, **kwargs):
-        assert self.pubkey is not None
-        r = await self.requests_get(session, '/history/%s' % self.pubkey, **kwargs)
-        return await r.json()
+    :rtype: dict
+    """
+    client = API(connection, URL_PATH)
+
+    r = await client.requests_get('/history/%s' % pubkey)
+    return await parse_response(r, UD_SCHEMA)

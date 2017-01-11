@@ -3,10 +3,10 @@ import base64
 import logging
 
 from .document import Document, MalformedDocumentError
-from .constants import pubkey_regex, signature_regex, block_id_regex, block_uid_regex
+from .constants import pubkey_regex, signature_regex, block_id_regex, block_uid_regex, uid_regex
 
 
-class SelfCertification(Document):
+class Identity(Document):
     """
     A document describing a self certification.
     """
@@ -15,8 +15,19 @@ class SelfCertification(Document):
                            .format(pubkey_regex=pubkey_regex,
                                    signature_regex=signature_regex,
                                    block_uid_regex=block_uid_regex))
+    re_type = re.compile("Type: (Identity)")
+    re_issuer = re.compile("Issuer: ({pubkey_regex})\n".format(pubkey_regex=pubkey_regex))
+    re_unique_id = re.compile("UniqueID: ({uid_regex})\n".format(uid_regex=uid_regex))
     re_uid = re.compile("UID:([^\n]+)\n")
-    re_timestamp = re.compile("META:TS:({block_uid_regex})\n".format(block_uid_regex=block_uid_regex))
+    re_meta_ts = re.compile("META:TS:({block_uid_regex})\n".format(block_uid_regex=block_uid_regex))
+    re_timestamp = re.compile("Timestamp: ({block_uid_regex})\n".format(block_uid_regex=block_uid_regex))
+
+    fields_parsers = {**Document.fields_parsers, **{
+        "Type": re_type,
+        "UniqueID": re_unique_id,
+        "Issuer": re_issuer,
+        "Timestamp": re_timestamp
+    }}
 
     def __init__(self, version, currency, pubkey, uid, ts, signature):
         """
@@ -41,13 +52,42 @@ class SelfCertification(Document):
     def from_inline(cls, version, currency, inline):
         from .block import BlockUID
 
-        selfcert_data = SelfCertification.re_inline.match(inline)
+        selfcert_data = Identity.re_inline.match(inline)
         if selfcert_data is None:
             raise MalformedDocumentError("Inline self certification")
         pubkey = selfcert_data.group(1)
         signature = selfcert_data.group(2)
         ts = BlockUID.from_str(selfcert_data.group(3))
         uid = selfcert_data.group(4)
+
+        return cls(version, currency, pubkey, uid, ts, signature)
+
+    @classmethod
+    def from_signed_raw(cls, signed_raw):
+        from .block import BlockUID
+
+        n = 0
+        lines = signed_raw.splitlines(True)
+
+        version = int(Identity.parse_field("Version", lines[n]))
+        n += 1
+
+        Identity.parse_field("Type", lines[n])
+        n += 1
+
+        currency = Identity.parse_field("Currency", lines[n])
+        n += 1
+
+        pubkey = Identity.parse_field("Issuer", lines[n])
+        n += 1
+
+        uid = Identity.parse_field("UniqueID", lines[n])
+        n += 1
+
+        ts = BlockUID.from_str(Identity.parse_field("Timestamp", lines[n]))
+        n += 1
+
+        signature = Identity.parse_field("Signature", lines[n])
 
         return cls(version, currency, pubkey, uid, ts, signature)
 
@@ -84,6 +124,23 @@ class Certification(Document):
                                 signature_regex=signature_regex
                     ))
     re_timestamp = re.compile("META:TS:({block_uid_regex})\n".format(block_uid_regex=block_uid_regex))
+    re_type = re.compile("Type: (Certification)")
+    re_issuer = re.compile("Issuer: ({pubkey_regex})\n".format(pubkey_regex=pubkey_regex))
+    re_idty_issuer = re.compile("IdtyIssuer: ({pubkey_regex})\n".format(pubkey_regex=pubkey_regex))
+    re_idty_unique_id = re.compile("IdtyUniqueID: ({uid_regex})\n".format(uid_regex=uid_regex))
+    re_idty_timestamp = re.compile("IdtyTimestamp: ({block_uid_regex})\n".format(block_uid_regex=block_uid_regex))
+    re_idty_signature = re.compile("IdtySignature: ({signature_regex})\n".format(signature_regex=signature_regex))
+    re_cert_timestamp = re.compile("CertTimestamp: ({block_uid_regex})\n".format(block_uid_regex=block_uid_regex))
+
+    fields_parsers = {**Document.fields_parsers, **{
+        "Type": re_type,
+        "Issuer": re_issuer,
+        "CertTimestamp": re_cert_timestamp,
+        "IdtyIssuer": re_idty_issuer,
+        "IdtyUniqueID": re_idty_unique_id,
+        "IdtySignature": re_idty_signature,
+        "IdtyTimestamp": re_idty_timestamp
+    }}
 
     def __init__(self, version, currency, pubkey_from, pubkey_to,
                  timestamp, signature):
@@ -101,6 +158,44 @@ class Certification(Document):
         self.pubkey_from = pubkey_from
         self.pubkey_to = pubkey_to
         self.timestamp = timestamp
+
+    @classmethod
+    def from_signed_raw(cls, signed_raw):
+        from .block import BlockUID
+
+        n = 0
+        lines = signed_raw.splitlines(True)
+
+        version = int(Identity.parse_field("Version", lines[n]))
+        n += 1
+
+        Certification.parse_field("Type", lines[n])
+        n += 1
+
+        currency = Certification.parse_field("Currency", lines[n])
+        n += 1
+
+        pubkey_from = Certification.parse_field("Issuer", lines[n])
+        n += 1
+
+        pubkey_to = Certification.parse_field("IdtyIssuer", lines[n])
+        n += 1
+
+        Certification.parse_field("IdtyUniqueID", lines[n])
+        n += 1
+
+        BlockUID.from_str(Certification.parse_field("IdtyTimestamp", lines[n]))
+        n += 1
+
+        Certification.parse_field("IdtySignature", lines[n])
+        n += 1
+
+        timestamp = BlockUID.from_str(Certification.parse_field("CertTimestamp", lines[n]))
+        n += 1
+
+        signature = Certification.parse_field("Signature", lines[n])
+
+        return cls(version, currency, pubkey_from, pubkey_to, timestamp, signature)
 
     @classmethod
     def from_inline(cls, version, currency, blockhash, inline):
@@ -130,7 +225,7 @@ class Certification(Document):
     def raw(self, selfcert):
         """
 
-        :param SelfCertification selfcert:
+        :param Identity selfcert:
         :return:
         """
         return """Version: {version}
@@ -273,7 +368,7 @@ class Revocation(Document):
         signature = Revocation.parse_field("IdtySignature", lines[n])
         n += 1
 
-        return SelfCertification(version, currency, issuer, unique_id, timestamp, signature)
+        return Identity(version, currency, issuer, unique_id, timestamp, signature)
 
     def inline(self):
         return "{0}:{1}".format(self.pubkey, self.signatures[0])
@@ -281,7 +376,7 @@ class Revocation(Document):
     def raw(self, selfcert):
         """
 
-        :param SelfCertification selfcert:
+        :param Identity selfcert:
         :return:
         """
         return """Version: {version}
