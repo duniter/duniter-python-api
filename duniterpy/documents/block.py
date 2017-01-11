@@ -142,6 +142,8 @@ The class Block handles Block documents.
     re_previousissuer = re.compile("PreviousIssuer: ({pubkey_regex})\n".format(pubkey_regex=pubkey_regex))
     re_parameters = re.compile("Parameters: ([0-9]+\.[0-9]+):([0-9]+):([0-9]+):([0-9]+):([0-9]+):([0-9]+):\
 ([0-9]+):([0-9]+):([0-9]+\.[0-9]+):([0-9]+):([0-9]+):([0-9]+):([0-9]+):([0-9]+):([0-9]+):([0-9]+\.[0-9]+)\n")
+    re_parameters_v10 = re.compile("Parameters: ([0-9]+\.[0-9]+):([0-9]+):([0-9]+):([0-9]+):([0-9]+):([0-9]+):\
+([0-9]+):([0-9]+):([0-9]+\.[0-9]+):([0-9]+):([0-9]+):([0-9]+):([0-9]+):([0-9]+):([0-9]+\.[0-9]+)\n")
     re_memberscount = re.compile("MembersCount: ([0-9]+)\n")
     re_identities = re.compile("Identities:\n")
     re_joiners = re.compile("Joiners:\n")
@@ -323,7 +325,10 @@ The class Block handles Block documents.
         parameters = None
         if number == 0:
             try:
-                parameters = Block.re_parameters.match(lines[n]).groups()
+                if version >= 10:
+                    parameters = Block.re_parameters_v10.match(lines[n]).groups()
+                else:
+                    parameters = Block.re_parameters.match(lines[n]).groups()
                 n += 1
             except AttributeError:
                 raise MalformedDocumentError("Parameters")
@@ -527,3 +532,18 @@ Nonce: {nonce}
         signed = self.raw()[-2:]
         signing = base64.b64encode(key.signature(bytes(signed, 'ascii')))
         self.signatures = [signing.decode("ascii")]
+
+    def __eq__(self, other):
+        return self.blockUID == other.blockUID
+
+    def __lt__(self, other):
+        return self.blockUID < other.blockUID
+
+    def __gt__(self, other):
+        return self.blockUID > other.blockUID
+
+    def __le__(self, other):
+        return self.blockUID <= other.blockUID
+
+    def __ge__(self, other):
+        return self.blockUID >= other.blockUID

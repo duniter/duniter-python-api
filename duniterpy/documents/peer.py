@@ -235,7 +235,7 @@ class SecuredBMAEndpoint(BMAEndpoint):
                             IPv6=(" {0}".format(self.ipv6) if self.ipv6 else ""),
                             PORT=(" {0}".format(self.port) if self.port else ""))
 
-    def conn_handler(self, session=None):
+    def conn_handler(self, session=None, proxy=None):
         """
         Return connection handler instance for the endpoint
 
@@ -243,8 +243,8 @@ class SecuredBMAEndpoint(BMAEndpoint):
         :rtype: ConnectionHandler
         """
         if self.server:
-            return ConnectionHandler("https", "wss", self.server, self.port, session)
+            return ConnectionHandler("https", "wss", self.server, self.port, proxy, session)
         elif self.ipv4:
-            return ConnectionHandler("https", "wss", self.ipv4, self.port, session)
+            return ConnectionHandler("https", "wss", self.ipv4, self.port, proxy, session)
         else:
-            return ConnectionHandler("https", "wss", "[{0}]".format(self.ipv6), self.port, session)
+            return ConnectionHandler("https", "wss", "[{0}]".format(self.ipv6), self.port, proxy, session)

@@ -222,16 +222,13 @@ PARAMETERS_SCHEMA = {
               "dtDiffEval": {
                   "type": "number"
               },
-              "blocksRot": {
-                  "type": "number"
-              },
               "percentRot": {
                   "type": "number"
               },
             },
         "required": ["currency", "c", "dt", "ud0","sigPeriod", "sigValidity", "sigQty", "xpercent", "sigStock",
                      "sigWindow", "msValidity","stepMax", "medianTimeBlocks",
-                     "avgGenTime", "dtDiffEval", "blocksRot", "percentRot"]
+                     "avgGenTime", "dtDiffEval", "percentRot"]
     }
 
 
