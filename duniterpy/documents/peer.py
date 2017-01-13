@@ -3,7 +3,7 @@ import re
 from ..api.bma import ConnectionHandler
 from .document import Document, MalformedDocumentError
 from . import BlockUID
-from .. import PROTOCOL_VERSION, MANAGED_API
+from .. import MANAGED_API
 from .constants import block_hash_regex, pubkey_regex
 
 
