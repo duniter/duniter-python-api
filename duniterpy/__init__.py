@@ -16,11 +16,9 @@
 # Caner Candan <caner@candan.fr>, http://caner.candan.fr
 #
 
-PROTOCOL_VERSION="6"
-
 MANAGED_API=["BASIC_MERKLED_API", "BMAS"]
 
-__author__      = 'Caner Candan & inso'
+__author__      = 'Caner Candan & inso & vit'
 __version__     = '0.30.8'
 __nonsense__    = 'duniter'
 
