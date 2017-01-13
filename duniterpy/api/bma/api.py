@@ -88,8 +88,8 @@ def parse_error(text):
         data = json.loads(text)
         jsonschema.validate(data, ERROR_SCHEMA)
         return data
-    except (TypeError, json.decoder.JSONDecodeError):
-        raise jsonschema.ValidationError("Could not parse json")
+    except (TypeError, json.decoder.JSONDecodeError) as e:
+        raise jsonschema.ValidationError("Could not parse json : {0}".format(str(e)))
 
 
 async def parse_response(response, schema):
@@ -159,7 +159,7 @@ class API(object):
                 try:
                     error_data = parse_error(await response.text())
                     raise DuniterError(error_data)
-                except TypeError:
+                except (TypeError, jsonschema.ValidationError):
                     raise ValueError('status code != 200 => %d (%s)' % (response.status, (await response.text())))
 
             return response
