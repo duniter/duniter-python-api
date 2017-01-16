@@ -13,6 +13,7 @@ UNHANDLED                            = 1002
 SIGNATURE_DOES_NOT_MATCH             = 1003
 ALREADY_UP_TO_DATE                   = 1004
 WRONG_DOCUMENT                       = 1005
+HTTP_LIMITATION                      = 1006
 
 HTTP_PARAM_PUBKEY_REQUIRED           = 1101
 HTTP_PARAM_IDENTITY_REQUIRED         = 1102
