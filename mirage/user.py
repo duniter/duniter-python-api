@@ -12,6 +12,8 @@ class User:
     """
     The user generates identities documents and sign them
     """
+    SCRYPT_PARAMS = ScryptParams(2 ** 12, 16, 1)
+
     currency = attr.ib(validator=attr.validators.instance_of(str))
     uid = attr.ib(validator=attr.validators.instance_of(str))
     key = attr.ib(validator=attr.validators.instance_of(SigningKey))
@@ -22,7 +24,7 @@ class User:
 
     @classmethod
     def create(cls, currency, uid, salt, password, blockstamp):
-        return cls(currency, uid, SigningKey(salt, password, ScryptParams(2 ** 12, 16, 1)), salt, password, blockstamp)
+        return cls(currency, uid, SigningKey(salt, password, User.SCRYPT_PARAMS), salt, password, blockstamp)
 
     def identity(self):
         identity = Identity(10, self.currency, self.key.pubkey, self.uid, self.blockstamp, [])
