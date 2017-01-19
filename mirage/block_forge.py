@@ -90,7 +90,7 @@ class BlockForge:
     def parameters(self):
         if not self.blocks:
             return 0.1, 86400, 100000, 10800, 40, 2629800, 31557600, 1, 604800, 604800,\
-                                                0.9, 15778800, 5, 12, 300, 25, 40, 0.66
+                                                0.9, 15778800, 5, 12, 300, 25, 0.66
 
     def monetary_mass(self, number=None):
         mass = 0
