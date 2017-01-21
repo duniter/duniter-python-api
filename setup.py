@@ -3,6 +3,7 @@ import duniterpy
 import os
 import re
 
+
 def which(program):
     """
     Detect whether or not a program is installed.

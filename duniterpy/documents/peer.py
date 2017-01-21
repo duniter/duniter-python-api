@@ -189,10 +189,10 @@ class BMAEndpoint(Endpoint):
         """
         if self.server:
             return ConnectionHandler("http", "ws", self.server, self.port, proxy, session)
-        elif self.ipv4:
-            return ConnectionHandler("http", "ws", self.ipv4, self.port, proxy, session)
-        else:
+        elif self.ipv6:
             return ConnectionHandler("http", "ws", "[{0}]".format(self.ipv6), self.port, proxy, session)
+        else:
+            return ConnectionHandler("http", "ws", self.ipv4, self.port, proxy, session)
 
     def __str__(self):
         return self.inline()
@@ -244,7 +244,7 @@ class SecuredBMAEndpoint(BMAEndpoint):
         """
         if self.server:
             return ConnectionHandler("https", "wss", self.server, self.port, proxy, session)
-        elif self.ipv4:
-            return ConnectionHandler("https", "wss", self.ipv4, self.port, proxy, session)
-        else:
+        elif self.ipv6:
             return ConnectionHandler("https", "wss", "[{0}]".format(self.ipv6), self.port, proxy, session)
+        else:
+            return ConnectionHandler("https", "wss", self.ipv4, self.port, proxy, session)
