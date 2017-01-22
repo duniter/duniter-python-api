@@ -394,7 +394,11 @@ class Node:
                         {
                             "pubkey": c.to_identity.pubkey,
                             "meta": {
-                                "block_number": c.block,
+                                "timestamp": str(c.to_identity.blockstamp),
+                            },
+                            "cert_time": {
+                                "block": c.block,
+                                "block_hash": str(self.forge.blocks[c.block].blockUID)
                             },
                             "uids": [c.to_identity.uid],
                             "isMember": c.to_identity.member,
