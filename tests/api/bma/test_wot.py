@@ -81,7 +81,7 @@ class Test_BMA_Wot(WebFunctionalSetupMixin, unittest.TestCase):
             _, srv, port, url = await self.create_server('GET', '/wot/lookup/pubkey', handler)
             with self.assertRaises(jsonschema.exceptions.ValidationError):
                 with aiohttp.ClientSession() as session:
-                    connection = BMAEndpoint("127.0.0.1", None, None, port).conn_handler(session)
+                    connection = next(BMAEndpoint("127.0.0.1", None, None, port).conn_handler(session))
                     await lookup(connection, 'pubkey')
 
         self.loop.run_until_complete(go())
@@ -105,7 +105,7 @@ class Test_BMA_Wot(WebFunctionalSetupMixin, unittest.TestCase):
             _, srv, port, url = await self.create_server('GET', '/wot/members', handler)
             with self.assertRaises(jsonschema.exceptions.ValidationError):
                 with aiohttp.ClientSession() as session:
-                    connection = BMAEndpoint("127.0.0.1", None, None, port).conn_handler(session)
+                    connection = next(BMAEndpoint("127.0.0.1", None, None, port).conn_handler(session))
                     await members(connection)
 
         self.loop.run_until_complete(go())
@@ -159,7 +159,7 @@ class Test_BMA_Wot(WebFunctionalSetupMixin, unittest.TestCase):
             _, srv, port, url = await self.create_server('GET', '/wot/certifiers-of/pubkey', handler)
             with self.assertRaises(jsonschema.exceptions.ValidationError):
                 with aiohttp.ClientSession() as session:
-                    connection = BMAEndpoint("127.0.0.1", None, None, port).conn_handler(session)
+                    connection = next(BMAEndpoint("127.0.0.1", None, None, port).conn_handler(session))
                     await certifiers_of(connection, 'pubkey')
 
         self.loop.run_until_complete(go())
@@ -191,7 +191,7 @@ class Test_BMA_Wot(WebFunctionalSetupMixin, unittest.TestCase):
             _, srv, port, url = await self.create_server('GET', '/wot/certifiers-of/pubkey', handler)
             with self.assertRaises(jsonschema.exceptions.ValidationError):
                 with aiohttp.ClientSession() as session:
-                    connection = BMAEndpoint("127.0.0.1", None, None, port).conn_handler(session)
+                    connection = next(BMAEndpoint("127.0.0.1", None, None, port).conn_handler(session))
                     await certifiers_of(connection, 'pubkey')
 
         self.loop.run_until_complete(go())
@@ -205,7 +205,7 @@ class Test_BMA_Wot(WebFunctionalSetupMixin, unittest.TestCase):
             _, srv, port, url = await self.create_server('GET', '/wot/certified-by/pubkey', handler)
             with self.assertRaises(jsonschema.exceptions.ValidationError):
                 with aiohttp.ClientSession() as session:
-                    connection = BMAEndpoint("127.0.0.1", None, None, port).conn_handler(session)
+                    connection = next(BMAEndpoint("127.0.0.1", None, None, port).conn_handler(session))
                     await certified_by(connection, 'pubkey')
 
         self.loop.run_until_complete(go())

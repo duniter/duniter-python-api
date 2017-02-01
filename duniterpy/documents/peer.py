@@ -185,14 +185,13 @@ class BMAEndpoint(Endpoint):
         Return connection handler instance for the endpoint
 
         :param aiohttp.ClientSession session: AIOHTTP client session instance
-        :rtype: ConnectionHandler
         """
         if self.server:
-            return ConnectionHandler("http", "ws", self.server, self.port, proxy, session)
+            yield ConnectionHandler("http", "ws", self.server, self.port, proxy, session)
         elif self.ipv6:
-            return ConnectionHandler("http", "ws", "[{0}]".format(self.ipv6), self.port, proxy, session)
+            yield ConnectionHandler("http", "ws", "[{0}]".format(self.ipv6), self.port, proxy, session)
         else:
-            return ConnectionHandler("http", "ws", self.ipv4, self.port, proxy, session)
+            yield ConnectionHandler("http", "ws", self.ipv4, self.port, proxy, session)
 
     def __str__(self):
         return self.inline()
@@ -243,8 +242,8 @@ class SecuredBMAEndpoint(BMAEndpoint):
         :rtype: ConnectionHandler
         """
         if self.server:
-            return ConnectionHandler("https", "wss", self.server, self.port, proxy, session)
+            yield ConnectionHandler("https", "wss", self.server, self.port, proxy, session)
         elif self.ipv6:
-            return ConnectionHandler("https", "wss", "[{0}]".format(self.ipv6), self.port, proxy, session)
+            yield ConnectionHandler("https", "wss", "[{0}]".format(self.ipv6), self.port, proxy, session)
         else:
-            return ConnectionHandler("https", "wss", self.ipv4, self.port, proxy, session)
+            yield ConnectionHandler("https", "wss", self.ipv4, self.port, proxy, session)

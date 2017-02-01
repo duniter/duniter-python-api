@@ -100,8 +100,8 @@ class Transaction(Document):
         :param int locktime:
         :param list[str] issuers:
         :param list[InputSource] inputs:
-        :param unlocks:
-        :param outputs:
+        :param list[Unlock] unlocks:
+        :param list[OutputSource] outputs:
         :param comment:
         :param signatures:
         """
