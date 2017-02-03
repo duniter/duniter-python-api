@@ -19,8 +19,9 @@ A python implementation of [duniter](https://github.com/duniter/duniter) API
 You can install duniter-python-api and all its dependencies via the following pip install :
 `pip install duniterpy`
 
-Please take a look at the document [HTTP API](https://github.com/duniter/duniter/blob/master/doc/HTTP_API.md) to learn about the API.
+Please take a look at the document [HTTP API](https://github.com/duniter/duniter-bma/blob/master/doc/API.md) to learn about the API.
 
 ## Documentation
 
+- [Documentation](https://github.com/duniter/duniter-python-api/wiki)
 - [Outdated documentation](https://ucoin-python-api.readthedocs.io/en/latest)
