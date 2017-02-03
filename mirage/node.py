@@ -11,6 +11,7 @@ import logging
 class Node:
     http = attr.ib()
     forge = attr.ib()
+    reject_next_post = attr.ib(default=False)
     _logger = attr.ib(default=attr.Factory(lambda: logging.getLogger('mirage')))
 
     @classmethod
@@ -48,18 +49,27 @@ class Node:
 
     async def add(self, request):
         data = await request.post()
+        if self.reject_next_post:
+            self.reject_next_post = False
+            return {'ucode': errors.UNHANDLED, 'message': "Rejected"}, 400
         identity = Identity.from_signed_raw(data["identity"])
         self.forge.pool.append(identity)
         return {}, 200
 
     async def process(self, request):
         data = await request.post()
+        if self.reject_next_post:
+            self.reject_next_post = False
+            return {'ucode': errors.UNHANDLED, 'message': "Rejected"}, 400
         transaction = Transaction.from_signed_raw(data["transaction"])
         self.forge.pool.append(transaction)
         return {}, 200
 
     async def certify(self, request):
         data = await request.post()
+        if self.reject_next_post:
+            self.reject_next_post = False
+            return {'ucode': errors.UNHANDLED, 'message': "Rejected"}, 400
         certification = Certification.from_signed_raw(data["cert"])
         self.forge.pool.append(certification)
         return {}, 200
@@ -133,7 +143,7 @@ class Node:
                 "revoked": [r.inline() for r in block.revoked],
                 "excluded": [i.inline() for i in block.excluded],
                 "certifications": [c.inline() for c in block.certifications],
-                "transactions": [t.inline() for t in block.transactions],
+                "transactions": [t.compact() for t in block.transactions],
                 "raw": block.raw()
             }, 200
         except IndexError:
