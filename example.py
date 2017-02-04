@@ -22,6 +22,11 @@ async def example(lp):
     node.forge.generate_dividend()
     node.forge.forge_block()
 
+    bob.send_money(10, node.forge.user_identities[bob.key.pubkey].sources, bob,
+                    node.forge.blocks[-1].blockUID, "Test receive")
+    node.forge.forge_block()
+
+
 
 logging.getLogger('mirage').setLevel(logging.DEBUG)
 lp = asyncio.get_event_loop()

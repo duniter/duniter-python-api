@@ -1,7 +1,4 @@
 from setuptools import setup, find_packages
-import os
-import re
-
 
 setup(
     name='duniter-mirage',
