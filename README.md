@@ -23,5 +23,6 @@ Please take a look at the document [HTTP API](https://github.com/duniter/duniter
 
 ## Documentation
 
-- [Documentation](https://github.com/duniter/duniter-python-api/wiki)
+- [Documentation](https://github.com/duniter/duniter-python-api/tree/master/docs)
+- [Examples](https://github.com/duniter/duniter-python-api/tree/master/examples)
 - [Outdated documentation](https://ucoin-python-api.readthedocs.io/en/latest)
