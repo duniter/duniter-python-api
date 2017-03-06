@@ -225,10 +225,19 @@ PARAMETERS_SCHEMA = {
               "percentRot": {
                   "type": "number"
               },
+              "udTime0": {
+                  "type": "number"
+              },
+              "udEffectiveTime0": {
+                  "type": "number"
+              },
+              "dtEffective": {
+                  "type": "number"
+              }
             },
         "required": ["currency", "c", "dt", "ud0","sigPeriod", "sigValidity", "sigQty", "xpercent", "sigStock",
                      "sigWindow", "msValidity","stepMax", "medianTimeBlocks",
-                     "avgGenTime", "dtDiffEval", "percentRot"]
+                     "avgGenTime", "dtDiffEval", "percentRot", "udTime0", "udEffectiveTime0", "dtEffective"]
     }
 
 
