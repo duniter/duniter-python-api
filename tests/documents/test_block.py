@@ -91,15 +91,19 @@ nY/MsFU2luiohLmSiOOimL1RIqbriOBgc22ua03Z2dhxtSJxKZeGNGDvl1jaXgmEBRnXU87yXbZ7ioOS
 """
 
 
-raw_block_zero = """Version: 2
+raw_block_zero = """Version: 10
 Type: Block
 Currency: zeta_brouzouf
 Number: 0
 PoWMin: 3
 Time: 1418077277
 MedianTime: 1418077277
+UnitBase: 0
 Issuer: HnFcSms8jzwngtVomTTnzudZx7SHUQY8sVE1y8yBmULk
-Parameters: 0.007376575:300:10:0:40:1209600:31536000:0:0.9:31536000:3:20:60:10:20:0.66
+IssuersFrame: 1
+IssuersFrameVar: 0
+DifferentIssuersCount: 0
+Parameters: 0.0488:86400:1000:432000:100:5259600:63115200:5:5259600:5259600:0.8:31557600:5:24:300:12:0.67:1488970800:1490094000:15778800
 MembersCount: 4
 Identities:
 HnFcSms8jzwngtVomTTnzudZx7SHUQY8sVE1y8yBmULk:h/H8tDIEbfA4yxMQcvfOXVDQhi1sUa9qYtPKrM59Bulv97ouwbAvAsEkC1Uyit1IOpeAV+CQQs4IaAyjE8F1Cw==:0-DA39A3EE5E6B4B0D3255BFEF95601890AFD80709:cgeek
@@ -351,7 +355,7 @@ class Test_Block(unittest.TestCase):
 
     def test_from_signed_raw_block_zero(self):
         block = Block.from_signed_raw(raw_block_zero)
-        self.assertEqual(block.version, 2)
+        self.assertEqual(block.version, 10)
         self.assertEqual(block.currency, "zeta_brouzouf")
         self.assertEqual(block.noonce, 2125)
         self.assertEqual(block.number, 0)
@@ -359,9 +363,9 @@ class Test_Block(unittest.TestCase):
         self.assertEqual(block.time, 1418077277)
         self.assertEqual(block.mediantime, 1418077277)
         self.assertEqual(block.issuer, "HnFcSms8jzwngtVomTTnzudZx7SHUQY8sVE1y8yBmULk")
-        self.assertEqual(block.parameters, ("0.007376575",
-                                            "300","10","0","40","1209600","31536000","0","0.9","31536000",
-                                            "3","20","60","10","20","0.66"))
+        self.assertEqual(block.parameters, ("0.0488","86400","1000","432000","100","5259600","63115200","5","5259600",
+                                            "5259600","0.8","31557600","5","24","300","12","0.67","1488970800",
+                                            "1490094000", "15778800"))
         self.assertEqual(block.members_count, 4)
         self.assertEqual(len(block.identities), 4)
         self.assertEqual(len(block.joiners), 4)
@@ -404,7 +408,7 @@ class Test_Block(unittest.TestCase):
         rendered_raw = block.signed_raw()
         from_rendered_raw = block.from_signed_raw(rendered_raw)
 
-        self.assertEqual(from_rendered_raw.version, 2)
+        self.assertEqual(from_rendered_raw.version, 10)
         self.assertEqual(from_rendered_raw.currency, "zeta_brouzouf")
         self.assertEqual(from_rendered_raw.noonce, 2125)
         self.assertEqual(from_rendered_raw.number, 0)

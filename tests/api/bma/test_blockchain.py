@@ -11,24 +11,28 @@ from duniterpy.api.bma.blockchain import API, parameters, block, current, hardsh
 class Test_BMA_blockchain(WebFunctionalSetupMixin, unittest.TestCase):
     def test_parameters(self):
         json_sample = {
-              "currency": "super_currency",
-              "c": 0.007376575,
-              "dt": 36000,
-              "ud0": 100,
-              "sigPeriod": 0,
-              "sigStock": 0,
-              "sigWindow": 1209600,
-              "sigValidity": 31536000,
-              "sigQty": 0,
-              "xpercent": 0.9,
-              "msValidity": 31536000,
-              "stepMax": 3,
-              "medianTimeBlocks": 20,
-              "avgGenTime": 960,
-              "dtDiffEval": 10,
-              "blocksRot": 20,
-              "percentRot": 0.66
-            }
+                          "currency": "g1",
+                          "c": 0.0488,
+                          "dt": 86400,
+                          "ud0": 1000,
+                          "sigPeriod": 432000,
+                          "sigStock": 100,
+                          "sigWindow": 5259600,
+                          "sigValidity": 63115200,
+                          "sigQty": 5,
+                          "idtyWindow": 5259600,
+                          "msWindow": 5259600,
+                          "xpercent": 0.8,
+                          "msValidity": 31557600,
+                          "stepMax": 5,
+                          "medianTimeBlocks": 24,
+                          "avgGenTime": 300,
+                          "dtDiffEval": 12,
+                          "percentRot": 0.67,
+                          "udTime0": 1488970800,
+                          "udReevalTime0": 1490094000,
+                          "dtReeval": 15778800
+        }
         jsonschema.validate(json_sample, PARAMETERS_SCHEMA)
 
     def test_parameters_bad(self):

@@ -228,16 +228,16 @@ PARAMETERS_SCHEMA = {
               "udTime0": {
                   "type": "number"
               },
-              "udEffectiveTime0": {
+              "udReevalTime0": {
                   "type": "number"
               },
-              "dtEffective": {
+              "dtReeval": {
                   "type": "number"
               }
             },
         "required": ["currency", "c", "dt", "ud0","sigPeriod", "sigValidity", "sigQty", "xpercent", "sigStock",
                      "sigWindow", "msValidity","stepMax", "medianTimeBlocks",
-                     "avgGenTime", "dtDiffEval", "percentRot", "udTime0", "udEffectiveTime0", "dtEffective"]
+                     "avgGenTime", "dtDiffEval", "percentRot", "udTime0", "udReevalTime0", "dtReeval"]
     }
 
 
