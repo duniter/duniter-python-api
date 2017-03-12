@@ -249,7 +249,11 @@ class Node:
             "avgGenTime": 300,
             "dtDiffEval": 25,
             "blocksRot": 40,
-            "percentRot": 0.66
+            "percentRot": 0.66,
+            "udTime0": 1488970800,
+            "udReevalTime0": 1490094000,
+            "dtReeval": 15778800
+
         }, 200
 
     async def with_ud(self, request):
