@@ -43,7 +43,7 @@ ERROR_SCHEMA = {
 class ConnectionHandler(object):
     """Helper class used by other API classes to ease passing server connection information."""
 
-    def __init__(self, http_scheme, ws_scheme, server, port, proxy=None, session=None):
+    def __init__(self, http_scheme, ws_scheme, server, port, path="", proxy=None, session=None):
         """
         Init instance of connection handler
 
@@ -57,6 +57,7 @@ class ConnectionHandler(object):
         self.proxy = proxy
         self.port = port
         self.session = session
+        self.path = path
 
     def __str__(self):
         return 'connection info: %s:%d' % (self.server, self.port)
@@ -136,11 +137,18 @@ class API(object):
         """
 
         server, port = self.connection_handler.server, self.connection_handler.port
+        if self.connection_handler.path:
+            url = '{scheme}://{server}:{port}/{path}/{module}'.format(scheme=scheme,
+                                                                  server=server,
+                                                                  port=port,
+                                                                  path=path,
+                                                                  module=self.module)
+        else:
+            url = '{scheme}://{server}:{port}/{module}'.format(scheme=scheme,
+                                                                  server=server,
+                                                                  port=port,
+                                                                  module=self.module)
 
-        url = '{scheme}://{server}:{port}/{module}'.format(scheme=scheme,
-                                                           server=server,
-                                                           port=port,
-                                                           module=self.module)
         return url + path
 
     async def requests_get(self, path, **kwargs):

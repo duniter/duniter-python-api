@@ -187,11 +187,11 @@ class BMAEndpoint(Endpoint):
         :param aiohttp.ClientSession session: AIOHTTP client session instance
         """
         if self.server:
-            yield ConnectionHandler("http", "ws", self.server, self.port, proxy, session)
+            yield ConnectionHandler("http", "ws", self.server, self.port, "", proxy, session)
         elif self.ipv6:
-            yield ConnectionHandler("http", "ws", "[{0}]".format(self.ipv6), self.port, proxy, session)
+            yield ConnectionHandler("http", "ws", "[{0}]".format(self.ipv6), self.port, "", proxy, session)
         else:
-            yield ConnectionHandler("http", "ws", self.ipv4, self.port, proxy, session)
+            yield ConnectionHandler("http", "ws", self.ipv4, self.port, "", proxy, session)
 
     def __str__(self):
         return self.inline()
@@ -208,13 +208,11 @@ class BMAEndpoint(Endpoint):
 
 
 class SecuredBMAEndpoint(BMAEndpoint):
-    re_inline = re.compile('^BMAS(?: ([a-z0-9-_.]*(?:.[a-zA-Z])))?(?: ((?:[0-9.]{1,4}){4}))?(?: ((?:[0-9a-f:]{4,5}){4,8}))?(?: ([0-9]+))$')
+    re_inline = re.compile('^BMAS(?: ([a-z0-9-_.]*(?:.[a-zA-Z])))?(?: ((?:[0-9.]{1,4}){4}))?(?: ((?:[0-9a-f:]{4,5}){4,8}))?(?: ([0-9]+))(?: ([/\w \.-]*)/?)?$')
 
-    def __init__(self, server, ipv4, ipv6, port):
-        self.server = server
-        self.ipv4 = ipv4
-        self.ipv6 = ipv6
-        self.port = port
+    def __init__(self, server, ipv4, ipv6, port, path):
+        super().__init__(server, ipv4, ipv6, port)
+        self.path = path
 
     @classmethod
     def from_inline(cls, inline):
@@ -225,7 +223,10 @@ class SecuredBMAEndpoint(BMAEndpoint):
         ipv4 = m.group(2)
         ipv6 = m.group(3)
         port = int(m.group(4))
-        return cls(server, ipv4, ipv6, port)
+        path = m.group(5)
+        if not path:
+            path = ""
+        return cls(server, ipv4, ipv6, port, path)
 
     def inline(self):
         return "BMAS{DNS}{IPv4}{IPv6}{PORT}" \
@@ -242,8 +243,8 @@ class SecuredBMAEndpoint(BMAEndpoint):
         :rtype: ConnectionHandler
         """
         if self.server:
-            yield ConnectionHandler("https", "wss", self.server, self.port, proxy, session)
+            yield ConnectionHandler("https", "wss", self.server, self.port, self.path, proxy, session)
         elif self.ipv6:
-            yield ConnectionHandler("https", "wss", "[{0}]".format(self.ipv6), self.port, proxy, session)
+            yield ConnectionHandler("https", "wss", "[{0}]".format(self.ipv6), self.port, self.path, proxy, session)
         else:
-            yield ConnectionHandler("https", "wss", self.ipv4, self.port, proxy, session)
+            yield ConnectionHandler("https", "wss", self.ipv4, self.port, self.path, proxy, session)
