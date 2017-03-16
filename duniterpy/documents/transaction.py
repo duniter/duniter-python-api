@@ -1,5 +1,5 @@
 from .document import Document, MalformedDocumentError
-from .constants import pubkey_regex, transaction_hash_regex, block_id_regex, block_uid_regex
+from .constants import pubkey_regex, transaction_hash_regex, block_id_regex, block_uid_regex, conditions_regex
 from ..grammars import output
 import pypeg2
 import re
@@ -576,7 +576,7 @@ class OutputSource:
     """
     A Transaction OUTPUT
     """
-    re_inline = re.compile("([0-9]+):([0-9]+):([A-Za-z0-9\(\)\s]+)\n")
+    re_inline = re.compile("([0-9]+):([0-9]+):(.*)\n")
 
     def __init__(self, amount, base, conditions):
         self.amount = amount
@@ -590,8 +590,9 @@ class OutputSource:
             raise MalformedDocumentError("Inline output")
         amount = int(data.group(1))
         base = int(data.group(2))
+        conditions_text = data.group(3)
         try:
-            conditions = pypeg2.parse(data.group(3), output.Condition)
+            conditions = pypeg2.parse(conditions_text, output.Condition)
         except SyntaxError:
             raise MalformedDocumentError("Output source syntax error")
         return cls(amount, base, conditions)

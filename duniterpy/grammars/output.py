@@ -1,5 +1,5 @@
 from ..documents.constants import pubkey_regex
-from ..documents.constants import block_hash_regex as hash_regex
+from ..documents.constants import hash_regex
 from pypeg2 import *
 
 
@@ -9,6 +9,10 @@ class Pubkey(str):
 
 class Hash(str):
     regex = re.compile(hash_regex)
+
+
+class Int(str):
+    regex = re.compile(r"[0-9]+")
 
 
 class SIG(str):
@@ -22,6 +26,32 @@ class SIG(str):
 
     def compose(self, parser, grammar=None, attr_of=None):
         return "SIG({0})".format(self.pubkey)
+
+
+class CSV(str):
+    grammar = "CSV(", attr('time', Int), ")"
+
+    @classmethod
+    def token(cls, time):
+        csv = cls()
+        csv.time = str(time)
+        return csv
+
+    def compose(self, parser, grammar=None, attr_of=None):
+        return "CSV({0})".format(self.time)
+
+
+class CLTV(str):
+    grammar = "CLTV(", attr('timestamp', Int), ")"
+
+    @classmethod
+    def token(cls, timestamp):
+        cltv = cls()
+        cltv.timestamp = str(timestamp)
+        return cltv
+
+    def compose(self, parser, grammar=None, attr_of=None):
+        return "CLTV({0})".format(self.timestamp)
 
 
 class XHX(str):
@@ -38,7 +68,8 @@ class XHX(str):
 
 
 class Operator(Keyword):
-    grammar = Enum(K("AND"), K("OR"))
+    grammar = Enum(K("&&"), K("||"), K("AND"), K("OR"))
+    regex = re.compile(r"[&&|\|\||\w]+")
 
     @classmethod
     def token(cls, keyword):
@@ -78,6 +109,6 @@ class Condition(str):
             result = left
         return result
 
-Condition.grammar = contiguous(attr('left', [SIG, XHX, ('(', Condition, ')')]),
+Condition.grammar = contiguous(attr('left', [SIG, XHX, CSV, CLTV, ('(', Condition, ')')]),
                      maybe_some(whitespace, attr('op', Operator), whitespace,
-                               attr('right', [SIG, XHX, ('(', Condition, ')')])))
+                               attr('right', [SIG, XHX, CSV, CLTV, ('(', Condition, ')')])))

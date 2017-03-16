@@ -80,7 +80,7 @@ D:9WYHTavL1pmhunFCzUwiiq4pXwvgGG5ysjZnjz9H8yB:46
 5:SIG(2)
 120:2:SIG(BYfWYFrsyjpvpFysgu19rGK3VHBkz4MqmQbNyEuVU64g)
 146:2:SIG(DSz4rgncXCytsUMW2JU2yhLquZECD2XpEkpP9gG5HyAx)
-49:2:(SIG(6DyGr5LFtFmbaJYRvcs9WmBsr4cbJbJ1EV9zBbqG7A6i) OR XHX(3EB4702F2AC2FD3FA4FDC46A4FC05AE8CDEE1A85))
+49:2:(SIG(6DyGr5LFtFmbaJYRvcs9WmBsr4cbJbJ1EV9zBbqG7A6i) OR XHX(12CCC75A48B1502E4A4E5E9EC2C5153AE2DDF760D5B70262103309D4C7FA86EE))
 -----@@@----- (why not this comment?)
 42yQm4hGTJYWkPg39hQAUgP6S6EQ4vTfXdJuxKEHL1ih6YHiDL2hcwrFgBHjXLRgxRhj2VNVqqc6b4JayKqTE14r
 2D96KZwNUvVtcapQPq2mm7J9isFcDCfykwJpVEZwBc7tCgL4qPyu17BT5ePozAE9HS6Yvj51f62Mp4n9d9dkzJoX
@@ -162,72 +162,6 @@ Transactions:
 InnerHash: DB30D958EE5CB75186972286ED3F4686B8A1C2CD
 Nonce: 9906
 5LZCFSnm5FkFihPBTpmsPyILEdvu8MXfJOp6OR4d1s+/e2jVWg4J6YSDfO2KBBPgubASyr2QwQuiBlYD2918Bw==
-"""
-
-raw_block_with_tx_v3 = """Version: 3
-Type: Block
-Currency: meta_brouzouf
-Number: 34436
-PoWMin: 5
-Time: 1443896211
-MedianTime: 1443881811
-UnitBase: 3
-Issuer: HnFcSms8jzwngtVomTTnzudZx7SHUQY8sVE1y8yBmULk
-IssuersFrame: 43
-IssuersFrameVar: 2
-DifferentIssuersCount: 8
-PreviousHash: 000002B06C990DEBD5C1D947289C2CF4F4396FB2
-PreviousIssuer: HnFcSms8jzwngtVomTTnzudZx7SHUQY8sVE1y8yBmULk
-MembersCount: 19
-Identities:
-Joiners:
-Actives:
-ATkjQPa4sn4LBF69jqEPzFtRdHYJs6MJQjvP8JdN7MtN:QTowsupV+uXrcomL44WCxbu3LQoJM2C2VPMet5Xg6gXGAHEtGRp47FfQLb2ok1+/588JiIHskCyazj3UOsmKDw==:34434-00000D21F80687248A8C02F16BB19A975B4F983D:34432-00000D21F80687248A8C02F16BB19A975B4F983D:urodelus
-Leavers:
-Revoked:
-Excluded:
-Certifications:
-5ocqzyDMMWf1V8bsoNhWb1iNwax1e9M7VTUN6navs8of:ATkjQPa4sn4LBF69jqEPzFtRdHYJs6MJQjvP8JdN7MtN:0:6TuxRcARnpo13l3cXtgPTkjJlv8DZOUvsAzmZJMbjHZbbZfDQ6MJpH9DIuH0eyG3WGc0EX/046mbMGBrKKg9DQ==
-ATkjQPa4sn4LBF69jqEPzFtRdHYJs6MJQjvP8JdN7MtN:2qwGeLWoPG7db72bKXPfJpAtj67FYDnPaJn2JB7tyXxJ:0:LusTbb7CgwrqqacDKjtldw60swwvDBH8wVUIJN4SWRb2pZPJSpDxgqaGyjC5P9i/DendfyQWc7cfzPDqSZmZAg==
-Transactions:
-TX:3:1:3:3:1:0:0
-32-DB30D958EE5CB75186972286ED3F4686B8A1C2CD
-HsLShAtzXTVxeUtQd7yi5Z5Zh4zNvbu8sTEZ53nfKcqY
-5:0:T:6991C993631BED4733972ED7538E41CCC33660F554E3C51963E2A0AC4D6453D3:0
-1:1:T:3A09A20E9014110FD224889F13357BAB4EC78A72F95CA03394D8CCA2936A7435:10
-35:0:D:HsLShAtzXTVxeUtQd7yi5Z5Zh4zNvbu8sTEZ53nfKcqY:88
-0:SIG(0)
-1:SIG(0)
-2:SIG(0)
-30:2:SIG(BYfWYFrsyjpvpFysgu19rGK3VHBkz4MqmQbNyEuVU64g)
-42yQm4hGTJYWkPg39hQAUgP6S6EQ4vTfXdJuxKEHL1ih6YHiDL2hcwrFgBHjXLRgxRhj2VNVqqc6b4JayKqTE14r
-TX:3:3:6:6:3:1:0
-3-DB30D958EE5CB75186972286ED3F4686B8A1C2CD
-HsLShAtzXTVxeUtQd7yi5Z5Zh4zNvbu8sTEZ53nfKcqY
-CYYjHsNyg3HMRMpTHqCJAN9McjH5BwFLmDKGV3PmCuKp
-9WYHTavL1pmhunFCzUwiiq4pXwvgGG5ysjZnjz9H8yB
-30:0:T:6991C993631BED4733972ED7538E41CCC33660F554E3C51963E2A0AC4D6453D3:2
-25:0:T:3A09A20E9014110FD224889F13357BAB4EC78A72F95CA03394D8CCA2936A7435:8
-5:1:D:HsLShAtzXTVxeUtQd7yi5Z5Zh4zNvbu8sTEZ53nfKcqY:46
-10:1:T:A0D9B4CDC113ECE1145C5525873821398890AE842F4B318BD076095A23E70956:3
-60:0:T:67F2045B5318777CC52CD38B424F3E40DDA823FA0364625F124BABE0030E7B5B:5
-50:0:D:9WYHTavL1pmhunFCzUwiiq4pXwvgGG5ysjZnjz9H8yB:46
-0:SIG(0)
-1:XHX(7665798292)
-2:SIG(0)
-3:SIG(0) SIG(2)
-4:SIG(0) SIG(1) SIG(2)
-5:SIG(2)
-120:2:SIG(BYfWYFrsyjpvpFysgu19rGK3VHBkz4MqmQbNyEuVU64g)
-146:2:SIG(DSz4rgncXCytsUMW2JU2yhLquZECD2XpEkpP9gG5HyAx)
-49:2:(SIG(6DyGr5LFtFmbaJYRvcs9WmBsr4cbJbJ1EV9zBbqG7A6i) OR XHX(3EB4702F2AC2FD3FA4FDC46A4FC05AE8CDEE1A85))
------@@@----- (why not this comment?)
-42yQm4hGTJYWkPg39hQAUgP6S6EQ4vTfXdJuxKEHL1ih6YHiDL2hcwrFgBHjXLRgxRhj2VNVqqc6b4JayKqTE14r
-2D96KZwNUvVtcapQPq2mm7J9isFcDCfykwJpVEZwBc7tCgL4qPyu17BT5ePozAE9HS6Yvj51f62Mp4n9d9dkzJoX
-2XiBDpuUdu6zCPWGzHXXy8c4ATSscfFQG9DjmqMZUxDZVt1Dp4m2N5oHYVUfoPdrU9SLk4qxi65RNrfCVnvQtQJk
-InnerHash: DB30D958EE5CB75186972286ED3F4686B8A1C2CD
-Nonce: 581
-nY/MsFU2luiohLmSiOOimL1RIqbriOBgc22ua03Z2dhxtSJxKZeGNGDvl1jaXgmEBRnXU87yXbZ7ioOS/AAVCA==
 """
 
 
@@ -451,31 +385,6 @@ class Test_Block(unittest.TestCase):
         self.assertEqual(len(from_rendered_raw.transactions), 2)
 
         self.assertEqual(block.signed_raw(), raw_block_with_tx)
-
-    def test_raw_with_tx_v3(self):
-        block = Block.from_signed_raw(raw_block_with_tx_v3)
-        rendered_raw = block.signed_raw()
-        from_rendered_raw = block.from_signed_raw(rendered_raw)
-
-        self.assertEqual(from_rendered_raw.version, 3)
-        self.assertEqual(from_rendered_raw.currency, "meta_brouzouf")
-        self.assertEqual(from_rendered_raw.noonce, 581)
-        self.assertEqual(from_rendered_raw.number, 34436)
-        self.assertEqual(from_rendered_raw.powmin, 5)
-        self.assertEqual(from_rendered_raw.time, 1443896211)
-        self.assertEqual(from_rendered_raw.mediantime, 1443881811)
-        self.assertEqual(from_rendered_raw.issuer, "HnFcSms8jzwngtVomTTnzudZx7SHUQY8sVE1y8yBmULk")
-        self.assertEqual(from_rendered_raw.parameters, None)
-        self.assertEqual(from_rendered_raw.members_count, 19)
-        self.assertEqual(from_rendered_raw.identities, [])
-        self.assertEqual(from_rendered_raw.joiners, [])
-        self.assertEqual(len(from_rendered_raw.actives), 1)
-        self.assertEqual(from_rendered_raw.leavers, [])
-        self.assertEqual(from_rendered_raw.excluded, [])
-        self.assertEqual(len(from_rendered_raw.certifications), 2)
-        self.assertEqual(len(from_rendered_raw.transactions), 2)
-
-        self.assertEqual(block.signed_raw(), raw_block_with_tx_v3)
 
     def test_raw_with_leavers(self):
         block = Block.from_signed_raw(raw_block_with_leavers)
