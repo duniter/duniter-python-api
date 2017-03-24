@@ -138,7 +138,8 @@ REQUIREMENTS_SCHEMA = {
                             "timestamp": {
                                 "type": "string"
                             }
-                        }
+                        },
+                        "required": ["timestamp"]
                     },
                     "outdistanced": {
                         "type": "boolean"
@@ -157,7 +158,8 @@ REQUIREMENTS_SCHEMA = {
                                 "expiresIn": {
                                     "type": "number"
                                 }
-                            }
+                            },
+                            "required": ["from", "to", "expiresIn"]
                         }
                     },
                     "membershipPendingExpiresIn": {
@@ -165,11 +167,29 @@ REQUIREMENTS_SCHEMA = {
                     },
                     "membershipExpiresIn": {
                         "type": "number"
-                    }
-                }
+                    },
+                    "wasMember": {
+                        "type": "boolean"
+                    },
+                    "isSentry": {
+                        "type": "boolean"
+                    },
+                    "revoked": {
+                        "type": "boolean"
+                    },
+                    "revokation_sig": {
+                        "type": ["string", "null"]
+                    },
+                    "revoked_on": {
+                        "type": ["number", "null"]
+                    },
+                },
+                "required": ["pubkey", "uid", "meta", "outdistanced", "certifications", "membershipPendingExpiresIn",
+                             "membershipExpiresIn", "wasMember", "isSentry", "revoked", "revoked_on", "revocation_sig"]
             }
         }
-    }
+    },
+    "required": ["identities"]
 }
 
 LOOKUP_SCHEMA = {
@@ -212,7 +232,10 @@ LOOKUP_SCHEMA = {
                                 "type": "string",
                             },
                             "revokation_sig": {
-                                "type": "string"
+                                "type": ["string", "null"]
+                            },
+                            "revoked_on": {
+                                "type": ["number", "null"]
                             },
                             "revoked": {
                                 "type": "boolean"
@@ -256,7 +279,10 @@ LOOKUP_SCHEMA = {
                                 "type": "string"
                             },
                             "revokation_sig": {
-                                "type": "string"
+                                "type": ["string", "null"]
+                            },
+                            "revoked_on": {
+                                "type": ["number", "null"]
                             },
                             "revoked": {
                                 "type": "boolean"

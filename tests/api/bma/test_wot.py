@@ -220,6 +220,12 @@ class Test_BMA_Wot(WebFunctionalSetupMixin, unittest.TestCase):
                         "timestamp": "1470-46221DE81776D8382F6DE595105386ADEDD291BEC33D238C506F56EA3721B012"
                     },
                     "outdistanced": False,
+                    "revocation_sig": None,
+                    "revoked": False,
+                    "revoked_on": None,
+                    "expired": False,
+                    "isSentry": True,
+                    "wasMember": True,
                     "certifications": [
                         {
                             "from": "J78bPUvLjxmjaEkdjxWLeENQtcfXm7iobqB49uT1Bgp3",
@@ -247,4 +253,5 @@ class Test_BMA_Wot(WebFunctionalSetupMixin, unittest.TestCase):
                 }
             ]
         }
-        jsonschema.validate(REQUIREMENTS_SCHEMA, json_sample)
+        jsonschema.validate(json_sample, REQUIREMENTS_SCHEMA)
+
