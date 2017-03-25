@@ -145,7 +145,9 @@ class BlockForge:
         for identity in block.identities:
             self.user_identities[identity.pubkey] = UserIdentity(pubkey=identity.pubkey, uid=identity.uid,
                                                                  blockstamp=identity.timestamp,
-                                                                 signature=identity.signatures[0])
+                                                                 signature=identity.signatures[0],
+                                                                 was_member=True,
+                                                                 member=True)
             self._logger.info("New identity : {0}".format(self.user_identities[identity.pubkey]))
 
         if block.ud:

@@ -94,7 +94,7 @@ class Node:
                               "meta": {
                                 "timestamp": str(user_identity.blockstamp),
                               },
-                              "wasMember": user_identity.member,
+                              "wasMember": user_identity.was_member,
                               "isSentry": True,
                               "revoked": user_identity.revoked,
                               "revocation_sig": user_identity.revocation_sig,
@@ -108,7 +108,7 @@ class Node:
                                   "expiresIn": max(self.forge.blocks[-1].mediantime - 31557600 - c.mediantime, 0)
                                 } for c in user_identity.certs_received
                                 ],
-                                "membershipPendingExpiresIn": 0,
+                                "membershipPendingExpiresIn": 0 if not user_identity.member else 10000000,
                                 "membershipExpiresIn": max(self.forge.blocks[-1].mediantime - 15778800
                                                            - user_identity.memberships[-1].timestamp, 0)
                             },
