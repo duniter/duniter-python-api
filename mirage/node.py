@@ -94,6 +94,11 @@ class Node:
                               "meta": {
                                 "timestamp": str(user_identity.blockstamp),
                               },
+                              "wasMember": user_identity.member,
+                              "isSentry": True,
+                              "revoked": user_identity.revoked,
+                              "revocation_sig": user_identity.revocation_sig,
+                              "revoked_on": user_identity.revoked_on,
                               "expired": user_identity.revoked,
                               "outdistanced": not user_identity.member,
                               "certifications": [
