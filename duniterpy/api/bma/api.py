@@ -159,18 +159,18 @@ class API(object):
         :rtype: aiohttp.ClientResponse
         """
         logging.debug("Request : {0}".format(self.reverse_url(self.connection_handler.http_scheme, path)))
-        with aiohttp.Timeout(15):
-            url = self.reverse_url(self.connection_handler.http_scheme, path)
-            response = await self.connection_handler.session.get(url, params=kwargs, headers=self.headers,
-                                                                 proxy=self.connection_handler.proxy)
-            if response.status != 200:
-                try:
-                    error_data = parse_error(await response.text())
-                    raise DuniterError(error_data)
-                except (TypeError, jsonschema.ValidationError):
-                    raise ValueError('status code != 200 => %d (%s)' % (response.status, (await response.text())))
+        url = self.reverse_url(self.connection_handler.http_scheme, path)
+        response = await self.connection_handler.session.get(url, params=kwargs, headers=self.headers,
+                                                             proxy=self.connection_handler.proxy,
+                                                             timeout=15)
+        if response.status != 200:
+            try:
+                error_data = parse_error(await response.text())
+                raise DuniterError(error_data)
+            except (TypeError, jsonschema.ValidationError):
+                raise ValueError('status code != 200 => %d (%s)' % (response.status, (await response.text())))
 
-            return response
+        return response
 
     async def requests_post(self, path, **kwargs):
         """
