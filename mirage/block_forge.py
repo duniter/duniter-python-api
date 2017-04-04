@@ -25,7 +25,7 @@ class BlockForge:
     _logger = attr.ib(default=attr.Factory(lambda: logging.getLogger('mirage')))
 
     @classmethod
-    def start(cls, currency, salt, password, scrypt_params, loop):
+    def start(cls, currency, salt, password, scrypt_params):
         key = SigningKey(salt, password, scrypt_params)
         return cls(currency, key)
 

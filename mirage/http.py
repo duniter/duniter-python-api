@@ -1,4 +1,4 @@
-from aiohttp import web, log, errors
+from aiohttp import web, log
 import json
 import socket
 from duniterpy.documents import Peer
