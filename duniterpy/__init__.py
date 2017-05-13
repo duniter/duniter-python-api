@@ -19,7 +19,7 @@
 MANAGED_API=["BASIC_MERKLED_API", "BMAS"]
 
 __author__      = 'Caner Candan & inso & vit'
-__version__     = '0.40.9'
+__version__     = '0.40.10'
 __nonsense__    = 'duniter'
 
 from . import api, documents, key
