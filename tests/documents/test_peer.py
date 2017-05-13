@@ -19,6 +19,16 @@ OTHER_PROTOCOL 88.77.66.55 9001
 dkaXIiCYUJtCg8Feh/BKvPYf4uFH9CJ/zY6J4MlA9BsjmcMe4YAblvNt/gJy31b1aGq3ue3h14mLMCu84rraDg==
 """
 
+test_weird_ipv6_peer = """Version: 10
+Type: Peer
+Currency: g1
+PublicKey: 6fFt4zdvtNyVcfJn7Y41mKLmMDizyK3nVeNW3qdDXzpc
+Block: 18198-000004AC710E04D8015ED6CA5D87D4B6620A7551233FFEE1B521FF756CE3B9CD
+Endpoints:
+BASIC_MERKLED_API duniter.aquilenet.fr 141.255.128.35 2a01:474::35 10901
+BMAS duniter.aquilenet.fr 443
+dkaXIiCYUJtCg8Feh/BKvPYf4uFH9CJ/zY6J4MlA9BsjmcMe4YAblvNt/gJy31b1aGq3ue3h14mLMCu84rraDg==
+"""
 
 class TestPeer(unittest.TestCase):
     def test_fromraw(self):
@@ -68,3 +78,8 @@ class TestPeer(unittest.TestCase):
 
         self.assertEqual(from_rendered_peer.signatures[0], "dkaXIiCYUJtCg8Feh/BKvPYf4uFH9CJ/zY6J4MlA9BsjmcMe4YAblvNt/gJy31b1aGq3ue3h14mLMCu84rraDg==")
         self.assertEqual(rawpeer, from_rendered_peer.signed_raw())
+
+    def test_incorrect(self):
+        peer = Peer.from_signed_raw(test_weird_ipv6_peer)
+        rendered_peer = peer.signed_raw()
+        from_rendered_peer = Peer.from_signed_raw(rendered_peer)

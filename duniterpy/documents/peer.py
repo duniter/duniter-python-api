@@ -4,7 +4,7 @@ from ..api.bma import ConnectionHandler
 from .document import Document, MalformedDocumentError
 from . import BlockUID
 from .. import MANAGED_API
-from .constants import block_hash_regex, pubkey_regex
+from .constants import block_hash_regex, pubkey_regex, ipv4_regex, ipv6_regex
 
 
 class Peer(Document):
@@ -154,7 +154,8 @@ class UnknownEndpoint(Endpoint):
 
 
 class BMAEndpoint(Endpoint):
-    re_inline = re.compile('^BASIC_MERKLED_API(?: ([a-z0-9-_.]*(?:.[a-zA-Z])))?(?: ((?:[0-9.]{1,4}){4}))?(?: ((?:[0-9a-f:]{4,5}){4,8}))?(?: ([0-9]+))$')
+    re_inline = re.compile('^BASIC_MERKLED_API(?: ([a-z0-9-_.]*(?:.[a-zA-Z])))?(?: ({ipv4_regex}))?(?: ({ipv6_regex}))?(?: ([0-9]+))$'.format(ipv4_regex=ipv4_regex,
+                                                                                                                                            ipv6_regex=ipv6_regex))
 
     def __init__(self, server, ipv4, ipv6, port):
         self.server = server
@@ -208,7 +209,8 @@ class BMAEndpoint(Endpoint):
 
 
 class SecuredBMAEndpoint(BMAEndpoint):
-    re_inline = re.compile('^BMAS(?: ([a-z0-9-_.]*(?:.[a-zA-Z])))?(?: ((?:[0-9.]{1,4}){4}))?(?: ((?:[0-9a-f:]{4,5}){4,8}))?(?: ([0-9]+))(?: ([/\w \.-]*)/?)?$')
+    re_inline = re.compile('^BMAS(?: ([a-z0-9-_.]*(?:.[a-zA-Z])))?(?: ({ipv4_regex}))?(?: ({ipv6_regex}))? ([0-9]+)(?: ([/\w \.-]*)/?)?$'.format(ipv4_regex=ipv4_regex,
+                                                                                                                                                 ipv6_regex=ipv6_regex))
 
     def __init__(self, server, ipv4, ipv6, port, path):
         super().__init__(server, ipv4, ipv6, port)
@@ -218,7 +220,7 @@ class SecuredBMAEndpoint(BMAEndpoint):
     def from_inline(cls, inline):
         m = SecuredBMAEndpoint.re_inline.match(inline)
         if m is None:
-            raise MalformedDocumentError("BMAEndpoint")
+            raise MalformedDocumentError("BMAS")
         server = m.group(1)
         ipv4 = m.group(2)
         ipv6 = m.group(3)
@@ -229,11 +231,8 @@ class SecuredBMAEndpoint(BMAEndpoint):
         return cls(server, ipv4, ipv6, port, path)
 
     def inline(self):
-        return "BMAS{DNS}{IPv4}{IPv6}{PORT}" \
-                    .format(DNS=(" {0}".format(self.server) if self.server else ""),
-                            IPv4=(" {0}".format(self.ipv4) if self.ipv4 else ""),
-                            IPv6=(" {0}".format(self.ipv6) if self.ipv6 else ""),
-                            PORT=(" {0}".format(self.port) if self.port else ""))
+        inlined = [str(info) for info in (self.server, self.ipv4, self.ipv6, self.port, self.path) if info]
+        return "BMAS " + " ".join(inlined)
 
     def conn_handler(self, session=None, proxy=None):
         """
