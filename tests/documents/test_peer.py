@@ -19,6 +19,7 @@ OTHER_PROTOCOL 88.77.66.55 9001
 dkaXIiCYUJtCg8Feh/BKvPYf4uFH9CJ/zY6J4MlA9BsjmcMe4YAblvNt/gJy31b1aGq3ue3h14mLMCu84rraDg==
 """
 
+
 test_weird_ipv6_peer = """Version: 10
 Type: Peer
 Currency: g1
@@ -29,6 +30,7 @@ BASIC_MERKLED_API duniter.aquilenet.fr 141.255.128.35 2a01:474::35 10901
 BMAS duniter.aquilenet.fr 443
 dkaXIiCYUJtCg8Feh/BKvPYf4uFH9CJ/zY6J4MlA9BsjmcMe4YAblvNt/gJy31b1aGq3ue3h14mLMCu84rraDg==
 """
+
 
 class TestPeer(unittest.TestCase):
     def test_fromraw(self):
