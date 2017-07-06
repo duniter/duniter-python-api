@@ -38,3 +38,6 @@ class CRCPubkey:
 
     def is_valid(self):
         return CRCPubkey.from_pubkey(self.pubkey).crc == self.crc
+
+    def __str__(self):
+        return "{:}:{:}".format(self.pubkey, self.crc)
