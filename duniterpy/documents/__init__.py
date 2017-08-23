@@ -5,5 +5,6 @@ from .peer import endpoint, BMAEndpoint, UnknownEndpoint, Peer, SecuredBMAEndpoi
 from .transaction import SimpleTransaction, Transaction, InputSource, OutputSource, \
     SIGParameter, Unlock, UnlockParameter
 from .document import Document, MalformedDocumentError
+from .crc_pubkey import CRCPubkey
 
 from . import constants
