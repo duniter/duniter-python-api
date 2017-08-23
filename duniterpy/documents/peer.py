@@ -155,7 +155,7 @@ class UnknownEndpoint(Endpoint):
 
 class BMAEndpoint(Endpoint):
     re_inline = re.compile('^BASIC_MERKLED_API(?: ([a-z0-9-_.]*(?:.[a-zA-Z])))?(?: ({ipv4_regex}))?(?: ({ipv6_regex}))?(?: ([0-9]+))$'.format(ipv4_regex=ipv4_regex,
-                                                                                                                                            ipv6_regex=ipv6_regex))
+                                                                                                                                              ipv6_regex=ipv6_regex))
 
     def __init__(self, server, ipv4, ipv6, port):
         self.server = server
@@ -166,6 +166,7 @@ class BMAEndpoint(Endpoint):
     @classmethod
     def from_inline(cls, inline):
         m = BMAEndpoint.re_inline.match(inline)
+        str_re = BMAEndpoint.re_inline.pattern
         if m is None:
             raise MalformedDocumentError("BMAEndpoint")
         server = m.group(1)

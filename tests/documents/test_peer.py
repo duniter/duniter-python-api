@@ -13,8 +13,8 @@ Currency: beta_brousouf
 PublicKey: HsLShAtzXTVxeUtQd7yi5Z5Zh4zNvbu8sTEZ53nfKcqY
 Block: 8-1922C324ABC4AF7EF7656734A31F5197888DDD52
 Endpoints:
-BASIC_MERKLED_API some.dns.name 88.77.66.55 2001:0db8:0000:85a3:0000:0000:ac1f 9001
-BASIC_MERKLED_API some.dns.name 88.77.66.55 2001:0db8:0000:85a3:0000:0000:ac1f 9002
+BASIC_MERKLED_API some.dns.name 88.77.66.55 2001:42d0:52:a00::648 9001
+BASIC_MERKLED_API some.dns.name 88.77.66.55 2001:42d0:52:a00::648 9002
 OTHER_PROTOCOL 88.77.66.55 9001
 dkaXIiCYUJtCg8Feh/BKvPYf4uFH9CJ/zY6J4MlA9BsjmcMe4YAblvNt/gJy31b1aGq3ue3h14mLMCu84rraDg==
 """
@@ -45,12 +45,12 @@ class TestPeer(unittest.TestCase):
 
         self.assertEqual(peer.endpoints[0].server, "some.dns.name")
         self.assertEqual(peer.endpoints[0].ipv4, "88.77.66.55")
-        self.assertEqual(peer.endpoints[0].ipv6, "2001:0db8:0000:85a3:0000:0000:ac1f")
+        self.assertEqual(peer.endpoints[0].ipv6, "2001:42d0:52:a00::648")
         self.assertEqual(peer.endpoints[0].port, 9001)
 
         self.assertEqual(peer.endpoints[1].server, "some.dns.name")
         self.assertEqual(peer.endpoints[1].ipv4, "88.77.66.55")
-        self.assertEqual(peer.endpoints[1].ipv6, "2001:0db8:0000:85a3:0000:0000:ac1f")
+        self.assertEqual(peer.endpoints[1].ipv6, "2001:42d0:52:a00::648")
         self.assertEqual(peer.endpoints[1].port, 9002)
 
         self.assertEqual(peer.signatures[0], "dkaXIiCYUJtCg8Feh/BKvPYf4uFH9CJ/zY6J4MlA9BsjmcMe4YAblvNt/gJy31b1aGq3ue3h14mLMCu84rraDg==")
@@ -70,12 +70,12 @@ class TestPeer(unittest.TestCase):
 
         self.assertEqual(from_rendered_peer.endpoints[0].server, "some.dns.name")
         self.assertEqual(from_rendered_peer.endpoints[0].ipv4, "88.77.66.55")
-        self.assertEqual(from_rendered_peer.endpoints[0].ipv6, "2001:0db8:0000:85a3:0000:0000:ac1f")
+        self.assertEqual(from_rendered_peer.endpoints[0].ipv6, "2001:42d0:52:a00::648")
         self.assertEqual(from_rendered_peer.endpoints[0].port, 9001)
 
         self.assertEqual(from_rendered_peer.endpoints[1].server, "some.dns.name")
         self.assertEqual(from_rendered_peer.endpoints[1].ipv4, "88.77.66.55")
-        self.assertEqual(from_rendered_peer.endpoints[1].ipv6, "2001:0db8:0000:85a3:0000:0000:ac1f")
+        self.assertEqual(from_rendered_peer.endpoints[1].ipv6, "2001:42d0:52:a00::648")
         self.assertEqual(from_rendered_peer.endpoints[1].port, 9002)
 
         self.assertEqual(from_rendered_peer.signatures[0], "dkaXIiCYUJtCg8Feh/BKvPYf4uFH9CJ/zY6J4MlA9BsjmcMe4YAblvNt/gJy31b1aGq3ue3h14mLMCu84rraDg==")
