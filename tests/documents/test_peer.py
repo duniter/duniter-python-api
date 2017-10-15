@@ -1,10 +1,5 @@
-'''
-Created on 13 déc. 2014
-
-@author: inso
-'''
 import unittest
-from duniterpy.documents.peer import Peer, BMAEndpoint, UnknownEndpoint
+from duniterpy.documents.peer import Peer, BMAEndpoint, UnknownEndpoint, WS2PEndpoint
 
 
 rawpeer = """Version: 2
@@ -15,6 +10,7 @@ Block: 8-1922C324ABC4AF7EF7656734A31F5197888DDD52
 Endpoints:
 BASIC_MERKLED_API some.dns.name 88.77.66.55 2001:42d0:52:a00::648 9001
 BASIC_MERKLED_API some.dns.name 88.77.66.55 2001:42d0:52:a00::648 9002
+WS2P d2edcb92 g1-test.duniter.org 20902
 OTHER_PROTOCOL 88.77.66.55 9001
 dkaXIiCYUJtCg8Feh/BKvPYf4uFH9CJ/zY6J4MlA9BsjmcMe4YAblvNt/gJy31b1aGq3ue3h14mLMCu84rraDg==
 """
@@ -38,10 +34,11 @@ class TestPeer(unittest.TestCase):
         self.assertEqual(peer.currency, "beta_brousouf")
         self.assertEqual(peer.pubkey, "HsLShAtzXTVxeUtQd7yi5Z5Zh4zNvbu8sTEZ53nfKcqY")
         self.assertEqual(str(peer.blockUID), "8-1922C324ABC4AF7EF7656734A31F5197888DDD52")
-        self.assertEqual(len(peer.endpoints), 3)
-        self.assertTrue(type(peer.endpoints[0]) is BMAEndpoint)
-        self.assertTrue(type(peer.endpoints[1]) is BMAEndpoint)
-        self.assertTrue(type(peer.endpoints[2]) is UnknownEndpoint)
+        self.assertEqual(len(peer.endpoints), 4)
+        self.assertIsInstance(peer.endpoints[0], BMAEndpoint)
+        self.assertIsInstance(peer.endpoints[1], BMAEndpoint)
+        self.assertIsInstance(peer.endpoints[2], WS2PEndpoint)
+        self.assertIsInstance(peer.endpoints[3], UnknownEndpoint)
 
         self.assertEqual(peer.endpoints[0].server, "some.dns.name")
         self.assertEqual(peer.endpoints[0].ipv4, "88.77.66.55")
@@ -53,6 +50,10 @@ class TestPeer(unittest.TestCase):
         self.assertEqual(peer.endpoints[1].ipv6, "2001:42d0:52:a00::648")
         self.assertEqual(peer.endpoints[1].port, 9002)
 
+        self.assertEqual(peer.endpoints[2].server, "g1-test.duniter.org")
+        self.assertEqual(peer.endpoints[2].ws2pid, "d2edcb92")
+        self.assertEqual(peer.endpoints[2].port, 20902)
+
         self.assertEqual(peer.signatures[0], "dkaXIiCYUJtCg8Feh/BKvPYf4uFH9CJ/zY6J4MlA9BsjmcMe4YAblvNt/gJy31b1aGq3ue3h14mLMCu84rraDg==")
 
     def test_fromraw_toraw(self):
@@ -63,10 +64,11 @@ class TestPeer(unittest.TestCase):
         self.assertEqual(from_rendered_peer.currency, "beta_brousouf")
         self.assertEqual(from_rendered_peer.pubkey, "HsLShAtzXTVxeUtQd7yi5Z5Zh4zNvbu8sTEZ53nfKcqY")
         self.assertEqual(str(from_rendered_peer.blockUID), "8-1922C324ABC4AF7EF7656734A31F5197888DDD52")
-        self.assertEqual(len(from_rendered_peer.endpoints), 3)
-        self.assertTrue(type(from_rendered_peer.endpoints[0]) is BMAEndpoint)
-        self.assertTrue(type(from_rendered_peer.endpoints[1]) is BMAEndpoint)
-        self.assertTrue(type(from_rendered_peer.endpoints[2]) is UnknownEndpoint)
+        self.assertEqual(len(peer.endpoints), 4)
+        self.assertIsInstance(peer.endpoints[0], BMAEndpoint)
+        self.assertIsInstance(peer.endpoints[1], BMAEndpoint)
+        self.assertIsInstance(peer.endpoints[2], WS2PEndpoint)
+        self.assertIsInstance(peer.endpoints[3], UnknownEndpoint)
 
         self.assertEqual(from_rendered_peer.endpoints[0].server, "some.dns.name")
         self.assertEqual(from_rendered_peer.endpoints[0].ipv4, "88.77.66.55")
@@ -77,6 +79,11 @@ class TestPeer(unittest.TestCase):
         self.assertEqual(from_rendered_peer.endpoints[1].ipv4, "88.77.66.55")
         self.assertEqual(from_rendered_peer.endpoints[1].ipv6, "2001:42d0:52:a00::648")
         self.assertEqual(from_rendered_peer.endpoints[1].port, 9002)
+
+        self.assertEqual(peer.endpoints[2].server, "g1-test.duniter.org")
+        self.assertEqual(peer.endpoints[2].ws2pid, "d2edcb92")
+        self.assertEqual(peer.endpoints[2].port, 20902)
+
 
         self.assertEqual(from_rendered_peer.signatures[0], "dkaXIiCYUJtCg8Feh/BKvPYf4uFH9CJ/zY6J4MlA9BsjmcMe4YAblvNt/gJy31b1aGq3ue3h14mLMCu84rraDg==")
         self.assertEqual(rawpeer, from_rendered_peer.signed_raw())

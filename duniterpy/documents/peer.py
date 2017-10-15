@@ -4,7 +4,7 @@ from ..api.bma import ConnectionHandler
 from .document import Document, MalformedDocumentError
 from . import BlockUID
 from .. import MANAGED_API
-from .constants import block_hash_regex, pubkey_regex, ipv4_regex, ipv6_regex
+from .constants import block_hash_regex, pubkey_regex, ipv4_regex, ipv6_regex, ws2pid_regex
 
 
 class Peer(Document):
@@ -103,6 +103,8 @@ def endpoint(value):
                     return BMAEndpoint.from_inline(value)
                 if api == "BMAS":
                     return SecuredBMAEndpoint.from_inline(value)
+                if api == "WS2P":
+                    return WS2PEndpoint.from_inline(value)
         return UnknownEndpoint.from_inline(value)
     else:
         raise TypeError("Cannot convert {0} to endpoint".format(value))
@@ -248,3 +250,37 @@ class SecuredBMAEndpoint(BMAEndpoint):
             yield ConnectionHandler("https", "wss", "[{0}]".format(self.ipv6), self.port, self.path, proxy, session)
         else:
             yield ConnectionHandler("https", "wss", self.ipv4, self.port, self.path, proxy, session)
+
+
+class WS2PEndpoint(Endpoint):
+    re_inline = re.compile('^WS2P ({ws2pid_regex}) ((?:[a-z0-9-_.]*(?:.[a-zA-Z]))|(?:{ipv4_regex})) ([0-9]+)?$'.format(ws2pid_regex=ws2pid_regex,
+                                                                                                                 ipv4_regex=ipv4_regex,
+                                                                                                                 ipv6_regex=ipv6_regex))
+
+    def __init__(self, ws2pid, server, port):
+        self.ws2pid = ws2pid
+        self.server = server
+        self.port = port
+
+    @classmethod
+    def from_inline(cls, inline):
+        m = WS2PEndpoint.re_inline.match(inline)
+        if m is None:
+            raise MalformedDocumentError("WS2P")
+        ws2pid = m.group(1)
+        server = m.group(2)
+        port = int(m.group(3))
+        return cls(ws2pid, server, port)
+
+    def inline(self):
+        inlined = [str(info) for info in (self.ws2pid, self.server,self.port)]
+        return "WS2P " + " ".join(inlined)
+
+    def conn_handler(self, session=None, proxy=None):
+        """
+        Return connection handler instance for the endpoint
+
+        :param aiohttp.ClientSession session: AIOHTTP client session instance
+        :rtype: ConnectionHandler
+        """
+        yield ConnectionHandler("https", "wss", self.server, self.port, "", proxy, session)

@@ -16,7 +16,7 @@
 # Caner Candan <caner@candan.fr>, http://caner.candan.fr
 #
 
-MANAGED_API=["BASIC_MERKLED_API", "BMAS"]
+MANAGED_API=["BASIC_MERKLED_API", "BMAS", "WS2P"]
 
 __author__      = 'Caner Candan & inso & vit'
 __version__     = '0.41.1'
