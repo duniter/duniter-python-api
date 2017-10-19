@@ -96,6 +96,8 @@ def endpoint(value):
         return value
     elif isinstance(value, BMAEndpoint):
         return value
+    elif isinstance(value, WS2PEndpoint):
+        return value
     elif isinstance(value, str):
         for api in MANAGED_API:
             if value.startswith(api):
@@ -126,15 +128,20 @@ class Endpoint():
 
 
 class UnknownEndpoint(Endpoint):
+    API = None
+
     def __init__(self, api, properties):
         self.api = api
         self.properties = properties
 
     @classmethod
     def from_inline(cls, inline):
-        api = inline.split()[0]
-        properties = inline.split()[1:]
-        return cls(api, properties)
+        try:
+            api = inline.split()[0]
+            properties = inline.split()[1:]
+            return cls(api, properties)
+        except IndexError:
+            return None
 
     def inline(self):
         doc = self.api
@@ -156,6 +163,7 @@ class UnknownEndpoint(Endpoint):
 
 
 class BMAEndpoint(Endpoint):
+    API = "BMA"
     re_inline = re.compile('^BASIC_MERKLED_API(?: ([a-z0-9-_.]*(?:.[a-zA-Z])))?(?: ({ipv4_regex}))?(?: ({ipv6_regex}))?(?: ([0-9]+))$'.format(ipv4_regex=ipv4_regex,
                                                                                                                                               ipv6_regex=ipv6_regex))
 
@@ -212,6 +220,7 @@ class BMAEndpoint(Endpoint):
 
 
 class SecuredBMAEndpoint(BMAEndpoint):
+    API = "BMAS"
     re_inline = re.compile('^BMAS(?: ([a-z0-9-_.]*(?:.[a-zA-Z])))?(?: ({ipv4_regex}))?(?: ({ipv6_regex}))? ([0-9]+)(?: ([/\w \.-]*)/?)?$'.format(ipv4_regex=ipv4_regex,
                                                                                                                                                  ipv6_regex=ipv6_regex))
 
@@ -253,6 +262,7 @@ class SecuredBMAEndpoint(BMAEndpoint):
 
 
 class WS2PEndpoint(Endpoint):
+    API = "WS2P"
     re_inline = re.compile('^WS2P ({ws2pid_regex}) ((?:[a-z0-9-_.]*(?:.[a-zA-Z]))|(?:{ipv4_regex})) ([0-9]+)?$'.format(ws2pid_regex=ws2pid_regex,
                                                                                                                  ipv4_regex=ipv4_regex,
                                                                                                                  ipv6_regex=ipv6_regex))
@@ -284,3 +294,16 @@ class WS2PEndpoint(Endpoint):
         :rtype: ConnectionHandler
         """
         yield ConnectionHandler("https", "wss", self.server, self.port, "", proxy, session)
+
+    def __str__(self):
+        return self.inline()
+
+    def __eq__(self, other):
+        if isinstance(other, WS2PEndpoint):
+            return self.server == other.server and self.ws2pid == other.ws2pid \
+                    and self.port == other.port
+        else:
+            return False
+
+    def __hash__(self):
+        return hash((self.ws2pid, self.server, self.port))
