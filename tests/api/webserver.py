@@ -15,7 +15,7 @@ class WebFunctionalSetupMixin:
 
     def tearDown(self):
         if self.handler:
-            self.loop.run_until_complete(self.handler.finish_connections())
+            self.loop.run_until_complete(self.handler.shutdown())
         try:
             self.loop.stop()
             self.loop.close()
@@ -29,8 +29,8 @@ class WebFunctionalSetupMixin:
         s.close()
         return port
 
-    async    def create_server(self, method, path, handler=None, ssl_ctx=None):
-        app = web.Application(loop=self.loop)
+    async def create_server(self, method, path, handler=None, ssl_ctx=None):
+        app = web.Application()
         if handler:
             app.router.add_route(method, path, handler)
 

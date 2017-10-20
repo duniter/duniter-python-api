@@ -43,7 +43,7 @@ class Test_BMA_blockchain(WebFunctionalSetupMixin, unittest.TestCase):
         async def go():
             _, srv, port, url = await self.create_server('GET', '/blockchain/parameters', handler)
             with self.assertRaises(jsonschema.exceptions.ValidationError):
-                with aiohttp.ClientSession() as session:
+                async with aiohttp.ClientSession() as session:
                     connection = next(BMAEndpoint("127.0.0.1", None, None, port).conn_handler(session))
                     await parameters(connection)
 
@@ -112,7 +112,7 @@ class Test_BMA_blockchain(WebFunctionalSetupMixin, unittest.TestCase):
         async def go():
             _, srv, port, url = await self.create_server('GET', '/blockchain/block/100', handler)
             with self.assertRaises(jsonschema.exceptions.ValidationError):
-                with aiohttp.ClientSession() as session:
+                async with aiohttp.ClientSession() as session:
                     connection = next(BMAEndpoint("127.0.0.1", None, None, port).conn_handler(session))
                     await block(connection, 100)
 
@@ -126,7 +126,7 @@ class Test_BMA_blockchain(WebFunctionalSetupMixin, unittest.TestCase):
         async def go():
             _, srv, port, url = await self.create_server('GET', '/blockchain/current', handler)
             with self.assertRaises(jsonschema.exceptions.ValidationError):
-                with aiohttp.ClientSession() as session:
+                async with aiohttp.ClientSession() as session:
                     connection = next(BMAEndpoint("127.0.0.1", None, None, port).conn_handler(session))
                     await current(connection)
 
@@ -187,7 +187,7 @@ class Test_BMA_blockchain(WebFunctionalSetupMixin, unittest.TestCase):
         async def go():
             _, srv, port, url = await self.create_server('GET', '/blockchain/hardship/8Fi1VSTbjkXguwThF4v2ZxC5whK7pwG2vcGTkPUPjPGU', handler)
             with self.assertRaises(jsonschema.exceptions.ValidationError):
-                with aiohttp.ClientSession() as session:
+                async with aiohttp.ClientSession() as session:
                     connection = next(BMAEndpoint("127.0.0.1", None, None, port).conn_handler(session))
                     await hardship(connection, "8Fi1VSTbjkXguwThF4v2ZxC5whK7pwG2vcGTkPUPjPGU")
 
@@ -227,7 +227,7 @@ class Test_BMA_blockchain(WebFunctionalSetupMixin, unittest.TestCase):
         async def go():
             _, srv, port, url = await self.create_server('GET', '/blockchain/memberships/8Fi1VSTbjkXguwThF4v2ZxC5whK7pwG2vcGTkPUPjPGU', handler)
             with self.assertRaises(jsonschema.exceptions.ValidationError):
-                with aiohttp.ClientSession() as session:
+                async with aiohttp.ClientSession() as session:
                     connection = next(BMAEndpoint("127.0.0.1", None, None, port).conn_handler(session))
                     await memberships(connection, "8Fi1VSTbjkXguwThF4v2ZxC5whK7pwG2vcGTkPUPjPGU")
 
@@ -249,7 +249,7 @@ class Test_BMA_blockchain(WebFunctionalSetupMixin, unittest.TestCase):
         async def go():
             _, srv, port, url = await self.create_server('GET', '/blockchain/with/newcomers', handler)
             with self.assertRaises(jsonschema.exceptions.ValidationError):
-                with aiohttp.ClientSession() as session:
+                async with aiohttp.ClientSession() as session:
                     connection = next(BMAEndpoint("127.0.0.1", None, None, port).conn_handler(session))
                     await newcomers(connection)
 
@@ -271,7 +271,7 @@ class Test_BMA_blockchain(WebFunctionalSetupMixin, unittest.TestCase):
         async def go():
             _, srv, port, url = await self.create_server('GET', '/blockchain/with/certs', handler)
             with self.assertRaises(jsonschema.exceptions.ValidationError):
-                with aiohttp.ClientSession() as session:
+                async with aiohttp.ClientSession() as session:
                     connection = next(BMAEndpoint("127.0.0.1", None, None, port).conn_handler(session))
                     await certifications(connection)
 
@@ -293,7 +293,7 @@ class Test_BMA_blockchain(WebFunctionalSetupMixin, unittest.TestCase):
         async def go():
             _, srv, port, url = await self.create_server('GET', '/blockchain/with/joiners', handler)
             with self.assertRaises(jsonschema.exceptions.ValidationError):
-                with aiohttp.ClientSession() as session:
+                async with aiohttp.ClientSession() as session:
                     connection = next(BMAEndpoint("127.0.0.1", None, None, port).conn_handler(session))
                     await joiners(connection)
 
@@ -315,7 +315,7 @@ class Test_BMA_blockchain(WebFunctionalSetupMixin, unittest.TestCase):
         async def go():
             _, srv, port, url = await self.create_server('GET', '/blockchain/with/actives', handler)
             with self.assertRaises(jsonschema.exceptions.ValidationError):
-                with aiohttp.ClientSession() as session:
+                async with aiohttp.ClientSession() as session:
                     connection = next(BMAEndpoint("127.0.0.1", None, None, port).conn_handler(session))
                     await actives(connection)
 
@@ -337,7 +337,7 @@ class Test_BMA_blockchain(WebFunctionalSetupMixin, unittest.TestCase):
         async def go():
             _, srv, port, url = await self.create_server('GET', '/blockchain/with/leavers', handler)
             with self.assertRaises(jsonschema.exceptions.ValidationError):
-                with aiohttp.ClientSession() as session:
+                async with aiohttp.ClientSession() as session:
                     connection = next(BMAEndpoint("127.0.0.1", None, None, port).conn_handler(session))
                     await leavers(connection)
 
@@ -460,7 +460,7 @@ class Test_BMA_blockchain(WebFunctionalSetupMixin, unittest.TestCase):
         async def go():
             _, srv, port, url = await self.create_server('GET', '/blockchain/with/ud', handler)
             with self.assertRaises(jsonschema.exceptions.ValidationError):
-                with aiohttp.ClientSession() as session:
+                async with aiohttp.ClientSession() as session:
                     connection = next(BMAEndpoint("127.0.0.1", None, None, port).conn_handler(session))
                     await ud(connection)
 
@@ -482,7 +482,7 @@ class Test_BMA_blockchain(WebFunctionalSetupMixin, unittest.TestCase):
         async def go():
             _, srv, port, url = await self.create_server('GET', '/blockchain/with/tx', handler)
             with self.assertRaises(jsonschema.exceptions.ValidationError):
-                with aiohttp.ClientSession() as session:
+                async with aiohttp.ClientSession() as session:
                     connection = next(BMAEndpoint("127.0.0.1", None, None, port).conn_handler(session))
                     await tx(connection)
 

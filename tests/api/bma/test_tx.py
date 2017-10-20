@@ -128,7 +128,7 @@ class Test_BMA_TX(WebFunctionalSetupMixin, unittest.TestCase):
         async def go():
             _, srv, port, url = await self.create_server('GET', '/tx/history/pubkey', handler)
             with self.assertRaises(jsonschema.exceptions.ValidationError):
-                with aiohttp.ClientSession() as session:
+                async with aiohttp.ClientSession() as session:
                     connection = next(BMAEndpoint("127.0.0.1", None, None, port).conn_handler(session))
                     await history(connection, 'pubkey')
 
@@ -142,7 +142,7 @@ class Test_BMA_TX(WebFunctionalSetupMixin, unittest.TestCase):
         async def go():
             _, srv, port, url = await self.create_server('GET', '/tx/history/pubkey/blocks/0/100', handler)
             with self.assertRaises(jsonschema.exceptions.ValidationError):
-                with aiohttp.ClientSession() as session:
+                async with aiohttp.ClientSession() as session:
                     connection = next(BMAEndpoint("127.0.0.1", None, None, port).conn_handler(session))
                     await blocks(connection, 'pubkey', 0, 100)
 
@@ -181,7 +181,7 @@ class Test_BMA_TX(WebFunctionalSetupMixin, unittest.TestCase):
         async def go():
             _, srv, port, url = await self.create_server('GET', '/tx/sources/pubkey', handler)
             with self.assertRaises(jsonschema.exceptions.ValidationError):
-                with aiohttp.ClientSession() as session:
+                async with aiohttp.ClientSession() as session:
                     connection = next(BMAEndpoint("127.0.0.1", None, None, port).conn_handler(session))
                     await sources(connection, 'pubkey')
 
