@@ -402,10 +402,14 @@ class SimpleTransaction(Transaction):
             elif type(unlock.parameters[0]) is not SIGParameter:
                 simple = False
         for o in tx.outputs:
-            if getattr('right', o.conditions, None):
+            # If condition is str type, it is unlockable
+            if type(o.conditions) is str:
                 simple = False
-            elif type(o.conditions.left) is not output.SIG:
-                simple = False
+            else:
+                if getattr('right', o.conditions, None):
+                    simple = False
+                elif type(o.conditions.left) is not output.SIG:
+                    simple = False
         return simple
 
 
@@ -594,9 +598,15 @@ class OutputSource:
         try:
             conditions = pypeg2.parse(conditions_text, output.Condition)
         except SyntaxError:
-            raise MalformedDocumentError("Output source syntax error")
+            # Invalid conditions are possible, see https://github.com/duniter/duniter/issues/1156
+            # In such a case, they are store "as-is" and considered unlockable
+            conditions = conditions_text
         return cls(amount, base, conditions)
 
     def inline(self):
-        return "{0}:{1}:{2}".format(self.amount, self.base,
-                                    pypeg2.compose(self.conditions, output.Condition))
+        if type(self.conditions) is str:
+            return "{0}:{1}:{2}".format(self.amount, self.base, self.conditions)
+        else:
+            return "{0}:{1}:{2}".format(self.amount, self.base,
+                                        pypeg2.compose(self.conditions, output.Condition))
+
