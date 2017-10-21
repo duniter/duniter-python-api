@@ -16,8 +16,7 @@ class HTTPServer:
     def __init__(self, port, loop):
         self.lp = loop
         self.requests = []
-        self.app = web.Application(loop=self.lp,
-                                   middlewares=[self.middleware_factory])
+        self.app = web.Application(middlewares=[self.middleware_factory])
 
         self.handler = None
         self.port = self.find_unused_port() if not port else port
@@ -75,4 +74,4 @@ class HTTPServer:
         return srv, self.port, url
 
     async def close(self):
-        await self.handler.finish_connections()
+        await self.handler.shutdown()
