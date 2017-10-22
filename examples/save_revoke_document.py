@@ -21,7 +21,7 @@ else:
 # You can either use a complete defined endpoint : [NAME_OF_THE_API] [DOMAIN] [IPv4] [IPv6] [PORT]
 # or the simple definition : [NAME_OF_THE_API] [DOMAIN] [PORT]
 # Here we use the BASIC_MERKLED_API
-BMA_ENDPOINT = "BASIC_MERKLED_API cgeek.fr 9330"
+BMA_ENDPOINT = "BASIC_MERKLED_API g1.duniter.org 10901"
 
 # WARNING : Hide this file in a safe and secure place
 # If one day you forget your credentials,
@@ -31,8 +31,8 @@ REVOKE_DOCUMENT_FILE_PATH = os.path.join(home_path, "duniter_account_revoke_docu
 ################################################
 AIOHTTP_SESSION = aiohttp.ClientSession()
 
-# Current protocole version
-PROTOCOL_VERSION = 2
+# Current protocol version
+PROTOCOL_VERSION = 10
 
 async def get_identity_document(connection, currency, pubkey):
     """
@@ -112,7 +112,7 @@ async def main():
         exit(0)
 
     # connection handler from BMA endpoint
-    connection = BMAEndpoint.from_inline(BMA_ENDPOINT).conn_handler(AIOHTTP_SESSION)
+    connection = next(BMAEndpoint.from_inline(BMA_ENDPOINT).conn_handler(AIOHTTP_SESSION))
     # capture current block to get currency name
     current_block = await bma.blockchain.current(connection)
 

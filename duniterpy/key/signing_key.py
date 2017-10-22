@@ -26,7 +26,7 @@ def _ensure_bytes(data):
 
 
 class SigningKey(libnacl.sign.Signer):
-    def __init__(self, salt, password, scrypt_params):
+    def __init__(self, salt, password, scrypt_params=ScryptParams(4096,16,1)):
         salt = _ensure_bytes(salt)
         password = _ensure_bytes(password)
         seed = scrypt(password, salt,
