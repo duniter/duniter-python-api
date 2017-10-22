@@ -91,11 +91,7 @@ Endpoints:
 
 
 def endpoint(value):
-    if isinstance(value, UnknownEndpoint):
-        return value
-    elif isinstance(value, BMAEndpoint):
-        return value
-    elif isinstance(value, WS2PEndpoint):
+    if issubclass(type(value), Endpoint):
         return value
     elif isinstance(value, str):
         for api, cls in MANAGED_API.items():
