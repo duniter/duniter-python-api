@@ -108,7 +108,7 @@ async def main():
 
     # check public key
     if signer.pubkey != pubkey:
-        print("Bad credentials !")
+        print("Bad credentials!")
         exit(0)
 
     # connection handler from BMA endpoint

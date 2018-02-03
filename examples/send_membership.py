@@ -107,8 +107,8 @@ async def main():
     # prompt hidden user entry
     password = getpass.getpass("Enter your password: ")
 
-    # prompt hidden user entry
-    UID = getpass.getpass("Enter your UID: ")
+    # prompt entry
+    UID = input("Enter your UID: ")
 
     # create our signed identity document
     identity = get_identity_document(current_block, UID, salt, password)

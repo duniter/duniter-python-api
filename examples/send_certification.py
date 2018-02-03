@@ -96,13 +96,13 @@ async def main():
     salt = getpass.getpass("Enter your passphrase (salt): ")
 
     # prompt hidden user entry
-    password = getpass.getpass("Enter your password : ")
+    password = getpass.getpass("Enter your password: ")
 
-    # prompt hidden user entry
-    pubkey_from = getpass.getpass("Enter your pubkey : ")
+    # prompt entry
+    pubkey_from = input("Enter your pubkey: ")
 
-    # prompt hidden user entry
-    pubkey_to = getpass.getpass("Enter certified pubkey : ")
+    # prompt entry
+    pubkey_to = input("Enter certified pubkey: ")
 
     # capture current block to get version and currency and blockstamp
     current_block = await bma.blockchain.current(connection)
@@ -119,7 +119,7 @@ async def main():
     if response.status == 200:
         print(await response.text())
     else:
-        print("Error while publishing certification : {0}".format(await response.text()))
+        print("Error while publishing certification: {0}".format(await response.text()))
     response.close()
 
 with AIOHTTP_SESSION:
