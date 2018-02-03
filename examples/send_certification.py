@@ -11,7 +11,7 @@ from duniterpy.key import SigningKey
 # You can either use a complete defined endpoint : [NAME_OF_THE_API] [DOMAIN] [IPv4] [IPv6] [PORT]
 # or the simple definition : [NAME_OF_THE_API] [DOMAIN] [PORT]
 # Here we use the BASIC_MERKLED_API
-BMA_ENDPOINT = "BASIC_MERKLED_API cgeek.fr 9330"
+BMA_ENDPOINT = "BASIC_MERKLED_API g1.duniter.org 10901"
 
 ################################################
 
@@ -49,7 +49,7 @@ async def get_identity_document(connection, current_block, pubkey):
 
             # return self-certification document
             return Identity(
-                version=2,
+                version=10,
                 currency=current_block['currency'],
                 pubkey=pubkey,
                 uid=uid,
@@ -72,7 +72,7 @@ def get_certification_document(current_block, self_cert_document, from_pubkey, s
     """
     # construct Certification Document
     certification = Certification(
-        version=2,
+        version=10,
         currency=current_block['currency'],
         pubkey_from=from_pubkey,
         pubkey_to=self_cert_document.pubkey,
@@ -90,7 +90,7 @@ async def main():
     Main code
     """
     # connection handler from BMA endpoint
-    connection = BMAEndpoint.from_inline(BMA_ENDPOINT).conn_handler(AIOHTTP_SESSION)
+    connection = next(BMAEndpoint.from_inline(BMA_ENDPOINT).conn_handler(AIOHTTP_SESSION))
 
     # prompt hidden user entry
     salt = getpass.getpass("Enter your passphrase (salt): ")
