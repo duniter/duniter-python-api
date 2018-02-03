@@ -41,7 +41,7 @@ def get_identity_document(current_block, uid, salt, password):
 
     # create identity document
     identity = Identity(
-        version=2,
+        version=10,
         currency=current_block['currency'],
         pubkey=key.pubkey,
         uid=uid,
@@ -76,7 +76,7 @@ def get_membership_document(mtype, current_block, identity, salt, password):
 
     # create identity document
     membership = Membership(
-        version=2,
+        version=10,
         currency=current_block['currency'],
         issuer=key.pubkey,
         membership_ts=timestamp,

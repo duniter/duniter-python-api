@@ -24,7 +24,7 @@ BMA_ENDPOINT = "BASIC_MERKLED_API g1.duniter.org 10901"
 AIOHTTP_SESSION = aiohttp.ClientSession()
 
 # Version of the transaction document
-TRANSACTION_VERSION = 3
+TRANSACTION_VERSION = 10
 
 
 def get_transaction_document(current_block, source, from_pubkey, to_pubkey):
