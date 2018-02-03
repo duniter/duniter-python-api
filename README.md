@@ -1,10 +1,10 @@
-#duniter-python-api
+# Duniter Python API
 [![Build Status](https://travis-ci.org/duniter/duniter-python-api.svg)](https://travis-ci.org/duniter/duniter-python-api) [![Coverage Status](https://coveralls.io/repos/duniter/duniter-python-api/badge.svg?branch=master&service=github)](https://coveralls.io/github/duniter/duniter-python-api?branch=master)
 
-A python implementation of [duniter](https://github.com/duniter/duniter) API
+Python implementation of [Duniter](https://git.duniter.org/nodes/typescript/duniter) BMA API
 
 ## Features
- * Supports duniter's Basic Merkle Api
+ * Supports Duniter's [Basic Merkle API](https://git.duniter.org/nodes/typescript/duniter/blob/master/doc/HTTP_API.md) and [protocol](https://git.duniter.org/nodes/typescript/duniter/blob/master/doc/Protocol.md)
  * Asynchronous
  * duniter signing key
 
