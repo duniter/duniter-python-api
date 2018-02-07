@@ -3,7 +3,7 @@ import aiohttp
 import getpass
 import duniterpy.api.bma as bma
 from duniterpy.documents import BMAEndpoint, BlockUID, Identity, Certification
-from duniterpy.key import SigningKey
+from duniterpy.key import SigningKey, ScryptParams
 
 
 # CONFIG #######################################
@@ -80,7 +80,7 @@ def get_certification_document(current_block, self_cert_document, from_pubkey, s
         signature=""
     )
     # sign document
-    key = SigningKey(salt, password)
+    key = SigningKey(salt, password, ScryptParams(4096, 16, 1))
     certification.sign(self_cert_document, [key])
 
     return certification

@@ -6,7 +6,7 @@ from duniterpy.api import bma
 from duniterpy.documents import BMAEndpoint, BlockUID, Transaction
 from duniterpy.documents.transaction import InputSource, OutputSource, Unlock, SIGParameter
 from duniterpy.grammars.output import Condition, SIG
-from duniterpy.key import SigningKey
+from duniterpy.key import SigningKey, ScryptParams
 
 # CONFIG #######################################
 
@@ -125,7 +125,7 @@ async def main():
     transaction = get_transaction_document(current_block, source, pubkey_from, pubkey_to)
 
     # create keys from credentials
-    key = SigningKey(salt, password)
+    key = SigningKey(salt, password, ScryptParams(4096, 16, 1))
 
     # sign document
     transaction.sign([key])

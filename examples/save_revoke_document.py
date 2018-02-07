@@ -3,7 +3,7 @@ import aiohttp
 import duniterpy.api.bma as bma
 from duniterpy.documents import BMAEndpoint, BlockUID, Identity
 from duniterpy.documents import Revocation
-from duniterpy.key import SigningKey
+from duniterpy.key import SigningKey, ScryptParams
 import getpass
 import os
 
@@ -86,7 +86,7 @@ def get_revoke_document(identity, salt, password):
     """
     document = Revocation(PROTOCOL_VERSION, identity.currency, identity.pubkey, "")
 
-    key = SigningKey(salt, password)
+    key = SigningKey(salt, password, ScryptParams(4096, 16, 1))
     document.sign(identity, [key])
     return document.signed_raw(identity)
 
@@ -104,7 +104,7 @@ async def main():
     pubkey = input("Enter your public key: ")
 
     # init signer instance
-    signer = SigningKey(salt, password)
+    signer = SigningKey(salt, password, ScryptParams(4096, 16, 1))
 
     # check public key
     if signer.pubkey != pubkey:

@@ -1,4 +1,4 @@
-from duniterpy.key import SigningKey
+from duniterpy.key import SigningKey, ScryptParams
 import getpass
 import os
 
@@ -30,7 +30,7 @@ password = getpass.getpass("Enter your password: ")
 pubkey = input("Enter your public key: ")
 
 # init signer instance
-signer = SigningKey(salt, password)\
+signer = SigningKey(salt, password, ScryptParams(4096, 16, 1))\
 
 # check public key
 if signer.pubkey != pubkey:
