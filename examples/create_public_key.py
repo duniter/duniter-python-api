@@ -1,5 +1,5 @@
 import getpass
-from duniterpy.key import SigningKey
+from duniterpy.key import SigningKey, ScryptParams
 
 ################################################
 
@@ -12,7 +12,7 @@ if __name__ == '__main__':
     password = getpass.getpass("Enter your password: ")
 
     # Create key object
-    key = SigningKey(salt, password)
+    key = SigningKey(salt, password, ScryptParams(4096, 16, 1))
 
     # Display your public key
     print("Public key for your credentials: %s" % key.pubkey)
