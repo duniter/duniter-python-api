@@ -4,8 +4,7 @@ import getpass
 
 import duniterpy.api.bma as bma
 from duniterpy.documents import BMAEndpoint, BlockUID, Identity
-from duniterpy.key import SigningKey
-
+from duniterpy.key import SigningKey, ScryptParams
 
 # CONFIG #######################################
 
@@ -39,7 +38,7 @@ def get_identity_document(current_block, uid, salt, password):
     timestamp = BlockUID(current_block['number'], current_block['hash'])
 
     # create keys from credentials
-    key = SigningKey(salt, password)
+    key = SigningKey(salt, password, ScryptParams(4096, 16, 1))
 
     # create identity document
     identity = Identity(
