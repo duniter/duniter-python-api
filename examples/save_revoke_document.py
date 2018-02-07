@@ -21,7 +21,7 @@ else:
 # You can either use a complete defined endpoint : [NAME_OF_THE_API] [DOMAIN] [IPv4] [IPv6] [PORT]
 # or the simple definition : [NAME_OF_THE_API] [DOMAIN] [PORT]
 # Here we use the BASIC_MERKLED_API
-BMA_ENDPOINT = "BASIC_MERKLED_API g1.duniter.org 10901"
+BMA_ENDPOINT = "BASIC_MERKLED_API g1-test.duniter.org 10900"
 
 # WARNING : Hide this file in a safe and secure place
 # If one day you forget your credentials,
