@@ -3,7 +3,7 @@ import aiohttp
 import duniterpy.api.bma as bma
 from duniterpy.documents import BMAEndpoint, BlockUID, Identity
 from duniterpy.documents import Revocation
-from duniterpy.key import SigningKey
+from duniterpy.key import SigningKey, ScryptParams
 import getpass
 import os
 
@@ -21,7 +21,7 @@ else:
 # You can either use a complete defined endpoint : [NAME_OF_THE_API] [DOMAIN] [IPv4] [IPv6] [PORT]
 # or the simple definition : [NAME_OF_THE_API] [DOMAIN] [PORT]
 # Here we use the BASIC_MERKLED_API
-BMA_ENDPOINT = "BASIC_MERKLED_API g1.duniter.org 10901"
+BMA_ENDPOINT = "BASIC_MERKLED_API g1-test.duniter.org 10900"
 
 # WARNING : Hide this file in a safe and secure place
 # If one day you forget your credentials,
@@ -86,7 +86,7 @@ def get_revoke_document(identity, salt, password):
     """
     document = Revocation(PROTOCOL_VERSION, identity.currency, identity.pubkey, "")
 
-    key = SigningKey(salt, password)
+    key = SigningKey(salt, password, ScryptParams(4096, 16, 1))
     document.sign(identity, [key])
     return document.signed_raw(identity)
 
@@ -104,7 +104,7 @@ async def main():
     pubkey = input("Enter your public key: ")
 
     # init signer instance
-    signer = SigningKey(salt, password)
+    signer = SigningKey(salt, password, ScryptParams(4096, 16, 1))
 
     # check public key
     if signer.pubkey != pubkey:

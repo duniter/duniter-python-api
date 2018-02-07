@@ -4,7 +4,7 @@ import getpass
 
 import duniterpy.api.bma as bma
 from duniterpy.documents import BMAEndpoint, BlockUID, Identity, Membership
-from duniterpy.key import SigningKey
+from duniterpy.key import SigningKey, ScryptParams
 
 
 # CONFIG #######################################
@@ -12,7 +12,7 @@ from duniterpy.key import SigningKey
 # You can either use a complete defined endpoint : [NAME_OF_THE_API] [DOMAIN] [IPv4] [IPv6] [PORT]
 # or the simple definition : [NAME_OF_THE_API] [DOMAIN] [PORT]
 # Here we use the BASIC_MERKLED_API
-BMA_ENDPOINT = "BASIC_MERKLED_API g1.duniter.org 10901"
+BMA_ENDPOINT = "BASIC_MERKLED_API g1-test.duniter.org 10900"
 
 ################################################
 
@@ -37,7 +37,7 @@ def get_identity_document(current_block, uid, salt, password):
     timestamp = BlockUID(current_block['number'], current_block['hash'])
 
     # create keys from credentials
-    key = SigningKey(salt, password)
+    key = SigningKey(salt, password, ScryptParams(4096, 16, 1))
 
     # create identity document
     identity = Identity(
@@ -72,7 +72,7 @@ def get_membership_document(mtype, current_block, identity, salt, password):
     timestamp = BlockUID(current_block['number'], current_block['hash'])
 
     # create keys from credentials
-    key = SigningKey(salt, password)
+    key = SigningKey(salt, password, ScryptParams(4096, 16, 1))
 
     # create identity document
     membership = Membership(

@@ -3,7 +3,7 @@ import aiohttp
 import getpass
 import duniterpy.api.bma as bma
 from duniterpy.documents import BMAEndpoint, BlockUID, Identity, Certification
-from duniterpy.key import SigningKey
+from duniterpy.key import SigningKey, ScryptParams
 
 
 # CONFIG #######################################
@@ -11,7 +11,7 @@ from duniterpy.key import SigningKey
 # You can either use a complete defined endpoint : [NAME_OF_THE_API] [DOMAIN] [IPv4] [IPv6] [PORT]
 # or the simple definition : [NAME_OF_THE_API] [DOMAIN] [PORT]
 # Here we use the BASIC_MERKLED_API
-BMA_ENDPOINT = "BASIC_MERKLED_API g1.duniter.org 10901"
+BMA_ENDPOINT = "BASIC_MERKLED_API g1-test.duniter.org 10900"
 
 ################################################
 
@@ -80,7 +80,7 @@ def get_certification_document(current_block, self_cert_document, from_pubkey, s
         signature=""
     )
     # sign document
-    key = SigningKey(salt, password)
+    key = SigningKey(salt, password, ScryptParams(4096, 16, 1))
     certification.sign(self_cert_document, [key])
 
     return certification
