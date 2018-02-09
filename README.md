@@ -29,5 +29,5 @@ Please take a look at the document [HTTP API](https://github.com/duniter/duniter
 
 ## Documentation
 
-- [Documentation](https://github.com/duniter/duniter-python-api/tree/master/docs)
+- [HTML Documentation](https://github.com/duniter/duniter-python-api/tree/master/docs/_build/html)
 - [Examples](https://github.com/duniter/duniter-python-api/tree/master/examples)
