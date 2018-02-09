@@ -1,14 +1,14 @@
 import asyncio
 import aiohttp
 import duniterpy.api.bma as bma
-from duniterpy.documents import BMAEndpoint
+from duniterpy.documents import BMAEndpoint, SecuredBMAEndpoint
 
 # CONFIG #######################################
 
 # You can either use a complete defined endpoint : [NAME_OF_THE_API] [DOMAIN] [IPv4] [IPv6] [PORT]
 # or the simple definition : [NAME_OF_THE_API] [DOMAIN] [PORT]
-# Here we use the BASIC_MERKLED_API
-BMA_ENDPOINT = "BASIC_MERKLED_API g1.duniter.org 10901"
+# Here we use the secure BASIC_MERKLED_API (BMAS)
+BMA_ENDPOINT = "BMAS g1-test.duniter.org 443"
 
 ################################################
 
@@ -16,12 +16,13 @@ BMA_ENDPOINT = "BASIC_MERKLED_API g1.duniter.org 10901"
 # ( http://pythonhosted.org/aiohttp )
 AIOHTTP_SESSION = aiohttp.ClientSession()
 
+
 async def main():
     """
     Main code
     """
     # connection handler from BMA endpoint
-    connection = next(BMAEndpoint.from_inline(BMA_ENDPOINT).conn_handler(AIOHTTP_SESSION))
+    connection = next(SecuredBMAEndpoint.from_inline(BMA_ENDPOINT).conn_handler(AIOHTTP_SESSION))
 
     # Get the node summary infos
     response = await bma.node.summary(connection)

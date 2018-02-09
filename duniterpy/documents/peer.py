@@ -1,4 +1,5 @@
 import re
+from typing import Generator
 
 from ..api.bma import ConnectionHandler
 from .document import Document, MalformedDocumentError
@@ -188,6 +189,8 @@ class BMAEndpoint(Endpoint):
         Return connection handler instance for the endpoint
 
         :param aiohttp.ClientSession session: AIOHTTP client session instance
+        :param str proxy: Proxy url
+        :rtype: Generator[ConnectionHandler, None, None]
         """
         if self.server:
             yield ConnectionHandler("http", "ws", self.server, self.port, "", proxy, session)
@@ -244,7 +247,8 @@ class SecuredBMAEndpoint(BMAEndpoint):
         Return connection handler instance for the endpoint
 
         :param aiohttp.ClientSession session: AIOHTTP client session instance
-        :rtype: ConnectionHandler
+        :param str proxy: Proxy url
+        :rtype: Generator[ConnectionHandler, None, None]
         """
         if self.server:
             yield ConnectionHandler("https", "wss", self.server, self.port, self.path, proxy, session)

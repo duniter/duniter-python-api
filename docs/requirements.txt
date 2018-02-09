@@ -1,4 +1,0 @@
-asyncio
-aiohttp
-pylibscrypt
-base58

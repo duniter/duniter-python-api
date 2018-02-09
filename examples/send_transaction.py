@@ -3,7 +3,7 @@ import getpass
 import aiohttp
 
 from duniterpy.api import bma
-from duniterpy.documents import BMAEndpoint, BlockUID, Transaction
+from duniterpy.documents import BMAEndpoint, SecuredBMAEndpoint, BlockUID, Transaction
 from duniterpy.documents.transaction import InputSource, OutputSource, Unlock, SIGParameter
 from duniterpy.grammars.output import Condition, SIG
 from duniterpy.key import SigningKey
@@ -12,8 +12,8 @@ from duniterpy.key import SigningKey
 
 # You can either use a complete defined endpoint : [NAME_OF_THE_API] [DOMAIN] [IPv4] [IPv6] [PORT]
 # or the simple definition : [NAME_OF_THE_API] [DOMAIN] [PORT]
-# Here we use the BASIC_MERKLED_API
-BMA_ENDPOINT = "BASIC_MERKLED_API g1.duniter.org 10901"
+# Here we use the secure BASIC_MERKLED_API (BMAS)
+BMA_ENDPOINT = "BMAS g1-test.duniter.org 443"
 
 
 ################################################
@@ -89,12 +89,13 @@ def get_transaction_document(current_block, source, from_pubkey, to_pubkey):
 
     return transaction
 
+
 async def main():
     """
     Main code
     """
     # connection handler from BMA endpoint
-    connection = next(BMAEndpoint.from_inline(BMA_ENDPOINT).conn_handler(AIOHTTP_SESSION))
+    connection = next(SecuredBMAEndpoint.from_inline(BMA_ENDPOINT).conn_handler(AIOHTTP_SESSION))
 
     # prompt hidden user entry
     salt = getpass.getpass("Enter your passphrase (salt): ")

@@ -1,0 +1,199 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>duniterpy : A python implementation of duniter API &#8212; duniterpy 0.30.5 documentation</title>
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.30.5',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="duniterpy" href="modules.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="duniterpy-a-python-implementation-of-duniter-api">
+<h1>duniterpy : A python implementation of duniter API<a class="headerlink" href="#duniterpy-a-python-implementation-of-duniter-api" title="Permalink to this headline">¶</a></h1>
+<p>duniterpy is a library to develop an application for duniter.
+duniterpy helps to handle the following problem :
+* Request Basic Merkle API provided by duniter nodes
+* Request nodes in a non-blocking way
+* Handle duniter signing keys</p>
+<div class="section" id="installation">
+<h2>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h2>
+<p>Simply type:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span>$ pip install duniterpy
+</pre></div>
+</div>
+</div>
+<div class="section" id="source-code">
+<h2>Source code<a class="headerlink" href="#source-code" title="Permalink to this headline">¶</a></h2>
+<p>Sources can be found at <a class="reference external" href="https://github.com/duniter/duniter-python-api">https://github.com/duniter/duniter-python-api</a></p>
+<p>Contributions are welcome.</p>
+</div>
+</div>
+<div class="section" id="contents">
+<h1>Contents:<a class="headerlink" href="#contents" title="Permalink to this headline">¶</a></h1>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="modules.html">duniterpy</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="duniterpy.html">duniterpy package</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="duniterpy.html#subpackages">Subpackages</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="duniterpy.api.html">duniterpy.api package</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="duniterpy.api.html#subpackages">Subpackages</a><ul>
+<li class="toctree-l6"><a class="reference internal" href="duniterpy.api.bma.html">duniterpy.api.bma package</a><ul>
+<li class="toctree-l7"><a class="reference internal" href="duniterpy.api.bma.html#submodules">Submodules</a></li>
+<li class="toctree-l7"><a class="reference internal" href="duniterpy.api.bma.html#module-duniterpy.api.bma.api">duniterpy.api.bma.api module</a></li>
+<li class="toctree-l7"><a class="reference internal" href="duniterpy.api.bma.html#module-duniterpy.api.bma.blockchain">duniterpy.api.bma.blockchain module</a></li>
+<li class="toctree-l7"><a class="reference internal" href="duniterpy.api.bma.html#module-duniterpy.api.bma.network">duniterpy.api.bma.network module</a></li>
+<li class="toctree-l7"><a class="reference internal" href="duniterpy.api.bma.html#module-duniterpy.api.bma.node">duniterpy.api.bma.node module</a></li>
+<li class="toctree-l7"><a class="reference internal" href="duniterpy.api.bma.html#module-duniterpy.api.bma.tx">duniterpy.api.bma.tx module</a></li>
+<li class="toctree-l7"><a class="reference internal" href="duniterpy.api.bma.html#module-duniterpy.api.bma.ud">duniterpy.api.bma.ud module</a></li>
+<li class="toctree-l7"><a class="reference internal" href="duniterpy.api.bma.html#module-duniterpy.api.bma.wot">duniterpy.api.bma.wot module</a></li>
+<li class="toctree-l7"><a class="reference internal" href="duniterpy.api.bma.html#module-duniterpy.api.bma.ws">duniterpy.api.bma.ws module</a></li>
+<li class="toctree-l7"><a class="reference internal" href="duniterpy.api.bma.html#module-duniterpy.api.bma">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l5"><a class="reference internal" href="duniterpy.api.html#submodules">Submodules</a></li>
+<li class="toctree-l5"><a class="reference internal" href="duniterpy.api.html#module-duniterpy.api.errors">duniterpy.api.errors module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="duniterpy.api.html#module-duniterpy.api">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="duniterpy.documents.html">duniterpy.documents package</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="duniterpy.documents.html#submodules">Submodules</a></li>
+<li class="toctree-l5"><a class="reference internal" href="duniterpy.documents.html#module-duniterpy.documents.block">duniterpy.documents.block module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="duniterpy.documents.html#module-duniterpy.documents.certification">duniterpy.documents.certification module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="duniterpy.documents.html#module-duniterpy.documents.constants">duniterpy.documents.constants module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="duniterpy.documents.html#module-duniterpy.documents.crc_pubkey">duniterpy.documents.crc_pubkey module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="duniterpy.documents.html#module-duniterpy.documents.document">duniterpy.documents.document module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="duniterpy.documents.html#module-duniterpy.documents.membership">duniterpy.documents.membership module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="duniterpy.documents.html#module-duniterpy.documents.peer">duniterpy.documents.peer module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="duniterpy.documents.html#module-duniterpy.documents.transaction">duniterpy.documents.transaction module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="duniterpy.documents.html#module-duniterpy.documents">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="duniterpy.grammars.html">duniterpy.grammars package</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="duniterpy.grammars.html#submodules">Submodules</a></li>
+<li class="toctree-l5"><a class="reference internal" href="duniterpy.grammars.html#module-duniterpy.grammars.output">duniterpy.grammars.output module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="duniterpy.grammars.html#module-duniterpy.grammars">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="duniterpy.key.html">duniterpy.key package</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="duniterpy.key.html#submodules">Submodules</a></li>
+<li class="toctree-l5"><a class="reference internal" href="duniterpy.key.html#module-duniterpy.key.base58">duniterpy.key.base58 module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="duniterpy.key.html#module-duniterpy.key.encryption_key">duniterpy.key.encryption_key module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="duniterpy.key.html#module-duniterpy.key.signing_key">duniterpy.key.signing_key module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="duniterpy.key.html#module-duniterpy.key.verifying_key">duniterpy.key.verifying_key module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="duniterpy.key.html#module-duniterpy.key">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="duniterpy.html#module-duniterpy">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+<div class="section" id="indices-and-tables">
+<h1>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Permalink to this headline">¶</a></h1>
+<ul class="simple">
+<li><a class="reference internal" href="genindex.html"><span class="std std-ref">Index</span></a></li>
+<li><a class="reference internal" href="py-modindex.html"><span class="std std-ref">Module Index</span></a></li>
+<li><a class="reference internal" href="search.html"><span class="std std-ref">Search Page</span></a></li>
+</ul>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="#">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">duniterpy : A python implementation of duniter API</a><ul>
+<li><a class="reference internal" href="#installation">Installation</a></li>
+<li><a class="reference internal" href="#source-code">Source code</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#contents">Contents:</a></li>
+<li><a class="reference internal" href="#indices-and-tables">Indices and tables</a></li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="#">Documentation overview</a><ul>
+      <li>Next: <a href="modules.html" title="next chapter">duniterpy</a></li>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/index.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2015, caner & inso.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.6.7</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
+      
+      |
+      <a href="_sources/index.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>
