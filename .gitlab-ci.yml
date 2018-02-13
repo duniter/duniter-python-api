@@ -27,7 +27,7 @@ push_to_github:
 
 .pyenv: &pyenv
   tags:
-    - redshift
+    - redshift-docker-python
   before_script:
     - export PYENV_ROOT="$HOME/.pyenv"
     - export PATH="$PYENV_ROOT/bin:$PATH"
