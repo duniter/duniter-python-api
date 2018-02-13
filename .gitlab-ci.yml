@@ -1,3 +1,6 @@
+stages:
+  - github-sync
+
 push_to_github:
   stage: github-sync
   variables:
