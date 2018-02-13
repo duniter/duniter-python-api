@@ -1,5 +1,11 @@
 stages:
   - github-sync
+  - prepare
+  - build
+  - test
+
+variables:
+    PYENV_PYTHON_VERSION: 3.5.5
 
 push_to_github:
   stage: github-sync
@@ -18,3 +24,31 @@ push_to_github:
     - bash -c "cat packed-refs | grep -v 'refs/pull' > packed-refs-new; echo 'Removed pull refs.'"
     - mv packed-refs-new packed-refs
     - bash -c "git push --force --mirror github 2>&1 | grep -v duniter-gitlab; echo $?"
+
+.pyenv: &pyenv
+  tags:
+    - redshift
+  before_script:
+    - export PYENV_ROOT="$HOME/.pyenv"
+    - export PATH="$PYENV_ROOT/bin:$PATH"
+    - eval "$(pyenv init -)"
+
+prepare:
+  <<: *pyenv
+  stage: prepare
+  script:
+    - pyenv install $PYENV_PYTHON_VERSION
+
+build:
+  <<: *pyenv
+  stage: build
+  script:
+    - bash ci/libsodium.sh
+    - pip install coveralls
+    - pip install -r requirements.txt
+
+test:
+  <<: *pyenv
+  stage: test
+  script:
+    - coverage run --source=duniterpy setup.py test
