@@ -32,23 +32,22 @@ push_to_github:
     - export PYENV_ROOT="$HOME/.pyenv"
     - export PATH="$PYENV_ROOT/bin:$PATH"
     - eval "$(pyenv init -)"
-
-prepare:
-  <<: *pyenv
-  stage: prepare
-  script:
-    - pyenv install $PYENV_PYTHON_VERSION
+    - pyenv shell $PYENV_PYTHON_VERSION
 
 build:
   <<: *pyenv
   stage: build
   script:
     - bash ci/libsodium.sh
-    - pip install coveralls
     - pip install -r requirements.txt
+    - pip install wheel
+    - python setup.py sdist bdist_wheel
 
 test:
   <<: *pyenv
   stage: test
   script:
+    - bash ci/libsodium.sh
+    - pip install coveralls
+    - pip install -r requirements.txt
     - coverage run --source=duniterpy setup.py test
