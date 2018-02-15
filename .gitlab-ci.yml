@@ -40,7 +40,6 @@ build:
   <<: *pyenv
   stage: build
   script:
-    - bash ci/libsodium.sh
     - pip install -r requirements.txt
     - pip install wheel
     - python setup.py sdist bdist_wheel
@@ -49,7 +48,6 @@ test:
   <<: *pyenv
   stage: test
   script:
-    - bash ci/libsodium.sh
     - pip install coveralls
     - pip install -r requirements.txt
     - coverage run --source=duniterpy setup.py test
