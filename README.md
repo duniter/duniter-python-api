@@ -1,5 +1,5 @@
 # Duniter Python API
-[![Build Status](https://travis-ci.org/duniter/duniter-python-api.svg)](https://travis-ci.org/duniter/duniter-python-api) [![Coverage Status](https://coveralls.io/repos/duniter/duniter-python-api/badge.svg?branch=master&service=github)](https://coveralls.io/github/duniter/duniter-python-api?branch=master)
+[![Coverage Status](https://coveralls.io/repos/duniter/duniter-python-api/badge.svg?branch=master&service=github)](https://coveralls.io/github/duniter/duniter-python-api?branch=master)
 
 Python implementation of [Duniter](https://git.duniter.org/nodes/typescript/duniter) BMA API
 

@@ -7,6 +7,8 @@ stages:
 variables:
     PYENV_PYTHON_VERSION: 3.5.5
 
+image: registry.duniter.org/docker/python3/duniterpy-builder:0.0.4
+
 push_to_github:
   stage: github-sync
   variables:
@@ -38,7 +40,6 @@ build:
   <<: *pyenv
   stage: build
   script:
-    - bash ci/libsodium.sh
     - pip install -r requirements.txt
     - pip install wheel
     - python setup.py sdist bdist_wheel
@@ -47,7 +48,6 @@ test:
   <<: *pyenv
   stage: test
   script:
-    - bash ci/libsodium.sh
     - pip install coveralls
     - pip install -r requirements.txt
     - coverage run --source=duniterpy setup.py test
