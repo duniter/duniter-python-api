@@ -78,7 +78,7 @@ class Test_BMA_Wot(WebFunctionalSetupMixin, unittest.TestCase):
             return web.Response(body=b'{}', content_type='application/json')
 
         async def go():
-            _, srv, port, url = await self.create_server('GET', '/wot/lookup/pubkey', handler)
+            _, port, url = await self.create_server('GET', '/wot/lookup/pubkey', handler)
             with self.assertRaises(jsonschema.exceptions.ValidationError):
                 async with aiohttp.ClientSession() as session:
                     connection = next(BMAEndpoint("127.0.0.1", None, None, port).conn_handler(session))
@@ -102,7 +102,7 @@ class Test_BMA_Wot(WebFunctionalSetupMixin, unittest.TestCase):
             return web.Response(body=b'{}', content_type='application/json')
 
         async def go():
-            _, srv, port, url = await self.create_server('GET', '/wot/members', handler)
+            _, port, url = await self.create_server('GET', '/wot/members', handler)
             with self.assertRaises(jsonschema.exceptions.ValidationError):
                 async with aiohttp.ClientSession() as session:
                     connection = next(BMAEndpoint("127.0.0.1", None, None, port).conn_handler(session))
@@ -156,7 +156,7 @@ class Test_BMA_Wot(WebFunctionalSetupMixin, unittest.TestCase):
             return web.Response(body=b'{}', content_type='application/json')
 
         async def go():
-            _, srv, port, url = await self.create_server('GET', '/wot/certifiers-of/pubkey', handler)
+            _, port, url = await self.create_server('GET', '/wot/certifiers-of/pubkey', handler)
             with self.assertRaises(jsonschema.exceptions.ValidationError):
                 async with aiohttp.ClientSession() as session:
                     connection = next(BMAEndpoint("127.0.0.1", None, None, port).conn_handler(session))
@@ -188,7 +188,7 @@ class Test_BMA_Wot(WebFunctionalSetupMixin, unittest.TestCase):
             }), "utf-8"), content_type='application/json')
 
         async def go():
-            _, srv, port, url = await self.create_server('GET', '/wot/certifiers-of/pubkey', handler)
+            _, port, url = await self.create_server('GET', '/wot/certifiers-of/pubkey', handler)
             with self.assertRaises(jsonschema.exceptions.ValidationError):
                 async with aiohttp.ClientSession() as session:
                     connection = next(BMAEndpoint("127.0.0.1", None, None, port).conn_handler(session))
@@ -202,7 +202,7 @@ class Test_BMA_Wot(WebFunctionalSetupMixin, unittest.TestCase):
             return web.Response(body=b'{}', content_type='application/json')
 
         async def go():
-            _, srv, port, url = await self.create_server('GET', '/wot/certified-by/pubkey', handler)
+            _, port, url = await self.create_server('GET', '/wot/certified-by/pubkey', handler)
             with self.assertRaises(jsonschema.exceptions.ValidationError):
                 async with aiohttp.ClientSession() as session:
                     connection = next(BMAEndpoint("127.0.0.1", None, None, port).conn_handler(session))
