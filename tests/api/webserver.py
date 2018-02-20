@@ -41,7 +41,7 @@ class WebFunctionalSetupMixin:
         port = self.find_unused_port()
         self.runner = web.AppRunner(app)
         await self.runner.setup()
-        site = web.TCPSite(self.runner, 'localhost', port)
+        site = web.TCPSite(self.runner, '127.0.0.1', port)
         await site.start()
 
         protocol = "https" if ssl_ctx else "http"
