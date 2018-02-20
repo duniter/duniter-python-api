@@ -181,6 +181,9 @@ class BlockForge:
             receivers = [o.conditions.left.pubkey for o in tx.outputs
                          if o.conditions.left.pubkey != tx.issuers[0]]
             self.user_identities[tx.issuers[0]].tx_sent.append(tx)
-            self.user_identities[receivers[0]].tx_received.append(tx)
+            if len(receivers) == 0:
+                self.user_identities[tx.issuers[0]].tx_received.append(tx)
+            else:
+                self.user_identities[receivers[0]].tx_received.append(tx)
 
         self.pool = []

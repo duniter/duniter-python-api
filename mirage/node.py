@@ -43,7 +43,7 @@ class Node:
             node.http.add_route("GET", r, h)
         for r, h in post_routes.items():
             node.http.add_route("POST", r, h)
-        srv, port, url = await node.http.create_server()
+        port, url = await node.http.create_server()
         print("Server started on {0}".format(url))
         return node
 

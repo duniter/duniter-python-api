@@ -19,6 +19,7 @@ class HTTPServer:
         self.app = web.Application(middlewares=[self.middleware_factory])
 
         self.handler = None
+        self.runner = None
         self.port = self.find_unused_port() if not port else port
 
     def get_request(self, i):
@@ -62,16 +63,16 @@ class HTTPServer:
             access_log=log.access_logger,
         )
 
-        srv = None
-        while not srv:
-            try:
-                srv = await self.lp.create_server(self.handler, '127.0.0.1', self.port)
-            except OSError:
-                self.port = self.find_unused_port()
+        self.port = self.find_unused_port()
+        self.runner = web.AppRunner(self.app)
+        await self.runner.setup()
+        site = web.TCPSite(self.runner, '127.0.0.1', self.port)
+        await site.start()
+
         protocol = "https" if ssl_ctx else "http"
         url = "{}://127.0.0.1:{}".format(protocol, self.port)
-
-        return srv, self.port, url
+        return self.port, url
 
     async def close(self):
         await self.handler.shutdown()
+        await self.runner.cleanup()
