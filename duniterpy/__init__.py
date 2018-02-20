@@ -18,7 +18,7 @@
 
 
 __author__      = 'Caner Candan & inso & vit'
-__version__     = '0.42.3'
+__version__     = '0.42.4'
 __nonsense__    = 'duniter'
 
 from . import api, documents, key
