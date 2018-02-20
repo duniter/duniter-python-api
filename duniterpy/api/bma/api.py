@@ -183,14 +183,14 @@ class API(object):
             kwargs['self'] = kwargs.pop('self_')
 
         logging.debug("POST : {0}".format(kwargs))
-        with aiohttp.Timeout(15):
-            response = await self.connection_handler.session.post(
-                self.reverse_url(self.connection_handler.http_scheme, path),
-                data=kwargs,
-                headers=self.headers,
-                proxy=self.connection_handler.proxy
-            )
-            return response
+        response = await self.connection_handler.session.post(
+            self.reverse_url(self.connection_handler.http_scheme, path),
+            data=kwargs,
+            headers=self.headers,
+            proxy=self.connection_handler.proxy,
+            timeout=15
+        )
+        return response
 
     def connect_ws(self, path):
         """
