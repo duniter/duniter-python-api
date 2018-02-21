@@ -3,6 +3,7 @@ stages:
   - prepare
   - build
   - test
+  - package
 
 variables:
     PYENV_PYTHON_VERSION: 3.5.5
@@ -36,7 +37,7 @@ push_to_github:
     - eval "$(pyenv init -)"
     - pyenv shell $PYENV_PYTHON_VERSION
 
-build:
+build: &build
   <<: *pyenv
   stage: build
   script:
@@ -51,3 +52,28 @@ test:
     - pip install coveralls
     - pip install -r requirements.txt
     - coverage run --source=duniterpy setup.py test
+
+
+.build_releases: &build_releases
+  stage: package
+  allow_failure: false
+  when: manual
+  artifacts:
+    paths: &releases_artifacts
+      - dist/
+
+releases:test:
+  <<: *build_releases
+  <<: *pyenv
+  <<: *build
+  script:
+    - pip install -r requirements.txt
+    - pip install wheel
+    - pip install twine
+    - python setup.py sdist bdist_wheel
+    - twine upload dist/* --username duniter --password $PYPI_PASSWORD
+  artifacts:
+    paths: *releases_artifacts
+    expire_in: 4h
+  except:
+    - tags
