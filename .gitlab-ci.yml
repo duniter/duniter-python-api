@@ -54,7 +54,6 @@ test:
     - coverage run --source=duniterpy setup.py test
 
 releases:
-  <<: *build_releases
   <<: *pyenv
   stage: release
   script:
