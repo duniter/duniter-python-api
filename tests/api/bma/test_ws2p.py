@@ -4,7 +4,7 @@ import jsonschema
 import json
 from duniterpy.documents import BMAEndpoint
 from tests.api.webserver import WebFunctionalSetupMixin, web, asyncio
-from duniterpy.api.bma.ws2p import heads, WS2P_HEADS_SCHEMA
+from duniterpy.api.bma.network import heads, WS2P_HEADS_SCHEMA
 from duniterpy.api.bma import parse_text
 
 

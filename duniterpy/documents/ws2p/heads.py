@@ -83,7 +83,7 @@ class HeadV0:
         api = API.from_inline(data.group(1))
         head = Head.from_inline(data.group(2))
         pubkey = data.group(3)
-        blockstamp = data.group(4)
+        blockstamp = BlockUID.from_str(data.group(4))
         offload = data.group(5)
 
         return cls(signature, api, head, pubkey, blockstamp), offload
@@ -133,6 +133,10 @@ class HeadV1:
     def signature(self):
         return self.v0.signature
 
+    @property
+    def blockstamp(self):
+        return self.v0.blockstamp
+
 @attr.s
 class HeadV2:
     re_inline = re.compile("({free_member_room}):({free_mirror_room})(?::)?(.*)"
@@ -163,3 +167,7 @@ class HeadV2:
     @property
     def signature(self):
         return self.v1.signature
+
+    @property
+    def blockstamp(self):
+        return self.v1.blockstamp

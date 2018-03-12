@@ -144,20 +144,47 @@ async def peer(connection, entry=None, signature=None):
     r = await client.requests_post('/peering/peers', entry=entry, signature=signature)
     return r
 
-# async def status(connection):
-#     """
-# NOT DOCUMENTED IN BMA API DOCUMENTATION
-#     POST a network status document to this node in order notify of its status
-#
-#     :param duniterpy.api.bma.ConnectionHandler connection: Connection handler instance
-#     :param duniterpy.documents.peer.Peer entry: Peer document
-#     :param str signature: Signature of the document issuer
-#     :rtype: dict
-#     """
-#
-#     async def __post__(self, session, **kwargs):
-#         assert 'status' in kwargs
-#         assert 'signature' in kwargs
-#
-#         r = await self.requests_post(session, '/status', **kwargs)
-#         return r
+WS2P_HEADS_SCHEMA = {
+                    "type": "object",
+                    "properties": {
+                        "heads": {
+                            "type": "array",
+                            "items": {
+                                "type": "object",
+                                "properties": {
+                                    "message": {
+                                        "type": "string"
+                                    },
+                                    "sig": {
+                                        "type": "string",
+                                    },
+                                    "messageV2": {
+                                        "type": "string"
+                                    },
+                                    "sigV2": {
+                                        "type": "string",
+                                    },
+                                    "step": {
+                                        "type": "number",
+                                    },
+                                },
+                                "required": ["messageV2", "sigV2", "step"]
+                            }
+                        }
+                    },
+                    "required": ["heads"]
+                }
+
+
+async def heads(connection):
+    """
+    GET Certification data over a member
+
+    :param duniterpy.api.bma.ConnectionHandler connection: Connection handler instance
+    :rtype: dict
+    """
+
+    client = API(connection, URL_PATH)
+
+    r = await client.requests_get('/ws2p/heads')
+    return await parse_response(r, WS2P_HEADS_SCHEMA)
