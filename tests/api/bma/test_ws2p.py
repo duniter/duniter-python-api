@@ -45,7 +45,7 @@ class Test_WS2P_Heads(WebFunctionalSetupMixin, unittest.TestCase):
             return web.Response(body=b'{}', content_type='application/json')
 
         async def go():
-            _, port, url = await self.create_server('GET', '/ws2p/heads', handler)
+            _, port, url = await self.create_server('GET', '/network/ws2p/heads', handler)
             with self.assertRaises(jsonschema.ValidationError):
                 async with aiohttp.ClientSession() as session:
                     connection = next(BMAEndpoint("127.0.0.1", None, None, port).conn_handler(session))

@@ -43,7 +43,7 @@ BASIC_MERKLED_API testnet.duniter.inso.ovh 80
         self.assertTrue(verifying_key.verify_ws2p_head(headv1))
 
     def test_ws2p_headv2(self):
-        headv2 = HeadV2.from_inline("WS2POCA:HEAD:2:D3krfq6J9AmfpKnS3gQVYoy7NzGCc61vokteTS8LJ4YH:"
+        headv2, _ = HeadV2.from_inline("WS2POCA:HEAD:2:D3krfq6J9AmfpKnS3gQVYoy7NzGCc61vokteTS8LJ4YH:"
                                        "99393-0000017256006BFA979565F1280488D5831DD66054069E46A3EDEB1AECDBBF13:cb36b021:"
                                        "duniter:1.6.21:1:20:19",
                                        "CgD1vaImPWZUCDFt5HDHUdjCTFcIwW5ndiCx6kXioFLZoz1a4WhCFYXvjI2N8+jEwQdWtf5+yNoHonqBSqirAQ==")

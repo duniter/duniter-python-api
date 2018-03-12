@@ -154,7 +154,7 @@ class HeadV2:
         data = HeadV2.re_inline.match(offload)
         free_member_room = int(data.group(1))
         free_mirror_room = int(data.group(2))
-        return cls(v1, free_member_room, free_mirror_room)
+        return cls(v1, free_member_room, free_mirror_room), ""
 
     def inline(self):
         values = (str(v) for v in attr.astuple(self, True, filter=attr.filters.exclude(attr.fields(HeadV2).v1)))

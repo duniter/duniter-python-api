@@ -168,7 +168,7 @@ WS2P_HEADS_SCHEMA = {
                                         "type": "number",
                                     },
                                 },
-                                "required": ["messageV2", "sigV2", "step"]
+                                "required": ["message", "sig"]
                             }
                         }
                     },
