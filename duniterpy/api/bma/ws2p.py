@@ -12,6 +12,12 @@ WS2P_HEADS_SCHEMA = {
                             "items": {
                                 "type": "object",
                                 "properties": {
+                                    "message": {
+                                        "type": "string"
+                                    },
+                                    "sig": {
+                                        "type": "string",
+                                    },
                                     "messageV2": {
                                         "type": "string"
                                     },
@@ -28,6 +34,7 @@ WS2P_HEADS_SCHEMA = {
                     },
                     "required": ["heads"]
                 }
+
 
 async def heads(connection):
     """

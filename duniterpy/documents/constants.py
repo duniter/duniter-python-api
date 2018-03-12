@@ -15,3 +15,6 @@ ipv6_regex = '(?:(?:[0-9A-Fa-f]{1,4}:){6}(?:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|(?
 ws2pid_regex = "[0-9a-f]{8}"
 host_regex = "[a-z0-9-_.]*(?:.[a-zA-Z])?"
 path_regex = "[/\w \.-]*/?"
+ws2p_private_prefix_regex = "O[CT][SAM]"
+ws2p_public_prefix_regex = "I[CT]"
+ws2p_head_regex = "HEAD:?(?:[0-9]+)?"
