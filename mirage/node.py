@@ -419,9 +419,12 @@ class Node:
                                 "block": c.block,
                                 "block_hash": str(self.forge.blocks[c.block].blockUID)
                             },
-                            "uids": [c.to_identity.uid],
+                            "uid": c.to_identity.uid,
                             "isMember": c.to_identity.member,
                             "wasMember": c.to_identity.was_member,
+                            "revoked": c.to_identity.revoked,
+                            "revoked_on": c.to_identity.revoked_on,
+                            "revocation_sig": c.to_identity.revocation_sig,
                             "signature": c.signature
                         } for c in m.certs_sent
                     ]
