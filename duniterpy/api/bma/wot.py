@@ -215,81 +215,81 @@ LOOKUP_SCHEMA = {
                 "properties": {
                     "pubkey": {
                         "type": "string"
-                    }
-                },
-                "uids": {
-                    "type": "array",
-                    "items": {
-                        "type": "object",
-                        "properties": {
-                            "uid": {
-                                "type": "string"
-                            },
-                            "meta": {
-                                "$ref": "#/definitions/meta_data"
-                            },
-                            "self": {
-                                "type": "string",
-                            },
-                            "revokation_sig": {
-                                "type": ["string", "null"]
-                            },
-                            "revoked_on": {
-                                "type": ["number", "null"]
-                            },
-                            "revoked": {
-                                "type": "boolean"
-                            },
-                            "others": {
-                                "type": "array",
-                                "items": {
-                                    "type": "object",
-                                    "properties": {
-                                        "pubkey": {
-                                            "type": "string",
-                                        },
-                                        "meta": {
-                                            "$ref": "#/definitions/meta_data"
-                                        },
-                                        "signature": {
-                                            "type": "string"
+                    },
+                    "uids": {
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "properties": {
+                                "uid": {
+                                    "type": "string"
+                                },
+                                "meta": {
+                                    "$ref": "#/definitions/meta_data"
+                                },
+                                "self": {
+                                    "type": "string",
+                                },
+                                "revocation_sig": {
+                                    "type": ["string", "null"]
+                                },
+                                "revoked_on": {
+                                    "type": ["number", "null"]
+                                },
+                                "revoked": {
+                                    "type": "boolean"
+                                },
+                                "others": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "object",
+                                        "properties": {
+                                            "pubkey": {
+                                                "type": "string",
+                                            },
+                                            "meta": {
+                                                "$ref": "#/definitions/meta_data"
+                                            },
+                                            "signature": {
+                                                "type": "string"
+                                            }
                                         }
                                     }
                                 }
-                            }
-                        },
-                        "required": ["uid", "meta", "self", "revokation_sig", "revoked", "others"]
-                    }
-                },
-                "signed": {
-                    "type": "array",
-                    "items": {
-                        "type": "object",
-                        "properties": {
-                            "uid": {
-                                "type": "string"
                             },
-                            "pubkey": {
-                                "type": "string"
+                            "required": ["uid", "meta", "self", "revocation_sig", "revoked", "others"]
+                        }
+                    },
+                    "signed": {
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "properties": {
+                                "uid": {
+                                    "type": "string"
+                                },
+                                "pubkey": {
+                                    "type": "string"
+                                },
+                                "meta": {
+                                    "$ref": "#/definitions/meta_data"
+                                },
+                                "signature": {
+                                    "type": "string"
+                                },
+                                "revocation_sig": {
+                                    "type": ["string", "null"]
+                                },
+                                "revoked_on": {
+                                    "type": ["number", "null"]
+                                },
+                                "revoked": {
+                                    "type": "boolean"
+                                }
                             },
-                            "meta": {
-                                "$ref": "#/definitions/meta_data"
-                            },
-                            "signature": {
-                                "type": "string"
-                            },
-                            "revokation_sig": {
-                                "type": ["string", "null"]
-                            },
-                            "revoked_on": {
-                                "type": ["number", "null"]
-                            },
-                            "revoked": {
-                                "type": "boolean"
-                            }
-                        },
-                        "required": ["uid", "pubkey", "meta", "revokation_sig", "revoked", "signature"]
-                    }
+                            "required": ["uid", "pubkey", "meta", "revocation_sig", "revoked", "signature"]
+                        }
+                    },
                 },
                 "required": ["uids", "signed"]
             }
