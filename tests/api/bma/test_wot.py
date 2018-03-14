@@ -11,65 +11,152 @@ from duniterpy.api.bma.wot import lookup, members, certified_by, certifiers_of, 
 class Test_BMA_Wot(WebFunctionalSetupMixin, unittest.TestCase):
     def test_bma_wot_lookup(self):
         json_sample = {
-            "partial": False,
-            "results": [
+  "partial": False,
+  "results": [
+            {
+              "pubkey": "5cnvo5bmR8QbtyNVnkDXWq6n5My6oNLd1o6auJApGCsv",
+              "uids": [
                 {
-                    "pubkey": "HsLShAtzXTVxeUtQd7yi5Z5Zh4zNvbu8sTEZ53nfKcqY",
-                    "uids": [
-                        {
-                            "uid": "udid2;c;TOCQUEVILLE;FRANCOIS-XAVIER-ROBE;1989-07-14;e+48.84+002.30;0;",
-                            "meta": {
-                                "timestamp": "44-76522E321B3380B058DB6D9E66121705EEA63610869A7C5B3E701CF6AF2D55A8"
-                            },
-                            "self": "J3G9oM5AKYZNLAB5Wx499w61NuUoS57JVccTShUbGpCMjCqj9yXXqNq7dyZpDWA6BxipsiaMZhujMeBfCznzyci",
-                            "others": [
-                                {
-                                    "pubkey": "9WYHTavL1pmhunFCzUwiiq4pXwvgGG5ysjZnjz9H8yB",
-                                    "meta": {
-                                        "timestamp": "44-76522E321B3380B058DB6D9E66121705EEA63610869A7C5B3E701CF6AF2D55A8"
-                                    },
-                                    "signature": "42yQm4hGTJYWkPg39hQAUgP6S6EQ4vTfXdJuxKEHL1ih6YHiDL2hcwrFgBHjXLRgxRhj2VNVqqc6b4JayKqTE14r"
-                                }
-                            ]
-                        }
-                    ],
-                    "signed": [
-                        {
-                            "uid": "snow",
-                            "pubkey": "2P7y2UDiCcvsgSSt8sgHF3BPKS4m9waqKw4yXHCuP6CN",
-                            "meta": {
-                                "timestamp": "44-76522E321B3380B058DB6D9E66121705EEA63610869A7C5B3E701CF6AF2D55A8"
-                            },
-                            "signature": "Xbr7qhyGNCmLoVuuKnKIbrdmtCvb9VBIEY19izUNwA5nufsjNm8iEsBTwKWOo0lq5O1+AAPMnht8cm2JjMq8AQ=="
-                        },
-                        {
-                            "uid": "snow",
-                            "pubkey": "2P7y2UDiCcvsgSSt8sgHF3BPKS4m9waqKw4yXHCuP6CN",
-                            "meta": {
-                                "timestamp": "44-76522E321B3380B058DB6D9E66121705EEA63610869A7C5B3E701CF6AF2D55A8"
-                            },
-                            "signature": "HU9VPwC4EqPJwATPuyUJM7HLjfig5Ke1CKonL9Q78n5/uNSL2hkgE9Pxsor8CCJfkwCxh66NjGyqnGYqZnQMAg=="
-                        },
-                        {
-                            "uid": "snow",
-                            "pubkey": "7xapQvvxQ6367bs8DsskEf3nvQAgJv97Yu11aPbkCLQj",
-                            "meta": {
-                                "timestamp": "44-76522E321B3380B058DB6D9E66121705EEA63610869A7C5B3E701CF6AF2D55A8"
-                            },
-                            "signature": "6S3x3NwiHB2QqYEY79x4wCUYHcDctbazfxIyxejs38V1uRAl4DuC8R3HJUfD6wMSiWKPqbO+td+8ZMuIn0L8AA=="
-                        },
-                        {
-                            "uid": "cat",
-                            "pubkey": "CK2hBp25sYQhdBf9oFMGHyokkmYFfzSCmwio27jYWAN7",
-                            "meta": {
-                                "timestamp": "44-76522E321B3380B058DB6D9E66121705EEA63610869A7C5B3E701CF6AF2D55A8"
-                            },
-                            "signature": "AhgblSOdxUkLwpUN9Ec46St3JGaw2jPyDn/mLcR4j3EjKxUOwHBYqqkxcQdRz/6K4Qo/xMa941MgUp6NjNbKBA=="
-                        }
-                    ]
+                  "uid": "inso",
+                  "meta": {
+                    "timestamp": "0-E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+                  },
+                  "revoked": False,
+                  "revoked_on": None,
+                  "revocation_sig": None,
+                  "self": "gTUSERA3IqEzMDvdpiFkTgBBFKwUl7M62e+VCzwyHJTrxvBSB+C+8ImoKsd7pYFAnZ+HL6cJ1p7jyVUIOZGqCw==",
+                  "others": [
+                    {
+                      "pubkey": "Ds1z6Wd8hNTexBoo3LVG2oXLZN4dC9ZWxoWwnDbF1NEW",
+                      "meta": {
+                        "block_number": 0,
+                        "block_hash": "000003D02B95D3296A4F06DBAC51775C4336A4DC09D0E958DC40033BE7E20F3D"
+                      },
+                      "uids": [
+                        "Galuel"
+                      ],
+                      "isMember": True,
+                      "wasMember": True,
+                      "signature": "iK3TOdqrHhUbHNB3cPpmWd8sTL2hz0wiScZmXlRc8WhLg2et3xMjAHMuF+wuiM9/7R3daKZq5dOGF3drOuApAg=="
+                    },
+                    {
+                      "pubkey": "7F6oyFQywURCACWZZGtG97Girh9EL1kg2WBwftEZxDoJ",
+                      "meta": {
+                        "block_number": 0,
+                        "block_hash": "000003D02B95D3296A4F06DBAC51775C4336A4DC09D0E958DC40033BE7E20F3D"
+                      },
+                      "uids": [
+                        "vit"
+                      ],
+                      "isMember": True,
+                      "wasMember": True,
+                      "signature": "eTdxT+2VikgYgdFENy/zmYxFyDDpBuGDBHedS7CzlEfYWU7iClZ9se06QdtzkFtiOtQ1BBkWPVMXxbqF8KSECw=="
+                    },
+                      ]
+                },
+              ],
+              "signed": [
+                    {
+                      "uid": "yannlefranco",
+                      "pubkey": "8SJZia3RJ36hp3wXy8AJXJj8z7yeLHCVaTtv2xSi2MBj",
+                      "meta": {
+                        "timestamp": "0-E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+                      },
+                      "cert_time": {
+                        "block": 0
+                      },
+                      "isMember": True,
+                      "wasMember": True,
+                      "signature": "lYdOV3uLH3DQHzuODuaZXQnfPIKKF9AsT84b8pkmgU65trAojmTpuBgaYaPN0Yce+8dwtdHxby7h5pO0RWgRBw=="
+                    },
+                    {
+                      "uid": "Galuel",
+                      "pubkey": "Ds1z6Wd8hNTexBoo3LVG2oXLZN4dC9ZWxoWwnDbF1NEW",
+                      "meta": {
+                        "timestamp": "0-E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+                      },
+                      "cert_time": {
+                        "block": 0
+                      },
+                      "isMember": True,
+                      "wasMember": True,
+                      "signature": "PcZUAleSeR38CbL5zfcdN2+ir+s11Y6oIl2iO4t80M4PXKXWHeqd0uYore0JibMBVnIhpLqcC8SpyVmZnfdaAQ=="
+                    }
+          ]
+            },
+            {
+              "pubkey": "7hygreNPE4LJpQhB6zHqGsofKA2G3dDXQM2n6LkDBakB",
+              "uids": [
+                {
+                  "uid": "Mymypinson",
+                  "meta": {
+                    "timestamp": "17524-00000C1533A49A4EC583B91148E2A38E91E39396BAD0C8D3A5B93338E905EF83"
+                  },
+                  "revoked": False,
+                  "revoked_on": None,
+                  "revocation_sig": None,
+                  "self": "trkirggMe9HsnO4T2FV9h1NKzxiZncXB5D5znhuq3zDZaY3MTja2edWaJhO0KcFU4yZdQPudt8ltldYL0rk1Cg==",
+                  "others": [
+                    {
+                      "pubkey": "zio4Jp8hnqkYmoz5FMYm1siCjGmjWzVUg27KMfDoefA",
+                      "meta": {
+                        "block_number": 19452,
+                        "block_hash": "00000B96722EC36F4089D2490929931B3CF26994A8ED6708C6C71370D60AA25F"
+                      },
+                      "uids": [
+                        "eliadem"
+                      ],
+                      "isMember": True,
+                      "wasMember": True,
+                      "signature": "GJJa4T9eOJf6oL+SYLGQDnD4K1TpC1492ItGa4+51imkJRXMTvvYmZguwbOuBn8GRISxlMqfgzbHzj5SFG0ODg=="
+                    },
+                    {
+                      "pubkey": "5SwfQubSat5SunNafCsunEGTY93nVM4kLSsuprNqQb6S",
+                      "meta": {
+                        "block_number": 19452,
+                        "block_hash": "00000B96722EC36F4089D2490929931B3CF26994A8ED6708C6C71370D60AA25F"
+                      },
+                      "uids": [
+                        "Patrice_F"
+                      ],
+                      "isMember": True,
+                      "wasMember": True,
+                      "signature": "E2Km7x6L8/iiFuWVa+UHailM/AOsM/1COj9aQM7B0bDRMx6h+iSfOPxnUSXydiaeT1FPlNeLZOEKIcNmRk6gCA=="
+                    },
+                  ],
                 }
-            ]
-        }
+              ],
+                "signed": [
+                    {
+                      "uid": "Duarte",
+                      "pubkey": "GRBPV3Y7PQnB9LaZhSGuS3BqBJbSHyibzYq65kTh1nQ4",
+                      "meta": {
+                        "timestamp": "20544-000008FFA0AABEA96759559DA426D92880EA35878C680479135A5C9A3FFA8BF9"
+                      },
+                      "cert_time": {
+                        "block": 35202
+                      },
+                      "isMember": True,
+                      "wasMember": True,
+                      "signature": "regfnOZWIrA4Tkj+MU6PFwHcfm/8G+ygDlNGKUP7b5pLhBHGVVMIw3xh6PcLHSkUUmnxlTImuqGJg+ky6dl3CA=="
+                    },
+                    {
+                      "uid": "NicolasCARRAT",
+                      "pubkey": "44PxHAjt5L9vasbgruPeccs1kjhG3sdzP3ATRWvXSLop",
+                      "meta": {
+                        "timestamp": "21924-000007B75B75D8E6393F609BD42423776FAB90500BCAE7EAAC498BD8EC6DFABB"
+                      },
+                      "cert_time": {
+                        "block": 36645
+                      },
+                      "isMember": True,
+                      "wasMember": True,
+                      "signature": "kC8hoeM2b0wiis5iaF4aHEzRUs0YQy7qJyPFD4rGtZ6II+EN5WbvmxQaN7PckoRUbbSFhNC4gMcnrClNdchBBQ=="
+                    },
+          ]
+            }
+          ]
+    }
         jsonschema.validate(json_sample, LOOKUP_SCHEMA)
 
     def test_bma_wot_lookup_bad(self):

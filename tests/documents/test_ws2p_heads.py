@@ -28,7 +28,7 @@ class TestWS2PHeads(unittest.TestCase):
                                        "duniter:1.6.21:1",
                                        "ZGpT8HG4uX5Hc96gqhzIkkELVjGQKDp2/L+7BTFG5ODxGYWd2VX/H+hdZRqf0iUWRNuhxlequ68kkwMaE6ymBw==")
 
-        self.assertEquals(headv1.v0.api.public, "IC")
+        self.assertEqual(headv1.v0.api.public, "IC")
         self.assertEqual(headv1.v0.api.private, "OCA")
         self.assertEqual(headv1.v0.head.version, 1)
         self.assertEqual(headv1.software, "duniter")

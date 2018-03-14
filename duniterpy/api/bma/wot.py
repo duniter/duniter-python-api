@@ -287,11 +287,10 @@ LOOKUP_SCHEMA = {
                                     "type": "boolean"
                                 }
                             },
-                            "required": ["uid", "pubkey", "meta", "revocation_sig", "revoked", "signature"]
+                            "required": ["uid", "pubkey", "meta", "signature"]
                         }
                     },
                 },
-                "required": ["uids", "signed"]
             }
         }
     },
