@@ -9,4 +9,4 @@ class Base58Encoder(object):
 
     @staticmethod
     def decode(data):
-        return ensure_str(base58.b58decode(ensure_bytes(data)))
+        return base58.b58decode(data)

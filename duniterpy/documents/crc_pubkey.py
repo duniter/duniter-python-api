@@ -2,6 +2,7 @@ import base58
 import re
 import hashlib
 from .constants import pubkey_regex
+from ..helpers import ensure_str
 
 
 class CRCPubkey:
@@ -31,7 +32,7 @@ class CRCPubkey:
         hash_root.update(base58.b58decode(pubkey))
         hash_squared = hashlib.sha256()
         hash_squared.update(hash_root.digest())
-        b58_checksum = base58.b58encode(hash_squared.digest())
+        b58_checksum = ensure_str(base58.b58encode(hash_squared.digest()))
 
         crc = b58_checksum[:3]
         return cls(pubkey, crc)

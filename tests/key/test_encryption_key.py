@@ -1,6 +1,4 @@
-from duniterpy.key import SecretKey, PublicKey, SigningKey
-from duniterpy.documents import Peer
-from duniterpy.key.signing_key import _ensure_bytes
+from duniterpy.key import SecretKey
 import unittest
 
 
