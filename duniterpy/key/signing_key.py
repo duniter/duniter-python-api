@@ -7,7 +7,7 @@ duniter public and private keys
 import libnacl.sign
 from pylibscrypt import scrypt
 from .base58 import Base58Encoder
-
+from ..helpers import ensure_bytes
 
 SEED_LENGTH = 32  # Length of the key
 crypto_sign_BYTES = 64
@@ -27,19 +27,6 @@ class ScryptParams:
         self.p = p
 
 
-def _ensure_bytes(data):
-    """
-    Convert data in bytes if data is a string
-
-    :param data: Data
-    :rtype bytes:
-    """
-    if isinstance(data, str):
-        return bytes(data, 'utf-8')
-
-    return data
-
-
 class SigningKey(libnacl.sign.Signer):
     def __init__(self, salt, password, scrypt_params=None):
         """
@@ -52,8 +39,8 @@ class SigningKey(libnacl.sign.Signer):
         if scrypt_params is None:
             scrypt_params = ScryptParams(4096, 16, 1)
 
-        salt = _ensure_bytes(salt)
-        password = _ensure_bytes(password)
+        salt = ensure_bytes(salt)
+        password = ensure_bytes(password)
         seed = scrypt(password, salt,
                       scrypt_params.N, scrypt_params.r, scrypt_params.p,
                       SEED_LENGTH)
