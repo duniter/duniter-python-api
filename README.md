@@ -6,7 +6,7 @@ Python implementation of [Duniter](https://git.duniter.org/nodes/typescript/duni
 ## Features
  * Supports Duniter's [Basic Merkle API](https://git.duniter.org/nodes/typescript/duniter/blob/master/doc/HTTP_API.md) and [protocol](https://git.duniter.org/nodes/typescript/duniter/blob/master/doc/Protocol.md)
  * Asynchronous
- * duniter signing key
+ * Duniter signing key
 
 ## Requirements
  * Python >= 3.5
@@ -17,7 +17,8 @@ Python implementation of [Duniter](https://git.duniter.org/nodes/typescript/duni
 
 ## Installation
 You can install duniter-python-api and all its dependencies via the following pip install:
-`pip install duniterpy`
+
+`pip3 install duniterpy`
 
 Please take a look at the document [HTTP API](https://github.com/duniter/duniter-bma/blob/master/doc/API.md) to learn about the API.
 
