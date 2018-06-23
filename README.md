@@ -20,7 +20,7 @@ You can install duniter-python-api and all its dependencies via the following pi
 
 `pip3 install duniterpy`
 
-Please take a look at the document [HTTP API](https://github.com/duniter/duniter-bma/blob/master/doc/API.md) to learn about the API.
+Please take a look at the document [HTTP API](https://git.duniter.org/nodes/typescript/duniter/blob/master/doc/HTTP_API.md) to learn about the API.
 
 ## Development
 - Create a python environment with pyenv
@@ -30,5 +30,5 @@ Please take a look at the document [HTTP API](https://github.com/duniter/duniter
 
 ## Documentation
 
-- [HTML Documentation](https://github.com/duniter/duniter-python-api/tree/master/docs/_build/html)
-- [Examples](https://github.com/duniter/duniter-python-api/tree/master/examples)
+- [HTML Documentation](https://git.duniter.org/clients/python/duniterpy/tree/master/docs/_build/html)
+- [Examples](https://git.duniter.org/clients/python/duniterpy/tree/master/examples)
