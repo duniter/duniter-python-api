@@ -27,7 +27,7 @@ Installation
 
 You can install duniter-python-api and all its dependencies via the following pip install:
 
-:code:`pip install duniterpy`
+:code:`pip3 install duniterpy`
 
 Please take a look at the document `HTTP API <https://git.duniter.org/nodes/typescript/duniter/blob/master/doc/HTTP_API.md>`_ to learn about the API.
 
@@ -37,7 +37,7 @@ Development
 * Create a python environment with pyenv
 * Add PYTHONPATH env var to your shell containing the path to this repository
 * Take a look at examples
-* Run examples from parent folder :code:`python example/request_data.py`
+* Run examples from parent folder :code:`python examples/request_data.py`
 
 Documentation
 -------------
