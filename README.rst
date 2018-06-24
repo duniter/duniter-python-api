@@ -1,9 +1,6 @@
 Duniter Python API
 ==================
 
-.. image:: https://travis-ci.org/duniter/duniter-python-api.svg
-    :target: https://travis-ci.org/duniter/duniter-python-api
-
 .. image:: https://coveralls.io/repos/duniter/duniter-python-api/badge.svg?branch=master&service=github
     :target: https://coveralls.io/github/duniter/duniter-python-api?branch=master
 
@@ -32,7 +29,7 @@ You can install duniter-python-api and all its dependencies via the following pi
 
 :code:`pip install duniterpy`
 
-Please take a look at the document `HTTP API <https://github.com/duniter/duniter-bma/blob/master/doc/API.md>`_ to learn about the API.
+Please take a look at the document `HTTP API <https://git.duniter.org/nodes/typescript/duniter/blob/master/doc/HTTP_API.md>`_ to learn about the API.
 
 Development
 -----------
@@ -45,8 +42,8 @@ Development
 Documentation
 -------------
 
-* `HTML Documentation <https://github.com/duniter/duniter-python-api/tree/master/docs/_build/html>`_
-* `Examples <https://github.com/duniter/duniter-python-api/tree/master/examples>`_
+* `HTML Documentation <https://git.duniter.org/clients/python/duniterpy/tree/master/docs/_build/html>`_
+* `Examples <https://git.duniter.org/clients/python/duniterpy/tree/master/examples>`_
 
 Packaging and deploy
 --------------------
@@ -74,8 +71,3 @@ Deploy the package on the Pypi repository::
 
     twine upload dist/*
 
-
-Github
-++++++
-
-Add a tag with the semantic version number on the master branch and push on github to make a new github release.
