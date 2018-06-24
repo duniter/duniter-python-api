@@ -1,4 +1,5 @@
 import re
+import aiohttp
 from typing import Generator
 
 from ..api.bma import ConnectionHandler
@@ -184,20 +185,20 @@ class BMAEndpoint(Endpoint):
                             IPv6=(" {0}".format(self.ipv6) if self.ipv6 else ""),
                             PORT=(" {0}".format(self.port) if self.port else ""))
 
-    def conn_handler(self, session=None, proxy=None):
+    def conn_handler(self, session: aiohttp.ClientSession = None, proxy: str = None) -> ConnectionHandler:
         """
         Return connection handler instance for the endpoint
 
         :param aiohttp.ClientSession session: AIOHTTP client session instance
         :param str proxy: Proxy url
-        :rtype: Generator[ConnectionHandler, None, None]
+        :rtype: ConnectionHandler
         """
         if self.server:
-            yield ConnectionHandler("http", "ws", self.server, self.port, "", proxy, session)
+            return ConnectionHandler("http", "ws", self.server, self.port, "", proxy, session)
         elif self.ipv6:
-            yield ConnectionHandler("http", "ws", "[{0}]".format(self.ipv6), self.port, "", proxy, session)
-        else:
-            yield ConnectionHandler("http", "ws", self.ipv4, self.port, "", proxy, session)
+            return ConnectionHandler("http", "ws", "[{0}]".format(self.ipv6), self.port, "", proxy, session)
+
+        return ConnectionHandler("http", "ws", self.ipv4, self.port, "", proxy, session)
 
     def __str__(self):
         return self.inline()
@@ -242,20 +243,20 @@ class SecuredBMAEndpoint(BMAEndpoint):
         inlined = [str(info) for info in (self.server, self.ipv4, self.ipv6, self.port, self.path) if info]
         return SecuredBMAEndpoint.API + " " + " ".join(inlined)
 
-    def conn_handler(self, session=None, proxy=None):
+    def conn_handler(self, session: aiohttp.ClientSession = None, proxy: str = None) -> ConnectionHandler:
         """
         Return connection handler instance for the endpoint
 
         :param aiohttp.ClientSession session: AIOHTTP client session instance
         :param str proxy: Proxy url
-        :rtype: Generator[ConnectionHandler, None, None]
+        :rtype: ConnectionHandler
         """
         if self.server:
-            yield ConnectionHandler("https", "wss", self.server, self.port, self.path, proxy, session)
+            return ConnectionHandler("https", "wss", self.server, self.port, self.path, proxy, session)
         elif self.ipv6:
-            yield ConnectionHandler("https", "wss", "[{0}]".format(self.ipv6), self.port, self.path, proxy, session)
-        else:
-            yield ConnectionHandler("https", "wss", self.ipv4, self.port, self.path, proxy, session)
+            return ConnectionHandler("https", "wss", "[{0}]".format(self.ipv6), self.port, self.path, proxy, session)
+
+        return ConnectionHandler("https", "wss", self.ipv4, self.port, self.path, proxy, session)
 
 
 class WS2PEndpoint(Endpoint):
@@ -289,14 +290,15 @@ class WS2PEndpoint(Endpoint):
         inlined = [str(info) for info in (self.ws2pid, self.server, self.port, self.path) if info]
         return WS2PEndpoint.API + " " + " ".join(inlined)
 
-    def conn_handler(self, session=None, proxy=None):
+    def conn_handler(self, session: aiohttp.ClientSession = None, proxy: str = None) -> ConnectionHandler:
         """
         Return connection handler instance for the endpoint
 
         :param aiohttp.ClientSession session: AIOHTTP client session instance
+        :param str proxy: Proxy url
         :rtype: ConnectionHandler
         """
-        yield ConnectionHandler("https", "wss", self.server, self.port, self.path, proxy, session)
+        return ConnectionHandler("https", "wss", self.server, self.port, self.path, proxy, session)
 
     def __str__(self):
         return self.inline()
@@ -335,14 +337,15 @@ class ESUserEndpoint(Endpoint):
         inlined = [str(info) for info in (self.server, self.port) if info]
         return ESUserEndpoint.API + " " + " ".join(inlined)
 
-    def conn_handler(self, session=None, proxy=None):
+    def conn_handler(self, session: aiohttp.ClientSession = None, proxy: str = None) -> ConnectionHandler:
         """
         Return connection handler instance for the endpoint
 
         :param aiohttp.ClientSession session: AIOHTTP client session instance
+        :param str proxy: Proxy url
         :rtype: ConnectionHandler
         """
-        yield ConnectionHandler("https", "wss", self.server, self.port, "", proxy, session)
+        return ConnectionHandler("https", "wss", self.server, self.port, "", proxy, session)
 
     def __str__(self):
         return self.inline()
@@ -380,14 +383,15 @@ class ESSubscribtionEndpoint(Endpoint):
         inlined = [str(info) for info in (self.server, self.port) if info]
         return ESSubscribtionEndpoint.API + " " + " ".join(inlined)
 
-    def conn_handler(self, session=None, proxy=None):
+    def conn_handler(self, session: aiohttp.ClientSession = None, proxy: str = None) -> ConnectionHandler:
         """
         Return connection handler instance for the endpoint
 
         :param aiohttp.ClientSession session: AIOHTTP client session instance
+        :param str proxy: Proxy url
         :rtype: ConnectionHandler
         """
-        yield ConnectionHandler("https", "wss", self.server, self.port, "", proxy, session)
+        return ConnectionHandler("https", "wss", self.server, self.port, "", proxy, session)
 
     def __str__(self):
         return self.inline()
@@ -402,8 +406,7 @@ class ESSubscribtionEndpoint(Endpoint):
         return hash((ESSubscribtionEndpoint.API, self.server, self.port))
 
 
-
-MANAGED_API={
+MANAGED_API = {
     BMAEndpoint.API: BMAEndpoint,
     SecuredBMAEndpoint.API: SecuredBMAEndpoint,
     WS2PEndpoint.API: WS2PEndpoint,

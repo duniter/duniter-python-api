@@ -113,7 +113,7 @@ async def main():
         exit(0)
 
     # connection handler from BMAS endpoint
-    connection = next(SecuredBMAEndpoint.from_inline(BMA_ENDPOINT).conn_handler(AIOHTTP_SESSION))
+    connection = SecuredBMAEndpoint.from_inline(BMA_ENDPOINT).conn_handler(AIOHTTP_SESSION)
     # capture current block to get currency name
     current_block = await bma.blockchain.current(connection)
 

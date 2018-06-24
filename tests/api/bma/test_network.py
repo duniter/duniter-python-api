@@ -33,7 +33,7 @@ class TestBMANetwork(WebFunctionalSetupMixin, unittest.TestCase):
             _, port, url = await self.create_server('GET', '/network/peering', handler)
             with self.assertRaises(jsonschema.exceptions.ValidationError):
                 async with aiohttp.ClientSession() as session:
-                    connection = next(BMAEndpoint("127.0.0.1", None, None, port).conn_handler(session))
+                    connection = BMAEndpoint("127.0.0.1", None, None, port).conn_handler(session)
                     await network.peering(connection)
 
         self.loop.run_until_complete(go())
@@ -73,7 +73,7 @@ class TestBMANetwork(WebFunctionalSetupMixin, unittest.TestCase):
             _, port, url = await self.create_server('GET', '/network/peering/peers', handler)
             with self.assertRaises(jsonschema.exceptions.ValidationError):
                 async with aiohttp.ClientSession() as session:
-                    connection = next(BMAEndpoint("127.0.0.1", None, None, port).conn_handler(session))
+                    connection = BMAEndpoint("127.0.0.1", None, None, port).conn_handler(session)
                     await network.peers(connection)
 
         self.loop.run_until_complete(go())

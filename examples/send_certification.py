@@ -92,7 +92,7 @@ async def main():
     Main code
     """
     # connection handler from BMA endpoint
-    connection = next(SecuredBMAEndpoint.from_inline(BMA_ENDPOINT).conn_handler(AIOHTTP_SESSION))
+    connection = SecuredBMAEndpoint.from_inline(BMA_ENDPOINT).conn_handler(AIOHTTP_SESSION)
 
     # prompt hidden user entry
     salt = getpass.getpass("Enter your passphrase (salt): ")

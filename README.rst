@@ -16,28 +16,38 @@ Features
 Requirements
 ------------
 
-* Python >= 3.5
-* `aiohttp >= 0.19 <https://pypi.python.org/pypi/aiohttp>`_
-* `pylibscrypt <https://pypi.python.org/pypi/pylibscrypt>`_
-* `libnacl <https://pypi.python.org/pypi/libnacl>`_
-* `base58 <https://pypi.python.org/pypi/base58>`_
+* Python >= 3.5.2
+* `aiohttp >= 0.19 <https://pypi.org/pypi/aiohttp>`_
+* `pylibscrypt <https://pypi.org/pypi/pylibscrypt>`_
+* `libnacl <https://pypi.org/pypi/libnacl>`_
+* `base58 <https://pypi.org/pypi/base58>`_
+* `attr <https://pypi.org/project/attr/>`_
 
 Installation
 ------------
 
-You can install duniter-python-api and all its dependencies via the following pip install:
+You can install duniter-python-api and all its dependencies via the following pip install::
 
-:code:`pip3 install duniterpy`
+    pip3 install duniterpy
 
 Please take a look at the document `HTTP API <https://git.duniter.org/nodes/typescript/duniter/blob/master/doc/HTTP_API.md>`_ to learn about the API.
 
 Development
 -----------
 
-* Create a python environment with pyenv
+* Create a python environment with `pyenv <https://github.com/pyenv/pyenv>`_ ::
+
+    curl -L https://github.com/pyenv/pyenv-installer/raw/master/bin/pyenv-installer | bash`
+
 * Add PYTHONPATH env var to your shell containing the path to this repository
-* Take a look at examples
-* Run examples from parent folder :code:`python examples/request_data.py`
+* Run unit tests with ::
+
+    python -m unittest
+
+* Take a look at examples folder
+* Run examples from parent folder ::
+
+    python examples/request_data.py
 
 Documentation
 -------------
