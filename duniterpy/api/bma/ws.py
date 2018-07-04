@@ -15,16 +15,17 @@
 # Authors:
 # Caner Candan <caner@candan.fr>, http://caner.candan.fr
 #
-
-from duniterpy.api.bma import API, logging
+# vit
+import logging
+from duniterpy.api.client import Client
 from duniterpy.api.bma.blockchain import BLOCK_SCHEMA
 
 logger = logging.getLogger("duniter/ws")
 
-URL_PATH = 'ws'
+MODULE = 'ws'
 
+WS_BLOCK_SCHEMA = BLOCK_SCHEMA
 
-WS_BLOCk_SCHEMA = BLOCK_SCHEMA
 WS_PEER_SCHEMA = {
     "type": "object",
     "properties": {
@@ -51,23 +52,23 @@ WS_PEER_SCHEMA = {
 }
 
 
-def block(connection):
-    """
-    Connect to block websocket
+# def block(client: Client):
+#     """
+#     Connect to block websocket
+#
+#     :param client: Client to connect to the api
+#     :rtype: aiohttp.ClientWebSocketResponse
+#     """
+#     client = API(connection, MODULE)
+#     return client.connect_ws('/block')
 
-    :param duniterpy.api.bma.ConnectionHandler connection: Connection handler instance
-    :rtype: aiohttp.ClientWebSocketResponse
-    """
-    client = API(connection, URL_PATH)
-    return client.connect_ws('/block')
 
-
-def peer(connection):
-    """
-    Connect to peer websocket
-
-    :param duniterpy.api.bma.ConnectionHandler connection: Connection handler instance
-    :rtype: aiohttp.ClientWebSocketResponse
-    """
-    client = API(connection, URL_PATH)
-    return client.connect_ws('/peer')
+# def peer(client: Client):
+#     """
+#     Connect to peer websocket
+#
+#     :param duniterpy.api.bma.ConnectionHandler connection: Connection handler instance
+#     :rtype: aiohttp.ClientWebSocketResponse
+#     """
+#     client = API(connection, MODULE)
+#     return client.connect_ws('/peer')

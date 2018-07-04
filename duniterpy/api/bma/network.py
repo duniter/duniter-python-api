@@ -14,13 +14,14 @@
 #
 # Authors:
 # Caner Candan <caner@candan.fr>, http://caner.candan.fr
-#
-
-from duniterpy.api.bma import API, logging, parse_response
+# vit
+import logging
+from duniterpy.api.client import Client
+from duniterpy.documents.peer import Peer
 
 logger = logging.getLogger("duniter/network")
 
-URL_PATH = 'network'
+MODULE = 'network'
 
 PEERING_SCHEMA = {
         "type": "object",
@@ -100,91 +101,42 @@ PEERS_SCHEMA = schema = {
         ]
     }
 
-async def peering(connection):
+
+async def peering(client: Client) -> dict:
     """
     GET peering information about a peer
 
-    :param duniterpy.api.bma.ConnectionHandler connection: Connection handler instance
+    :param client: Client to connect to the api
     :rtype: dict
     """
+    return await client.get(MODULE + '/peering', schema=PEERING_SCHEMA)
 
-    client = API(connection, URL_PATH)
-    r = await client.requests_get('/peering')
-    return await parse_response(r, PEERING_SCHEMA)
 
-async def peers(connection, leaves=False, leaf=""):
+async def peers(client: Client, leaves: bool = False, leaf: str = ""):
     """
     GET peering entries of every node inside the currency network
 
-    :param bool leaves: True if leaves should be requested
-    :param str leaf: True if leaf should be requested
+    :param client: Client to connect to the api
+    :param leaves: True if leaves should be requested
+    :param leaf: True if leaf should be requested
     :rtype: dict
     """
-
-    client = API(connection, URL_PATH)
-    # GET Peers
-    if leaves:
-        r = await client.requests_get('/peering/peers', leaves=leaves)
+    if leaves is True:
+        return await client.get(MODULE + '/peering/peers', {"leaves": "true"}, schema=PEERS_SCHEMA)
     else:
-        r = await client.requests_get('/peering/peers', leaf=leaf)
-
-    return await parse_response(r, PEERS_SCHEMA)
-
-async def peer(connection, entry=None, signature=None):
-    """
-    GET peering entries of every node inside the currency network
-
-    :param duniterpy.api.bma.ConnectionHandler connection: Connection handler instance
-    :param duniterpy.documents.peer.Peer entry: Peer document
-    :param str signature: Signature of the document issuer
-    :rtype: dict
-    """
-
-    client = API(connection, URL_PATH)
-    r = await client.requests_post('/peering/peers', entry=entry, signature=signature)
-    return r
-
-WS2P_HEADS_SCHEMA = {
-                    "type": "object",
-                    "properties": {
-                        "heads": {
-                            "type": "array",
-                            "items": {
-                                "type": "object",
-                                "properties": {
-                                    "message": {
-                                        "type": "string"
-                                    },
-                                    "sig": {
-                                        "type": "string",
-                                    },
-                                    "messageV2": {
-                                        "type": "string"
-                                    },
-                                    "sigV2": {
-                                        "type": "string",
-                                    },
-                                    "step": {
-                                        "type": "number",
-                                    },
-                                },
-                                "required": ["message", "sig"]
-                            }
-                        }
-                    },
-                    "required": ["heads"]
-                }
+        return await client.get(MODULE + '/peering/peers', {"leaf": leaf}, schema=PEERS_SCHEMA)
 
 
-async def heads(connection):
-    """
-    GET Certification data over a member
-
-    :param duniterpy.api.bma.ConnectionHandler connection: Connection handler instance
-    :rtype: dict
-    """
-
-    client = API(connection, URL_PATH)
-
-    r = await client.requests_get('/ws2p/heads')
-    return await parse_response(r, WS2P_HEADS_SCHEMA)
+# async def peer(client: Client, entry: Peer = None, signature: str = None) -> dict:
+#     """
+#     POST a Peer document with his signature
+#
+#     :param client: Client to connect to the api
+#     :param entry: Peer document
+#     :param signature: Signature of the document issuer
+#     :rtype: dict
+#     """
+#
+#     client = API(connection, MODULE)
+#     r = await client.requests_post('/peering/peers', entry=entry, signature=signature)
+#     return r

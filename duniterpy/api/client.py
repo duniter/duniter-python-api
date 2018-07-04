@@ -1,28 +1,13 @@
-#
-#
-# This program is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
-#
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License
-# along with this program.  If not, see <http://www.gnu.org/licenses/>.
-#
 # Authors:
 # Caner Candan <caner@candan.fr>, http://caner.candan.fr
 # Inso <insomniak.fr at gmail.com>
 
-
-import aiohttp
 import json
 import logging
+import aiohttp
 import jsonschema
-from ..errors import DuniterError
+from .errors import DuniterError
+from duniterpy.api.endpoint import endpoint
 
 logger = logging.getLogger("duniter")
 
@@ -40,34 +25,12 @@ ERROR_SCHEMA = {
 }
 
 
-class ConnectionHandler(object):
-    """Helper class used by other API classes to ease passing server connection information."""
-
-    def __init__(self, http_scheme, ws_scheme, server, port, path="", proxy=None, session=None):
-        """
-        Init instance of connection handler
-
-        :param str server: Server IP or domaine name
-        :param int port: Port
-        :param aiohttp.ClientSession|None session: Session AIOHTTP
-        """
-        self.http_scheme = http_scheme
-        self.ws_scheme = ws_scheme
-        self.server = server
-        self.proxy = proxy
-        self.port = port
-        self.session = session
-        self.path = path
-
-    def __str__(self):
-        return 'connection info: %s:%d' % (self.server, self.port)
-
-
 def parse_text(text, schema):
     """
     Validate and parse the BMA answer from websocket
 
     :param str text: the bma answer
+    :param dict schema: dict for jsonschema
     :return: the json data
     """
     try:
@@ -112,7 +75,8 @@ async def parse_response(response, schema):
 
 
 class API(object):
-    """APIRequest is a class used as an interface. The intermediate derivated classes are the modules and the leaf classes are the API requests."""
+    """APIRequest is a class used as an interface. The intermediate derivated classes are the modules and the leaf
+    classes are the API requests. """
 
     schema = {}
 
@@ -139,15 +103,15 @@ class API(object):
         server, port = self.connection_handler.server, self.connection_handler.port
         if self.connection_handler.path:
             url = '{scheme}://{server}:{port}/{path}/{module}'.format(scheme=scheme,
-                                                                  server=server,
-                                                                  port=port,
-                                                                  path=path,
-                                                                  module=self.module)
+                                                                      server=server,
+                                                                      port=port,
+                                                                      path=path,
+                                                                      module=self.module)
         else:
             url = '{scheme}://{server}:{port}/{module}'.format(scheme=scheme,
-                                                                  server=server,
-                                                                  port=port,
-                                                                  module=self.module)
+                                                               server=server,
+                                                               port=port,
+                                                               module=self.module)
 
         return url + path
 
@@ -201,3 +165,57 @@ class API(object):
         """
         url = self.reverse_url(self.connection_handler.ws_scheme, path)
         return self.connection_handler.session.ws_connect(url, proxy=self.connection_handler.proxy)
+
+
+class Client:
+    """
+    Main class to create an API client
+    """
+    def __init__(self, _endpoint: str, session: aiohttp.ClientSession = None, proxy: str = None):
+        """
+        Init Client instance
+
+        :param _endpoint: Endpoint string in duniter format
+        :param session: Aiohttp client session (optional, default None)
+        :param proxy: Proxy server as hostname:port
+        """
+        # Endpoint Protocol detection
+        self.endpoint = endpoint(_endpoint)
+
+        # if no user session...
+        if session is None:
+            # open a session
+            self.session = aiohttp.ClientSession()
+        else:
+            self.session = session
+        self.proxy = proxy
+
+    async def get(self, url_path: str, params: dict = None, schema: dict = None)-> any:
+        """
+        Get request on self.endpoint + url_path
+
+        :param url_path: Url encoded path following the endpoint
+        :param params: Url query string parameters dictionary
+        :param schema: Json Schema to validate response (optional, default None)
+        :return:
+        """
+        if params is None:
+            params = dict()
+
+        client = API(self.endpoint.conn_handler(self.session, self.proxy), '')
+
+        response = await client.requests_get(url_path, **params)
+
+        if schema is not None:
+            return await parse_response(response, schema)
+        else:
+            return await response.json()
+
+    async def close(self):
+        """
+        Close aiohttp session
+
+        :return:
+        """
+        await self.session.close()
+

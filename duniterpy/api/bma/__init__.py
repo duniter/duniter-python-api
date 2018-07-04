@@ -15,16 +15,12 @@
 # Authors:
 # Caner Candan <caner@candan.fr>, http://caner.candan.fr
 # Inso <insomniak.fr at gmail.com>
+import logging
+from . import network, blockchain, tx, wot, node, ud, ws
 
-
-__all__ = ['api']
+__all__ = [network, blockchain, tx, wot, node, ud, ws]
 
 PROTOCOL_VERSION = 2
 
-import logging
-
 logger = logging.getLogger("duniter")
 
-
-from .api import API, ConnectionHandler, parse_error, parse_response, parse_text
-from . import network, blockchain, tx, wot, node, ud, ws

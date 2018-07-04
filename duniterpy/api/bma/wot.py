@@ -14,13 +14,13 @@
 #
 # Authors:
 # Caner Candan <caner@candan.fr>, http://caner.candan.fr
-#
-from duniterpy.api.bma import API, logging, parse_response
+# vit
+import logging
+from duniterpy.api.client import Client
 
 logger = logging.getLogger("duniter/wot")
 
-URL_PATH = 'wot'
-
+MODULE = 'wot'
 
 CERTIFICATIONS_SCHEMA = {
     "type": "object",
@@ -297,109 +297,98 @@ LOOKUP_SCHEMA = {
     "required": ["partial", "results"]
 }
 
-async def add(connection, identity):
-    """
-    POST identity document
 
-    :param duniterpy.api.bma.ConnectionHandler connection: Connection handler instance
-    :param duniterpy.documents.certification.Identity identity: Identity document
-    :rtype: aiohttp.ClientResponse
-    """
-    client = API(connection, URL_PATH)
-
-    r = await client.requests_post('/add', identity=identity)
-    return r
-
-async def certify(connection, cert):
-    """
-    POST certification document
-
-    :param duniterpy.api.bma.ConnectionHandler connection: Connection handler instance
-    :param duniterpy.documents.certification.Certification cert: Certification document
-    :rtype: aiohttp.ClientResponse
-    """
-    client = API(connection, URL_PATH)
-
-    r = await client.requests_post('/certify', cert=cert)
-    return r
-
-async def revoke(connection, revocation):
-    """
-    POST revocation document
-
-    :param duniterpy.api.bma.ConnectionHandler connection: Connection handler instance
-    :param duniterpy.documents.certification.Revocation revocation: Certification document
-    :rtype: aiohttp.ClientResponse
-    """
-    client = API(connection, URL_PATH)
-
-    r = await client.requests_post('/revoke', revocation=revocation)
-    return r
+# async def add(client: Client, identity: str) -> dict:
+#     """
+#     POST identity document
+#
+#     :param duniterpy.api.bma.ConnectionHandler connection: Connection handler instance
+#     :param duniterpy.documents.certification.Identity identity: Identity document
+#     :rtype: aiohttp.ClientResponse
+#     """
+#     client = API(connection, URL_PATH)
+#
+#     r = await client.requests_post('/add', identity=identity)
+#     return r
 
 
-async def lookup(connection, search):
+# async def certify(connection, cert):
+#     """
+#     POST certification document
+#
+#     :param duniterpy.api.bma.ConnectionHandler connection: Connection handler instance
+#     :param duniterpy.documents.certification.Certification cert: Certification document
+#     :rtype: aiohttp.ClientResponse
+#     """
+#     client = API(connection, URL_PATH)
+#
+#     r = await client.requests_post('/certify', cert=cert)
+#     return r
+
+
+# async def revoke(connection, revocation):
+#     """
+#     POST revocation document
+#
+#     :param duniterpy.api.bma.ConnectionHandler connection: Connection handler instance
+#     :param duniterpy.documents.certification.Revocation revocation: Certification document
+#     :rtype: aiohttp.ClientResponse
+#     """
+#     client = API(connection, URL_PATH)
+#
+#     r = await client.requests_post('/revoke', revocation=revocation)
+#     return r
+
+
+async def lookup(client: Client, search: str) -> dict:
     """
     GET UID/Public key data
 
-    :param duniterpy.api.bma.ConnectionHandler connection: Connection handler instance
-    :param str search: UID or public key
+    :param client: Client to connect to the api
+    :param search: UID or public key
     :rtype: dict
     """
-    client = API(connection, URL_PATH)
-
-    r = await client.requests_get('/lookup/%s' % search)
-    return await parse_response(r, LOOKUP_SCHEMA)
+    return await client.get(MODULE + '/lookup/%s' % search, schema=LOOKUP_SCHEMA)
 
 
-async def certifiers_of(connection, search):
+async def certifiers_of(client: Client, search: str) -> dict:
     """
     GET UID/Public key certifiers
 
-    :param duniterpy.api.bma.ConnectionHandler connection: Connection handler instance
-    :param str search: UID or public key
+    :param client: Client to connect to the api
+    :param search: UID or public key
     :rtype: dict
     """
+    return await client.get(MODULE + '/certifiers-of/%s' % search, schema=CERTIFICATIONS_SCHEMA)
 
-    client = API(connection, URL_PATH)
 
-    r = await client.requests_get('/certifiers-of/%s' % search)
-    return await parse_response(r, CERTIFICATIONS_SCHEMA)
-
-async def certified_by(connection, search):
+async def certified_by(client: Client, search: str) -> dict:
     """
     GET identities certified by UID/Public key
 
-    :param duniterpy.api.bma.ConnectionHandler connection: Connection handler instance
-    :param str search: UID or public key
+    :param client: Client to connect to the api
+    :param search: UID or public key
     :rtype: dict
     """
-    client = API(connection, URL_PATH)
+    return await client.get(MODULE + '/certified-by/%s' % search, schema=CERTIFICATIONS_SCHEMA)
 
-    r = await client.requests_get('/certified-by/%s' % search)
-    return await parse_response(r, CERTIFICATIONS_SCHEMA)
 
-async def members(connection):
+async def members(client: Client) -> dict:
     """
     GET list of all current members of the Web of Trust
 
-    :param duniterpy.api.bma.ConnectionHandler connection: Connection handler instance
+    :param client: Client to connect to the api
     :rtype: dict
     """
-    client = API(connection, URL_PATH)
-
-    r = await client.requests_get('/members')
-    return await parse_response(r, MEMBERS_SCHEMA)
+    return await client.get(MODULE + '/members', schema=MEMBERS_SCHEMA)
 
 
-async def requirements(connection, search):
+async def requirements(client: Client, search: str) -> dict:
     """
     GET list of requirements for a given UID/Public key
 
-    :param duniterpy.api.bma.ConnectionHandler connection: Connection handler instance
-    :param str search: UID or public key
+    :param client: Client to connect to the api
+    :param search: UID or public key
     :rtype: dict
     """
-    client = API(connection, URL_PATH)
-
-    r = await client.requests_get('/requirements/%s' % search)
-    return await parse_response(r, REQUIREMENTS_SCHEMA)
+    return await client.get(MODULE + '/requirements/%s' % search, schema=REQUIREMENTS_SCHEMA)

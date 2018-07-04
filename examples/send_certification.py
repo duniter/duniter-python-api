@@ -2,7 +2,8 @@ import asyncio
 import aiohttp
 import getpass
 import duniterpy.api.bma as bma
-from duniterpy.documents import BMAEndpoint, SecuredBMAEndpoint, BlockUID, Identity, Certification
+from duniterpy.api.endpoint import SecuredBMAEndpoint
+from duniterpy.documents import BlockUID, Identity, Certification
 from duniterpy.key import SigningKey
 
 
@@ -11,7 +12,7 @@ from duniterpy.key import SigningKey
 # You can either use a complete defined endpoint : [NAME_OF_THE_API] [DOMAIN] [IPv4] [IPv6] [PORT]
 # or the simple definition : [NAME_OF_THE_API] [DOMAIN] [PORT]
 # Here we use the secure BASIC_MERKLED_API (BMAS)
-BMA_ENDPOINT = "BMAS g1-test.duniter.org 443"
+BMAS_ENDPOINT = "BMAS g1-test.duniter.org 443"
 
 ################################################
 
@@ -24,7 +25,7 @@ async def get_identity_document(connection, current_block, pubkey):
     """
     Get the identity document of the pubkey
 
-    :param bma.api.ConnectionHandler connection: Connection handler
+    :param bma.connection.ConnectionHandler connection: Connection handler
     :param dict current_block: Current block data
     :param str pubkey: UID/Public key
 
@@ -92,7 +93,7 @@ async def main():
     Main code
     """
     # connection handler from BMA endpoint
-    connection = SecuredBMAEndpoint.from_inline(BMA_ENDPOINT).conn_handler(AIOHTTP_SESSION)
+    connection = SecuredBMAEndpoint.from_inline(BMAS_ENDPOINT).conn_handler(AIOHTTP_SESSION)
 
     # prompt hidden user entry
     salt = getpass.getpass("Enter your passphrase (salt): ")

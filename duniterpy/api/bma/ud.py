@@ -14,13 +14,13 @@
 #
 # Authors:
 # Caner Candan <caner@candan.fr>, http://caner.candan.fr
-#
-
-from duniterpy.api.bma import logging, API, parse_response
+# vit
+import logging
+from duniterpy.api.client import Client
 
 logger = logging.getLogger("duniter/ud")
 
-URL_PATH = 'ud'
+MODULE = 'ud'
 
 UD_SCHEMA = {
     "type": "object",
@@ -64,16 +64,14 @@ UD_SCHEMA = {
     "required": ["currency", "pubkey", "history"]
 }
 
-async def history(connection, pubkey):
+
+async def history(client: Client, pubkey: str) -> dict:
     """
     Get UD history of a member account
 
-    :param duniterpy.api.bma.ConnectionHandler connection: Connection handler instance
-    :param str pubkey:  Public key of the member
-
+    :param client: Client to connect to the api
+    :param pubkey:  Public key of the member
     :rtype: dict
     """
-    client = API(connection, URL_PATH)
+    return await client.get(MODULE + '/history/%s' % pubkey, schema=UD_SCHEMA)
 
-    r = await client.requests_get('/history/%s' % pubkey)
-    return await parse_response(r, UD_SCHEMA)

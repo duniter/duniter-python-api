@@ -14,13 +14,14 @@
 #
 # Authors:
 # Caner Candan <caner@candan.fr>, http://caner.candan.fr
-#
-
-from duniterpy.api.bma import API, logging, parse_response
+# vit
+import logging
+from duniterpy.api.client import Client
+from duniterpy.documents import Transaction
 
 logger = logging.getLogger("duniter/tx")
 
-URL_PATH = 'tx'
+MODULE = 'tx'
 
 HISTORY_SCHEMA = {
     "type": "object",
@@ -160,109 +161,100 @@ HISTORY_SCHEMA = {
 }
 
 SOURCES_SCHEMA = {
-        "type": "object",
-        "properties": {
-            "currency": {
-                "type": "string"
-            },
-            "pubkey": {
-                "type": "string"
-            },
-            "sources": {
-                "type": "array",
-                "items": {
-                    "type": "object",
-                    "properties": {
-                        "type": {
-                            "type": "string"
-                        },
-                        "noffset": {
-                            "type": "number"
-                        },
-                        "identifier": {
-                            "type": "string"
-                        },
-                        "amount": {
-                            "type": "number"
-                        },
-                        "base": {
-                            "type": "number"
-                        }
-                    },
-                    "required": ["type", "noffset", "identifier", "amount", "base"]
-                }
-            }
+    "type": "object",
+    "properties": {
+        "currency": {
+            "type": "string"
         },
-        "required": ["currency", "pubkey", "sources"]
-    }
+        "pubkey": {
+            "type": "string"
+        },
+        "sources": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "type": {
+                        "type": "string"
+                    },
+                    "noffset": {
+                        "type": "number"
+                    },
+                    "identifier": {
+                        "type": "string"
+                    },
+                    "amount": {
+                        "type": "number"
+                    },
+                    "base": {
+                        "type": "number"
+                    }
+                },
+                "required": ["type", "noffset", "identifier", "amount", "base"]
+            }
+        }
+    },
+    "required": ["currency", "pubkey", "sources"]
+}
 
-async def history(connection, pubkey):
+
+async def history(client: Client, pubkey: str) -> dict:
     """
     Get transactions history of public key
 
-    :param duniterpy.api.bma.ConnectionHandler connection: Connection handler instance
-    :param str pubkey: Public key
+    :param client: Client to connect to the api
+    :param pubkey: Public key
     :rtype: dict
     """
-
-    client = API(connection, URL_PATH)
-
-    r = await client.requests_get( '/history/%s' % pubkey)
-    return await parse_response(r, HISTORY_SCHEMA)
-
-async def process(connection, transaction):
-    """
-    POST a transaction
-
-    :param duniterpy.api.bma.ConnectionHandler connection: Connection handler instance
-    :param duniterpy.documents.Transaction transaction: Transaction document
-    :rtype: aiohttp.ClientResponse
-    """
-    client = API(connection, URL_PATH)
-
-    r = await client.requests_post('/process', transaction=transaction)
-    return r
+    return await client.get(MODULE + '/history/%s' % pubkey, schema=HISTORY_SCHEMA)
 
 
-async def sources(connection, pubkey):
+# async def process(client: Client, transaction: Transaction):
+#     """
+#     POST a transaction
+#
+#     :param client: Client to connect to the api
+#     :param transaction: Transaction document
+#     :rtype: aiohttp.ClientResponse
+#     """
+#     client = API(connection, MODULE)
+#
+#     r = await client.requests_post('/process', transaction=transaction)
+#     return r
+
+
+async def sources(client: Client, pubkey: str):
     """
     GET transaction sources
 
-    :param duniterpy.api.bma.ConnectionHandler connection: Connection handler instance
-    :param str pubkey: Public key
+    :param client: Client to connect to the api
+    :param pubkey: Public key
     :rtype: dict
     """
-    client = API(connection, URL_PATH)
+    return await client.get(MODULE + '/sources/%s' % pubkey, schema=SOURCES_SCHEMA)
 
-    r = await client.requests_get( '/sources/%s' % pubkey)
-    return await parse_response(r, SOURCES_SCHEMA)
 
-async def blocks(connection, pubkey, start, end):
+async def blocks(client: Client, pubkey: str, start: int, end: int) -> dict:
     """
     GET public key transactions history between start and end block number
 
-    :param duniterpy.api.bma.ConnectionHandler connection: Connection handler instance
-    :param str pubkey: Public key
-    :param int start: Start from block number
-    :param int end: End to block number
+    :param client: Client to connect to the api
+    :param pubkey: Public key
+    :param start: Start from block number
+    :param end: End to block number
     :return: dict
     """
-    client = API(connection, URL_PATH)
+    return await client.get(MODULE + '/history/%s/blocks/%s/%s' % (pubkey, start, end), schema=HISTORY_SCHEMA)
 
-    r = await client.requests_get('/history/%s/blocks/%s/%s' % (pubkey, start, end))
-    return await parse_response(r, HISTORY_SCHEMA)
 
-async def times(connection, pubkey, start, end):
+async def times(client: Client, pubkey: str, start: int, end: int) -> dict:
     """
     GET public key transactions history between start and end timestamp
 
-    :param duniterpy.api.bma.ConnectionHandler connection: Connection handler instance
-    :param str pubkey: Public key
-    :param int start: Start from timestamp
-    :param int end: End to timestamp
+    :param client: Client to connect to the api
+    :param pubkey: Public key
+    :param start: Start from timestamp
+    :param end: End to timestamp
     :return: dict
     """
-    client = API(connection, URL_PATH)
-
-    r = await client.requests_get('/history/%s/times/%s/%s' % (pubkey, start, end))
-    return await parse_response(r, HISTORY_SCHEMA)
+    return await client.get(MODULE + '/history/%s/times/%s/%s' % (pubkey, start, end), schema=HISTORY_SCHEMA)

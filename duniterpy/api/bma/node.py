@@ -14,19 +14,20 @@
 #
 # Authors:
 # Caner Candan <caner@candan.fr>, http://caner.candan.fr
-#
-
-from duniterpy.api.bma import API, logging, parse_response
+# vit
+import logging
+from duniterpy.api.client import Client
 
 logger = logging.getLogger("duniter/node")
 
-URL_PATH = 'node'
+MODULE = 'node'
 
-async def summary(connection):
+
+async def summary(client: Client) -> dict:
     """
-    GET Certification data over a member
+    GET Duniter node version and infos
 
-    :param duniterpy.api.bma.ConnectionHandler connection: Connection handler instance
+    :param client: Client to connect to the api
     :rtype: dict
     """
     schema = {
@@ -36,7 +37,7 @@ async def summary(connection):
                 "type": "object",
                 "properties": {
                     "software": {
-                    "type": "string"
+                        "type": "string"
                     },
                     "version": {
                         "type": "string",
@@ -50,7 +51,5 @@ async def summary(connection):
         },
         "required": ["duniter"]
     }
-    client = API(connection, URL_PATH)
 
-    r = await client.requests_get('/summary')
-    return await parse_response(r, schema)
+    return await client.get(MODULE + '/summary', schema=schema)

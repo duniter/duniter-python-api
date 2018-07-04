@@ -3,7 +3,8 @@ import aiohttp
 import getpass
 
 import duniterpy.api.bma as bma
-from duniterpy.documents import BMAEndpoint, SecuredBMAEndpoint, BlockUID, Identity, Membership
+from duniterpy.api.endpoint import SecuredBMAEndpoint
+from duniterpy.documents import BlockUID, Identity, Membership
 from duniterpy.key import SigningKey
 
 
@@ -12,7 +13,7 @@ from duniterpy.key import SigningKey
 # You can either use a complete defined endpoint : [NAME_OF_THE_API] [DOMAIN] [IPv4] [IPv6] [PORT]
 # or the simple definition : [NAME_OF_THE_API] [DOMAIN] [PORT]
 # Here we use the secure BASIC_MERKLED_API (BMAS)
-BMA_ENDPOINT = "BMAS g1-test.duniter.org 443"
+BMAS_ENDPOINT = "BMAS g1-test.duniter.org 443"
 
 ################################################
 
@@ -97,7 +98,7 @@ async def main():
     Main code
     """
     # connection handler from BMA endpoint
-    connection = SecuredBMAEndpoint.from_inline(BMA_ENDPOINT).conn_handler(AIOHTTP_SESSION)
+    connection = SecuredBMAEndpoint.from_inline(BMAS_ENDPOINT).conn_handler(AIOHTTP_SESSION)
 
     # capture current block to get version and currency and blockstamp
     current_block = await bma.blockchain.current(connection)

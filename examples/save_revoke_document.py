@@ -1,8 +1,8 @@
 import asyncio
 import aiohttp
 import duniterpy.api.bma as bma
-from duniterpy.documents import BMAEndpoint, SecuredBMAEndpoint, BlockUID, Identity
-from duniterpy.documents import Revocation
+from duniterpy.api.endpoint import SecuredBMAEndpoint
+from duniterpy.documents import Revocation, BlockUID, Identity
 from duniterpy.key import SigningKey
 import getpass
 import os
@@ -21,7 +21,7 @@ else:
 # You can either use a complete defined endpoint : [NAME_OF_THE_API] [DOMAIN] [IPv4] [IPv6] [PORT]
 # or the simple definition : [NAME_OF_THE_API] [DOMAIN] [PORT]
 # Here we use the secure BASIC_MERKLED_API (BMAS)
-BMA_ENDPOINT = "BMAS g1-test.duniter.org 443"
+BMAS_ENDPOINT = "BMAS g1-test.duniter.org 443"
 
 # WARNING : Hide this file in a safe and secure place
 # If one day you forget your credentials,
@@ -39,7 +39,7 @@ async def get_identity_document(connection, currency, pubkey):
     """
     Get the Identity document of the pubkey
 
-    :param bma.api.ConnectionHandler connection: Connection handler
+    :param bma.connection.ConnectionHandler connection: Connection handler
     :param str currency: Currency name
     :param str pubkey: Public key
 
@@ -82,14 +82,15 @@ def get_revoke_document(identity, salt, password):
     :param str salt: Salt
     :param str password: Password
 
-    :return: the revokation document
-    :rtype: duniterpy.documents.certification.Revocation
+    :return: the raw signed revokation document
+    :rtype: str
     """
     document = Revocation(PROTOCOL_VERSION, identity.currency, identity.pubkey, "")
 
     key = SigningKey(salt, password)
     document.sign(identity, [key])
     return document.signed_raw(identity)
+
 
 async def main():
     """
@@ -113,7 +114,7 @@ async def main():
         exit(0)
 
     # connection handler from BMAS endpoint
-    connection = SecuredBMAEndpoint.from_inline(BMA_ENDPOINT).conn_handler(AIOHTTP_SESSION)
+    connection = SecuredBMAEndpoint.from_inline(BMAS_ENDPOINT).conn_handler(AIOHTTP_SESSION)
     # capture current block to get currency name
     current_block = await bma.blockchain.current(connection)
 

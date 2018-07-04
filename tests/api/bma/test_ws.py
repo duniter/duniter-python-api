@@ -1,6 +1,6 @@
 import unittest
 from tests.api.webserver import WebFunctionalSetupMixin
-from duniterpy.api.bma.ws import block, peer, WS_BLOCk_SCHEMA, WS_PEER_SCHEMA
+from duniterpy.api.bma.ws import block, peer, WS_BLOCK_SCHEMA, WS_PEER_SCHEMA
 from duniterpy.api.bma import parse_text
 
 
@@ -81,7 +81,7 @@ class Test_BMA_Websocket(WebFunctionalSetupMixin, unittest.TestCase):
   "signature": "H41/8OGV2W4CLKbE35kk5t1HJQsb3jEM0/QGLUf80CwJvGZf3HvVCcNtHPUFoUBKEDQO9mPK3KJkqOoxHpqHCw=="
 }
 """
-        parse_text(json_sample, WS_BLOCk_SCHEMA)
+        parse_text(json_sample, WS_BLOCK_SCHEMA)
 
     def test_peer(self):
         json_sample = """{
