@@ -24,19 +24,19 @@ async def main():
     print(response)
 
     # Get the node summary infos by dedicated method (with json schema validation)
-    response = await bma.node.summary(client)
+    response = await client(bma.node.summary)
     print(response)
 
     # Get the money parameters located in the first block
-    response = await bma.blockchain.parameters(client)
+    response = await client(bma.blockchain.parameters)
     print(response)
 
     # Get the current block
-    response = await bma.blockchain.current(client)
+    response = await client(bma.blockchain.current)
     print(response)
 
     # Get the block number 10
-    response = await bma.blockchain.block(client, 10)
+    response = await client(bma.blockchain.block, 10)
     print(response)
 
     # Close client aiohttp session

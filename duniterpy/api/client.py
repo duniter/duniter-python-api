@@ -1,13 +1,13 @@
 # Authors:
 # Caner Candan <caner@candan.fr>, http://caner.candan.fr
 # Inso <insomniak.fr at gmail.com>
-
+from typing import Callable
 import json
 import logging
 import aiohttp
 import jsonschema
 from .errors import DuniterError
-from duniterpy.api.endpoint import endpoint
+import duniterpy.api.endpoint as endpoint
 
 logger = logging.getLogger("duniter")
 
@@ -180,7 +180,7 @@ class Client:
         :param proxy: Proxy server as hostname:port
         """
         # Endpoint Protocol detection
-        self.endpoint = endpoint(_endpoint)
+        self.endpoint = endpoint.endpoint(_endpoint)
 
         # if no user session...
         if session is None:
@@ -219,3 +219,14 @@ class Client:
         """
         await self.session.close()
 
+    async def __call__(self, _function: Callable, *args: any, **kwargs: any) -> any:
+        """
+        Call the _function given with the args given
+        So we can have use many packages wrapping a REST API
+
+        :param _function: The function to call
+        :param args: The parameters
+        :param kwargs: The key/value parameters
+        :return:
+        """
+        return await _function(self, *args, **kwargs)
