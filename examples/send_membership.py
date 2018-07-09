@@ -1,12 +1,10 @@
 import asyncio
-import aiohttp
 import getpass
 
 import duniterpy.api.bma as bma
-from duniterpy.api.endpoint import SecuredBMAEndpoint
+from duniterpy.api.client import Client
 from duniterpy.documents import BlockUID, Identity, Membership
 from duniterpy.key import SigningKey
-
 
 # CONFIG #######################################
 
@@ -15,21 +13,18 @@ from duniterpy.key import SigningKey
 # Here we use the secure BASIC_MERKLED_API (BMAS)
 BMAS_ENDPOINT = "BMAS g1-test.duniter.org 443"
 
+
 ################################################
 
-# Latest duniter-python-api is asynchronous and you have to create an aiohttp session to send request
-# ( http://pythonhosted.org/aiohttp )
-AIOHTTP_SESSION = aiohttp.ClientSession()
 
-
-def get_identity_document(current_block, uid, salt, password):
+def get_identity_document(current_block: dict, uid: str, salt: str, password: str) -> Identity:
     """
     Get an Identity document
 
-    :param dict current_block: Current block data
-    :param str uid: Unique Identifier
-    :param str salt: Passphrase of the account
-    :param str password: Password of the account
+    :param current_block: Current block data
+    :param uid: Unique Identifier
+    :param salt: Passphrase of the account
+    :param password: Password of the account
 
     :rtype: Identity
     """
@@ -56,15 +51,16 @@ def get_identity_document(current_block, uid, salt, password):
     return identity
 
 
-def get_membership_document(mtype, current_block, identity, salt, password):
+def get_membership_document(membership_type: str, current_block: dict, identity: Identity, salt: str,
+                            password: str) -> Membership:
     """
     Get a Membership document
 
-    :param str mtype: "IN" to ask for membership or "OUT" to cancel membership
-    :param dict current_block: Current block data
-    :param Identity identity: Identity document
-    :param str salt: Passphrase of the account
-    :param str password: Password of the account
+    :param membership_type: "IN" to ask for membership or "OUT" to cancel membership
+    :param current_block: Current block data
+    :param identity: Identity document
+    :param salt: Passphrase of the account
+    :param password: Password of the account
 
     :rtype: Membership
     """
@@ -81,7 +77,7 @@ def get_membership_document(mtype, current_block, identity, salt, password):
         currency=current_block['currency'],
         issuer=key.pubkey,
         membership_ts=timestamp,
-        membership_type=mtype,
+        membership_type=membership_type,
         uid=identity.uid,
         identity_ts=identity.timestamp,
         signature=None
@@ -97,11 +93,15 @@ async def main():
     """
     Main code
     """
-    # connection handler from BMA endpoint
-    connection = SecuredBMAEndpoint.from_inline(BMAS_ENDPOINT).conn_handler(AIOHTTP_SESSION)
+    # Create Client from endpoint string in Duniter format
+    client = Client(BMAS_ENDPOINT)
+
+    # Get the node summary infos by dedicated method (with json schema validation)
+    response = await client(bma.node.summary)
+    print(response)
 
     # capture current block to get version and currency and blockstamp
-    current_block = await bma.blockchain.current(connection)
+    current_block = await client(bma.blockchain.current)
 
     # prompt hidden user entry
     salt = getpass.getpass("Enter your passphrase (salt): ")
@@ -110,27 +110,26 @@ async def main():
     password = getpass.getpass("Enter your password: ")
 
     # prompt entry
-    UID = input("Enter your UID: ")
+    uid = input("Enter your UID: ")
 
     # create our signed identity document
-    identity = get_identity_document(current_block, UID, salt, password)
+    identity = get_identity_document(current_block, uid, salt, password)
 
     # create a membership demand document
     membership = get_membership_document("IN", current_block, identity, salt, password)
 
-    # send the membership document to the node
-    response = await bma.blockchain.membership(connection, membership.signed_raw())
+    # send the membership signed raw document to the node
+    response = await client(bma.blockchain.membership, membership.signed_raw())
 
     if response.status == 200:
         print(await response.text())
     else:
         print("Error while publishing membership : {0}".format(await response.text()))
 
-    response.close()
+    # Close client aiohttp session
+    await client.close()
 
 
-with AIOHTTP_SESSION:
-
-    # Latest duniter-python-api is asynchronous and you have to use asyncio, an asyncio loop and a "as" on the data.
-    # ( https://docs.python.org/3/library/asyncio.html )
-    asyncio.get_event_loop().run_until_complete(main())
+# Latest duniter-python-api is asynchronous and you have to use asyncio, an asyncio loop and a "as" on the data.
+# ( https://docs.python.org/3/library/asyncio.html )
+asyncio.get_event_loop().run_until_complete(main())

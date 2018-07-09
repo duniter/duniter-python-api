@@ -16,7 +16,7 @@
 # Caner Candan <caner@candan.fr>, http://caner.candan.fr
 # vit
 import logging
-from duniterpy.api.client import Client
+from duniterpy.api.client import Client, RESPONSE_AIOHTTP
 
 logger = logging.getLogger("duniter/blockchain")
 
@@ -323,17 +323,16 @@ async def memberships(client: Client, search: str) -> dict:
     return await client.get(MODULE + '/memberships/%s' % search, schema=MEMBERSHIPS_SCHEMA)
 
 
-# async def membership(connection, membership):
-#     """
-#     POST a Membership document
-#
-#     :param duniterpy.api.bma.ConnectionHandler connection: Connection handler instance
-#     :param str membership: Membership signed raw document
-#     :rtype: aiohttp.ClientResponse
-#     """
-#     client = API(connection, MODULE)
-#
-#     return await client.requests_post('/membership', membership=membership)
+async def membership(client: Client, _membership: str):
+    """
+    POST a Membership document
+
+    :param client: Client to connect to the api
+    :param _membership: Membership signed raw document
+    :rtype: aiohttp.ClientResponse
+    """
+    return await client.post(MODULE + '/membership', {'membership': _membership}, rtype=RESPONSE_AIOHTTP)
+
 
 async def current(client: Client) -> dict:
     """
