@@ -1,7 +1,6 @@
 import asyncio
 import socket
 from aiohttp import web
-from aiohttp import log
 
 
 # Thanks to aiohttp tests courtesy
