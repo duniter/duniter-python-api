@@ -1,11 +1,11 @@
 import asyncio
-import aiohttp
-import duniterpy.api.bma as bma
-from duniterpy.api.endpoint import SecuredBMAEndpoint
-from duniterpy.documents import Revocation, BlockUID, Identity
-from duniterpy.key import SigningKey
 import getpass
 import os
+
+import duniterpy.api.bma as bma
+from duniterpy.api.client import Client
+from duniterpy.documents import Revocation, BlockUID, Identity
+from duniterpy.key import SigningKey
 
 if "XDG_CONFIG_HOME" in os.environ:
     home_path = os.environ["XDG_CONFIG_HOME"]
@@ -26,27 +26,27 @@ BMAS_ENDPOINT = "BMAS g1-test.duniter.org 443"
 # WARNING : Hide this file in a safe and secure place
 # If one day you forget your credentials,
 # you'll have to use your private key instead
-REVOKE_DOCUMENT_FILE_PATH = os.path.join(home_path, "duniter_account_revoke_document.txt")
-
-################################################
-AIOHTTP_SESSION = aiohttp.ClientSession()
+REVOCATION_DOCUMENT_FILE_PATH = os.path.join(home_path, "duniter_account_revocation_document.txt")
 
 # Current protocol version
 PROTOCOL_VERSION = 10
 
 
-async def get_identity_document(connection, currency, pubkey):
+################################################
+
+
+async def get_identity_document(client: Client, currency: str, pubkey: str) -> Identity:
     """
     Get the Identity document of the pubkey
 
-    :param bma.connection.ConnectionHandler connection: Connection handler
-    :param str currency: Currency name
-    :param str pubkey: Public key
+    :param client: Client to connect to the api
+    :param currency: Currency name
+    :param pubkey: Public key
 
     :rtype: Identity
     """
     # Here we request for the path wot/lookup/pubkey
-    lookup_data = await bma.wot.lookup(connection, pubkey)
+    lookup_data = await client(bma.wot.lookup, pubkey)
 
     # init vars
     uid = None
@@ -74,28 +74,34 @@ async def get_identity_document(connection, currency, pubkey):
             )
 
 
-def get_revoke_document(identity, salt, password):
+def get_signed_raw_revocation_document(identity: Identity, salt: str, password: str) -> str:
     """
     Generate account revocation document for given identity
 
-    :param Identity identity: Self Certification of the identity
-    :param str salt: Salt
-    :param str password: Password
+    :param identity: Self Certification of the identity
+    :param salt: Salt
+    :param password: Password
 
-    :return: the raw signed revokation document
     :rtype: str
     """
-    document = Revocation(PROTOCOL_VERSION, identity.currency, identity.pubkey, "")
+    revocation = Revocation(PROTOCOL_VERSION, identity.currency, identity.pubkey, "")
 
     key = SigningKey(salt, password)
-    document.sign(identity, [key])
-    return document.signed_raw(identity)
+    revocation.sign(identity, [key])
+    return revocation.signed_raw(identity)
 
 
 async def main():
     """
     Main code
     """
+    # Create Client from endpoint string in Duniter format
+    client = Client(BMAS_ENDPOINT)
+
+    # Get the node summary infos to test the connection
+    response = await client(bma.node.summary)
+    print(response)
+
     # prompt hidden user entry
     salt = getpass.getpass("Enter your passphrase (salt): ")
 
@@ -113,27 +119,27 @@ async def main():
         print("Bad credentials!")
         exit(0)
 
-    # connection handler from BMAS endpoint
-    connection = SecuredBMAEndpoint.from_inline(BMAS_ENDPOINT).conn_handler(AIOHTTP_SESSION)
     # capture current block to get currency name
-    current_block = await bma.blockchain.current(connection)
+    current_block = await client(bma.blockchain.current)
 
     # create our Identity document to sign the revoke document
-    identity_document = await get_identity_document(connection, current_block['currency'], pubkey)
+    identity_document = await get_identity_document(client, current_block['currency'], pubkey)
 
     # get the revoke document
-    revoke_document = get_revoke_document(identity_document, salt, password)
+    revocation_signed_raw_document = get_signed_raw_revocation_document(identity_document, salt, password)
 
     # save revoke document in a file
-    fp = open(REVOKE_DOCUMENT_FILE_PATH, 'w')
-    fp.write(revoke_document)
+    fp = open(REVOCATION_DOCUMENT_FILE_PATH, 'w')
+    fp.write(revocation_signed_raw_document)
     fp.close()
 
     # document saved
-    print("Revoke document saved in %s" % REVOKE_DOCUMENT_FILE_PATH)
+    print("Revocation document saved in %s" % REVOCATION_DOCUMENT_FILE_PATH)
+
+    # Close client aiohttp session
+    await client.close()
 
 
-with AIOHTTP_SESSION:
-    # Latest duniter-python-api is asynchronous and you have to use asyncio, an asyncio loop and a "as" on the data.
-    # ( https://docs.python.org/3/library/asyncio.html )
-    asyncio.get_event_loop().run_until_complete(main())
+# Latest duniter-python-api is asynchronous and you have to use asyncio, an asyncio loop and a "as" on the data.
+# ( https://docs.python.org/3/library/asyncio.html )
+asyncio.get_event_loop().run_until_complete(main())

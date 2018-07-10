@@ -16,90 +16,92 @@
 # Caner Candan <caner@candan.fr>, http://caner.candan.fr
 # vit
 import logging
-from duniterpy.api.client import Client
-from duniterpy.documents.peer import Peer
+
+from aiohttp import ClientSession
+
+from duniterpy.api.client import Client, RESPONSE_AIOHTTP
 
 logger = logging.getLogger("duniter/network")
 
 MODULE = 'network'
 
 PEERING_SCHEMA = {
-        "type": "object",
-        "properties": {
-          "version": {
-              "type": ["number", "string"]
-          },
-          "currency": {
-              "type": "string"
-          },
-          "pubkey": {
-              "type": "string"
-          },
-          "endpoints": {
-              "type": "array",
-              "items": {
-                  "type": "string"
-              }
-          },
-          "signature": {
-              "type": "string"
-          }
+    "type": "object",
+    "properties": {
+        "version": {
+            "type": ["number", "string"]
         },
-        "required": ["version", "currency", "pubkey", "endpoints", "signature"]
-    }
+        "currency": {
+            "type": "string"
+        },
+        "pubkey": {
+            "type": "string"
+        },
+        "endpoints": {
+            "type": "array",
+            "items": {
+                "type": "string"
+            }
+        },
+        "signature": {
+            "type": "string"
+        }
+    },
+    "required": ["version", "currency", "pubkey", "endpoints", "signature"]
+}
 
 PEERS_SCHEMA = schema = {
-        "type": ["object"],
-        "properties": {
-            "depth": {
-                "type": "number"
-            },
-            "nodesCount": {
-                "type": "number"
-            },
-            "leavesCount": {
-                "type": "number"
-            },
-            "root": {
-                "type": "string"
-            },
-            "hash": {
-                "type": "string"
-            },
-            "value": {
-                "type": "object",
-                "properties": {
-                    "version": {
-                        "type": "string"
-                    },
-                    "currency": {
-                        "type": "string"
-                    },
-                    "pubkey": {
-                        "type": "string"
-                    },
-                    "endpoints": {
-                        "type": "array",
-                        "items": {
-                            "type": "string"
-                        }
-                    },
-                    "signature": {
+    "type": ["object"],
+    "properties": {
+        "depth": {
+            "type": "number"
+        },
+        "nodesCount": {
+            "type": "number"
+        },
+        "leavesCount": {
+            "type": "number"
+        },
+        "root": {
+            "type": "string"
+        },
+        "hash": {
+            "type": "string"
+        },
+        "value": {
+            "type": "object",
+            "properties": {
+                "version": {
+                    "type": "string"
+                },
+                "currency": {
+                    "type": "string"
+                },
+                "pubkey": {
+                    "type": "string"
+                },
+                "endpoints": {
+                    "type": "array",
+                    "items": {
                         "type": "string"
                     }
                 },
-                "required": ["version", "currency", "pubkey", "endpoints", "signature"]
-            }
-        },
-        "oneOf": [
-            {
-                "required": ["depth", "nodesCount", "leavesCount", "root"]
+                "signature": {
+                    "type": "string"
+                }
             },
-            {
-                "required": ["hash", "value"]
-            }
-        ]
-    }
+            "required": ["version", "currency", "pubkey", "endpoints", "signature"]
+        }
+    },
+    "oneOf": [
+        {
+            "required": ["depth", "nodesCount", "leavesCount", "root"]
+        },
+        {
+            "required": ["hash", "value"]
+        }
+    ]
+}
 
 
 async def peering(client: Client) -> dict:
@@ -127,16 +129,12 @@ async def peers(client: Client, leaves: bool = False, leaf: str = ""):
         return await client.get(MODULE + '/peering/peers', {"leaf": leaf}, schema=PEERS_SCHEMA)
 
 
-# async def peer(client: Client, entry: Peer = None, signature: str = None) -> dict:
-#     """
-#     POST a Peer document with his signature
-#
-#     :param client: Client to connect to the api
-#     :param entry: Peer document
-#     :param signature: Signature of the document issuer
-#     :rtype: dict
-#     """
-#
-#     client = API(connection, MODULE)
-#     r = await client.requests_post('/peering/peers', entry=entry, signature=signature)
-#     return r
+async def peer(client: Client, peer_signed_raw: str) -> ClientSession:
+    """
+    POST a Peer signed raw document
+
+    :param client: Client to connect to the api
+    :param peer_signed_raw: Peer signed raw document
+    :rtype: ClientSession
+    """
+    return await client.post(MODULE + '/peering/peers', {'peer': peer_signed_raw}, rtype=RESPONSE_AIOHTTP)

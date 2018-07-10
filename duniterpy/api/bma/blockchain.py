@@ -16,6 +16,10 @@
 # Caner Candan <caner@candan.fr>, http://caner.candan.fr
 # vit
 import logging
+from typing import Union
+
+from aiohttp import ClientSession
+
 from duniterpy.api.client import Client, RESPONSE_AIOHTTP
 
 logger = logging.getLogger("duniter/blockchain")
@@ -174,76 +178,75 @@ BLOCK_NUMBERS_SCHEMA = {
 }
 
 PARAMETERS_SCHEMA = {
-        "type": "object",
-        "properties":
+    "type": "object",
+    "properties":
         {
-              "currency": {
-                  "type": "string"
-              },
-              "c": {
-                  "type": "number"
-              },
-              "dt": {
-                  "type": "number"
-              },
-              "ud0": {
-                  "type": "number"
-              },
-              "sigPeriod": {
-                  "type": "number"
-              },
-              "sigStock": {
-                  "type": "number"
-              },
-              "sigWindow": {
-                  "type": "number"
-              },
-              "sigValidity": {
-                  "type": "number"
-              },
-              "sigQty": {
-                  "type": "number"
-              },
-              "xpercent": {
-                  "type": "number"
-              },
-              "msValidity": {
-                  "type": "number"
-              },
-              "stepMax": {
-                  "type": "number"
-              },
-              "medianTimeBlocks": {
-                  "type": "number"
-              },
-              "avgGenTime": {
-                  "type": "number"
-              },
-              "dtDiffEval": {
-                  "type": "number"
-              },
-              "percentRot": {
-                  "type": "number"
-              },
-              "udTime0": {
-                  "type": "number"
-              },
-              "udReevalTime0": {
-                  "type": "number"
-              },
-              "dtReeval": {
-                  "type": "number"
-              }
+            "currency": {
+                "type": "string"
             },
-        "required": ["currency", "c", "dt", "ud0", "sigPeriod", "sigValidity", "sigQty", "xpercent", "sigStock",
-                     "sigWindow", "msValidity", "stepMax", "medianTimeBlocks",
-                     "avgGenTime", "dtDiffEval", "percentRot", "udTime0", "udReevalTime0", "dtReeval"]
-    }
-
+            "c": {
+                "type": "number"
+            },
+            "dt": {
+                "type": "number"
+            },
+            "ud0": {
+                "type": "number"
+            },
+            "sigPeriod": {
+                "type": "number"
+            },
+            "sigStock": {
+                "type": "number"
+            },
+            "sigWindow": {
+                "type": "number"
+            },
+            "sigValidity": {
+                "type": "number"
+            },
+            "sigQty": {
+                "type": "number"
+            },
+            "xpercent": {
+                "type": "number"
+            },
+            "msValidity": {
+                "type": "number"
+            },
+            "stepMax": {
+                "type": "number"
+            },
+            "medianTimeBlocks": {
+                "type": "number"
+            },
+            "avgGenTime": {
+                "type": "number"
+            },
+            "dtDiffEval": {
+                "type": "number"
+            },
+            "percentRot": {
+                "type": "number"
+            },
+            "udTime0": {
+                "type": "number"
+            },
+            "udReevalTime0": {
+                "type": "number"
+            },
+            "dtReeval": {
+                "type": "number"
+            }
+        },
+    "required": ["currency", "c", "dt", "ud0", "sigPeriod", "sigValidity", "sigQty", "xpercent", "sigStock",
+                 "sigWindow", "msValidity", "stepMax", "medianTimeBlocks",
+                 "avgGenTime", "dtDiffEval", "percentRot", "udTime0", "udReevalTime0", "dtReeval"]
+}
 
 MEMBERSHIPS_SCHEMA = {
-        "type": "object",
-        "properties":
+    "type": "object",
+    "properties":
         {
             "pubkey": {
                 "type": "string"
@@ -279,9 +282,8 @@ MEMBERSHIPS_SCHEMA = {
                 }
             }
         },
-        "required": ["pubkey", "uid", "sigDate", "memberships"]
-    }
-
+    "required": ["pubkey", "uid", "sigDate", "memberships"]
+}
 
 BLOCKS_SCHEMA = {
     "type": "array",
@@ -323,15 +325,15 @@ async def memberships(client: Client, search: str) -> dict:
     return await client.get(MODULE + '/memberships/%s' % search, schema=MEMBERSHIPS_SCHEMA)
 
 
-async def membership(client: Client, _membership: str):
+async def membership(client: Client, membership_signed_raw: str):
     """
     POST a Membership document
 
     :param client: Client to connect to the api
-    :param _membership: Membership signed raw document
+    :param membership_signed_raw: Membership signed raw document
     :rtype: aiohttp.ClientResponse
     """
-    return await client.post(MODULE + '/membership', {'membership': _membership}, rtype=RESPONSE_AIOHTTP)
+    return await client.post(MODULE + '/membership', {'membership': membership_signed_raw}, rtype=RESPONSE_AIOHTTP)
 
 
 async def current(client: Client) -> dict:
@@ -344,22 +346,21 @@ async def current(client: Client) -> dict:
     return await client.get(MODULE + '/current', schema=BLOCK_SCHEMA)
 
 
-async def block(client: Client, number: int = 0, _block: dict = None, signature: str = None):
+async def block(client: Client, number: int = 0, block_raw: str = None, signature: str = None) -> Union[dict,
+                                                                                                        ClientSession]:
     """
     GET/POST a block from/to the blockchain
 
     :param client: Client to connect to the api
     :param number: Block number to get
-    :param dict _block: Block document to post
-    :param str signature: Signature of the block document issuer
+    :param block_raw: Block document to post
+    :param signature: Signature of the block document issuer
     :rtype: dict
     """
-
-    # client = API(connection, MODULE)
-    # # POST block
-    # if _block is not None and signature is not None:
-    #     return await client.requests_post('/block', block=_block, signature=signature)
-
+    # POST block
+    if block_raw is not None and signature is not None:
+        return await client.post(MODULE + '/block', {'block': block_raw, 'signature': signature},
+                                 rtype=RESPONSE_AIOHTTP)
     # GET block
     return await client.get(MODULE + '/block/%d' % number, schema=BLOCK_SCHEMA)
 

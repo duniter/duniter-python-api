@@ -1,9 +1,8 @@
 import asyncio
 import getpass
-import aiohttp
 
 from duniterpy.api import bma
-from duniterpy.api.endpoint import SecuredBMAEndpoint
+from duniterpy.api.client import Client
 from duniterpy.documents import BlockUID, Transaction
 from duniterpy.documents.transaction import InputSource, OutputSource, Unlock, SIGParameter
 from duniterpy.grammars.output import Condition, SIG
@@ -16,26 +15,21 @@ from duniterpy.key import SigningKey
 # Here we use the secure BASIC_MERKLED_API (BMAS)
 BMAS_ENDPOINT = "BMAS g1-test.duniter.org 443"
 
-
-################################################
-
-
-# Latest duniter-python-api is asynchronous and you have to create an aiohttp session to send request
-# ( http://pythonhosted.org/aiohttp )
-AIOHTTP_SESSION = aiohttp.ClientSession()
-
 # Version of the transaction document
 TRANSACTION_VERSION = 10
 
 
-def get_transaction_document(current_block, source, from_pubkey, to_pubkey):
+################################################
+
+
+def get_transaction_document(current_block: dict, source: dict, from_pubkey: str, to_pubkey: str) -> Transaction:
     """
     Return a Transaction document
 
-    :param dict current_block: Current block infos
-    :param dict source: Source to send
-    :param str from_pubkey: Public key of the issuer
-    :param str to_pubkey: Public key of the receiver
+    :param current_block: Current block infos
+    :param source: Source to send
+    :param from_pubkey: Public key of the issuer
+    :param to_pubkey: Public key of the receiver
 
     :return: Transaction
     """
@@ -95,8 +89,12 @@ async def main():
     """
     Main code
     """
-    # connection handler from BMA endpoint
-    connection = SecuredBMAEndpoint.from_inline(BMAS_ENDPOINT).conn_handler(AIOHTTP_SESSION)
+    # Create Client from endpoint string in Duniter format
+    client = Client(BMAS_ENDPOINT)
+
+    # Get the node summary infos to test the connection
+    response = await client(bma.node.summary)
+    print(response)
 
     # prompt hidden user entry
     salt = getpass.getpass("Enter your passphrase (salt): ")
@@ -111,10 +109,10 @@ async def main():
     pubkey_to = input("Enter recipient pubkey: ")
 
     # capture current block to get version and currency and blockstamp
-    current_block = await bma.blockchain.current(connection)
+    current_block = await client(bma.blockchain.current)
 
     # capture sources of account
-    response = await bma.tx.sources(connection, pubkey_from)
+    response = await client(bma.tx.sources, pubkey_from)
 
     if len(response['sources']) == 0:
         print("no sources found for account %s" % pubkey_to)
@@ -133,17 +131,17 @@ async def main():
     transaction.sign([key])
 
     # send the Transaction document to the node
-    response = await bma.tx.process(connection, transaction.signed_raw())
+    response = await client(bma.tx.process, transaction.signed_raw())
 
     if response.status == 200:
         print(await response.text())
     else:
         print("Error while publishing transaction: {0}".format(await response.text()))
-    response.close()
+
+    # Close client aiohttp session
+    await client.close()
 
 
-with AIOHTTP_SESSION:
-
-    # Latest duniter-python-api is asynchronous and you have to use asyncio, an asyncio loop and a "as" on the data.
-    # ( https://docs.python.org/3/library/asyncio.html )
-    asyncio.get_event_loop().run_until_complete(main())
+# Latest duniter-python-api is asynchronous and you have to use asyncio, an asyncio loop and a "as" on the data.
+# ( https://docs.python.org/3/library/asyncio.html )
+asyncio.get_event_loop().run_until_complete(main())

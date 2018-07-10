@@ -16,8 +16,10 @@
 # Caner Candan <caner@candan.fr>, http://caner.candan.fr
 # vit
 import logging
-from duniterpy.api.client import Client
-from duniterpy.documents import Transaction
+
+from aiohttp import ClientSession
+
+from duniterpy.api.client import Client, RESPONSE_AIOHTTP
 
 logger = logging.getLogger("duniter/tx")
 
@@ -209,18 +211,15 @@ async def history(client: Client, pubkey: str) -> dict:
     return await client.get(MODULE + '/history/%s' % pubkey, schema=HISTORY_SCHEMA)
 
 
-# async def process(client: Client, transaction: Transaction):
-#     """
-#     POST a transaction
-#
-#     :param client: Client to connect to the api
-#     :param transaction: Transaction document
-#     :rtype: aiohttp.ClientResponse
-#     """
-#     client = API(connection, MODULE)
-#
-#     r = await client.requests_post('/process', transaction=transaction)
-#     return r
+async def process(client: Client, transaction_signed_raw: str) -> ClientSession:
+    """
+    POST a transaction raw document
+
+    :param client: Client to connect to the api
+    :param transaction_signed_raw: Transaction signed raw document
+    :rtype: ClientResponse
+    """
+    return await client.post(MODULE + '/process', {'transaction': transaction_signed_raw}, rtype=RESPONSE_AIOHTTP)
 
 
 async def sources(client: Client, pubkey: str):

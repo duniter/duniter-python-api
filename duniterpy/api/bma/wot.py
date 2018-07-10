@@ -16,7 +16,10 @@
 # Caner Candan <caner@candan.fr>, http://caner.candan.fr
 # vit
 import logging
-from duniterpy.api.client import Client
+
+from aiohttp import ClientSession
+
+from duniterpy.api.client import Client, RESPONSE_AIOHTTP
 
 logger = logging.getLogger("duniter/wot")
 
@@ -97,7 +100,6 @@ CERTIFICATIONS_SCHEMA = {
     "required": ["pubkey", "uid", "isMember", "certifications"]
 }
 
-
 MEMBERS_SCHEMA = {
     "type": "object",
     "properties": {
@@ -116,7 +118,6 @@ MEMBERS_SCHEMA = {
     },
     "required": ["results"]
 }
-
 
 REQUIREMENTS_SCHEMA = {
     "type": "object",
@@ -298,46 +299,37 @@ LOOKUP_SCHEMA = {
 }
 
 
-# async def add(client: Client, identity: str) -> dict:
-#     """
-#     POST identity document
-#
-#     :param duniterpy.api.bma.ConnectionHandler connection: Connection handler instance
-#     :param duniterpy.documents.certification.Identity identity: Identity document
-#     :rtype: aiohttp.ClientResponse
-#     """
-#     client = API(connection, URL_PATH)
-#
-#     r = await client.requests_post('/add', identity=identity)
-#     return r
+async def add(client: Client, identity_signed_raw: str) -> ClientSession:
+    """
+    POST identity raw document
+
+    :param client: Client to connect to the api
+    :param identity_signed_raw: Identity raw document
+    :rtype: aiohttp.ClientResponse
+    """
+    return await client.post(MODULE + '/add', {'identity': identity_signed_raw}, rtype=RESPONSE_AIOHTTP)
 
 
-# async def certify(connection, cert):
-#     """
-#     POST certification document
-#
-#     :param duniterpy.api.bma.ConnectionHandler connection: Connection handler instance
-#     :param duniterpy.documents.certification.Certification cert: Certification document
-#     :rtype: aiohttp.ClientResponse
-#     """
-#     client = API(connection, URL_PATH)
-#
-#     r = await client.requests_post('/certify', cert=cert)
-#     return r
+async def certify(client: Client, certification_signed_raw: str) -> ClientSession:
+    """
+    POST certification raw document
+
+    :param client: Client to connect to the api
+    :param certification_signed_raw: Certification raw document
+    :rtype: aiohttp.ClientResponse
+    """
+    return await client.post(MODULE + '/certify', {'cert': certification_signed_raw}, rtype=RESPONSE_AIOHTTP)
 
 
-# async def revoke(connection, revocation):
-#     """
-#     POST revocation document
-#
-#     :param duniterpy.api.bma.ConnectionHandler connection: Connection handler instance
-#     :param duniterpy.documents.certification.Revocation revocation: Certification document
-#     :rtype: aiohttp.ClientResponse
-#     """
-#     client = API(connection, URL_PATH)
-#
-#     r = await client.requests_post('/revoke', revocation=revocation)
-#     return r
+async def revoke(client: Client, revocation_signed_raw: str) -> ClientSession:
+    """
+    POST revocation document
+
+    :param client: Client to connect to the api
+    :param revocation_signed_raw: Certification raw document
+    :rtype: aiohttp.ClientResponse
+    """
+    return await client.post(MODULE + '/revoke', {'revocation': revocation_signed_raw}, rtype=RESPONSE_AIOHTTP)
 
 
 async def lookup(client: Client, search: str) -> dict:

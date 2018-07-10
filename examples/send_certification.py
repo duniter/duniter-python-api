@@ -1,11 +1,10 @@
 import asyncio
-import aiohttp
 import getpass
+
 import duniterpy.api.bma as bma
-from duniterpy.api.endpoint import SecuredBMAEndpoint
+from duniterpy.api.client import Client
 from duniterpy.documents import BlockUID, Identity, Certification
 from duniterpy.key import SigningKey
-
 
 # CONFIG #######################################
 
@@ -14,25 +13,22 @@ from duniterpy.key import SigningKey
 # Here we use the secure BASIC_MERKLED_API (BMAS)
 BMAS_ENDPOINT = "BMAS g1-test.duniter.org 443"
 
+
 ################################################
 
-# Latest duniter-python-api is asynchronous and you have to create an aiohttp session to send request
-# ( http://pythonhosted.org/aiohttp )
-AIOHTTP_SESSION = aiohttp.ClientSession()
 
-
-async def get_identity_document(connection, current_block, pubkey):
+async def get_identity_document(client: Client, current_block: dict, pubkey: str) -> Identity:
     """
     Get the identity document of the pubkey
 
-    :param bma.connection.ConnectionHandler connection: Connection handler
-    :param dict current_block: Current block data
-    :param str pubkey: UID/Public key
+    :param client: Client to connect to the api
+    :param current_block: Current block data
+    :param pubkey: UID/Public key
 
     :rtype: Identity
     """
     # Here we request for the path wot/lookup/pubkey
-    lookup_data = await bma.wot.lookup(connection, pubkey)
+    lookup_data = await client(bma.wot.lookup, pubkey)
 
     # init vars
     uid = None
@@ -60,15 +56,16 @@ async def get_identity_document(connection, current_block, pubkey):
             )
 
 
-def get_certification_document(current_block, self_cert_document, from_pubkey, salt, password):
+def get_certification_document(current_block: dict, self_cert_document: Identity, from_pubkey: str, salt: str,
+                               password: str) -> Certification:
     """
     Create and return a Certification document
 
-    :param dict current_block: Current block data
-    :param Identity self_cert_document: Identity document
-    :param str from_pubkey: Pubkey of the certifier
-    :param str salt: Secret salt (DO NOT SHOW IT ANYWHERE, IT IS SECRET !!!)
-    :param str password: Secret password (DO NOT SHOW IT ANYWHERE, IT IS SECRET !!!)
+    :param current_block: Current block data
+    :param self_cert_document: Identity document
+    :param from_pubkey: Pubkey of the certifier
+    :param salt: Secret salt (DO NOT SHOW IT ANYWHERE, IT IS SECRET !!!)
+    :param password: Secret password (DO NOT SHOW IT ANYWHERE, IT IS SECRET !!!)
 
     :rtype: Certification
     """
@@ -92,8 +89,12 @@ async def main():
     """
     Main code
     """
-    # connection handler from BMA endpoint
-    connection = SecuredBMAEndpoint.from_inline(BMAS_ENDPOINT).conn_handler(AIOHTTP_SESSION)
+    # Create Client from endpoint string in Duniter format
+    client = Client(BMAS_ENDPOINT)
+
+    # Get the node summary infos to test the connection
+    response = await client(bma.node.summary)
+    print(response)
 
     # prompt hidden user entry
     salt = getpass.getpass("Enter your passphrase (salt): ")
@@ -108,25 +109,26 @@ async def main():
     pubkey_to = input("Enter certified pubkey: ")
 
     # capture current block to get version and currency and blockstamp
-    current_block = await bma.blockchain.current(connection)
+    current_block = await client(bma.blockchain.current)
 
     # create our Identity document to sign the Certification document
-    identity = await get_identity_document(connection, current_block, pubkey_to)
+    identity = await get_identity_document(client, current_block, pubkey_to)
 
     # send the Certification document to the node
     certification = get_certification_document(current_block, identity, pubkey_from, salt, password)
 
     # Here we request for the path wot/certify
-    response = await bma.wot.certify(connection, certification.signed_raw(identity))
+    response = await client(bma.wot.certify, certification.signed_raw(identity))
 
     if response.status == 200:
         print(await response.text())
     else:
         print("Error while publishing certification: {0}".format(await response.text()))
-    response.close()
 
-with AIOHTTP_SESSION:
+    # Close client aiohttp session
+    await client.close()
 
-    # Latest duniter-python-api is asynchronous and you have to use asyncio, an asyncio loop and a "as" on the data.
-    # ( https://docs.python.org/3/library/asyncio.html )
-    asyncio.get_event_loop().run_until_complete(main())
+
+# Latest duniter-python-api is asynchronous and you have to use asyncio, an asyncio loop and a "as" on the data.
+# ( https://docs.python.org/3/library/asyncio.html )
+asyncio.get_event_loop().run_until_complete(main())
