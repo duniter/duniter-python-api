@@ -1,5 +1,7 @@
 import re
+
 import aiohttp
+
 from .constants import *
 from ..documents import MalformedDocumentError
 
@@ -7,7 +9,8 @@ from ..documents import MalformedDocumentError
 class ConnectionHandler:
     """Helper class used by other API classes to ease passing server connection information."""
 
-    def __init__(self, http_scheme: str, ws_scheme: str, server: str, port: int, path: str = "", proxy: str = None, session: aiohttp.ClientSession = None):
+    def __init__(self, http_scheme: str, ws_scheme: str, server: str, port: int, path: str = "", proxy: str = None,
+                 session: aiohttp.ClientSession = None):
         """
         Init instance of connection handler
 
@@ -27,7 +30,7 @@ class ConnectionHandler:
         self.proxy = proxy
         self.session = session
 
-    def __str__(self)-> str:
+    def __str__(self) -> str:
         return 'connection info: %s:%d' % (self.server, self.port)
 
 
@@ -38,6 +41,9 @@ class Endpoint:
 
     def inline(self) -> str:
         raise NotImplementedError("inline() is not implemented")
+
+    def conn_handler(self, session: aiohttp.ClientSession = None, proxy: str = None) -> ConnectionHandler:
+        raise NotImplementedError("conn_handler is not implemented")
 
     def __str__(self) -> str:
         raise NotImplementedError("__str__ is not implemented")
@@ -78,6 +84,9 @@ class UnknownEndpoint(Endpoint):
         for p in self.properties:
             doc += " {0}".format(p)
         return doc
+
+    def conn_handler(self, session: aiohttp.ClientSession = None, proxy: str = None) -> ConnectionHandler:
+        return ConnectionHandler("", "", "", 0, "")
 
     def __str__(self) -> str:
         return "{0} {1}".format(self.api, ' '.join(["{0}".format(p) for p in self.properties]))
@@ -152,10 +161,10 @@ class BMAEndpoint(Endpoint):
         :return:
         """
         return BMAEndpoint.API + "{DNS}{IPv4}{IPv6}{PORT}" \
-                    .format(DNS=(" {0}".format(self.server) if self.server else ""),
-                            IPv4=(" {0}".format(self.ipv4) if self.ipv4 else ""),
-                            IPv6=(" {0}".format(self.ipv6) if self.ipv6 else ""),
-                            PORT=(" {0}".format(self.port) if self.port else ""))
+            .format(DNS=(" {0}".format(self.server) if self.server else ""),
+                    IPv4=(" {0}".format(self.ipv4) if self.ipv4 else ""),
+                    IPv6=(" {0}".format(self.ipv6) if self.ipv6 else ""),
+                    PORT=(" {0}".format(self.port) if self.port else ""))
 
     # fixme: session must be mandatory
     def conn_handler(self, session: aiohttp.ClientSession = None, proxy: str = None) -> ConnectionHandler:
@@ -179,7 +188,7 @@ class BMAEndpoint(Endpoint):
     def __eq__(self, other):
         if isinstance(other, BMAEndpoint):
             return self.server == other.server and self.ipv4 == other.ipv4 \
-                    and self.ipv6 == other.ipv6 and self.port == other.port
+                   and self.ipv6 == other.ipv6 and self.port == other.port
         else:
             return False
 
@@ -304,7 +313,7 @@ class WS2PEndpoint(Endpoint):
     def __eq__(self, other):
         if isinstance(other, WS2PEndpoint):
             return self.server == other.server and self.ws2pid == other.ws2pid \
-                    and self.port == other.port and self.path == other.path
+                   and self.port == other.port and self.path == other.path
         else:
             return False
 

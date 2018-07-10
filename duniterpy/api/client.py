@@ -1,13 +1,16 @@
 # Authors:
 # Caner Candan <caner@candan.fr>, http://caner.candan.fr
 # Inso <insomniak.fr at gmail.com>
-from typing import Callable
+# vit
 import json
 import logging
+from typing import Callable, Union
+
 import aiohttp
 import jsonschema
-from .errors import DuniterError
+
 import duniterpy.api.endpoint as endpoint
+from .errors import DuniterError
 
 logger = logging.getLogger("duniter")
 
@@ -177,7 +180,9 @@ class Client:
     """
     Main class to create an API client
     """
-    def __init__(self, _endpoint: str, session: aiohttp.ClientSession = None, proxy: str = None):
+
+    def __init__(self, _endpoint: Union[str, endpoint.Endpoint], session: aiohttp.ClientSession = None,
+                 proxy: str = None):
         """
         Init Client instance
 
@@ -185,8 +190,11 @@ class Client:
         :param session: Aiohttp client session (optional, default None)
         :param proxy: Proxy server as hostname:port
         """
-        # Endpoint Protocol detection
-        self.endpoint = endpoint.endpoint(_endpoint)
+        if type(endpoint) is str:
+            # Endpoint Protocol detection
+            self.endpoint = endpoint.endpoint(_endpoint)
+        else:
+            self.endpoint = _endpoint
 
         # if no user session...
         if session is None:
@@ -196,7 +204,7 @@ class Client:
             self.session = session
         self.proxy = proxy
 
-    async def get(self, url_path: str, params: dict = None, rtype: str = RESPONSE_JSON, schema: dict = None)-> any:
+    async def get(self, url_path: str, params: dict = None, rtype: str = RESPONSE_JSON, schema: dict = None) -> any:
         """
         GET request on self.endpoint + url_path
 
@@ -227,7 +235,7 @@ class Client:
         elif rtype == RESPONSE_JSON:
             return await response.json()
 
-    async def post(self, url_path: str, params: dict = None, rtype: str = RESPONSE_JSON, schema: dict = None)-> any:
+    async def post(self, url_path: str, params: dict = None, rtype: str = RESPONSE_JSON, schema: dict = None) -> any:
         """
         POST request on self.endpoint + url_path
 
