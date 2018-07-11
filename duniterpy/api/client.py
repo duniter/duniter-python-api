@@ -190,7 +190,7 @@ class Client:
         :param session: Aiohttp client session (optional, default None)
         :param proxy: Proxy server as hostname:port
         """
-        if type(endpoint) is str:
+        if isinstance(_endpoint, str):
             # Endpoint Protocol detection
             self.endpoint = endpoint.endpoint(_endpoint)
         else:
@@ -277,7 +277,7 @@ class Client:
     async def __call__(self, _function: Callable, *args: any, **kwargs: any) -> any:
         """
         Call the _function given with the args given
-        So we can have use many packages wrapping a REST API
+        So we can have many packages wrapping a REST API
 
         :param _function: The function to call
         :param args: The parameters
