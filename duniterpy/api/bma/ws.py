@@ -17,8 +17,9 @@
 #
 # vit
 import logging
-from duniterpy.api.client import Client
+
 from duniterpy.api.bma.blockchain import BLOCK_SCHEMA
+from duniterpy.api.client import Client
 
 logger = logging.getLogger("duniter/ws")
 
@@ -52,23 +53,21 @@ WS_PEER_SCHEMA = {
 }
 
 
-# def block(client: Client):
-#     """
-#     Connect to block websocket
-#
-#     :param client: Client to connect to the api
-#     :rtype: aiohttp.ClientWebSocketResponse
-#     """
-#     client = API(connection, MODULE)
-#     return client.connect_ws('/block')
+def block(client: Client):
+    """
+    Connect to block websocket
+
+    :param client: Client to connect to the api
+    :rtype: aiohttp.ClientWebSocketResponse
+    """
+    return client.connect_ws(MODULE + '/block')
 
 
-# def peer(client: Client):
-#     """
-#     Connect to peer websocket
-#
-#     :param duniterpy.api.bma.ConnectionHandler connection: Connection handler instance
-#     :rtype: aiohttp.ClientWebSocketResponse
-#     """
-#     client = API(connection, MODULE)
-#     return client.connect_ws('/peer')
+def peer(client: Client):
+    """
+    Connect to peer websocket
+
+    :param client: Client to connect to the api
+    :rtype: aiohttp.ClientWebSocketResponse
+    """
+    return client.connect_ws(MODULE + '/peer')

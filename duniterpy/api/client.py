@@ -34,43 +34,45 @@ ERROR_SCHEMA = {
 }
 
 
-def parse_text(text, schema):
+def parse_text(text: str, schema: dict) -> any:
     """
     Validate and parse the BMA answer from websocket
 
-    :param str text: the bma answer
-    :param dict schema: dict for jsonschema
+    :param text: the bma answer
+    :param schema: dict for jsonschema
     :return: the json data
     """
     try:
         data = json.loads(text)
         jsonschema.validate(data, schema)
-        return data
     except (TypeError, json.decoder.JSONDecodeError):
         raise jsonschema.ValidationError("Could not parse json")
 
+    return data
 
-def parse_error(text):
+
+def parse_error(text: str) -> any:
     """
     Validate and parse the BMA answer from websocket
 
-    :param str text: the bma error
+    :param text: the bma error
     :return: the json data
     """
     try:
         data = json.loads(text)
         jsonschema.validate(data, ERROR_SCHEMA)
-        return data
     except (TypeError, json.decoder.JSONDecodeError) as e:
         raise jsonschema.ValidationError("Could not parse json : {0}".format(str(e)))
 
+    return data
 
-async def parse_response(response, schema):
+
+async def parse_response(response: aiohttp.ClientResponse, schema: dict) -> any:
     """
     Validate and parse the BMA answer
 
-    :param aiohttp.ClientResponse response: Response of aiohttp request
-    :param dict schema: The expected response structure
+    :param response: Response of aiohttp request
+    :param schema: The expected response structure
     :return: the json data
     """
     try:
@@ -84,28 +86,28 @@ async def parse_response(response, schema):
 
 
 class API(object):
-    """APIRequest is a class used as an interface. The intermediate derivated classes are the modules and the leaf
-    classes are the API requests. """
-
+    """
+    API is a class used as an abstraction layer over the request library (AIOHTTP).
+    """
     schema = {}
 
-    def __init__(self, connection_handler, module):
+    def __init__(self, connection_handler: endpoint.ConnectionHandler, module: str):
         """
         Asks a module in order to create the url used then by derivated classes.
 
-        :param ConnectionHandler connection_handler: Connection handler
-        :param str module: Module path
+        :param connection_handler: Connection handler
+        :param module: Module path
         """
         self.module = module
         self.connection_handler = connection_handler
         self.headers = {}
 
-    def reverse_url(self, scheme, path):
+    def reverse_url(self, scheme: str, path: str) -> str:
         """
         Reverses the url using scheme and path given in parameter.
 
-        :param str scheme: Scheme of the url
-        :param str path: Path of the url
+        :param scheme: Scheme of the url
+        :param path: Path of the url
         :return: str
         """
 
@@ -124,11 +126,11 @@ class API(object):
 
         return url + path
 
-    async def requests_get(self, path, **kwargs):
+    async def requests_get(self, path: str, **kwargs) -> aiohttp.ClientResponse:
         """
         Requests GET wrapper in order to use API parameters.
 
-        :param str path: the request path
+        :param path: the request path
         :rtype: aiohttp.ClientResponse
         """
         logging.debug("Request : {0}".format(self.reverse_url(self.connection_handler.http_scheme, path)))
@@ -145,11 +147,11 @@ class API(object):
 
         return response
 
-    async def requests_post(self, path, **kwargs):
+    async def requests_post(self, path: str, **kwargs) -> aiohttp.ClientResponse:
         """
         Requests POST wrapper in order to use API parameters.
 
-        :param str path: the request path
+        :param path: the request path
         :rtype: aiohttp.ClientResponse
         """
         if 'self_' in kwargs:
@@ -165,11 +167,11 @@ class API(object):
         )
         return response
 
-    def connect_ws(self, path):
+    def connect_ws(self, path: str) -> aiohttp.ClientWebSocketResponse:
         """
         Connect to a websocket in order to use API parameters
 
-        :param str path: the url path
+        :param path: the url path
         :rtype: aiohttp.ClientWebSocketResponse
         """
         url = self.reverse_url(self.connection_handler.ws_scheme, path)
@@ -266,6 +268,16 @@ class Client:
         elif rtype == RESPONSE_JSON:
             return await response.json()
 
+    def connect_ws(self, path: str) -> aiohttp.ClientWebSocketResponse:
+        """
+        Connect to a websocket in order to use API parameters
+
+        :param path: the url path
+        :rtype: aiohttp.ClientWebSocketResponse
+        """
+        client = API(self.endpoint.conn_handler(self.session, self.proxy), '')
+        return client.connect_ws(path)
+
     async def close(self):
         """
         Close aiohttp session
@@ -274,14 +286,14 @@ class Client:
         """
         await self.session.close()
 
-    async def __call__(self, _function: Callable, *args: any, **kwargs: any) -> any:
+    def __call__(self, _function: Callable, *args: any, **kwargs: any) -> any:
         """
         Call the _function given with the args given
-        So we can have many packages wrapping a REST API
+        So we can call many packages wrapping the REST API
 
         :param _function: The function to call
         :param args: The parameters
         :param kwargs: The key/value parameters
         :return:
         """
-        return await _function(self, *args, **kwargs)
+        return _function(self, *args, **kwargs)
