@@ -14,55 +14,52 @@
 #
 # Authors:
 # Caner Candan <caner@candan.fr>, http://caner.candan.fr
-#
+# vit
+import logging
 
-from duniterpy.api.client import API, logging, parse_response
+from duniterpy.api.client import Client
 
 logger = logging.getLogger("duniter/network")
 
-URL_PATH = 'network'
+MODULE = 'network'
 
 WS2P_HEADS_SCHEMA = {
-                    "type": "object",
-                    "properties": {
-                        "heads": {
-                            "type": "array",
-                            "items": {
-                                "type": "object",
-                                "properties": {
-                                    "message": {
-                                        "type": "string"
-                                    },
-                                    "sig": {
-                                        "type": "string",
-                                    },
-                                    "messageV2": {
-                                        "type": "string"
-                                    },
-                                    "sigV2": {
-                                        "type": "string",
-                                    },
-                                    "step": {
-                                        "type": "number",
-                                    },
-                                },
-                                "required": ["message", "sig"]
-                            }
-                        }
+    "type": "object",
+    "properties": {
+        "heads": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "message": {
+                        "type": "string"
                     },
-                    "required": ["heads"]
-                }
+                    "sig": {
+                        "type": "string",
+                    },
+                    "messageV2": {
+                        "type": "string"
+                    },
+                    "sigV2": {
+                        "type": "string",
+                    },
+                    "step": {
+                        "type": "number",
+                    },
+                },
+                "required": ["message", "sig"]
+            }
+        }
+    },
+    "required": ["heads"]
+}
 
 
-async def heads(connection):
+def heads(client: Client):
     """
     GET Certification data over a member
 
-    :param duniterpy.api.bma.ConnectionHandler connection: Connection handler instance
+    :param client: Client to connect to the api
     :rtype: dict
     """
-
-    client = API(connection, URL_PATH)
-
-    r = await client.requests_get('/ws2p/heads')
-    return await parse_response(r, WS2P_HEADS_SCHEMA)
+    return client.connect_ws(MODULE + '/ws2p/heads')
