@@ -1,6 +1,7 @@
 import unittest
-from duniterpy.documents.peer import Peer, BMAEndpoint, UnknownEndpoint, WS2PEndpoint
 
+from duniterpy.api.endpoint import BMAEndpoint, UnknownEndpoint, WS2PEndpoint
+from duniterpy.documents.peer import Peer
 
 rawpeer = """Version: 2
 Type: Peer
@@ -14,7 +15,6 @@ WS2P d2edcb92 g1-test.duniter.org 20902
 OTHER_PROTOCOL 88.77.66.55 9001
 dkaXIiCYUJtCg8Feh/BKvPYf4uFH9CJ/zY6J4MlA9BsjmcMe4YAblvNt/gJy31b1aGq3ue3h14mLMCu84rraDg==
 """
-
 
 test_weird_ipv6_peer = """Version: 10
 Type: Peer
@@ -54,7 +54,8 @@ class TestPeer(unittest.TestCase):
         self.assertEqual(peer.endpoints[2].ws2pid, "d2edcb92")
         self.assertEqual(peer.endpoints[2].port, 20902)
 
-        self.assertEqual(peer.signatures[0], "dkaXIiCYUJtCg8Feh/BKvPYf4uFH9CJ/zY6J4MlA9BsjmcMe4YAblvNt/gJy31b1aGq3ue3h14mLMCu84rraDg==")
+        self.assertEqual(peer.signatures[0],
+                         "dkaXIiCYUJtCg8Feh/BKvPYf4uFH9CJ/zY6J4MlA9BsjmcMe4YAblvNt/gJy31b1aGq3ue3h14mLMCu84rraDg==")
 
     def test_fromraw_toraw(self):
         peer = Peer.from_signed_raw(rawpeer)
@@ -84,11 +85,11 @@ class TestPeer(unittest.TestCase):
         self.assertEqual(peer.endpoints[2].ws2pid, "d2edcb92")
         self.assertEqual(peer.endpoints[2].port, 20902)
 
-
-        self.assertEqual(from_rendered_peer.signatures[0], "dkaXIiCYUJtCg8Feh/BKvPYf4uFH9CJ/zY6J4MlA9BsjmcMe4YAblvNt/gJy31b1aGq3ue3h14mLMCu84rraDg==")
+        self.assertEqual(from_rendered_peer.signatures[0],
+                         "dkaXIiCYUJtCg8Feh/BKvPYf4uFH9CJ/zY6J4MlA9BsjmcMe4YAblvNt/gJy31b1aGq3ue3h14mLMCu84rraDg==")
         self.assertEqual(rawpeer, from_rendered_peer.signed_raw())
 
     def test_incorrect(self):
         peer = Peer.from_signed_raw(test_weird_ipv6_peer)
         rendered_peer = peer.signed_raw()
-        from_rendered_peer = Peer.from_signed_raw(rendered_peer)
+        Peer.from_signed_raw(rendered_peer)

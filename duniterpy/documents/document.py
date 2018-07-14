@@ -59,7 +59,7 @@ class Document:
             logging.debug("Signature : \n{0}".format(signing.decode("ascii")))
             self.signatures.append(signing.decode("ascii"))
 
-    def raw(self):
+    def raw(self, **kwargs):
         """
         Returns the raw document in string format
         """

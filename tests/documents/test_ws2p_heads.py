@@ -1,6 +1,6 @@
 import unittest
-from duniterpy.documents.ws2p.heads import *
 
+from duniterpy.documents.ws2p.heads import *
 
 headv1_clear = ""
 
@@ -12,15 +12,15 @@ headv2 = ""
 class TestWS2PHeads(unittest.TestCase):
     def test_headv0(self):
         headv0, _ = HeadV0.from_inline("WS2P:HEAD:3dnbnYY9i2bHMQUGyFp5GVvJ2wBkVpus31cDJA5cfRpj:"
-                                      "54813-00000A24802B33B71A91B6E990038C145A4815A45C71E57B2F2EF393183C7E2C",
-                                      "a1vAAM666kPsMCFTbkgkcCsqHf8nmXR+Lh3D3u+BaXzmArj7kwlItbdGUs4fc9QUG5Lp4TwPS7nhOM5t1Kt6CA==")
+                                       "54813-00000A24802B33B71A91B6E990038C145A4815A45C71E57B2F2EF393183C7E2C",
+                                       "a1vAAM666kPsMCFTbkgkcCsqHf8nmXR+Lh3D3u+BaXzmArj7kwlItbdGUs4fc9QUG5Lp4TwPS7nhOM5t1Kt6CA==")
 
         self.assertEqual(headv0.api.public, "")
         self.assertEqual(headv0.api.private, "")
         self.assertEqual(headv0.head.version, 0)
         self.assertEqual(headv0.pubkey, "3dnbnYY9i2bHMQUGyFp5GVvJ2wBkVpus31cDJA5cfRpj")
-        self.assertEqual(headv0.blockstamp, BlockUID.from_str("54813-00000A24802B33B71A91B6E990038C145A4815A45C71E57B2F2EF393183C7E2C"))
-
+        self.assertEqual(headv0.blockstamp,
+                         BlockUID.from_str("54813-00000A24802B33B71A91B6E990038C145A4815A45C71E57B2F2EF393183C7E2C"))
 
     def test_ws2p_headv1(self):
         headv1, _ = HeadV1.from_inline("WS2POCAIC:HEAD:1:HbTqJ1Ts3RhJ8Rx4XkNyh1oSKmoZL1kY5U7t9mKTSjAB:"

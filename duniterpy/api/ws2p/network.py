@@ -62,4 +62,4 @@ def heads(client: Client):
     :param client: Client to connect to the api
     :rtype: dict
     """
-    return client.connect_ws(MODULE + '/ws2p/heads')
+    return client.get(MODULE + '/ws2p/heads', schema=WS2P_HEADS_SCHEMA)

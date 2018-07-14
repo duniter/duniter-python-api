@@ -1,5 +1,5 @@
 from duniterpy.key import VerifyingKey, SigningKey, ScryptParams
-from duniterpy.documents import Peer
+from duniterpy.documents.peer import Peer
 from duniterpy.documents.ws2p.heads import *
 import unittest
 
