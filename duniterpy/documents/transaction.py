@@ -1,8 +1,10 @@
-from .document import Document, MalformedDocumentError
-from .constants import pubkey_regex, transaction_hash_regex, block_id_regex, block_uid_regex, conditions_regex
-from ..grammars import output
-import pypeg2
 import re
+
+import pypeg2
+
+from .document import Document, MalformedDocumentError
+from ..constants import pubkey_regex, transaction_hash_regex, block_id_regex, block_uid_regex
+from ..grammars import output
 
 
 def reduce_base(amount, base):
@@ -62,7 +64,7 @@ class Transaction(Document):
     """
 
     re_type = re.compile("Type: (Transaction)\n")
-    re_header = re.compile("TX:([0-9]+):([0-9]+):([0-9]+):([0-9]+):([0-9]+):(0|1):([0-9]+)\n")
+    re_header = re.compile("TX:([0-9]+):([0-9]+):([0-9]+):([0-9]+):([0-9]+):([01]):([0-9]+)\n")
     re_compact_blockstamp = re.compile("({block_uid_regex})\n".format(block_uid_regex=block_uid_regex))
     re_blockstamp = re.compile("Blockstamp: ({block_uid_regex})\n".format(block_uid_regex=block_uid_regex))
     re_locktime = re.compile("Locktime: ([0-9]+)\n")
@@ -75,20 +77,20 @@ class Transaction(Document):
     re_pubkey = re.compile("({pubkey_regex})\n".format(pubkey_regex=pubkey_regex))
 
     fields_parsers = {**Document.fields_parsers, **{
-            "Type": re_type,
-            "Blockstamp": re_blockstamp,
-            "CompactBlockstamp": re_compact_blockstamp,
-            "Locktime": re_locktime,
-            "TX": re_header,
-            "Issuers": re_issuers,
-            "Inputs": re_inputs,
-            "Unlocks": re_unlocks,
-            "Outputs": re_outputs,
-            "Comment": re_comment,
-            "Compact comment": re_compact_comment,
-            "Pubkey": re_pubkey
-        }
+        "Type": re_type,
+        "Blockstamp": re_blockstamp,
+        "CompactBlockstamp": re_compact_blockstamp,
+        "Locktime": re_locktime,
+        "TX": re_header,
+        "Issuers": re_issuers,
+        "Inputs": re_inputs,
+        "Unlocks": re_unlocks,
+        "Outputs": re_outputs,
+        "Comment": re_comment,
+        "Compact comment": re_compact_comment,
+        "Pubkey": re_pubkey
     }
+                      }
 
     def __init__(self, version, currency, blockstamp, locktime, issuers, inputs, unlocks, outputs,
                  comment, signatures):
@@ -127,7 +129,7 @@ class Transaction(Document):
         for data_list in ('issuers', 'outputs', 'inputs', 'unlocks', 'signatures'):
             tx_data['multiline_{0}'.format(data_list)] = '\n'.join(tx_data[data_list])
         if tx_data["version"] >= 3:
-                signed_raw = """Version: {version}
+            signed_raw = """Version: {version}
 Type: Transaction
 Currency: {currency}
 Blockstamp: {blockstamp}
@@ -281,8 +283,8 @@ Comment: {comment}
         if Transaction.re_outputs.match(lines[n]) is not None:
             n += 1
             while not Transaction.re_comment.match(lines[n]):
-                output = OutputSource.from_inline(lines[n])
-                outputs.append(output)
+                _output = OutputSource.from_inline(lines[n])
+                outputs.append(_output)
                 n += 1
 
         comment = Transaction.parse_field("Comment", lines[n])
@@ -344,12 +346,12 @@ PUBLIC_KEY:AMOUNT
 COMMENT
 """
         doc = "TX:{0}:{1}:{2}:{3}:{4}:{5}:{6}\n".format(self.version,
-                                              len(self.issuers),
-                                              len(self.inputs),
-                                              len(self.unlocks),
-                                              len(self.outputs),
-                                              '1' if self.comment != "" else '0',
-                                               self.locktime)
+                                                        len(self.issuers),
+                                                        len(self.inputs),
+                                                        len(self.unlocks),
+                                                        len(self.outputs),
+                                                        '1' if self.comment != "" else '0',
+                                                        self.locktime)
         if self.version >= 3:
             doc += "{0}\n".format(self.blockstamp)
 
@@ -374,13 +376,25 @@ class SimpleTransaction(Transaction):
     As transaction class, but for only one issuer.
     ...
     """
-    def __init__(self, version, currency, issuer,
-                 single_input, outputs, comment, signature):
+
+    def __init__(self, version, currency, blockstamp, locktime, issuer,
+                 single_input, unlocks, outputs, comment, signature):
         """
-        Constructor
+        Init instance
+
+        :param version:
+        :param currency:
+        :param blockstamp:
+        :param locktime:
+        :param issuer:
+        :param single_input:
+        :param unlocks:
+        :param outputs:
+        :param comment:
+        :param signature:
         """
-        super().__init__(version, currency, [issuer], [single_input],
-              outputs, comment, [signature])
+        super().__init__(version, currency, blockstamp, locktime, [issuer], [single_input], unlocks,
+                         outputs, comment, [signature])
 
     @staticmethod
     def is_simple(tx):
@@ -421,14 +435,17 @@ class InputSource:
     INDEX:SOURCE:FINGERPRINT:AMOUNT
 
     """
-    re_inline = re.compile("(?:(?:(D):({pubkey_regex}):({block_id_regex}))|(?:(T):({transaction_hash_regex}):([0-9]+)))\n"
-                           .format(pubkey_regex=pubkey_regex,
-                                   block_id_regex=block_id_regex,
-                                    transaction_hash_regex=transaction_hash_regex))
-    re_inline_v3 = re.compile("([0-9]+):([0-9]+):(?:(?:(D):({pubkey_regex}):({block_id_regex}))|(?:(T):({transaction_hash_regex}):([0-9]+)))\n"
-                           .format(pubkey_regex=pubkey_regex,
-                                   block_id_regex=block_id_regex,
-                                    transaction_hash_regex=transaction_hash_regex))
+    re_inline = re.compile(
+        "(?:(?:(D):({pubkey_regex}):({block_id_regex}))|(?:(T):({transaction_hash_regex}):([0-9]+)))\n"
+        .format(pubkey_regex=pubkey_regex,
+                block_id_regex=block_id_regex,
+                transaction_hash_regex=transaction_hash_regex))
+    re_inline_v3 = re.compile(
+        "([0-9]+):([0-9]+):(?:(?:(D):({pubkey_regex}):({block_id_regex}))|(?:(T):({transaction_hash_regex}):\
+([0-9]+)))\n"
+        .format(pubkey_regex=pubkey_regex,
+                block_id_regex=block_id_regex,
+                transaction_hash_regex=transaction_hash_regex))
 
     def __init__(self, amount, base, source, origin_id, index):
         """
@@ -481,10 +498,10 @@ class InputSource:
                                         self.index)
         else:
             return "{0}:{1}:{2}:{3}:{4}".format(self.amount,
-                                        self.base,
-                                        self.source,
-                                        self.origin_id,
-                                        self.index)
+                                                self.base,
+                                                self.source,
+                                                self.origin_id,
+                                                self.index)
 
 
 class UnlockParameter:
@@ -609,4 +626,3 @@ class OutputSource:
         else:
             return "{0}:{1}:{2}".format(self.amount, self.base,
                                         pypeg2.compose(self.conditions, output.Condition))
-

@@ -1,9 +1,11 @@
-from duniterpy.grammars import output
 import unittest
+
 import pypeg2
 
+from duniterpy.grammars import output
 
-class Test_OutputGrammar(unittest.TestCase):
+
+class TestOutputgrammar(unittest.TestCase):
     def test_sig(self):
         condition = "SIG(HgTTJLAQ5sqfknMq7yLPZbehtuLSsKj9CxWN7k8QvYJd)"
         result = pypeg2.parse(condition, output.SIG)
@@ -34,7 +36,8 @@ class Test_OutputGrammar(unittest.TestCase):
         self.assertEqual(pypeg2.compose(result, output.Condition), condition)
 
     def test_simple_and_condition(self):
-        condition = "(SIG(HgTTJLAQ5sqfknMq7yLPZbehtuLSsKj9CxWN7k8QvYJd) && XHX(309BC5E644F797F53E5A2065EAF38A173437F2E6))"
+        condition = "(SIG(HgTTJLAQ5sqfknMq7yLPZbehtuLSsKj9CxWN7k8QvYJd) && XHX(" \
+                    "309BC5E644F797F53E5A2065EAF38A173437F2E6))"
         result = pypeg2.parse(condition, output.Condition)
         self.assertEqual(result.left.left.pubkey, "HgTTJLAQ5sqfknMq7yLPZbehtuLSsKj9CxWN7k8QvYJd")
         self.assertEqual(result.left.op.name, "&&")
@@ -42,7 +45,8 @@ class Test_OutputGrammar(unittest.TestCase):
         self.assertEqual(pypeg2.compose(result, output.Condition), condition)
 
     def test_simple_or_condition(self):
-        condition = "(SIG(HgTTJLAQ5sqfknMq7yLPZbehtuLSsKj9CxWN7k8QvYJd) || XHX(309BC5E644F797F53E5A2065EAF38A173437F2E6))"
+        condition = "(SIG(HgTTJLAQ5sqfknMq7yLPZbehtuLSsKj9CxWN7k8QvYJd) || XHX(" \
+                    "309BC5E644F797F53E5A2065EAF38A173437F2E6))"
         result = pypeg2.parse(condition, output.Condition)
         self.assertEqual(result.left.left.pubkey, "HgTTJLAQ5sqfknMq7yLPZbehtuLSsKj9CxWN7k8QvYJd")
         self.assertEqual(result.left.op.name, "||")
@@ -50,7 +54,8 @@ class Test_OutputGrammar(unittest.TestCase):
         self.assertEqual(pypeg2.compose(result, output.Condition), condition)
 
     def test_complex_condition(self):
-        condition = "(SIG(HgTTJLAQ5sqfknMq7yLPZbehtuLSsKj9CxWN7k8QvYJd) || (SIG(DNann1Lh55eZMEDXeYt59bzHbA3NJR46DeQYCS2qQdLV) && XHX(309BC5E644F797F53E5A2065EAF38A173437F2E6)))"
+        condition = "(SIG(HgTTJLAQ5sqfknMq7yLPZbehtuLSsKj9CxWN7k8QvYJd) || (SIG(" \
+                    "DNann1Lh55eZMEDXeYt59bzHbA3NJR46DeQYCS2qQdLV) && XHX(309BC5E644F797F53E5A2065EAF38A173437F2E6)))"
         result = pypeg2.parse(condition, output.Condition)
         self.assertEqual(result.left.left.pubkey, "HgTTJLAQ5sqfknMq7yLPZbehtuLSsKj9CxWN7k8QvYJd")
         self.assertEqual(result.left.op.name, "||")
@@ -70,14 +75,15 @@ class Test_OutputGrammar(unittest.TestCase):
         self.assertEqual(pypeg2.compose(result, output.Condition), condition)
 
     def test_instanciate_condition(self):
-        inst = output.Condition.token(output.SIG.token("HgTTJLAQ5sqfknMq7yLPZbehtuLSsKj9CxWN7k8QvYJd"),
-                                           output.Operator.token("||"),
-                                           output.Condition.token(
-                                               output.SIG.token("DNann1Lh55eZMEDXeYt59bzHbA3NJR46DeQYCS2qQdLV"),
-                                               output.Operator.token("&&"),
-                                               output.XHX.token("309BC5E644F797F53E5A2065EAF38A173437F2E6")
-                                           ))
-        condition = "(SIG(HgTTJLAQ5sqfknMq7yLPZbehtuLSsKj9CxWN7k8QvYJd) || (SIG(DNann1Lh55eZMEDXeYt59bzHbA3NJR46DeQYCS2qQdLV) && XHX(309BC5E644F797F53E5A2065EAF38A173437F2E6)))"
+        output.Condition.token(output.SIG.token("HgTTJLAQ5sqfknMq7yLPZbehtuLSsKj9CxWN7k8QvYJd"),
+                               output.Operator.token("||"),
+                               output.Condition.token(
+                                   output.SIG.token("DNann1Lh55eZMEDXeYt59bzHbA3NJR46DeQYCS2qQdLV"),
+                                   output.Operator.token("&&"),
+                                   output.XHX.token("309BC5E644F797F53E5A2065EAF38A173437F2E6")
+                               ))
+        condition = "(SIG(HgTTJLAQ5sqfknMq7yLPZbehtuLSsKj9CxWN7k8QvYJd) || (SIG(" \
+                    "DNann1Lh55eZMEDXeYt59bzHbA3NJR46DeQYCS2qQdLV) && XHX(309BC5E644F797F53E5A2065EAF38A173437F2E6)))"
         inst = pypeg2.parse(condition, output.Condition)
         self.assertEqual(inst.left.left.pubkey, "HgTTJLAQ5sqfknMq7yLPZbehtuLSsKj9CxWN7k8QvYJd")
         self.assertEqual(inst.left.op.name, "||")

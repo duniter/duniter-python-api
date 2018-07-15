@@ -1,9 +1,9 @@
-import re
 import base64
 import logging
+import re
 
+from ..constants import pubkey_regex, signature_regex, block_id_regex, block_uid_regex, uid_regex
 from .document import Document, MalformedDocumentError
-from .constants import pubkey_regex, signature_regex, block_id_regex, block_uid_regex, uid_regex
 
 
 class Identity(Document):
@@ -118,11 +118,11 @@ class Certification(Document):
     """
 
     re_inline = re.compile("({certifier_regex}):({certified_regex}):({block_id_regex}):({signature_regex})\n".format(
-                                certifier_regex=pubkey_regex,
-                                certified_regex=pubkey_regex,
-                                block_id_regex=block_id_regex,
-                                signature_regex=signature_regex
-                    ))
+        certifier_regex=pubkey_regex,
+        certified_regex=pubkey_regex,
+        block_id_regex=block_id_regex,
+        signature_regex=signature_regex
+    ))
     re_timestamp = re.compile("META:TS:({block_uid_regex})\n".format(block_uid_regex=block_uid_regex))
     re_type = re.compile("Type: (Certification)")
     re_issuer = re.compile("Issuer: ({pubkey_regex})\n".format(pubkey_regex=pubkey_regex))
@@ -207,7 +207,7 @@ class Certification(Document):
         :param inline:
         :return:
         """
-        from .block import Block, BlockUID
+        from .block import BlockUID
         cert_data = Certification.re_inline.match(inline)
         if cert_data is None:
             raise MalformedDocumentError("Certification ({0})".format(inline))
@@ -273,9 +273,9 @@ class Revocation(Document):
     A document describing a self-revocation.
     """
     re_inline = re.compile("({pubkey_regex}):({signature_regex})\n".format(
-                                pubkey_regex=pubkey_regex,
-                                signature_regex=signature_regex
-                    ))
+        pubkey_regex=pubkey_regex,
+        signature_regex=signature_regex
+    ))
 
     re_type = re.compile("Type: (Revocation)")
     re_issuer = re.compile("Issuer: ({pubkey_regex})\n".format(pubkey_regex=pubkey_regex))
@@ -304,8 +304,7 @@ class Revocation(Document):
         From inline version in block
         :param int version:
         :param str currency:
-        :param str pubkey:
-        :param str signature:
+        :param str inline:
         :return:
         """
         cert_data = Revocation.re_inline.match(inline)

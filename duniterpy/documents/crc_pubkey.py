@@ -1,7 +1,7 @@
 import base58
 import re
 import hashlib
-from .constants import pubkey_regex
+from ..constants import pubkey_regex
 from ..helpers import ensure_str
 
 
@@ -20,8 +20,8 @@ class CRCPubkey:
         self.crc = crc
 
     @classmethod
-    def from_str(cls, str):
-        data = CRCPubkey.re_crc_pubkey.match(str)
+    def from_str(cls, crc_pubkey):
+        data = CRCPubkey.re_crc_pubkey.match(crc_pubkey)
         pubkey = data.group(1)
         crc = data.group(2)
         return cls(pubkey, crc)

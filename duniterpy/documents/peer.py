@@ -3,7 +3,7 @@ import re
 from duniterpy.api.endpoint import endpoint
 from .document import Document
 from . import BlockUID
-from .constants import block_hash_regex, pubkey_regex
+from ..constants import block_hash_regex, pubkey_regex
 
 
 class Peer(Document):

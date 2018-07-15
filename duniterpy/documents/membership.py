@@ -3,10 +3,10 @@ Created on 2 déc. 2014
 
 @author: inso
 """
-from .document import Document, MalformedDocumentError
-from .constants import block_uid_regex, signature_regex, pubkey_regex
-
 import re
+
+from .document import Document, MalformedDocumentError
+from ..constants import block_uid_regex, signature_regex, pubkey_regex
 
 
 class Membership(Document):
@@ -25,10 +25,11 @@ class Membership(Document):
     """
 
     # PUBLIC_KEY:SIGNATURE:NUMBER:HASH:TIMESTAMP:USER_ID
-    re_inline = re.compile("({pubkey_regex}):({signature_regex}):({ms_block_uid_regex}):({identity_block_uid_regex}):([^\n]+)\n"
-                                .format(pubkey_regex=pubkey_regex, signature_regex=signature_regex,
-                                        ms_block_uid_regex=block_uid_regex,
-                                        identity_block_uid_regex=block_uid_regex))
+    re_inline = re.compile(
+        "({pubkey_regex}):({signature_regex}):({ms_block_uid_regex}):({identity_block_uid_regex}):([^\n]+)\n"
+        .format(pubkey_regex=pubkey_regex, signature_regex=signature_regex,
+                ms_block_uid_regex=block_uid_regex,
+                identity_block_uid_regex=block_uid_regex))
     re_type = re.compile("Type: (Membership)")
     re_issuer = re.compile("Issuer: ({pubkey_regex})\n".format(pubkey_regex=pubkey_regex))
     re_block = re.compile("Block: ({block_uid_regex})\n".format(block_uid_regex=block_uid_regex))
@@ -125,16 +126,16 @@ Membership: {4}
 UserID: {5}
 CertTS: {6}
 """.format(self.version,
-                      self.currency,
-                      self.issuer,
-                      self.membership_ts,
-                      self.membership_type,
-                      self.uid,
-                      self.identity_ts)
+           self.currency,
+           self.issuer,
+           self.membership_ts,
+           self.membership_type,
+           self.uid,
+           self.identity_ts)
 
     def inline(self):
         return "{0}:{1}:{2}:{3}:{4}".format(self.issuer,
-                                        self.signatures[0],
-                                        self.membership_ts,
-                                        self.identity_ts,
-                                        self.uid)
+                                            self.signatures[0],
+                                            self.membership_ts,
+                                            self.identity_ts,
+                                            self.uid)

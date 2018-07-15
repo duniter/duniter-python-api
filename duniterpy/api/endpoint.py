@@ -2,7 +2,7 @@ import re
 
 import aiohttp
 
-from .constants import *
+from ..constants import *
 from ..documents import MalformedDocumentError
 
 

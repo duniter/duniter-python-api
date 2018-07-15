@@ -1,14 +1,16 @@
 import base64
-import re
-import logging
 import hashlib
-from .constants import signature_regex
+import logging
+import re
+
+from ..constants import signature_regex
 
 
 class MalformedDocumentError(Exception):
     """
     Malformed document exception
     """
+
     def __init__(self, field_name):
         super().__init__("Could not parse field {0}".format(field_name))
 
@@ -65,7 +67,7 @@ class Document:
         """
         raise NotImplementedError()
 
-    def signed_raw(self):
+    def signed_raw(self, *args):
         """
         If keys are None, returns the raw + current signatures
         If keys are present, returns the raw signed by these keys

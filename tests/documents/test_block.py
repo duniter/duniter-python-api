@@ -1,9 +1,10 @@
-'''
+"""
 Created on 12 déc. 2014
 
 @author: inso
-'''
+"""
 import unittest
+
 from duniterpy.documents.block import Block, BlockUID, block_uid
 
 raw_block = """Version: 2
@@ -90,7 +91,6 @@ Nonce: 581
 nY/MsFU2luiohLmSiOOimL1RIqbriOBgc22ua03Z2dhxtSJxKZeGNGDvl1jaXgmEBRnXU87yXbZ7ioOS/AAVCA==
 """
 
-
 raw_block_zero = """Version: 10
 Type: Block
 Currency: zeta_brouzouf
@@ -138,7 +138,6 @@ Nonce: 2125
 42yQm4hGTJYWkPg39hQAUgP6S6EQ4vTfXdJuxKEHL1ih6YHiDL2hcwrFgBHjXLRgxRhj2VNVqqc6b4JayKqTE14r
 """
 
-
 raw_block_with_leavers = """Version: 2
 Type: Block
 Currency: meta_brouzouf
@@ -163,7 +162,6 @@ InnerHash: DB30D958EE5CB75186972286ED3F4686B8A1C2CD
 Nonce: 9906
 5LZCFSnm5FkFihPBTpmsPyILEdvu8MXfJOp6OR4d1s+/e2jVWg4J6YSDfO2KBBPgubASyr2QwQuiBlYD2918Bw==
 """
-
 
 raw_block_with_excluded = """Version: 3
 Type: Block
@@ -220,7 +218,6 @@ Nonce: 137387
 GmgYhWrwCtsK7t2B/omPpxZ8EfJgv9UYzJIFo++Za+A0Mo70xRfZG7kywxbQTTxDk/V7r90P946N89vdVjv1Bg==
 """
 
-
 negative_issuers_frame_var = """Version: 3
 Type: Block
 Currency: test_net
@@ -265,7 +262,7 @@ WnJvw204wccmSBQK9UE2rCFw0EG34zf+b58n2KTLwSIhTpgmGsnr5ohkSyYZYcLEKjisLXKNCmMl7D1Q
 """
 
 
-class Test_Block(unittest.TestCase):
+class TestBlock(unittest.TestCase):
     def test_fromraw(self):
         block = Block.from_signed_raw(raw_block)
         self.assertEqual(block.version, 2)
@@ -297,9 +294,10 @@ class Test_Block(unittest.TestCase):
         self.assertEqual(block.time, 1418077277)
         self.assertEqual(block.mediantime, 1418077277)
         self.assertEqual(block.issuer, "HnFcSms8jzwngtVomTTnzudZx7SHUQY8sVE1y8yBmULk")
-        self.assertEqual(block.parameters, ("0.0488","86400","1000","432000","100","5259600","63115200","5","5259600",
-                                            "5259600","0.8","31557600","5","24","300","12","0.67","1488970800",
-                                            "1490094000", "15778800"))
+        self.assertEqual(block.parameters,
+                         ("0.0488", "86400", "1000", "432000", "100", "5259600", "63115200", "5", "5259600",
+                          "5259600", "0.8", "31557600", "5", "24", "300", "12", "0.67", "1488970800",
+                          "1490094000", "15778800"))
         self.assertEqual(block.members_count, 4)
         self.assertEqual(len(block.identities), 4)
         self.assertEqual(len(block.joiners), 4)
@@ -438,7 +436,7 @@ class Test_Block(unittest.TestCase):
 
     def test_block_uid_converter_error(self):
         with self.assertRaises(TypeError):
-            buid = block_uid(1235654)
+            block_uid(1235654)
 
     def test_block_uid_no_convert(self):
         buid = block_uid(BlockUID(1345, "0000338C775613399FA508A8F8B22EB60F525884730639E2A707299E373F43C0"))
@@ -483,7 +481,6 @@ AywstQpC0S5iaA/YQvbz2alpP6zTYG3tjkWpxy1jgeCo028Te2V327bBZbfDGDzsjxOrF4UVmEBiGsgb
         block_doc = Block.from_signed_raw(block)
         self.assertEqual(block_doc.proof_of_work(), "00000A84839226046082E2B1AD49664E382D98C845644945D133D4A90408813A")
 
+
 if __name__ == '__main__':
     unittest.main()
-
-

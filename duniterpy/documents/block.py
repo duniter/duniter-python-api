@@ -1,12 +1,12 @@
-from .document import Document, MalformedDocumentError
+import base64
+import hashlib
+import re
+
 from .certification import Identity, Certification, Revocation
+from .document import Document, MalformedDocumentError
 from .membership import Membership
 from .transaction import Transaction
-from .constants import pubkey_regex, block_id_regex, block_hash_regex
-
-import re
-import hashlib
-import base64
+from ..constants import pubkey_regex, block_id_regex, block_hash_regex
 
 
 def block_uid(value):
@@ -25,7 +25,7 @@ class BlockUID:
     A simple block id
     """
     re_block_uid = re.compile("({block_id_regex})-({block_hash_regex})".format(block_id_regex=block_id_regex,
-                                                                             block_hash_regex=block_hash_regex))
+                                                                               block_hash_regex=block_hash_regex))
     re_hash = re.compile("({block_hash_regex})".format(block_hash_regex=block_hash_regex))
 
     @classmethod
@@ -33,8 +33,8 @@ class BlockUID:
         return cls(0, Block.Empty_Hash)
 
     def __init__(self, number, sha_hash):
-        assert(type(number) is int)
-        assert(BlockUID.re_hash.match(sha_hash) is not None)
+        assert (type(number) is int)
+        assert (BlockUID.re_hash.match(sha_hash) is not None)
         self.number = number
         self.sha_hash = sha_hash
 
@@ -158,33 +158,33 @@ The class Block handles Block documents.
     re_noonce = re.compile("Nonce: ([0-9]+)\n")
 
     fields_parsers = {**Document.fields_parsers, **{
-                'Type': re_type,
-                'Number': re_number,
-                'PoWMin': re_powmin,
-                'Time': re_time,
-                'MedianTime': re_mediantime,
-                'UD': re_universaldividend,
-                'UnitBase': re_unitbase,
-                'Issuer': re_issuer,
-                'IssuersFrame': re_issuers_frame,
-                'IssuersFrameVar': re_issuers_frame_var,
-                'DifferentIssuersCount': re_different_issuers_count,
-                'PreviousIssuer': re_previousissuer,
-                'PreviousHash': re_previoushash,
-                'Parameters': re_parameters,
-                'MembersCount': re_memberscount,
-                'Identities': re_identities,
-                'Joiners': re_joiners,
-                'Actives': re_actives,
-                'Leavers': re_leavers,
-                'Revoked': re_revoked,
-                'Excluded': re_excluded,
-                'Certifications': re_certifications,
-                'Transactions': re_transactions,
-                'InnerHash': re_hash,
-                'Noonce': re_noonce,
-            }
-      }
+        'Type': re_type,
+        'Number': re_number,
+        'PoWMin': re_powmin,
+        'Time': re_time,
+        'MedianTime': re_mediantime,
+        'UD': re_universaldividend,
+        'UnitBase': re_unitbase,
+        'Issuer': re_issuer,
+        'IssuersFrame': re_issuers_frame,
+        'IssuersFrameVar': re_issuers_frame_var,
+        'DifferentIssuersCount': re_different_issuers_count,
+        'PreviousIssuer': re_previousissuer,
+        'PreviousHash': re_previoushash,
+        'Parameters': re_parameters,
+        'MembersCount': re_memberscount,
+        'Identities': re_identities,
+        'Joiners': re_joiners,
+        'Actives': re_actives,
+        'Leavers': re_leavers,
+        'Revoked': re_revoked,
+        'Excluded': re_excluded,
+        'Certifications': re_certifications,
+        'Transactions': re_transactions,
+        'InnerHash': re_hash,
+        'Noonce': re_noonce,
+    }
+                      }
 
     Empty_Hash = "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
 
@@ -205,12 +205,12 @@ The class Block handles Block documents.
         :param int ud: the dividend amount, or None if no dividend present in this block
         :param int unit_base: the unit_base of the dividend, or None if no dividend present in this block
         :param str issuer: the pubkey of the issuer of the block
-        :param int issuers__frame:
+        :param int issuers_frame:
         :param int issuers_frame_var:
         :param int different_issuers_count: the count of issuers
         :param str prev_hash: the previous block hash
         :param str prev_issuer: the previous block issuer
-        :param tuple parameters: the parameters of the currency. Should only be present in block 0.
+        :param Optional[Sequence[str]] parameters: the parameters of the currency. Should only be present in block 0.
         :param int members_count: the number of members found in this block
         :param list[duniterpy.documents.Identity] identities: the self certifications declared in this block
         :param list[duniterpy.documents.Membership] joiners: the joiners memberships via "IN" documents
@@ -223,16 +223,17 @@ The class Block handles Block documents.
         :param list[duniterpy.documents.Transaction] transactions: transactions documents
         :param str inner_hash: the block hah
         :param int noonce: the noonce value of the block
-        :param list[str] signatures: the block signaturezs
+        :param str signature: the block signature
         """
         super().__init__(version, currency, [signature])
         documents_versions = max(max([1] + [i.version for i in identities]),
-                               max([1] + [m.version for m in actives + leavers + joiners]),
-                               max([1] + [r.version for r in revokations]),
-                               max([1] + [c.version for c in certifications]),
-                               max([1] + [t.version for t in transactions]))
+                                 max([1] + [m.version for m in actives + leavers + joiners]),
+                                 max([1] + [r.version for r in revokations]),
+                                 max([1] + [c.version for c in certifications]),
+                                 max([1] + [t.version for t in transactions]))
         if self.version < documents_versions:
-            raise MalformedDocumentError("Block version is too low : {0} < {1}".format(self.version, documents_versions))
+            raise MalformedDocumentError(
+                "Block version is too low : {0} < {1}".format(self.version, documents_versions))
         self.number = number
         self.powmin = powmin
         self.time = time
@@ -261,7 +262,7 @@ The class Block handles Block documents.
     @property
     def blockUID(self):
         return BlockUID(self.number, self.proof_of_work())
-    
+
     @classmethod
     def from_signed_raw(cls, signed_raw):
         lines = signed_raw.splitlines(True)
@@ -445,11 +446,11 @@ PoWMin: {powmin}
 Time: {time}
 MedianTime: {mediantime}
 """.format(version=self.version,
-                      currency=self.currency,
-                      number=self.number,
-                      powmin=self.powmin,
-                      time=self.time,
-                      mediantime=self.mediantime)
+           currency=self.currency,
+           number=self.number,
+           powmin=self.powmin,
+           time=self.time,
+           mediantime=self.mediantime)
         if self.ud:
             doc += "UniversalDividend: {0}\n".format(self.ud)
 

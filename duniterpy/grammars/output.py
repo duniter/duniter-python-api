@@ -1,6 +1,6 @@
-from ..documents.constants import pubkey_regex
-from ..documents.constants import hash_regex
 from pypeg2 import *
+
+from ..constants import pubkey_regex, hash_regex
 
 
 class Pubkey(str):
@@ -109,6 +109,7 @@ class Condition(str):
             result = left
         return result
 
+
 Condition.grammar = contiguous(attr('left', [SIG, XHX, CSV, CLTV, ('(', Condition, ')')]),
-                     maybe_some(whitespace, attr('op', Operator), whitespace,
-                               attr('right', [SIG, XHX, CSV, CLTV, ('(', Condition, ')')])))
+                               maybe_some(whitespace, attr('op', Operator), whitespace,
+                                          attr('right', [SIG, XHX, CSV, CLTV, ('(', Condition, ')')])))
