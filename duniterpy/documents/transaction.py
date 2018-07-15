@@ -3,7 +3,7 @@ import re
 import pypeg2
 
 from .document import Document, MalformedDocumentError
-from ..constants import pubkey_regex, transaction_hash_regex, block_id_regex, block_uid_regex
+from ..constants import PUBKEY_REGEX, TRANSACTION_HASH_REGEX, BLOCK_ID_REGEX, BLOCK_UID_REGEX
 from ..grammars import output
 
 
@@ -65,8 +65,8 @@ class Transaction(Document):
 
     re_type = re.compile("Type: (Transaction)\n")
     re_header = re.compile("TX:([0-9]+):([0-9]+):([0-9]+):([0-9]+):([0-9]+):([01]):([0-9]+)\n")
-    re_compact_blockstamp = re.compile("({block_uid_regex})\n".format(block_uid_regex=block_uid_regex))
-    re_blockstamp = re.compile("Blockstamp: ({block_uid_regex})\n".format(block_uid_regex=block_uid_regex))
+    re_compact_blockstamp = re.compile("({block_uid_regex})\n".format(block_uid_regex=BLOCK_UID_REGEX))
+    re_blockstamp = re.compile("Blockstamp: ({block_uid_regex})\n".format(block_uid_regex=BLOCK_UID_REGEX))
     re_locktime = re.compile("Locktime: ([0-9]+)\n")
     re_issuers = re.compile("Issuers:\n")
     re_inputs = re.compile("Inputs:\n")
@@ -74,7 +74,7 @@ class Transaction(Document):
     re_outputs = re.compile("Outputs:\n")
     re_compact_comment = re.compile("([^\n]+)\n")
     re_comment = re.compile("Comment: ([^\n]*)\n")
-    re_pubkey = re.compile("({pubkey_regex})\n".format(pubkey_regex=pubkey_regex))
+    re_pubkey = re.compile("({pubkey_regex})\n".format(pubkey_regex=PUBKEY_REGEX))
 
     fields_parsers = {**Document.fields_parsers, **{
         "Type": re_type,
@@ -437,15 +437,15 @@ class InputSource:
     """
     re_inline = re.compile(
         "(?:(?:(D):({pubkey_regex}):({block_id_regex}))|(?:(T):({transaction_hash_regex}):([0-9]+)))\n"
-        .format(pubkey_regex=pubkey_regex,
-                block_id_regex=block_id_regex,
-                transaction_hash_regex=transaction_hash_regex))
+        .format(pubkey_regex=PUBKEY_REGEX,
+                block_id_regex=BLOCK_ID_REGEX,
+                transaction_hash_regex=TRANSACTION_HASH_REGEX))
     re_inline_v3 = re.compile(
         "([0-9]+):([0-9]+):(?:(?:(D):({pubkey_regex}):({block_id_regex}))|(?:(T):({transaction_hash_regex}):\
 ([0-9]+)))\n"
-        .format(pubkey_regex=pubkey_regex,
-                block_id_regex=block_id_regex,
-                transaction_hash_regex=transaction_hash_regex))
+        .format(pubkey_regex=PUBKEY_REGEX,
+                block_id_regex=BLOCK_ID_REGEX,
+                transaction_hash_regex=TRANSACTION_HASH_REGEX))
 
     def __init__(self, amount, base, source, origin_id, index):
         """

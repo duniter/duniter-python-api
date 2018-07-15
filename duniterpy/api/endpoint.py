@@ -119,9 +119,9 @@ class BMAEndpoint(Endpoint):
     API = "BASIC_MERKLED_API"
     re_inline = re.compile(
         '^BASIC_MERKLED_API(?: ({host_regex}))?(?: ({ipv4_regex}))?(?: ({ipv6_regex}))?(?: ([0-9]+))$'.format(
-            host_regex=host_regex,
-            ipv4_regex=ipv4_regex,
-            ipv6_regex=ipv6_regex))
+            host_regex=HOST_REGEX,
+            ipv4_regex=IPV4_REGEX,
+            ipv6_regex=IPV6_REGEX))
 
     def __init__(self, server: str, ipv4: str, ipv6: str, port: int):
         """
@@ -200,10 +200,10 @@ class SecuredBMAEndpoint(BMAEndpoint):
     API = "BMAS"
     re_inline = re.compile(
         '^BMAS(?: ({host_regex}))?(?: ({ipv4_regex}))?(?: ({ipv6_regex}))? ([0-9]+)(?: ({path_regex}))?$'.format(
-            host_regex=host_regex,
-            ipv4_regex=ipv4_regex,
-            ipv6_regex=ipv6_regex,
-            path_regex=path_regex))
+            host_regex=HOST_REGEX,
+            ipv4_regex=IPV4_REGEX,
+            ipv6_regex=IPV6_REGEX,
+            path_regex=PATH_REGEX))
 
     def __init__(self, server: str, ipv4: str, ipv6: str, port: int, path: str):
         """
@@ -268,11 +268,11 @@ class WS2PEndpoint(Endpoint):
     API = "WS2P"
     re_inline = re.compile(
         '^WS2P ({ws2pid_regex}) ((?:{host_regex})|(?:{ipv4_regex})) ([0-9]+)?(?: ({path_regex}))?$'.format(
-            ws2pid_regex=ws2pid_regex,
-            host_regex=host_regex,
-            ipv4_regex=ipv4_regex,
-            ipv6_regex=ipv6_regex,
-            path_regex=path_regex))
+            ws2pid_regex=WS2PID_REGEX,
+            host_regex=HOST_REGEX,
+            ipv4_regex=IPV4_REGEX,
+            ipv6_regex=IPV6_REGEX,
+            path_regex=PATH_REGEX))
 
     def __init__(self, ws2pid, server, port, path):
         self.ws2pid = ws2pid
@@ -324,9 +324,9 @@ class WS2PEndpoint(Endpoint):
 class ESUserEndpoint(Endpoint):
     API = "ES_USER_API"
     re_inline = re.compile(
-        '^ES_USER_API ((?:{host_regex})|(?:{ipv4_regex})) ([0-9]+)$'.format(ws2pid_regex=ws2pid_regex,
-                                                                            host_regex=host_regex,
-                                                                            ipv4_regex=ipv4_regex))
+        '^ES_USER_API ((?:{host_regex})|(?:{ipv4_regex})) ([0-9]+)$'.format(ws2pid_regex=WS2PID_REGEX,
+                                                                            host_regex=HOST_REGEX,
+                                                                            ipv4_regex=IPV4_REGEX))
 
     def __init__(self, server, port):
         self.server = server
@@ -371,9 +371,9 @@ class ESUserEndpoint(Endpoint):
 class ESSubscribtionEndpoint(Endpoint):
     API = "ES_SUBSCRIPTION_API"
     re_inline = re.compile(
-        '^ES_SUBSCRIPTION_API ((?:{host_regex})|(?:{ipv4_regex})) ([0-9]+)$'.format(ws2pid_regex=ws2pid_regex,
-                                                                                    host_regex=host_regex,
-                                                                                    ipv4_regex=ipv4_regex))
+        '^ES_SUBSCRIPTION_API ((?:{host_regex})|(?:{ipv4_regex})) ([0-9]+)$'.format(ws2pid_regex=WS2PID_REGEX,
+                                                                                    host_regex=HOST_REGEX,
+                                                                                    ipv4_regex=IPV4_REGEX))
 
     def __init__(self, server, port):
         self.server = server

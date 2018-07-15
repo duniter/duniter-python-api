@@ -1,7 +1,7 @@
 import base58
 import re
 import hashlib
-from ..constants import pubkey_regex
+from ..constants import PUBKEY_REGEX
 from ..helpers import ensure_str
 
 
@@ -9,7 +9,7 @@ class CRCPubkey:
     """
     Class to implement a crc on a pubkey
     """
-    re_crc_pubkey = re.compile("({pubkey_regex}):([A-Za-z0-9]{{3}})".format(pubkey_regex=pubkey_regex))
+    re_crc_pubkey = re.compile("({pubkey_regex}):([A-Za-z0-9]{{3}})".format(pubkey_regex=PUBKEY_REGEX))
 
     def __init__(self, pubkey, crc):
         """

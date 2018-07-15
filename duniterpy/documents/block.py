@@ -6,7 +6,7 @@ from .certification import Identity, Certification, Revocation
 from .document import Document, MalformedDocumentError
 from .membership import Membership
 from .transaction import Transaction
-from ..constants import pubkey_regex, block_id_regex, block_hash_regex
+from ..constants import PUBKEY_REGEX, BLOCK_ID_REGEX, BLOCK_HASH_REGEX
 
 
 def block_uid(value):
@@ -24,9 +24,9 @@ class BlockUID:
     """
     A simple block id
     """
-    re_block_uid = re.compile("({block_id_regex})-({block_hash_regex})".format(block_id_regex=block_id_regex,
-                                                                               block_hash_regex=block_hash_regex))
-    re_hash = re.compile("({block_hash_regex})".format(block_hash_regex=block_hash_regex))
+    re_block_uid = re.compile("({block_id_regex})-({block_hash_regex})".format(block_id_regex=BLOCK_ID_REGEX,
+                                                                               block_hash_regex=BLOCK_HASH_REGEX))
+    re_hash = re.compile("({block_hash_regex})".format(block_hash_regex=BLOCK_HASH_REGEX))
 
     @classmethod
     def empty(cls):
@@ -133,12 +133,12 @@ The class Block handles Block documents.
     re_mediantime = re.compile("MedianTime: ([0-9]+)\n")
     re_universaldividend = re.compile("UniversalDividend: ([0-9]+)\n")
     re_unitbase = re.compile("UnitBase: ([0-9]+)\n")
-    re_issuer = re.compile("Issuer: ({pubkey_regex})\n".format(pubkey_regex=pubkey_regex))
+    re_issuer = re.compile("Issuer: ({pubkey_regex})\n".format(pubkey_regex=PUBKEY_REGEX))
     re_issuers_frame = re.compile("IssuersFrame: ([0-9]+)\n")
     re_issuers_frame_var = re.compile("IssuersFrameVar: (0|-?[1-9]\d{0,18})\n")
     re_different_issuers_count = re.compile("DifferentIssuersCount: ([0-9]+)\n")
-    re_previoushash = re.compile("PreviousHash: ({block_hash_regex})\n".format(block_hash_regex=block_hash_regex))
-    re_previousissuer = re.compile("PreviousIssuer: ({pubkey_regex})\n".format(pubkey_regex=pubkey_regex))
+    re_previoushash = re.compile("PreviousHash: ({block_hash_regex})\n".format(block_hash_regex=BLOCK_HASH_REGEX))
+    re_previousissuer = re.compile("PreviousIssuer: ({pubkey_regex})\n".format(pubkey_regex=PUBKEY_REGEX))
     re_parameters = re.compile("Parameters: ([0-9]+\.[0-9]+):([0-9]+):([0-9]+):([0-9]+):([0-9]+):([0-9]+):\
 ([0-9]+):([0-9]+):([0-9]+\.[0-9]+):([0-9]+):([0-9]+):([0-9]+):([0-9]+):([0-9]+):([0-9]+):([0-9]+\.[0-9]+)\n")
     re_parameters_v10 = re.compile("Parameters: ([0-9]+\.[0-9]+):([0-9]+):([0-9]+):([0-9]+):([0-9]+):([0-9]+):\
@@ -151,10 +151,10 @@ The class Block handles Block documents.
     re_leavers = re.compile("Leavers:\n")
     re_revoked = re.compile("Revoked:\n")
     re_excluded = re.compile("Excluded:\n")
-    re_exclusion = re.compile("({pubkey_regex})\n".format(pubkey_regex=pubkey_regex))
+    re_exclusion = re.compile("({pubkey_regex})\n".format(pubkey_regex=PUBKEY_REGEX))
     re_certifications = re.compile("Certifications:\n")
     re_transactions = re.compile("Transactions:\n")
-    re_hash = re.compile("InnerHash: ({block_hash_regex})\n".format(block_hash_regex=block_hash_regex))
+    re_hash = re.compile("InnerHash: ({block_hash_regex})\n".format(block_hash_regex=BLOCK_HASH_REGEX))
     re_noonce = re.compile("Nonce: ([0-9]+)\n")
 
     fields_parsers = {**Document.fields_parsers, **{

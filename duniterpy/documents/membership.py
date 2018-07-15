@@ -6,7 +6,7 @@ Created on 2 déc. 2014
 import re
 
 from .document import Document, MalformedDocumentError
-from ..constants import block_uid_regex, signature_regex, pubkey_regex
+from ..constants import BLOCK_UID_REGEX, SIGNATURE_REGEX, PUBKEY_REGEX
 
 
 class Membership(Document):
@@ -27,15 +27,15 @@ class Membership(Document):
     # PUBLIC_KEY:SIGNATURE:NUMBER:HASH:TIMESTAMP:USER_ID
     re_inline = re.compile(
         "({pubkey_regex}):({signature_regex}):({ms_block_uid_regex}):({identity_block_uid_regex}):([^\n]+)\n"
-        .format(pubkey_regex=pubkey_regex, signature_regex=signature_regex,
-                ms_block_uid_regex=block_uid_regex,
-                identity_block_uid_regex=block_uid_regex))
+        .format(pubkey_regex=PUBKEY_REGEX, signature_regex=SIGNATURE_REGEX,
+                ms_block_uid_regex=BLOCK_UID_REGEX,
+                identity_block_uid_regex=BLOCK_UID_REGEX))
     re_type = re.compile("Type: (Membership)")
-    re_issuer = re.compile("Issuer: ({pubkey_regex})\n".format(pubkey_regex=pubkey_regex))
-    re_block = re.compile("Block: ({block_uid_regex})\n".format(block_uid_regex=block_uid_regex))
+    re_issuer = re.compile("Issuer: ({pubkey_regex})\n".format(pubkey_regex=PUBKEY_REGEX))
+    re_block = re.compile("Block: ({block_uid_regex})\n".format(block_uid_regex=BLOCK_UID_REGEX))
     re_membership_type = re.compile("Membership: (IN|OUT)")
     re_userid = re.compile("UserID: ([^\n]+)\n")
-    re_certts = re.compile("CertTS: ({block_uid_regex})\n".format(block_uid_regex=block_uid_regex))
+    re_certts = re.compile("CertTS: ({block_uid_regex})\n".format(block_uid_regex=BLOCK_UID_REGEX))
 
     fields_parsers = {**Document.fields_parsers, **{
         "Type": re_type,

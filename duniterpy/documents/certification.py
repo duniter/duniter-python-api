@@ -2,7 +2,7 @@ import base64
 import logging
 import re
 
-from ..constants import pubkey_regex, signature_regex, block_id_regex, block_uid_regex, uid_regex
+from ..constants import PUBKEY_REGEX, SIGNATURE_REGEX, BLOCK_ID_REGEX, BLOCK_UID_REGEX, UID_REGEX
 from .document import Document, MalformedDocumentError
 
 
@@ -12,15 +12,15 @@ class Identity(Document):
     """
 
     re_inline = re.compile("({pubkey_regex}):({signature_regex}):({block_uid_regex}):([^\n]+)\n"
-                           .format(pubkey_regex=pubkey_regex,
-                                   signature_regex=signature_regex,
-                                   block_uid_regex=block_uid_regex))
+                           .format(pubkey_regex=PUBKEY_REGEX,
+                                   signature_regex=SIGNATURE_REGEX,
+                                   block_uid_regex=BLOCK_UID_REGEX))
     re_type = re.compile("Type: (Identity)")
-    re_issuer = re.compile("Issuer: ({pubkey_regex})\n".format(pubkey_regex=pubkey_regex))
-    re_unique_id = re.compile("UniqueID: ({uid_regex})\n".format(uid_regex=uid_regex))
+    re_issuer = re.compile("Issuer: ({pubkey_regex})\n".format(pubkey_regex=PUBKEY_REGEX))
+    re_unique_id = re.compile("UniqueID: ({uid_regex})\n".format(uid_regex=UID_REGEX))
     re_uid = re.compile("UID:([^\n]+)\n")
-    re_meta_ts = re.compile("META:TS:({block_uid_regex})\n".format(block_uid_regex=block_uid_regex))
-    re_timestamp = re.compile("Timestamp: ({block_uid_regex})\n".format(block_uid_regex=block_uid_regex))
+    re_meta_ts = re.compile("META:TS:({block_uid_regex})\n".format(block_uid_regex=BLOCK_UID_REGEX))
+    re_timestamp = re.compile("Timestamp: ({block_uid_regex})\n".format(block_uid_regex=BLOCK_UID_REGEX))
 
     fields_parsers = {**Document.fields_parsers, **{
         "Type": re_type,
@@ -118,19 +118,19 @@ class Certification(Document):
     """
 
     re_inline = re.compile("({certifier_regex}):({certified_regex}):({block_id_regex}):({signature_regex})\n".format(
-        certifier_regex=pubkey_regex,
-        certified_regex=pubkey_regex,
-        block_id_regex=block_id_regex,
-        signature_regex=signature_regex
+        certifier_regex=PUBKEY_REGEX,
+        certified_regex=PUBKEY_REGEX,
+        block_id_regex=BLOCK_ID_REGEX,
+        signature_regex=SIGNATURE_REGEX
     ))
-    re_timestamp = re.compile("META:TS:({block_uid_regex})\n".format(block_uid_regex=block_uid_regex))
+    re_timestamp = re.compile("META:TS:({block_uid_regex})\n".format(block_uid_regex=BLOCK_UID_REGEX))
     re_type = re.compile("Type: (Certification)")
-    re_issuer = re.compile("Issuer: ({pubkey_regex})\n".format(pubkey_regex=pubkey_regex))
-    re_idty_issuer = re.compile("IdtyIssuer: ({pubkey_regex})\n".format(pubkey_regex=pubkey_regex))
-    re_idty_unique_id = re.compile("IdtyUniqueID: ({uid_regex})\n".format(uid_regex=uid_regex))
-    re_idty_timestamp = re.compile("IdtyTimestamp: ({block_uid_regex})\n".format(block_uid_regex=block_uid_regex))
-    re_idty_signature = re.compile("IdtySignature: ({signature_regex})\n".format(signature_regex=signature_regex))
-    re_cert_timestamp = re.compile("CertTimestamp: ({block_uid_regex})\n".format(block_uid_regex=block_uid_regex))
+    re_issuer = re.compile("Issuer: ({pubkey_regex})\n".format(pubkey_regex=PUBKEY_REGEX))
+    re_idty_issuer = re.compile("IdtyIssuer: ({pubkey_regex})\n".format(pubkey_regex=PUBKEY_REGEX))
+    re_idty_unique_id = re.compile("IdtyUniqueID: ({uid_regex})\n".format(uid_regex=UID_REGEX))
+    re_idty_timestamp = re.compile("IdtyTimestamp: ({block_uid_regex})\n".format(block_uid_regex=BLOCK_UID_REGEX))
+    re_idty_signature = re.compile("IdtySignature: ({signature_regex})\n".format(signature_regex=SIGNATURE_REGEX))
+    re_cert_timestamp = re.compile("CertTimestamp: ({block_uid_regex})\n".format(block_uid_regex=BLOCK_UID_REGEX))
 
     fields_parsers = {**Document.fields_parsers, **{
         "Type": re_type,
@@ -273,15 +273,15 @@ class Revocation(Document):
     A document describing a self-revocation.
     """
     re_inline = re.compile("({pubkey_regex}):({signature_regex})\n".format(
-        pubkey_regex=pubkey_regex,
-        signature_regex=signature_regex
+        pubkey_regex=PUBKEY_REGEX,
+        signature_regex=SIGNATURE_REGEX
     ))
 
     re_type = re.compile("Type: (Revocation)")
-    re_issuer = re.compile("Issuer: ({pubkey_regex})\n".format(pubkey_regex=pubkey_regex))
+    re_issuer = re.compile("Issuer: ({pubkey_regex})\n".format(pubkey_regex=PUBKEY_REGEX))
     re_uniqueid = re.compile("IdtyUniqueID: ([^\n]+)\n")
-    re_timestamp = re.compile("IdtyTimestamp: ({block_uid_regex})\n".format(block_uid_regex=block_uid_regex))
-    re_idtysignature = re.compile("IdtySignature: ({signature_regex})\n".format(signature_regex=signature_regex))
+    re_timestamp = re.compile("IdtyTimestamp: ({block_uid_regex})\n".format(block_uid_regex=BLOCK_UID_REGEX))
+    re_idtysignature = re.compile("IdtySignature: ({signature_regex})\n".format(signature_regex=SIGNATURE_REGEX))
 
     fields_parsers = {**Document.fields_parsers, **{
         "Type": re_type,

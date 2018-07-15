@@ -3,7 +3,7 @@ import re
 from duniterpy.api.endpoint import endpoint
 from .document import Document
 from . import BlockUID
-from ..constants import block_hash_regex, pubkey_regex
+from ..constants import BLOCK_HASH_REGEX, PUBKEY_REGEX
 
 
 class Peer(Document):
@@ -24,8 +24,8 @@ class Peer(Document):
     """
 
     re_type = re.compile("Type: (Peer)")
-    re_pubkey = re.compile("PublicKey: ({pubkey_regex})\n".format(pubkey_regex=pubkey_regex))
-    re_block = re.compile("Block: ([0-9]+-{block_hash_regex})\n".format(block_hash_regex=block_hash_regex))
+    re_pubkey = re.compile("PublicKey: ({pubkey_regex})\n".format(pubkey_regex=PUBKEY_REGEX))
+    re_block = re.compile("Block: ([0-9]+-{block_hash_regex})\n".format(block_hash_regex=BLOCK_HASH_REGEX))
     re_endpoints = re.compile("(Endpoints:)\n")
 
     fields_parsers = {**Document.fields_parsers, **{

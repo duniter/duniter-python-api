@@ -2,16 +2,16 @@ import attr
 import re
 
 from ..block import BlockUID
-from ...constants import ws2p_public_prefix_regex, ws2p_private_prefix_regex,\
-    pubkey_regex, signature_regex, ws2pid_regex, block_uid_regex, ws2p_head_regex
+from ...constants import WS2P_PUBLIC_PREFIX_REGEX, WS2P_PRIVATE_PREFIX_REGEX,\
+    PUBKEY_REGEX, SIGNATURE_REGEX, WS2PID_REGEX, BLOCK_UID_REGEX, ws2p_head_regex
 
 
 @attr.s()
 class API:
     re_inline = re.compile("WS2P({ws2p_private})?({ws2p_public})?"
                             .format(
-                                    ws2p_private=ws2p_private_prefix_regex,
-                                    ws2p_public=ws2p_public_prefix_regex))
+                                    ws2p_private=WS2P_PRIVATE_PREFIX_REGEX,
+                                    ws2p_public=WS2P_PUBLIC_PREFIX_REGEX))
 
     private = attr.ib(type=str)
     public = attr.ib(type=str)
@@ -62,14 +62,14 @@ class HeadV0:
     """
 
     re_inline = re.compile("^(WS2P(?:{ws2p_private})?(?:{ws2p_public})?):({head}):({pubkey}):({blockstamp})(?::)?(.*)"
-                                .format(ws2p_private=ws2p_private_prefix_regex,
-                                        ws2p_public=ws2p_public_prefix_regex,
-                                        head=ws2p_head_regex,
-                                        version="[0-9]+",
-                                        pubkey=pubkey_regex,
-                                        blockstamp=block_uid_regex))
+                           .format(ws2p_private=WS2P_PRIVATE_PREFIX_REGEX,
+                                   ws2p_public=WS2P_PUBLIC_PREFIX_REGEX,
+                                   head=ws2p_head_regex,
+                                   version="[0-9]+",
+                                   pubkey=PUBKEY_REGEX,
+                                   blockstamp=BLOCK_UID_REGEX))
 
-    re_signature = re.compile(signature_regex)
+    re_signature = re.compile(SIGNATURE_REGEX)
 
     signature = attr.ib(type=str)
     api = attr.ib(type=API)
@@ -99,7 +99,7 @@ class HeadV1:
     re_inline = re.compile("({ws2pid}):" \
                             "({software}):({software_version}):({pow_prefix})(?::)?(.*)"
                             .format(
-                                ws2pid=ws2pid_regex,
+                                ws2pid=WS2PID_REGEX,
                                 software="[A-Za-z-_]+",
                                 software_version="[0-9]+[.][0-9]+[.][0-9]+",
                                 pow_prefix="[0-9]+"))

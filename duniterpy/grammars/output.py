@@ -1,14 +1,14 @@
 from pypeg2 import *
 
-from ..constants import pubkey_regex, hash_regex
+from ..constants import PUBKEY_REGEX, HASH_REGEX
 
 
 class Pubkey(str):
-    regex = re.compile(pubkey_regex)
+    regex = re.compile(PUBKEY_REGEX)
 
 
 class Hash(str):
-    regex = re.compile(hash_regex)
+    regex = re.compile(HASH_REGEX)
 
 
 class Int(str):
