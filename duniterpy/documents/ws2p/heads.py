@@ -1,17 +1,17 @@
-import attr
 import re
 
+import attr
+
 from ..block import BlockUID
-from ...constants import WS2P_PUBLIC_PREFIX_REGEX, WS2P_PRIVATE_PREFIX_REGEX,\
-    PUBKEY_REGEX, SIGNATURE_REGEX, WS2PID_REGEX, BLOCK_UID_REGEX, ws2p_head_regex
+from ...constants import WS2P_PUBLIC_PREFIX_REGEX, WS2P_PRIVATE_PREFIX_REGEX, WS2P_HEAD_REGEX, \
+    PUBKEY_REGEX, SIGNATURE_REGEX, WS2PID_REGEX, BLOCK_UID_REGEX
 
 
 @attr.s()
 class API:
-    re_inline = re.compile("WS2P({ws2p_private})?({ws2p_public})?"
-                            .format(
-                                    ws2p_private=WS2P_PRIVATE_PREFIX_REGEX,
-                                    ws2p_public=WS2P_PUBLIC_PREFIX_REGEX))
+    re_inline = re.compile("WS2P({ws2p_private})?({ws2p_public})?".format(
+        ws2p_private=WS2P_PRIVATE_PREFIX_REGEX,
+        ws2p_public=WS2P_PUBLIC_PREFIX_REGEX))
 
     private = attr.ib(type=str)
     public = attr.ib(type=str)
@@ -37,7 +37,7 @@ class API:
 
 @attr.s()
 class Head:
-    re_inline = re.compile(ws2p_head_regex)
+    re_inline = re.compile(WS2P_HEAD_REGEX)
 
     version = attr.ib(type=int)
 
@@ -64,7 +64,7 @@ class HeadV0:
     re_inline = re.compile("^(WS2P(?:{ws2p_private})?(?:{ws2p_public})?):({head}):({pubkey}):({blockstamp})(?::)?(.*)"
                            .format(ws2p_private=WS2P_PRIVATE_PREFIX_REGEX,
                                    ws2p_public=WS2P_PUBLIC_PREFIX_REGEX,
-                                   head=ws2p_head_regex,
+                                   head=WS2P_HEAD_REGEX,
                                    version="[0-9]+",
                                    pubkey=PUBKEY_REGEX,
                                    blockstamp=BLOCK_UID_REGEX))
@@ -96,19 +96,17 @@ class HeadV0:
 
 @attr.s()
 class HeadV1:
-    re_inline = re.compile("({ws2pid}):" \
-                            "({software}):({software_version}):({pow_prefix})(?::)?(.*)"
-                            .format(
-                                ws2pid=WS2PID_REGEX,
-                                software="[A-Za-z-_]+",
-                                software_version="[0-9]+[.][0-9]+[.][0-9]+",
-                                pow_prefix="[0-9]+"))
+    re_inline = re.compile("({ws2pid}):({software}):({software_version}):({pow_prefix})(?::)?(.*)".format(
+        ws2pid=WS2PID_REGEX,
+        software="[A-Za-z-_]+",
+        software_version="[0-9]+[.][0-9]+[.][0-9]+",
+        pow_prefix="[0-9]+"))
 
     v0 = attr.ib(type=HeadV0)
     ws2pid = attr.ib(type=str)
     software = attr.ib(type=str)
     software_version = attr.ib(type=str)
-    pow_prefix= attr.ib(type=int)
+    pow_prefix = attr.ib(type=int)
 
     @classmethod
     def from_inline(cls, inline, signature):
@@ -137,12 +135,12 @@ class HeadV1:
     def blockstamp(self):
         return self.v0.blockstamp
 
+
 @attr.s
 class HeadV2:
-    re_inline = re.compile("({free_member_room}):({free_mirror_room})(?::)?(.*)"
-                            .format(
-                                free_member_room="[0-9]+",
-                                free_mirror_room="[0-9]+"))
+    re_inline = re.compile("({free_member_room}):({free_mirror_room})(?::)?(.*)".format(
+        free_member_room="[0-9]+",
+        free_mirror_room="[0-9]+"))
 
     v1 = attr.ib(type=HeadV1)
     free_member_room = attr.ib(type=int)
