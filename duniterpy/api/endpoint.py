@@ -42,7 +42,7 @@ class Endpoint:
     def inline(self) -> str:
         raise NotImplementedError("inline() is not implemented")
 
-    def conn_handler(self, session: aiohttp.ClientSession = None, proxy: str = None) -> ConnectionHandler:
+    def conn_handler(self, session: aiohttp.ClientSession, proxy: str = None) -> ConnectionHandler:
         raise NotImplementedError("conn_handler is not implemented")
 
     def __str__(self) -> str:
@@ -85,7 +85,7 @@ class UnknownEndpoint(Endpoint):
             doc += " {0}".format(p)
         return doc
 
-    def conn_handler(self, session: aiohttp.ClientSession = None, proxy: str = None) -> ConnectionHandler:
+    def conn_handler(self, session: aiohttp.ClientSession, proxy: str = None) -> ConnectionHandler:
         return ConnectionHandler("", "", "", 0, "")
 
     def __str__(self) -> str:
@@ -166,8 +166,7 @@ class BMAEndpoint(Endpoint):
                     IPv6=(" {0}".format(self.ipv6) if self.ipv6 else ""),
                     PORT=(" {0}".format(self.port) if self.port else ""))
 
-    # fixme: session must be mandatory
-    def conn_handler(self, session: aiohttp.ClientSession = None, proxy: str = None) -> ConnectionHandler:
+    def conn_handler(self, session: aiohttp.ClientSession, proxy: str = None) -> ConnectionHandler:
         """
         Return connection handler instance for the endpoint
 
@@ -247,8 +246,7 @@ class SecuredBMAEndpoint(BMAEndpoint):
         inlined = [str(info) for info in (self.server, self.ipv4, self.ipv6, self.port, self.path) if info]
         return SecuredBMAEndpoint.API + " " + " ".join(inlined)
 
-    # fixme: session must be mandatory
-    def conn_handler(self, session: aiohttp.ClientSession = None, proxy: str = None) -> ConnectionHandler:
+    def conn_handler(self, session: aiohttp.ClientSession, proxy: str = None) -> ConnectionHandler:
         """
         Return connection handler instance for the endpoint
 
@@ -297,7 +295,7 @@ class WS2PEndpoint(Endpoint):
         inlined = [str(info) for info in (self.ws2pid, self.server, self.port, self.path) if info]
         return WS2PEndpoint.API + " " + " ".join(inlined)
 
-    def conn_handler(self, session: aiohttp.ClientSession = None, proxy: str = None) -> ConnectionHandler:
+    def conn_handler(self, session: aiohttp.ClientSession, proxy: str = None) -> ConnectionHandler:
         """
         Return connection handler instance for the endpoint
 
@@ -345,7 +343,7 @@ class ESUserEndpoint(Endpoint):
         inlined = [str(info) for info in (self.server, self.port) if info]
         return ESUserEndpoint.API + " " + " ".join(inlined)
 
-    def conn_handler(self, session: aiohttp.ClientSession = None, proxy: str = None) -> ConnectionHandler:
+    def conn_handler(self, session: aiohttp.ClientSession, proxy: str = None) -> ConnectionHandler:
         """
         Return connection handler instance for the endpoint
 
@@ -392,7 +390,7 @@ class ESSubscribtionEndpoint(Endpoint):
         inlined = [str(info) for info in (self.server, self.port) if info]
         return ESSubscribtionEndpoint.API + " " + " ".join(inlined)
 
-    def conn_handler(self, session: aiohttp.ClientSession = None, proxy: str = None) -> ConnectionHandler:
+    def conn_handler(self, session: aiohttp.ClientSession, proxy: str = None) -> ConnectionHandler:
         """
         Return connection handler instance for the endpoint
 
