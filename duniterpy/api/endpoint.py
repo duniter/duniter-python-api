@@ -319,11 +319,56 @@ class WS2PEndpoint(Endpoint):
         return hash((self.ws2pid, self.server, self.port, self.path))
 
 
+class ESCoreEndpoint(Endpoint):
+    API = "ES_CORE_API"
+    re_inline = re.compile(
+        '^ES_CORE_API ((?:{host_regex})|(?:{ipv4_regex})) ([0-9]+)$'.format(host_regex=HOST_REGEX,
+                                                                            ipv4_regex=IPV4_REGEX))
+
+    def __init__(self, server, port):
+        self.server = server
+        self.port = port
+
+    @classmethod
+    def from_inline(cls, inline):
+        m = ESCoreEndpoint.re_inline.match(inline)
+        if m is None:
+            raise MalformedDocumentError(ESCoreEndpoint.API)
+        server = m.group(1)
+        port = int(m.group(2))
+        return cls(server, port)
+
+    def inline(self):
+        inlined = [str(info) for info in (self.server, self.port) if info]
+        return ESCoreEndpoint.API + " " + " ".join(inlined)
+
+    def conn_handler(self, session: aiohttp.ClientSession, proxy: str = None) -> ConnectionHandler:
+        """
+        Return connection handler instance for the endpoint
+
+        :param aiohttp.ClientSession session: AIOHTTP client session instance
+        :param str proxy: Proxy url
+        :rtype: ConnectionHandler
+        """
+        return ConnectionHandler("https", "wss", self.server, self.port, "", proxy, session)
+
+    def __str__(self):
+        return self.inline()
+
+    def __eq__(self, other):
+        if isinstance(other, ESCoreEndpoint):
+            return self.server == other.server and self.port == other.port
+        else:
+            return False
+
+    def __hash__(self):
+        return hash((self.server, self.port))
+
+
 class ESUserEndpoint(Endpoint):
     API = "ES_USER_API"
     re_inline = re.compile(
-        '^ES_USER_API ((?:{host_regex})|(?:{ipv4_regex})) ([0-9]+)$'.format(ws2pid_regex=WS2PID_REGEX,
-                                                                            host_regex=HOST_REGEX,
+        '^ES_USER_API ((?:{host_regex})|(?:{ipv4_regex})) ([0-9]+)$'.format(host_regex=HOST_REGEX,
                                                                             ipv4_regex=IPV4_REGEX))
 
     def __init__(self, server, port):
@@ -369,8 +414,7 @@ class ESUserEndpoint(Endpoint):
 class ESSubscribtionEndpoint(Endpoint):
     API = "ES_SUBSCRIPTION_API"
     re_inline = re.compile(
-        '^ES_SUBSCRIPTION_API ((?:{host_regex})|(?:{ipv4_regex})) ([0-9]+)$'.format(ws2pid_regex=WS2PID_REGEX,
-                                                                                    host_regex=HOST_REGEX,
+        '^ES_SUBSCRIPTION_API ((?:{host_regex})|(?:{ipv4_regex})) ([0-9]+)$'.format(host_regex=HOST_REGEX,
                                                                                     ipv4_regex=IPV4_REGEX))
 
     def __init__(self, server, port):
@@ -417,6 +461,7 @@ MANAGED_API = {
     BMAEndpoint.API: BMAEndpoint,
     SecuredBMAEndpoint.API: SecuredBMAEndpoint,
     WS2PEndpoint.API: WS2PEndpoint,
+    ESCoreEndpoint.API: ESCoreEndpoint,
     ESUserEndpoint.API: ESUserEndpoint,
     ESSubscribtionEndpoint.API: ESSubscribtionEndpoint
 }

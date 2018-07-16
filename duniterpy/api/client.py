@@ -203,6 +203,9 @@ class Client:
         else:
             self.endpoint = _endpoint
 
+        if isinstance(self.endpoint, endpoint.UnknownEndpoint):
+            raise NotImplementedError("{0} endpoint in not supported".format(self.endpoint.api))
+
         # if no user session...
         if session is None:
             # open a session
