@@ -38,4 +38,4 @@ nosetests.xml
 .python-version
 docs/_build
 docs/duniterpy.*
-
+.mypy_cache

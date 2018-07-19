@@ -44,14 +44,20 @@ Development
     pip install -r requirements.txt
 
 * Add PYTHONPATH env var to your shell containing the path to this repository
-* Run unit tests with::
-
-    make tests
-
 * Take a look at examples folder
 * Run examples from parent folder::
 
     python examples/request_data.py
+
+* Before submit a merge requests, please check the static typing and tests.
+
+* Check static typing with `mypy <http://mypy-lang.org/>`_::
+
+    make check
+
+* Run unit tests with::
+
+    make tests
 
 Documentation
 -------------

@@ -4,7 +4,7 @@
 # vit
 import json
 import logging
-from typing import Callable, Union
+from typing import Callable, Union, Any
 
 import aiohttp
 import jsonschema
@@ -34,7 +34,7 @@ ERROR_SCHEMA = {
 }
 
 
-def parse_text(text: str, schema: dict) -> any:
+def parse_text(text: str, schema: dict) -> Any:
     """
     Validate and parse the BMA answer from websocket
 
@@ -51,7 +51,7 @@ def parse_text(text: str, schema: dict) -> any:
     return data
 
 
-def parse_error(text: str) -> any:
+def parse_error(text: str) -> Any:
     """
     Validate and parse the BMA answer from websocket
 
@@ -67,7 +67,7 @@ def parse_error(text: str) -> any:
     return data
 
 
-async def parse_response(response: aiohttp.ClientResponse, schema: dict) -> any:
+async def parse_response(response: aiohttp.ClientResponse, schema: dict) -> Any:
     """
     Validate and parse the BMA answer
 
@@ -91,7 +91,7 @@ class API(object):
     """
     schema = {}
 
-    def __init__(self, connection_handler: endpoint.ConnectionHandler, module: str):
+    def __init__(self, connection_handler: endpoint.ConnectionHandler, module: str) -> None:
         """
         Asks a module in order to create the url used then by derivated classes.
 
@@ -189,7 +189,7 @@ class Client:
     """
 
     def __init__(self, _endpoint: Union[str, endpoint.Endpoint], session: aiohttp.ClientSession = None,
-                 proxy: str = None):
+                 proxy: str = None) -> None:
         """
         Init Client instance
 
@@ -214,7 +214,7 @@ class Client:
             self.session = session
         self.proxy = proxy
 
-    async def get(self, url_path: str, params: dict = None, rtype: str = RESPONSE_JSON, schema: dict = None) -> any:
+    async def get(self, url_path: str, params: dict = None, rtype: str = RESPONSE_JSON, schema: dict = None) -> Any:
         """
         GET request on self.endpoint + url_path
 
@@ -245,7 +245,7 @@ class Client:
         elif rtype == RESPONSE_JSON:
             return await response.json()
 
-    async def post(self, url_path: str, params: dict = None, rtype: str = RESPONSE_JSON, schema: dict = None) -> any:
+    async def post(self, url_path: str, params: dict = None, rtype: str = RESPONSE_JSON, schema: dict = None) -> Any:
         """
         POST request on self.endpoint + url_path
 
@@ -294,7 +294,7 @@ class Client:
         """
         await self.session.close()
 
-    def __call__(self, _function: Callable, *args: any, **kwargs: any) -> any:
+    def __call__(self, _function: Callable, *args: Any, **kwargs: Any) -> Any:
         """
         Call the _function given with the args given
         So we can call many packages wrapping the REST API

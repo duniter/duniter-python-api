@@ -1,4 +1,4 @@
-.PHONY: docs tests
+.PHONY: docs tests check
 
 # generate documentation
 docs:
@@ -8,3 +8,6 @@ docs:
 tests:
 	python -m unittest
 
+# check static typing
+check:
+	mypy duniterpy --ignore-missing-imports

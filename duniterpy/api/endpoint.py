@@ -1,4 +1,5 @@
 import re
+from typing import Any, Optional
 
 import aiohttp
 
@@ -9,8 +10,8 @@ from ..documents import MalformedDocumentError
 class ConnectionHandler:
     """Helper class used by other API classes to ease passing server connection information."""
 
-    def __init__(self, http_scheme: str, ws_scheme: str, server: str, port: int, path: str = "", proxy: str = None,
-                 session: aiohttp.ClientSession = None):
+    def __init__(self, http_scheme: str, ws_scheme: str, server: str, port: int, path: str,
+                 session: aiohttp.ClientSession, proxy: Optional[str] = None) -> None:
         """
         Init instance of connection handler
 
@@ -18,9 +19,9 @@ class ConnectionHandler:
         :param ws_scheme: Web socket scheme
         :param server: Server IP or domain name
         :param port: Port number
-        :param port: Url path (optional, default="")
+        :param port: Url path
+        :param session: Session AIOHTTP
         :param proxy: Proxy (optional, default=None)
-        :param session: Session AIOHTTP (optional, default=None)
         """
         self.http_scheme = http_scheme
         self.ws_scheme = ws_scheme
@@ -48,14 +49,14 @@ class Endpoint:
     def __str__(self) -> str:
         raise NotImplementedError("__str__ is not implemented")
 
-    def __eq__(self, other: any) -> bool:
+    def __eq__(self, other: Any) -> bool:
         raise NotImplementedError("__eq__ is not implemented")
 
 
 class UnknownEndpoint(Endpoint):
     API = None
 
-    def __init__(self, api: str, properties: list):
+    def __init__(self, api: str, properties: list) -> None:
         self.api = api
         self.properties = properties
 
@@ -86,12 +87,12 @@ class UnknownEndpoint(Endpoint):
         return doc
 
     def conn_handler(self, session: aiohttp.ClientSession, proxy: str = None) -> ConnectionHandler:
-        return ConnectionHandler("", "", "", 0, "")
+        return ConnectionHandler("", "", "", 0, "", aiohttp.ClientSession())
 
     def __str__(self) -> str:
         return "{0} {1}".format(self.api, ' '.join(["{0}".format(p) for p in self.properties]))
 
-    def __eq__(self, other: any) -> bool:
+    def __eq__(self, other: Any) -> bool:
         if isinstance(other, UnknownEndpoint):
             return self.api == other.api and self.properties == other.properties
         else:
@@ -123,7 +124,7 @@ class BMAEndpoint(Endpoint):
             ipv4_regex=IPV4_REGEX,
             ipv6_regex=IPV6_REGEX))
 
-    def __init__(self, server: str, ipv4: str, ipv6: str, port: int):
+    def __init__(self, server: str, ipv4: str, ipv6: str, port: int) -> None:
         """
         Init BMAEndpoint instance
 
@@ -175,11 +176,11 @@ class BMAEndpoint(Endpoint):
         :return:
         """
         if self.server:
-            return ConnectionHandler("http", "ws", self.server, self.port, "", proxy, session)
+            return ConnectionHandler("http", "ws", self.server, self.port, "", session, proxy)
         elif self.ipv6:
-            return ConnectionHandler("http", "ws", "[{0}]".format(self.ipv6), self.port, "", proxy, session)
+            return ConnectionHandler("http", "ws", "[{0}]".format(self.ipv6), self.port, "", session, proxy)
 
-        return ConnectionHandler("http", "ws", self.ipv4, self.port, "", proxy, session)
+        return ConnectionHandler("http", "ws", self.ipv4, self.port, "", session, proxy)
 
     def __str__(self):
         return self.inline()
@@ -204,7 +205,7 @@ class SecuredBMAEndpoint(BMAEndpoint):
             ipv6_regex=IPV6_REGEX,
             path_regex=PATH_REGEX))
 
-    def __init__(self, server: str, ipv4: str, ipv6: str, port: int, path: str):
+    def __init__(self, server: str, ipv4: str, ipv6: str, port: int, path: str) -> None:
         """
         Init SecuredBMAEndpoint instance
 
@@ -255,11 +256,11 @@ class SecuredBMAEndpoint(BMAEndpoint):
         :return:
         """
         if self.server:
-            return ConnectionHandler("https", "wss", self.server, self.port, self.path, proxy, session)
+            return ConnectionHandler("https", "wss", self.server, self.port, self.path, session, proxy)
         elif self.ipv6:
-            return ConnectionHandler("https", "wss", "[{0}]".format(self.ipv6), self.port, self.path, proxy, session)
+            return ConnectionHandler("https", "wss", "[{0}]".format(self.ipv6), self.port, self.path, session, proxy)
 
-        return ConnectionHandler("https", "wss", self.ipv4, self.port, self.path, proxy, session)
+        return ConnectionHandler("https", "wss", self.ipv4, self.port, self.path, session, proxy)
 
 
 class WS2PEndpoint(Endpoint):
@@ -303,7 +304,7 @@ class WS2PEndpoint(Endpoint):
         :param str proxy: Proxy url
         :rtype: ConnectionHandler
         """
-        return ConnectionHandler("https", "wss", self.server, self.port, self.path, proxy, session)
+        return ConnectionHandler("https", "wss", self.server, self.port, self.path, session, proxy)
 
     def __str__(self):
         return self.inline()
@@ -350,7 +351,7 @@ class ESCoreEndpoint(Endpoint):
         :param str proxy: Proxy url
         :rtype: ConnectionHandler
         """
-        return ConnectionHandler("https", "wss", self.server, self.port, "", proxy, session)
+        return ConnectionHandler("https", "wss", self.server, self.port, "", session, proxy)
 
     def __str__(self):
         return self.inline()
@@ -396,7 +397,7 @@ class ESUserEndpoint(Endpoint):
         :param str proxy: Proxy url
         :rtype: ConnectionHandler
         """
-        return ConnectionHandler("https", "wss", self.server, self.port, "", proxy, session)
+        return ConnectionHandler("https", "wss", self.server, self.port, "", session, proxy)
 
     def __str__(self):
         return self.inline()
@@ -442,7 +443,7 @@ class ESSubscribtionEndpoint(Endpoint):
         :param str proxy: Proxy url
         :rtype: ConnectionHandler
         """
-        return ConnectionHandler("https", "wss", self.server, self.port, "", proxy, session)
+        return ConnectionHandler("https", "wss", self.server, self.port, "", session, proxy)
 
     def __str__(self):
         return self.inline()
