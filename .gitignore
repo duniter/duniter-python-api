@@ -35,3 +35,7 @@ nosetests.xml
 .project
 .pydevproject
 .idea
+.python-version
+docs/_build
+docs/duniterpy.*
+

@@ -39,20 +39,28 @@ Development
 
     curl -L https://github.com/pyenv/pyenv-installer/raw/master/bin/pyenv-installer | bash`
 
+* Install dependencies::
+
+    pip install -r requirements.txt
+
 * Add PYTHONPATH env var to your shell containing the path to this repository
-* Run unit tests with ::
+* Run unit tests with::
 
     python -m unittest
 
 * Take a look at examples folder
-* Run examples from parent folder ::
+* Run examples from parent folder::
 
     python examples/request_data.py
 
 Documentation
 -------------
 
-* `HTML Documentation <https://git.duniter.org/clients/python/duniterpy/tree/master/docs/_build/html>`_
+* Install Sphinx::
+
+    pip install -r requirements_dev.txt
+
+* HTML Documentation is generated in docs/_build/html folder.
 * `Examples <https://git.duniter.org/clients/python/duniterpy/tree/master/examples>`_
 
 Packaging and deploy
@@ -60,8 +68,6 @@ Packaging and deploy
 
 Pypi
 ++++
-
-*The README file must be in RestructuredText format (README.rst) for the long description field of the package.*
 
 In the development pyenv environment, install the following tools::
 
