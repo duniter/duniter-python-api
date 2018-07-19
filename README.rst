@@ -46,7 +46,7 @@ Development
 * Add PYTHONPATH env var to your shell containing the path to this repository
 * Run unit tests with::
 
-    python -m unittest
+    make tests
 
 * Take a look at examples folder
 * Run examples from parent folder::
@@ -59,6 +59,10 @@ Documentation
 * Install Sphinx::
 
     pip install -r requirements_dev.txt
+
+* Generate documentation::
+
+    make docs
 
 * HTML Documentation is generated in docs/_build/html folder.
 * `Examples <https://git.duniter.org/clients/python/duniterpy/tree/master/examples>`_
