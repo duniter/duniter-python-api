@@ -1,4 +1,4 @@
-from pypeg2 import *
+from pypeg2 import re, attr, Keyword, Enum, contiguous, maybe_some, whitespace, K
 
 from ..constants import PUBKEY_REGEX, HASH_REGEX
 
@@ -81,6 +81,9 @@ class Operator(Keyword):
 
 
 class Condition(str):
+
+    grammar = None
+
     @classmethod
     def token(cls, left, op=None, right=None):
         condition = cls()

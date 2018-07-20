@@ -4,7 +4,7 @@
 # vit
 import json
 import logging
-from typing import Callable, Union, Any
+from typing import Callable, Union, Any, Optional
 
 import aiohttp
 import jsonschema
@@ -89,18 +89,16 @@ class API(object):
     """
     API is a class used as an abstraction layer over the request library (AIOHTTP).
     """
-    schema = {}
 
-    def __init__(self, connection_handler: endpoint.ConnectionHandler, module: str) -> None:
+    def __init__(self, connection_handler: endpoint.ConnectionHandler, headers: Optional[dict] = None) -> None:
         """
         Asks a module in order to create the url used then by derivated classes.
 
         :param connection_handler: Connection handler
-        :param module: Module path
+        :param headers: Headers dictionary (optional, default None)
         """
-        self.module = module
         self.connection_handler = connection_handler
-        self.headers = {}
+        self.headers = {} if headers is None else headers
 
     def reverse_url(self, scheme: str, path: str) -> str:
         """
@@ -110,19 +108,19 @@ class API(object):
         :param path: Path of the url
         :return: str
         """
+        # remove starting slash in path if present
+        path = path.lstrip('/')
 
         server, port = self.connection_handler.server, self.connection_handler.port
         if self.connection_handler.path:
-            url = '{scheme}://{server}:{port}/{path}/{module}'.format(scheme=scheme,
-                                                                      server=server,
-                                                                      port=port,
-                                                                      path=path,
-                                                                      module=self.module)
+            url = '{scheme}://{server}:{port}/{path}'.format(scheme=scheme,
+                                                             server=server,
+                                                             port=port,
+                                                             path=path)
         else:
-            url = '{scheme}://{server}:{port}/{module}'.format(scheme=scheme,
-                                                               server=server,
-                                                               port=port,
-                                                               module=self.module)
+            url = '{scheme}://{server}:{port}/'.format(scheme=scheme,
+                                                       server=server,
+                                                       port=port)
 
         return url + path
 
@@ -227,7 +225,7 @@ class Client:
         if params is None:
             params = dict()
 
-        client = API(self.endpoint.conn_handler(self.session, self.proxy), '')
+        client = API(self.endpoint.conn_handler(self.session, self.proxy))
 
         # get aiohttp response
         response = await client.requests_get(url_path, **params)
@@ -258,7 +256,7 @@ class Client:
         if params is None:
             params = dict()
 
-        client = API(self.endpoint.conn_handler(self.session, self.proxy), '')
+        client = API(self.endpoint.conn_handler(self.session, self.proxy))
 
         # get aiohttp response
         response = await client.requests_post(url_path, **params)
@@ -283,7 +281,7 @@ class Client:
         :param path: the url path
         :rtype: aiohttp.ClientWebSocketResponse
         """
-        client = API(self.endpoint.conn_handler(self.session, self.proxy), '')
+        client = API(self.endpoint.conn_handler(self.session, self.proxy))
         return client.connect_ws(path)
 
     async def close(self):
