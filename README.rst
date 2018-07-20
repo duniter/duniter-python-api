@@ -6,11 +6,17 @@ Duniter Python API
 
 Python implementation of `Duniter <https://git.duniter.org/nodes/typescript/duniter>`_ BMA API
 
+This is the most complete python library to communicate with Duniter nodes endpoints.
+
+This library is used by `Sakia <http://sakia-wallet.org/>`_, the rich client to manage your Duniter's wallets.
+
 Features
 --------
 
-* Supports Duniter's `Basic Merkle API <https://git.duniter.org/nodes/typescript/duniter/blob/master/doc/HTTP_API.md>`_ and `protocol <https://git.duniter.org/nodes/typescript/duniter/blob/master/doc/Protocol.md>`_
-* Asynchronous
+* Support Duniter's `Basic Merkle API <https://git.duniter.org/nodes/typescript/duniter/blob/master/doc/HTTP_API.md>`_ and `protocol <https://git.duniter.org/nodes/typescript/duniter/blob/master/doc/Protocol.md>`_
+* Asynchronous/synchronous without threads
+* Support HTTP, HTTPS and Web Socket transport for BMA API
+* Support `Elasticsearch Duniter4j <https://git.duniter.org/clients/java/duniter4j/blob/master/src/site/markdown/ES.md#request-the-es-node>`_ API
 * Duniter signing key
 
 Requirements

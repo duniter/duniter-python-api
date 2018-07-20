@@ -6,8 +6,9 @@
 duniterpy : A python implementation of duniter API
 ==================================================
 
-duniterpy is a library to develop an application for duniter.
-duniterpy helps to handle the following problem :
+Duniterpy is a library to develop an client Python application for Duniter.
+Duniterpy helps to handle the following problem :
+
 * Request Basic Merkle API provided by duniter nodes
 * Request nodes in a non-blocking way
 * Handle duniter signing keys
@@ -17,12 +18,12 @@ Installation
 
 Simply type::
 
-    $ pip install duniterpy
+    $ pip3 install duniterpy
 
 Source code
 -----------
 
-Sources can be found at https://github.com/duniter/duniter-python-api
+Sources can be found at https://git.duniter.org/clients/python/duniterpy
 
 Contributions are welcome.
 
