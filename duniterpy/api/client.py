@@ -17,7 +17,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import json
 import logging
-from typing import Callable, Union, Any, Optional
+from typing import Callable, Union, Any, Optional, Dict
 
 import jsonschema
 from aiohttp import ClientResponse, ClientSession, ClientWebSocketResponse
@@ -60,7 +60,7 @@ def parse_text(text: str, schema: dict) -> Any:
     return data
 
 
-def parse_error(text: str) -> Any:
+def parse_error(text: str) -> dict:
     """
     Validate and parse the BMA answer from websocket
 
@@ -237,7 +237,7 @@ class API:
 
         return url + path
 
-    async def requests_get(self, path: str, **kwargs) -> ClientResponse:
+    async def requests_get(self, path: str, **kwargs: Any) -> ClientResponse:
         """
         Requests GET wrapper in order to use API parameters.
 
@@ -267,7 +267,7 @@ class API:
 
         return response
 
-    async def requests_post(self, path: str, **kwargs) -> ClientResponse:
+    async def requests_post(self, path: str, **kwargs: Any) -> ClientResponse:
         """
         Requests POST wrapper in order to use API parameters.
 
@@ -281,6 +281,55 @@ class API:
         response = await self.connection_handler.session.post(
             self.reverse_url(self.connection_handler.http_scheme, path),
             data=kwargs,
+            headers=self.headers,
+            proxy=self.connection_handler.proxy,
+            timeout=15,
+        )
+
+        if response.status != 200:
+            try:
+                error_data = parse_error(await response.text())
+                raise DuniterError(error_data)
+            except (TypeError, jsonschema.ValidationError) as e:
+                raise ValueError(
+                    "status code != 200 => %d (%s)"
+                    % (response.status, (await response.text()))
+                ) from e
+
+        return response
+
+    async def requests(
+        self,
+        method: str = "GET",
+        path: str = "",
+        data: Optional[dict] = None,
+        _json: Optional[dict] = None,
+    ) -> ClientResponse:
+        """
+        Generic requests wrapper on aiohttp
+
+        :param method: the request http method
+        :param path: the path added to endpoint
+        :param data: data for form POST request
+        :param _json: json for json POST request
+        :rtype: aiohttp.ClientResponse
+        """
+        url = self.reverse_url(self.connection_handler.http_scheme, path)
+
+        if data is not None:
+            logging.debug("%s : %s, data=%s", method, url, data)
+        elif _json is not None:
+            logging.debug("%s : %s, json=%s", method, url, _json)
+            # http header to send json body
+            self.headers["Content-Type"] = "application/json; charset=utf-8"
+        else:
+            logging.debug("%s : %s", method, url)
+
+        response = await self.connection_handler.session.request(
+            method,
+            url,
+            data=data,
+            json=_json,
             headers=self.headers,
             proxy=self.connection_handler.proxy,
             timeout=15,
@@ -321,15 +370,15 @@ class Client:
     def __init__(
         self,
         _endpoint: Union[str, endpoint.Endpoint],
-        session: ClientSession = None,
-        proxy: str = None,
+        session: Optional[ClientSession] = None,
+        proxy: Optional[str] = None,
     ) -> None:
         """
         Init Client instance
 
         :param _endpoint: Endpoint string in duniter format
         :param session: Aiohttp client session (optional, default None)
-        :param proxy: Proxy server as hostname:port
+        :param proxy: Proxy server as hostname:port (optional, default None)
         """
         if isinstance(_endpoint, str):
             # Endpoint Protocol detection
@@ -353,16 +402,16 @@ class Client:
     async def get(
         self,
         url_path: str,
-        params: dict = None,
+        params: Optional[dict] = None,
         rtype: str = RESPONSE_JSON,
-        schema: dict = None,
+        schema: Optional[dict] = None,
     ) -> Any:
         """
-        GET request on self.endpoint + url_path
+        GET request on endpoint host + url_path
 
         :param url_path: Url encoded path following the endpoint
-        :param params: Url query string parameters dictionary
-        :param rtype: Response type
+        :param params: Url query string parameters dictionary (optional, default None)
+        :param rtype: Response type (optional, default RESPONSE_JSON)
         :param schema: Json Schema to validate response (optional, default None)
         :return:
         """
@@ -391,16 +440,16 @@ class Client:
     async def post(
         self,
         url_path: str,
-        params: dict = None,
+        params: Optional[dict] = None,
         rtype: str = RESPONSE_JSON,
-        schema: dict = None,
+        schema: Optional[dict] = None,
     ) -> Any:
         """
-        POST request on self.endpoint + url_path
+        POST request on endpoint host + url_path
 
         :param url_path: Url encoded path following the endpoint
-        :param params: Url query string parameters dictionary
-        :param rtype: Response type
+        :param params: Url query string parameters dictionary (optional, default None)
+        :param rtype: Response type (optional, default RESPONSE_JSON)
         :param schema: Json Schema to validate response (optional, default None)
         :return:
         """
@@ -411,6 +460,46 @@ class Client:
 
         # get aiohttp response
         response = await client.requests_post(url_path, **params)
+
+        # if schema supplied...
+        if schema is not None:
+            # validate response
+            await parse_response(response, schema)
+
+        # return the chosen type
+        result = response  # type: Any
+        if rtype == RESPONSE_TEXT:
+            result = await response.text()
+        elif rtype == RESPONSE_JSON:
+            result = await response.json()
+
+        return result
+
+    async def query(
+        self,
+        query: str,
+        variables: Optional[dict] = None,
+        rtype: str = RESPONSE_JSON,
+        schema: Optional[dict] = None,
+    ) -> Any:
+        """
+        GraphQL query or mutation request on endpoint
+
+        :param query: GraphQL query string
+        :param variables: Variables for the query (optional, default None)
+        :param rtype: Response type (optional, default RESPONSE_JSON)
+        :param schema: Json Schema to validate response (optional, default None)
+        :return:
+        """
+        payload = {"query": query}  # type: Dict[str, Union[str, dict]]
+
+        if variables is not None:
+            payload["variables"] = variables
+
+        client = API(self.endpoint.conn_handler(self.session, self.proxy))
+
+        # get aiohttp response
+        response = await client.requests("POST", _json=payload)
 
         # if schema supplied...
         if schema is not None:
