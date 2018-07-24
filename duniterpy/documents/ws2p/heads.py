@@ -1,6 +1,7 @@
 import attr
 import re
 
+from ..document import MalformedDocumentError
 from ..block import BlockUID
 from ..constants import ws2p_public_prefix_regex, ws2p_private_prefix_regex,\
     pubkey_regex, signature_regex, ws2pid_regex, block_uid_regex, ws2p_head_regex
@@ -43,13 +44,16 @@ class Head:
 
     @classmethod
     def from_inline(cls, inline):
-        data = Head.re_inline.match(inline)
-        head = data.group(0).split(':')
-        if len(head) == 2:
-            version = int(head[1])
-        else:
-            version = 0
-        return cls(version)
+        try:
+            data = Head.re_inline.match(inline)
+            head = data.group(0).split(':')
+            if len(head) == 2:
+                version = int(head[1])
+            else:
+                version = 0
+            return cls(version)
+        except AttributeError:
+            raise MalformedDocumentError("Head")
 
     def __str__(self):
         return "HEAD" if self.version == 0 else "HEAD:{}".format(str(self.version))
@@ -79,14 +83,17 @@ class HeadV0:
 
     @classmethod
     def from_inline(cls, inline, signature):
-        data = HeadV0.re_inline.match(inline)
-        api = API.from_inline(data.group(1))
-        head = Head.from_inline(data.group(2))
-        pubkey = data.group(3)
-        blockstamp = BlockUID.from_str(data.group(4))
-        offload = data.group(5)
+        try:
+            data = HeadV0.re_inline.match(inline)
+            api = API.from_inline(data.group(1))
+            head = Head.from_inline(data.group(2))
+            pubkey = data.group(3)
+            blockstamp = BlockUID.from_str(data.group(4))
+            offload = data.group(5)
 
-        return cls(signature, api, head, pubkey, blockstamp), offload
+            return cls(signature, api, head, pubkey, blockstamp), offload
+        except AttributeError:
+            raise MalformedDocumentError("HeadV0")
 
     def inline(self):
         values = (str(v) for v in attr.astuple(self, recurse=False,
@@ -101,7 +108,7 @@ class HeadV1:
                             .format(
                                 ws2pid=ws2pid_regex,
                                 software="[A-Za-z-_]+",
-                                software_version="[0-9]+[.][0-9]+[.][0-9]+",
+                                software_version="[0-9]+[.][0-9]+[.][0-9]+-?[A-Za-z0-9\.]+",
                                 pow_prefix="[0-9]+"))
 
     v0 = attr.ib(type=HeadV0)
@@ -112,14 +119,18 @@ class HeadV1:
 
     @classmethod
     def from_inline(cls, inline, signature):
-        v0, offload = HeadV0.from_inline(inline, signature)
-        data = HeadV1.re_inline.match(offload)
-        ws2pid = data.group(1)
-        software = data.group(2)
-        software_version = data.group(3)
-        pow_prefix = int(data.group(4))
-        offload = data.group(5)
-        return cls(v0, ws2pid, software, software_version, pow_prefix), offload
+        try:
+            v0, offload = HeadV0.from_inline(inline, signature)
+            inline = HeadV1.re_inline
+            data = HeadV1.re_inline.match(offload)
+            ws2pid = data.group(1)
+            software = data.group(2)
+            software_version = data.group(3)
+            pow_prefix = int(data.group(4))
+            offload = data.group(5)
+            return cls(v0, ws2pid, software, software_version, pow_prefix), offload
+        except AttributeError:
+            raise MalformedDocumentError("HeadV1")
 
     def inline(self):
         values = [str(v) for v in attr.astuple(self, True, filter=attr.filters.exclude(attr.fields(HeadV1).v0))]
@@ -150,11 +161,14 @@ class HeadV2:
 
     @classmethod
     def from_inline(cls, inline, signature):
-        v1, offload = HeadV1.from_inline(inline, signature)
-        data = HeadV2.re_inline.match(offload)
-        free_member_room = int(data.group(1))
-        free_mirror_room = int(data.group(2))
-        return cls(v1, free_member_room, free_mirror_room), ""
+        try:
+            v1, offload = HeadV1.from_inline(inline, signature)
+            data = HeadV2.re_inline.match(offload)
+            free_member_room = int(data.group(1))
+            free_mirror_room = int(data.group(2))
+            return cls(v1, free_member_room, free_mirror_room), ""
+        except AttributeError:
+            raise MalformedDocumentError("HeadV2")
 
     def inline(self):
         values = (str(v) for v in attr.astuple(self, True, filter=attr.filters.exclude(attr.fields(HeadV2).v1)))
