@@ -3,13 +3,13 @@ from setuptools import setup, find_packages
 setup(
     name='duniter-mirage',
 
-    version="0.1.10",
+    version="0.1.11",
 
     packages=find_packages(),
 
     author="inso",
 
-    author_email="insomniak.fr@gmail.com",
+    author_email="inso@tuta.io",
 
     description="A python mock server of [duniter](https://github.com/duniter/duniter) API",
 
