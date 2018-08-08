@@ -1,9 +1,10 @@
 stages:
   - github-sync
+  - release
 
 variables:
     PYENV_PYTHON_VERSION: 3.5.5
-  
+
 image: registry.duniter.org/docker/python3/duniterpy-builder:0.0.4
 
 .pyenv: &pyenv
