@@ -3,7 +3,7 @@ from setuptools import setup, find_packages
 setup(
     name='duniter-mirage',
 
-    version="0.1.13",
+    version="0.1.14",
 
     packages=find_packages(),
 
