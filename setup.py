@@ -52,7 +52,7 @@ setup(
 
     description="A python implementation of [duniter](https://github.com/duniter/duniter) API",
 
-    long_description=open('README.md').read(),
+    long_description=open('README.rst').read(),
 
     # Active la prise en compte du fichier MANIFEST.in
     include_package_data=True,

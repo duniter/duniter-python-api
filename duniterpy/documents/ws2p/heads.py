@@ -1,7 +1,6 @@
 import attr
 import re
 
-from ..document import  MalformedDocumentError
 from ..block import BlockUID
 from ..constants import ws2p_public_prefix_regex, ws2p_private_prefix_regex,\
     pubkey_regex, signature_regex, ws2pid_regex, block_uid_regex, ws2p_head_regex
@@ -108,7 +107,7 @@ class HeadV1:
                             .format(
                                 ws2pid=ws2pid_regex,
                                 software="[A-Za-z-_]+",
-                                software_version="[0-9]+[.][0-9]+[.][0-9]+",
+                                software_version="[0-9]+[.][0-9]+[.][0-9]+-?[A-Za-z0-9\.]+",
                                 pow_prefix="[0-9]+"))
 
     v0 = attr.ib(type=HeadV0)
@@ -165,7 +164,7 @@ class HeadV2:
             data = HeadV2.re_inline.match(offload)
             free_member_room = int(data.group(1))
             free_mirror_room = int(data.group(2))
-            return cls(v1, free_member_room, free_mirror_room), offload
+            return cls(v1, free_member_room, free_mirror_room), ""
         except AttributeError:
             raise MalformedDocumentError("HeadV2")
 
