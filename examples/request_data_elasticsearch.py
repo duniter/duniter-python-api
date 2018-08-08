@@ -11,6 +11,7 @@ from duniterpy.api.client import Client
 # or the simple definition : [NAME_OF_THE_API] [DOMAIN] [PORT]
 # Here we use the secure BASIC_MERKLED_API (BMAS)
 ES_CORE_ENDPOINT = "ES_CORE_API g1-test.data.duniter.fr 443"
+ES_USER_ENDPOINT = "ES_USER_API g1-test.data.duniter.fr 443"
 
 
 ################################################
@@ -31,6 +32,20 @@ async def main():
     # Get the node number 2 with only selected fields (direct REST GET request)
     print("\nGET g1-test/block/2/_source:")
     response = await client.get('g1-test/block/2/_source', {'_source': 'number,hash,dividend,membersCount'})
+    print(response)
+
+    # Close client aiohttp session
+    await client.close()
+
+    # Create Client from endpoint string in Duniter format
+    client = Client(ES_USER_ENDPOINT)
+
+    # prompt entry
+    pubkey = input("\nEnter a public key to get the user profile: ")
+
+    # Get the profil of a public key (direct REST GET request)
+    print("\nGET user/profile/{0}/_source:".format(pubkey))
+    response = await client.get('user/profile/{0}/_source'.format(pubkey.strip(' \n')))
     print(response)
 
     # Close client aiohttp session
