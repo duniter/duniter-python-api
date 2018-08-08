@@ -1,0 +1,7 @@
+aiohttp
+pylibscrypt
+libnacl
+base58
+jsonschema
+pypeg2
+duniterpy
