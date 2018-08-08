@@ -211,7 +211,8 @@ class Node:
                            'noffset': s.index,
                            'identifier': s.origin_id,
                            'amount': s.amount,
-                           'base': s.base
+                           'base': s.base,
+                           'conditions': "SIG({0})".format(pubkey)
                        } for s in sources]
                    }, 200
         except KeyError:
@@ -433,6 +434,9 @@ class Node:
                 for m in matched
             ]
         }, 200
+
+    async def tx_history_range(self, request):
+        return await self.tx_history(request)
 
     async def tx_history(self, request):
         search = str(request.match_info['search'])
