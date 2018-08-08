@@ -181,9 +181,24 @@ class BlockForge:
             receivers = [o.conditions.left.pubkey for o in tx.outputs
                          if o.conditions.left.pubkey != tx.issuers[0]]
             self.user_identities[tx.issuers[0]].tx_sent.append(tx)
-            if len(receivers) == 0:
-                self.user_identities[tx.issuers[0]].tx_received.append(tx)
-            else:
+
+            for input_source in tx.inputs:
+                for s in self.user_identities[tx.issuers[0]].sources:
+                    if s.origin_id == input_source.origin_id and s.index == input_source.index:
+                        self.user_identities[tx.issuers[0]].sources.remove(s)
+
+            for i, output in enumerate(tx.outputs):
+                if output.conditions.left.pubkey == tx.issuers[0]:
+                    self.user_identities[tx.issuers[0]].sources.append(InputSource(output.amount,
+                                                                                   output.base,
+                                                                                   'T', tx.sha_hash, i))
+            self.user_identities[tx.issuers[0]].tx_received.append(tx)
+            if len(receivers) > 0:
+                for i, output in enumerate(tx.outputs):
+                    if output.conditions.left.pubkey == receivers[0]:
+                        self.user_identities[receivers[0]].sources.append(InputSource(output.amount,
+                                                                                       output.base,
+                                                                                       'T', tx.sha_hash, i))
                 self.user_identities[receivers[0]].tx_received.append(tx)
 
         self.pool = []
