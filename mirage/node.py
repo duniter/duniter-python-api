@@ -32,6 +32,7 @@ class Node:
             '/blockchain/with/ud': node.with_ud,
             '/blockchain/memberships/{search}': node.memberships,
             '/tx/history/{search}': node.tx_history,
+            '/tx/history/{search}/blocks/{from}/{to}': node.tx_history_range,
             '/ud/history/{search}': node.ud_history,
         }
         post_routes = {
@@ -458,33 +459,43 @@ class Node:
                 "history": {
                     "sent": [
                         {
-                            "version": 2,
+                            "version": tx.version,
                             "issuers": tx.issuers,
-                            "inputs": [i.inline() for i in tx.inputs],
+                            "inputs": [i.inline(tx.version) for i in tx.inputs],
                             "unlocks": [u.inline() for u in tx.unlocks],
                             "outputs": [o.inline() for o in tx.outputs],
                             "comment": tx.comment,
                             "locktime": tx.locktime,
                             "blockstamp": str(tx.blockstamp),
-                            "blockstampTime": next([b.medianTime for b in self.forge.blocks
+                            "blockstampTime": next([b.mediantime for b in self.forge.blocks
                                                     if b.number == tx.blockstamp.number]),
-                            "signatures": tx.signatures
+                            "signatures": tx.signatures,
+                            "hash": tx.sha_hash,
+                            "block_number": next((b.number for b in self.forge.blocks
+                                                    if tx.sha_hash in [tx.sha_hash for tx in b.transactions])),
+                            "time": next((b.mediantime for b in self.forge.blocks
+                                                if tx.sha_hash in [tx.sha_hash for tx in b.transactions]))
                         }
                         for tx in user_identity.tx_sent
                     ],
                     "received": [
                         {
-                            "version": 2,
+                            "version": tx.version,
                             "issuers": tx.issuers,
-                            "inputs": [i.inline() for i in tx.inputs],
+                            "inputs": [i.inline(tx.version) for i in tx.inputs],
                             "unlocks": [u.inline() for u in tx.unlocks],
                             "outputs": [o.inline() for o in tx.outputs],
                             "comment": tx.comment,
                             "locktime": tx.locktime,
                             "blockstamp": str(tx.blockstamp),
-                            "blockstampTime": next([b.medianTime for b in self.forge.blocks
+                            "blockstampTime": next([b.mediantime for b in self.forge.blocks
                                                     if b.number == tx.blockstamp.number]),
-                            "signatures": tx.signatures
+                            "signatures": tx.signatures,
+                            "hash": tx.sha_hash,
+                            "block_number": next((b.number for b in self.forge.blocks
+                                                    if tx.sha_hash in [tx.sha_hash for tx in b.transactions])),
+                            "time": next((b.mediantime for b in self.forge.blocks
+                                                if tx.sha_hash in [tx.sha_hash for tx in b.transactions]))
                         }
                         for tx in user_identity.tx_received
                     ],
@@ -493,6 +504,82 @@ class Node:
                     "pending": []
                 }
             }, 200
+
+    async def tx_history_range(self, request):
+        try:
+            search = str(request.match_info['search'])
+            start = int(request.match_info['from'])
+            end = int(request.match_info["to"])
+            try:
+                user_identity = self.forge.user_identities[search]
+            except KeyError:
+                try:
+                    user_identity = next(i for i in self.forge.user_identities.values() if i.uid == search)
+                except StopIteration:
+                    return {
+                        "currency": self.forge.currency,
+                        "pubkey": search,
+                        "history": {
+                            "sent": [],
+                            "received": [],
+                            "sending": [],
+                            "receiving": [],
+                            "pending": []
+                        }
+                    }, 200
+            return {
+                    "currency": self.forge.currency,
+                    "pubkey": user_identity.pubkey,
+                    "history": {
+                        "sent": [
+                            {
+                                "version": tx.version,
+                                "issuers": tx.issuers,
+                                "inputs": [i.inline(tx.version) for i in tx.inputs],
+                                "unlocks": [u.inline() for u in tx.unlocks],
+                                "outputs": [o.inline() for o in tx.outputs],
+                                "comment": tx.comment,
+                                "locktime": tx.locktime,
+                                "blockstamp": str(tx.blockstamp),
+                                "blockstampTime": next((b.mediantime for b in self.forge.blocks
+                                                        if b.number == tx.blockstamp.number)),
+                                "signatures": tx.signatures,
+                                "hash": tx.sha_hash,
+                                "block_number": next((b.number for b in self.forge.blocks
+                                                    if tx.sha_hash in [tx.sha_hash for tx in b.transactions])),
+                                "time": next((b.mediantime for b in self.forge.blocks
+                                                    if tx.sha_hash in [tx.sha_hash for tx in b.transactions]))
+                            }
+                            for tx in user_identity.tx_sent if start <= tx.blockstamp.number <= end
+                        ],
+                        "received": [
+                            {
+                                "version": tx.version,
+                                "issuers": tx.issuers,
+                                "inputs": [i.inline(tx.version) for i in tx.inputs],
+                                "unlocks": [u.inline() for u in tx.unlocks],
+                                "outputs": [o.inline() for o in tx.outputs],
+                                "comment": tx.comment,
+                                "locktime": tx.locktime,
+                                "blockstamp": str(tx.blockstamp),
+                                "blockstampTime": next((b.mediantime for b in self.forge.blocks
+                                                        if b.number == tx.blockstamp.number)),
+                                "signatures": tx.signatures,
+                                "hash": tx.sha_hash,
+                                "block_number": next((b.number for b in self.forge.blocks
+                                                    if tx.sha_hash in [tx.sha_hash for tx in b.transactions])),
+                                "time": next((b.mediantime for b in self.forge.blocks
+                                                    if tx.sha_hash in [tx.sha_hash for tx in b.transactions]))
+                            }
+                            for tx in user_identity.tx_received if start <= tx.blockstamp.number <= end
+                        ],
+                        "sending": [],
+                        "receiving": [],
+                        "pending": []
+                    }
+                }, 200
+        except Exception as e:
+            print(str(e))
 
     async def ud_history(self, request):
         search = str(request.match_info['search'])
