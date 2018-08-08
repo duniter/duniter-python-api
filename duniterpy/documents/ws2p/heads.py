@@ -4,7 +4,7 @@ import re
 from ..block import BlockUID
 from ..constants import ws2p_public_prefix_regex, ws2p_private_prefix_regex,\
     pubkey_regex, signature_regex, ws2pid_regex, block_uid_regex, ws2p_head_regex
-
+from ..document import MalformedDocumentError
 
 @attr.s()
 class API:
