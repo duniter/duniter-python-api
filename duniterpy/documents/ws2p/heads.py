@@ -10,12 +10,12 @@ from ...constants import WS2P_PUBLIC_PREFIX_REGEX, WS2P_PRIVATE_PREFIX_REGEX, WS
 
 @attr.s()
 class API:
+    private = attr.ib(type=str)
+    public = attr.ib(type=str)
+
     re_inline = re.compile("WS2P({ws2p_private})?({ws2p_public})?".format(
         ws2p_private=WS2P_PRIVATE_PREFIX_REGEX,
         ws2p_public=WS2P_PUBLIC_PREFIX_REGEX))
-
-    private = attr.ib(type=str)
-    public = attr.ib(type=str)
 
     @classmethod
     def from_inline(cls, inline):
@@ -38,9 +38,9 @@ class API:
 
 @attr.s()
 class Head:
-    re_inline = re.compile(WS2P_HEAD_REGEX)
-
     version = attr.ib(type=int)
+
+    re_inline = re.compile(WS2P_HEAD_REGEX)
 
     @classmethod
     def from_inline(cls, inline):
@@ -64,6 +64,11 @@ class HeadV0:
     """
     A document describing a self certification.
     """
+    signature = attr.ib(type=str)
+    api = attr.ib(type=API)
+    head = attr.ib(type=Head)
+    pubkey = attr.ib(type=str)
+    blockstamp = attr.ib(type=BlockUID)
 
     re_inline = re.compile("^(WS2P(?:{ws2p_private})?(?:{ws2p_public})?):({head}):({pubkey}):({blockstamp})(?::)?(.*)"
                            .format(ws2p_private=WS2P_PRIVATE_PREFIX_REGEX,
@@ -74,12 +79,6 @@ class HeadV0:
                                    blockstamp=BLOCK_UID_REGEX))
 
     re_signature = re.compile(SIGNATURE_REGEX)
-
-    signature = attr.ib(type=str)
-    api = attr.ib(type=API)
-    head = attr.ib(type=Head)
-    pubkey = attr.ib(type=str)
-    blockstamp = attr.ib(type=BlockUID)
 
     @classmethod
     def from_inline(cls, inline, signature):
@@ -102,17 +101,17 @@ class HeadV0:
 
 @attr.s()
 class HeadV1:
-    re_inline = re.compile("({ws2pid}):({software}):({software_version}):({pow_prefix})(?::)?(.*)".format(
-        ws2pid=WS2PID_REGEX,
-        software="[A-Za-z-_]+",
-        software_version="[0-9]+[.][0-9]+[.][0-9]+",
-        pow_prefix="[0-9]+"))
-
     v0 = attr.ib(type=HeadV0)
     ws2pid = attr.ib(type=str)
     software = attr.ib(type=str)
     software_version = attr.ib(type=str)
     pow_prefix = attr.ib(type=int)
+
+    re_inline = re.compile("({ws2pid}):({software}):({software_version}):({pow_prefix})(?::)?(.*)".format(
+        ws2pid=WS2PID_REGEX,
+        software="[A-Za-z-_]+",
+        software_version="[0-9]+[.][0-9]+[.][0-9]+",
+        pow_prefix="[0-9]+"))
 
     @classmethod
     def from_inline(cls, inline, signature):
@@ -147,13 +146,13 @@ class HeadV1:
 
 @attr.s
 class HeadV2:
-    re_inline = re.compile("({free_member_room}):({free_mirror_room})(?::)?(.*)".format(
-        free_member_room="[0-9]+",
-        free_mirror_room="[0-9]+"))
-
     v1 = attr.ib(type=HeadV1)
     free_member_room = attr.ib(type=int)
     free_mirror_room = attr.ib(type=int)
+
+    re_inline = re.compile("({free_member_room}):({free_mirror_room})(?::)?(.*)".format(
+        free_member_room="[0-9]+",
+        free_mirror_room="[0-9]+"))
 
     @classmethod
     def from_inline(cls, inline, signature):
