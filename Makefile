@@ -2,7 +2,7 @@
 
 # generate documentation
 docs:
-	cd docs && sphinx-apidoc -o . ../duniterpy && make html && cd ..
+	cd docs && sphinx-apidoc -o . ../duniterpy && make clean && make html && cd ..
 
 # run tests
 tests:
