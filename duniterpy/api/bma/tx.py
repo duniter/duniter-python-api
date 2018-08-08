@@ -17,7 +17,7 @@
 # vit
 import logging
 
-from aiohttp import ClientSession
+from aiohttp import ClientResponse
 
 from duniterpy.api.client import Client, RESPONSE_AIOHTTP
 
@@ -211,7 +211,7 @@ async def history(client: Client, pubkey: str) -> dict:
     return await client.get(MODULE + '/history/%s' % pubkey, schema=HISTORY_SCHEMA)
 
 
-async def process(client: Client, transaction_signed_raw: str) -> ClientSession:
+async def process(client: Client, transaction_signed_raw: str) -> ClientResponse:
     """
     POST a transaction raw document
 

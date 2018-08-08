@@ -18,7 +18,7 @@
 import logging
 from typing import Union
 
-from aiohttp import ClientSession
+from aiohttp import ClientResponse
 
 from duniterpy.api.client import Client, RESPONSE_AIOHTTP
 
@@ -325,7 +325,7 @@ async def memberships(client: Client, search: str) -> dict:
     return await client.get(MODULE + '/memberships/%s' % search, schema=MEMBERSHIPS_SCHEMA)
 
 
-async def membership(client: Client, membership_signed_raw: str):
+async def membership(client: Client, membership_signed_raw: str) -> ClientResponse:
     """
     POST a Membership document
 
@@ -347,7 +347,7 @@ async def current(client: Client) -> dict:
 
 
 async def block(client: Client, number: int = 0, block_raw: str = None, signature: str = None) -> Union[dict,
-                                                                                                        ClientSession]:
+                                                                                                        ClientResponse]:
     """
     GET/POST a block from/to the blockchain
 

@@ -17,7 +17,7 @@
 # vit
 import logging
 
-from aiohttp import ClientSession
+from aiohttp import ClientResponse
 
 from duniterpy.api.client import Client, RESPONSE_AIOHTTP
 
@@ -129,12 +129,12 @@ async def peers(client: Client, leaves: bool = False, leaf: str = ""):
         return await client.get(MODULE + '/peering/peers', {"leaf": leaf}, schema=PEERS_SCHEMA)
 
 
-async def peer(client: Client, peer_signed_raw: str) -> ClientSession:
+async def peer(client: Client, peer_signed_raw: str) -> ClientResponse:
     """
     POST a Peer signed raw document
 
     :param client: Client to connect to the api
     :param peer_signed_raw: Peer signed raw document
-    :rtype: ClientSession
+    :rtype: ClientResponse
     """
     return await client.post(MODULE + '/peering/peers', {'peer': peer_signed_raw}, rtype=RESPONSE_AIOHTTP)

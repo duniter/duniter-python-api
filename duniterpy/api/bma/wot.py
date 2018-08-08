@@ -17,7 +17,7 @@
 # vit
 import logging
 
-from aiohttp import ClientSession
+from aiohttp import ClientResponse
 
 from duniterpy.api.client import Client, RESPONSE_AIOHTTP
 
@@ -299,7 +299,7 @@ LOOKUP_SCHEMA = {
 }
 
 
-async def add(client: Client, identity_signed_raw: str) -> ClientSession:
+async def add(client: Client, identity_signed_raw: str) -> ClientResponse:
     """
     POST identity raw document
 
@@ -310,7 +310,7 @@ async def add(client: Client, identity_signed_raw: str) -> ClientSession:
     return await client.post(MODULE + '/add', {'identity': identity_signed_raw}, rtype=RESPONSE_AIOHTTP)
 
 
-async def certify(client: Client, certification_signed_raw: str) -> ClientSession:
+async def certify(client: Client, certification_signed_raw: str) -> ClientResponse:
     """
     POST certification raw document
 
@@ -321,7 +321,7 @@ async def certify(client: Client, certification_signed_raw: str) -> ClientSessio
     return await client.post(MODULE + '/certify', {'cert': certification_signed_raw}, rtype=RESPONSE_AIOHTTP)
 
 
-async def revoke(client: Client, revocation_signed_raw: str) -> ClientSession:
+async def revoke(client: Client, revocation_signed_raw: str) -> ClientResponse:
     """
     POST revocation document
 
