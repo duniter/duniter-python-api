@@ -4,10 +4,12 @@ duniter public and private keys
 @author: inso
 """
 
-import base58
 import base64
 import libnacl.sign
-from pylibscrypt import scrypt
+import libnacl.encode
+
+from duniterpy.documents import Document
+from duniterpy.documents.ws2p.heads import HeadV2
 from .base58 import Base58Encoder
 
 
@@ -15,7 +17,7 @@ class VerifyingKey(libnacl.sign.Verifier):
     """
     Class to verify documents
     """
-    def __init__(self, pubkey):
+    def __init__(self, pubkey: str) -> None:
         """
         Creates a Verify class from base58 pubkey
         :param pubkey:
@@ -23,7 +25,7 @@ class VerifyingKey(libnacl.sign.Verifier):
         key = libnacl.encode.hex_encode(Base58Encoder.decode(pubkey))
         super().__init__(key)
 
-    def verify_document(self, document, **kwargs):
+    def verify_document(self, document: Document, **kwargs) -> bool:
         """
         Check specified document
         :param duniterpy.documents.Document document:
@@ -38,10 +40,10 @@ class VerifyingKey(libnacl.sign.Verifier):
         except ValueError:
             return False
 
-    def verify_ws2p_head(self, head):
+    def verify_ws2p_head(self, head: HeadV2) -> bool:
         """
         Check specified document
-        :param duniterpy.documents.Document document:
+        :param HeadV2 head:
         :return:
         """
         signature = base64.b64decode(head.signature)
@@ -53,3 +55,15 @@ class VerifyingKey(libnacl.sign.Verifier):
             return True
         except ValueError:
             return False
+
+    def verify_message(self, message: bytes) -> str:
+        """
+        Check specified signed message signature and return message
+
+        Return error message if signature is invalid
+
+        :param bytes message: Message + signature
+        :return str:
+        """
+        return self.verify(message).decode('utf-8')
+
