@@ -3,9 +3,11 @@ duniter public and private keys
 
 @author: inso
 """
+from typing import Optional
 
 import libnacl.sign
 from pylibscrypt import scrypt
+
 from .base58 import Base58Encoder
 from ..helpers import ensure_bytes
 
@@ -14,27 +16,27 @@ crypto_sign_BYTES = 64
 
 
 class ScryptParams:
-    def __init__(self, N, r, p):
+    def __init__(self, n: int, r: int, p: int) -> None:
         """
         Init a ScryptParams instance with crypto parameters
 
-        :param int N: scrypt param N
-        :param int r: scrypt param r
-        :param int p: scrypt param p
+        :param n: scrypt param N
+        :param r: scrypt param r
+        :param p: scrypt param p
         """
-        self.N = N
+        self.N = n
         self.r = r
         self.p = p
 
 
 class SigningKey(libnacl.sign.Signer):
-    def __init__(self, salt, password, scrypt_params=None):
+    def __init__(self, salt: str, password: str, scrypt_params: Optional[ScryptParams] = None) -> None:
         """
         Init a SigningKey object from credentials
 
-        :param str salt: Secret salt passphrase credential
-        :param str password: Secret password credential
-        :param ScryptParams scrypt_params: ScryptParams instance
+        :param salt: Secret salt passphrase credential
+        :param password: Secret password credential
+        :param scrypt_params: ScryptParams instance
         """
         if scrypt_params is None:
             scrypt_params = ScryptParams(4096, 16, 1)
@@ -47,3 +49,15 @@ class SigningKey(libnacl.sign.Signer):
 
         super().__init__(seed)
         self.pubkey = Base58Encoder.encode(self.vk)
+
+    def decrypt_seal(self, message: bytes) -> str:
+        """
+        Decrypt message with a curve25519 version of the ed25519 key pair
+
+        :param message: Encrypted message
+
+        :return:
+        """
+        curve25519_public_key = libnacl.crypto_sign_ed25519_pk_to_curve25519(self.vk)
+        curve25519_secret_key = libnacl.crypto_sign_ed25519_sk_to_curve25519(self.sk)
+        return libnacl.crypto_box_seal_open(message, curve25519_public_key, curve25519_secret_key).decode('utf-8')
