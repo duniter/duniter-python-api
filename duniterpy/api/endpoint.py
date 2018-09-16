@@ -1,7 +1,7 @@
 import re
-from typing import Any, Optional
+from typing import Any, Optional, TypeVar, Type, Dict
 
-import aiohttp
+from aiohttp import ClientSession
 
 from ..constants import *
 from ..documents import MalformedDocumentError
@@ -11,7 +11,7 @@ class ConnectionHandler:
     """Helper class used by other API classes to ease passing server connection information."""
 
     def __init__(self, http_scheme: str, ws_scheme: str, server: str, port: int, path: str,
-                 session: aiohttp.ClientSession, proxy: Optional[str] = None) -> None:
+                 session: ClientSession, proxy: Optional[str] = None) -> None:
         """
         Init instance of connection handler
 
@@ -35,15 +35,19 @@ class ConnectionHandler:
         return 'connection info: %s:%d' % (self.server, self.port)
 
 
+# required to type hint cls in classmethod
+EndpointType = TypeVar('EndpointType', bound='Endpoint')
+
+
 class Endpoint:
     @classmethod
-    def from_inline(cls, inline: str):
+    def from_inline(cls: Type[EndpointType], inline: str) -> EndpointType:
         raise NotImplementedError("from_inline(..) is not implemented")
 
     def inline(self) -> str:
         raise NotImplementedError("inline() is not implemented")
 
-    def conn_handler(self, session: aiohttp.ClientSession, proxy: str = None) -> ConnectionHandler:
+    def conn_handler(self, session: ClientSession, proxy: str = None) -> ConnectionHandler:
         raise NotImplementedError("conn_handler is not implemented")
 
     def __str__(self) -> str:
@@ -51,6 +55,10 @@ class Endpoint:
 
     def __eq__(self, other: Any) -> bool:
         raise NotImplementedError("__eq__ is not implemented")
+
+
+# required to type hint cls in classmethod
+UnknownEndpointType = TypeVar('UnknownEndpointType', bound='UnknownEndpoint')
 
 
 class UnknownEndpoint(Endpoint):
@@ -61,7 +69,7 @@ class UnknownEndpoint(Endpoint):
         self.properties = properties
 
     @classmethod
-    def from_inline(cls, inline: str):
+    def from_inline(cls: Type[UnknownEndpointType], inline: str) -> UnknownEndpointType:
         """
         Return UnknownEndpoint instance from endpoint string
 
@@ -86,8 +94,8 @@ class UnknownEndpoint(Endpoint):
             doc += " {0}".format(p)
         return doc
 
-    def conn_handler(self, session: aiohttp.ClientSession, proxy: str = None) -> ConnectionHandler:
-        return ConnectionHandler("", "", "", 0, "", aiohttp.ClientSession())
+    def conn_handler(self, session: ClientSession, proxy: str = None) -> ConnectionHandler:
+        return ConnectionHandler("", "", "", 0, "", ClientSession())
 
     def __str__(self) -> str:
         return "{0} {1}".format(self.api, ' '.join(["{0}".format(p) for p in self.properties]))
@@ -115,6 +123,9 @@ ERROR_SCHEMA = {
     "required": ["ucode", "message"]
 }
 
+# required to type hint cls in classmethod
+BMAEndpointType = TypeVar('BMAEndpointType', bound='BMAEndpoint')
+
 
 class BMAEndpoint(Endpoint):
     API = "BASIC_MERKLED_API"
@@ -139,7 +150,7 @@ class BMAEndpoint(Endpoint):
         self.port = port
 
     @classmethod
-    def from_inline(cls, inline: str):
+    def from_inline(cls: Type[BMAEndpointType], inline: str) -> BMAEndpointType:
         """
         Return BMAEndpoint instance from endpoint string
 
@@ -167,7 +178,7 @@ class BMAEndpoint(Endpoint):
                     IPv6=(" {0}".format(self.ipv6) if self.ipv6 else ""),
                     PORT=(" {0}".format(self.port) if self.port else ""))
 
-    def conn_handler(self, session: aiohttp.ClientSession, proxy: str = None) -> ConnectionHandler:
+    def conn_handler(self, session: ClientSession, proxy: str = None) -> ConnectionHandler:
         """
         Return connection handler instance for the endpoint
 
@@ -182,18 +193,22 @@ class BMAEndpoint(Endpoint):
 
         return ConnectionHandler("http", "ws", self.ipv4, self.port, "", session, proxy)
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.inline()
 
-    def __eq__(self, other):
+    def __eq__(self, other: Any) -> bool:
         if isinstance(other, BMAEndpoint):
             return self.server == other.server and self.ipv4 == other.ipv4 \
                    and self.ipv6 == other.ipv6 and self.port == other.port
         else:
             return False
 
-    def __hash__(self):
+    def __hash__(self) -> int:
         return hash((self.server, self.ipv4, self.ipv6, self.port))
+
+
+# required to type hint cls in classmethod
+SecuredBMAEndpointType = TypeVar('SecuredBMAEndpointType', bound='SecuredBMAEndpoint')
 
 
 class SecuredBMAEndpoint(BMAEndpoint):
@@ -219,7 +234,7 @@ class SecuredBMAEndpoint(BMAEndpoint):
         self.path = path
 
     @classmethod
-    def from_inline(cls, inline: str):
+    def from_inline(cls: Type[SecuredBMAEndpointType], inline: str) -> SecuredBMAEndpointType:
         """
         Return SecuredBMAEndpoint instance from endpoint string
 
@@ -247,7 +262,7 @@ class SecuredBMAEndpoint(BMAEndpoint):
         inlined = [str(info) for info in (self.server, self.ipv4, self.ipv6, self.port, self.path) if info]
         return SecuredBMAEndpoint.API + " " + " ".join(inlined)
 
-    def conn_handler(self, session: aiohttp.ClientSession, proxy: str = None) -> ConnectionHandler:
+    def conn_handler(self, session: ClientSession, proxy: str = None) -> ConnectionHandler:
         """
         Return connection handler instance for the endpoint
 
@@ -263,6 +278,10 @@ class SecuredBMAEndpoint(BMAEndpoint):
         return ConnectionHandler("https", "wss", self.ipv4, self.port, self.path, session, proxy)
 
 
+# required to type hint cls in classmethod
+WS2PEndpointType = TypeVar('WS2PEndpointType', bound='WS2PEndpoint')
+
+
 class WS2PEndpoint(Endpoint):
     API = "WS2P"
     re_inline = re.compile(
@@ -273,14 +292,14 @@ class WS2PEndpoint(Endpoint):
             ipv6_regex=IPV6_REGEX,
             path_regex=PATH_REGEX))
 
-    def __init__(self, ws2pid, server, port, path):
+    def __init__(self, ws2pid: str, server: str, port: int, path: str) -> None:
         self.ws2pid = ws2pid
         self.server = server
         self.port = port
         self.path = path
 
     @classmethod
-    def from_inline(cls, inline):
+    def from_inline(cls: Type[WS2PEndpointType], inline: str) -> WS2PEndpointType:
         m = WS2PEndpoint.re_inline.match(inline)
         if m is None:
             raise MalformedDocumentError(WS2PEndpoint.API)
@@ -292,11 +311,11 @@ class WS2PEndpoint(Endpoint):
             path = ""
         return cls(ws2pid, server, port, path)
 
-    def inline(self):
+    def inline(self) -> str:
         inlined = [str(info) for info in (self.ws2pid, self.server, self.port, self.path) if info]
         return WS2PEndpoint.API + " " + " ".join(inlined)
 
-    def conn_handler(self, session: aiohttp.ClientSession, proxy: str = None) -> ConnectionHandler:
+    def conn_handler(self, session: ClientSession, proxy: str = None) -> ConnectionHandler:
         """
         Return connection handler instance for the endpoint
 
@@ -306,18 +325,22 @@ class WS2PEndpoint(Endpoint):
         """
         return ConnectionHandler("https", "wss", self.server, self.port, self.path, session, proxy)
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.inline()
 
-    def __eq__(self, other):
+    def __eq__(self, other: Any) -> bool:
         if isinstance(other, WS2PEndpoint):
             return self.server == other.server and self.ws2pid == other.ws2pid \
                    and self.port == other.port and self.path == other.path
         else:
             return False
 
-    def __hash__(self):
+    def __hash__(self) -> int:
         return hash((self.ws2pid, self.server, self.port, self.path))
+
+
+# required to type hint cls in classmethod
+ESCoreEndpointType = TypeVar('ESCoreEndpointType', bound='ESCoreEndpoint')
 
 
 class ESCoreEndpoint(Endpoint):
@@ -326,12 +349,12 @@ class ESCoreEndpoint(Endpoint):
         '^ES_CORE_API ((?:{host_regex})|(?:{ipv4_regex})) ([0-9]+)$'.format(host_regex=HOST_REGEX,
                                                                             ipv4_regex=IPV4_REGEX))
 
-    def __init__(self, server, port):
+    def __init__(self, server: str, port: int) -> None:
         self.server = server
         self.port = port
 
     @classmethod
-    def from_inline(cls, inline):
+    def from_inline(cls: Type[ESCoreEndpointType], inline: str) -> ESCoreEndpointType:
         m = ESCoreEndpoint.re_inline.match(inline)
         if m is None:
             raise MalformedDocumentError(ESCoreEndpoint.API)
@@ -339,11 +362,11 @@ class ESCoreEndpoint(Endpoint):
         port = int(m.group(2))
         return cls(server, port)
 
-    def inline(self):
+    def inline(self) -> str:
         inlined = [str(info) for info in (self.server, self.port) if info]
         return ESCoreEndpoint.API + " " + " ".join(inlined)
 
-    def conn_handler(self, session: aiohttp.ClientSession, proxy: str = None) -> ConnectionHandler:
+    def conn_handler(self, session: ClientSession, proxy: str = None) -> ConnectionHandler:
         """
         Return connection handler instance for the endpoint
 
@@ -353,17 +376,21 @@ class ESCoreEndpoint(Endpoint):
         """
         return ConnectionHandler("https", "wss", self.server, self.port, "", session, proxy)
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.inline()
 
-    def __eq__(self, other):
+    def __eq__(self, other: Any) -> bool:
         if isinstance(other, ESCoreEndpoint):
             return self.server == other.server and self.port == other.port
         else:
             return False
 
-    def __hash__(self):
+    def __hash__(self) -> int:
         return hash((self.server, self.port))
+
+
+# required to type hint cls in classmethod
+ESUserEndpointType = TypeVar('ESUserEndpointType', bound='ESUserEndpoint')
 
 
 class ESUserEndpoint(Endpoint):
@@ -372,12 +399,12 @@ class ESUserEndpoint(Endpoint):
         '^ES_USER_API ((?:{host_regex})|(?:{ipv4_regex})) ([0-9]+)$'.format(host_regex=HOST_REGEX,
                                                                             ipv4_regex=IPV4_REGEX))
 
-    def __init__(self, server, port):
+    def __init__(self, server: str, port: int) -> None:
         self.server = server
         self.port = port
 
     @classmethod
-    def from_inline(cls, inline):
+    def from_inline(cls: Type[ESUserEndpointType], inline: str) -> ESUserEndpointType:
         m = ESUserEndpoint.re_inline.match(inline)
         if m is None:
             raise MalformedDocumentError(ESUserEndpoint.API)
@@ -385,11 +412,11 @@ class ESUserEndpoint(Endpoint):
         port = int(m.group(2))
         return cls(server, port)
 
-    def inline(self):
+    def inline(self) -> str:
         inlined = [str(info) for info in (self.server, self.port) if info]
         return ESUserEndpoint.API + " " + " ".join(inlined)
 
-    def conn_handler(self, session: aiohttp.ClientSession, proxy: str = None) -> ConnectionHandler:
+    def conn_handler(self, session: ClientSession, proxy: str = None) -> ConnectionHandler:
         """
         Return connection handler instance for the endpoint
 
@@ -399,17 +426,21 @@ class ESUserEndpoint(Endpoint):
         """
         return ConnectionHandler("https", "wss", self.server, self.port, "", session, proxy)
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.inline()
 
-    def __eq__(self, other):
+    def __eq__(self, other: Any) -> bool:
         if isinstance(other, ESUserEndpoint):
             return self.server == other.server and self.port == other.port
         else:
             return False
 
-    def __hash__(self):
+    def __hash__(self) -> int:
         return hash((self.server, self.port))
+
+
+# required to type hint cls in classmethod
+ESSubscribtionEndpointType = TypeVar('ESSubscribtionEndpointType', bound='ESSubscribtionEndpoint')
 
 
 class ESSubscribtionEndpoint(Endpoint):
@@ -418,12 +449,12 @@ class ESSubscribtionEndpoint(Endpoint):
         '^ES_SUBSCRIPTION_API ((?:{host_regex})|(?:{ipv4_regex})) ([0-9]+)$'.format(host_regex=HOST_REGEX,
                                                                                     ipv4_regex=IPV4_REGEX))
 
-    def __init__(self, server, port):
+    def __init__(self, server: str, port: int) -> None:
         self.server = server
         self.port = port
 
     @classmethod
-    def from_inline(cls, inline):
+    def from_inline(cls: Type[ESSubscribtionEndpointType], inline: str) -> ESSubscribtionEndpointType:
         m = ESSubscribtionEndpoint.re_inline.match(inline)
         if m is None:
             raise MalformedDocumentError(ESSubscribtionEndpoint.API)
@@ -431,11 +462,11 @@ class ESSubscribtionEndpoint(Endpoint):
         port = int(m.group(2))
         return cls(server, port)
 
-    def inline(self):
+    def inline(self) -> str:
         inlined = [str(info) for info in (self.server, self.port) if info]
         return ESSubscribtionEndpoint.API + " " + " ".join(inlined)
 
-    def conn_handler(self, session: aiohttp.ClientSession, proxy: str = None) -> ConnectionHandler:
+    def conn_handler(self, session: ClientSession, proxy: str = None) -> ConnectionHandler:
         """
         Return connection handler instance for the endpoint
 
@@ -445,16 +476,16 @@ class ESSubscribtionEndpoint(Endpoint):
         """
         return ConnectionHandler("https", "wss", self.server, self.port, "", session, proxy)
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.inline()
 
-    def __eq__(self, other):
+    def __eq__(self, other: Any) -> bool:
         if isinstance(other, ESSubscribtionEndpoint):
             return self.server == other.server and self.port == other.port
         else:
             return False
 
-    def __hash__(self):
+    def __hash__(self) -> int:
         return hash((ESSubscribtionEndpoint.API, self.server, self.port))
 
 
@@ -465,10 +496,10 @@ MANAGED_API = {
     ESCoreEndpoint.API: ESCoreEndpoint,
     ESUserEndpoint.API: ESUserEndpoint,
     ESSubscribtionEndpoint.API: ESSubscribtionEndpoint
-}
+}  # type: Dict[str, Any]
 
 
-def endpoint(value):
+def endpoint(value: Any) -> Any:
     if issubclass(type(value), Endpoint):
         return value
     elif isinstance(value, str):

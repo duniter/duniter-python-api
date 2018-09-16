@@ -222,7 +222,7 @@ async def process(client: Client, transaction_signed_raw: str) -> ClientResponse
     return await client.post(MODULE + '/process', {'transaction': transaction_signed_raw}, rtype=RESPONSE_AIOHTTP)
 
 
-async def sources(client: Client, pubkey: str):
+async def sources(client: Client, pubkey: str) -> dict:
     """
     GET transaction sources
 

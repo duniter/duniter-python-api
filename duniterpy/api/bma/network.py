@@ -114,7 +114,7 @@ async def peering(client: Client) -> dict:
     return await client.get(MODULE + '/peering', schema=PEERING_SCHEMA)
 
 
-async def peers(client: Client, leaves: bool = False, leaf: str = ""):
+async def peers(client: Client, leaves: bool = False, leaf: str = "") -> dict:
     """
     GET peering entries of every node inside the currency network
 

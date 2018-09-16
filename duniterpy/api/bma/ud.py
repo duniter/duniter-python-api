@@ -16,6 +16,7 @@
 # Caner Candan <caner@candan.fr>, http://caner.candan.fr
 # vit
 import logging
+
 from duniterpy.api.client import Client
 
 logger = logging.getLogger("duniter/ud")
@@ -74,4 +75,3 @@ async def history(client: Client, pubkey: str) -> dict:
     :rtype: dict
     """
     return await client.get(MODULE + '/history/%s' % pubkey, schema=UD_SCHEMA)
-

@@ -18,6 +18,7 @@ Features
 * Support HTTP, HTTPS and Web Socket transport for BMA API
 * Support `Elasticsearch Duniter4j <https://git.duniter.org/clients/java/duniter4j/blob/master/src/site/markdown/ES.md#request-the-es-node>`_ API
 * Duniter signing key
+* Sign/verify and encrypt/decrypt messages with the Duniter credentials
 
 Requirements
 ------------

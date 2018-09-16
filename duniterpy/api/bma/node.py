@@ -16,6 +16,7 @@
 # Caner Candan <caner@candan.fr>, http://caner.candan.fr
 # vit
 import logging
+
 from duniterpy.api.client import Client
 
 logger = logging.getLogger("duniter/node")

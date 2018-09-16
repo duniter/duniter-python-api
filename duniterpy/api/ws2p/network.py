@@ -55,6 +55,7 @@ WS2P_HEADS_SCHEMA = {
 }
 
 
+# fixme: ws2p heads support must be handled by websocket
 def heads(client: Client):
     """
     GET Certification data over a member

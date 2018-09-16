@@ -6,8 +6,8 @@ import json
 import logging
 from typing import Callable, Union, Any, Optional
 
-import aiohttp
 import jsonschema
+from aiohttp import ClientResponse, ClientWebSocketResponse, ClientSession
 
 import duniterpy.api.endpoint as endpoint
 from .errors import DuniterError
@@ -67,7 +67,7 @@ def parse_error(text: str) -> Any:
     return data
 
 
-async def parse_response(response: aiohttp.ClientResponse, schema: dict) -> Any:
+async def parse_response(response: ClientResponse, schema: dict) -> Any:
     """
     Validate and parse the BMA answer
 
@@ -124,12 +124,12 @@ class API(object):
 
         return url + path
 
-    async def requests_get(self, path: str, **kwargs) -> aiohttp.ClientResponse:
+    async def requests_get(self, path: str, **kwargs) -> ClientResponse:
         """
         Requests GET wrapper in order to use API parameters.
 
         :param path: the request path
-        :rtype: aiohttp.ClientResponse
+        :rtype: ClientResponse
         """
         logging.debug("Request : {0}".format(self.reverse_url(self.connection_handler.http_scheme, path)))
         url = self.reverse_url(self.connection_handler.http_scheme, path)
@@ -145,12 +145,12 @@ class API(object):
 
         return response
 
-    async def requests_post(self, path: str, **kwargs) -> aiohttp.ClientResponse:
+    async def requests_post(self, path: str, **kwargs) -> ClientResponse:
         """
         Requests POST wrapper in order to use API parameters.
 
         :param path: the request path
-        :rtype: aiohttp.ClientResponse
+        :rtype: ClientResponse
         """
         if 'self_' in kwargs:
             kwargs['self'] = kwargs.pop('self_')
@@ -165,7 +165,7 @@ class API(object):
         )
         return response
 
-    def connect_ws(self, path: str) -> aiohttp.ClientWebSocketResponse:
+    def connect_ws(self, path: str) -> ClientWebSocketResponse:
         """
         Connect to a websocket in order to use API parameters
 
@@ -175,7 +175,7 @@ class API(object):
         and close the ClientWebSocketResponse in it.
 
         :param path: the url path
-        :rtype: aiohttp.ClientWebSocketResponse
+        :rtype: ClientWebSocketResponse
         """
         url = self.reverse_url(self.connection_handler.ws_scheme, path)
         return self.connection_handler.session.ws_connect(url, proxy=self.connection_handler.proxy)
@@ -186,7 +186,7 @@ class Client:
     Main class to create an API client
     """
 
-    def __init__(self, _endpoint: Union[str, endpoint.Endpoint], session: aiohttp.ClientSession = None,
+    def __init__(self, _endpoint: Union[str, endpoint.Endpoint], session: ClientSession = None,
                  proxy: str = None) -> None:
         """
         Init Client instance
@@ -207,7 +207,7 @@ class Client:
         # if no user session...
         if session is None:
             # open a session
-            self.session = aiohttp.ClientSession()
+            self.session = ClientSession()
         else:
             self.session = session
         self.proxy = proxy
@@ -274,12 +274,12 @@ class Client:
         elif rtype == RESPONSE_JSON:
             return await response.json()
 
-    def connect_ws(self, path: str) -> aiohttp.ClientWebSocketResponse:
+    def connect_ws(self, path: str) -> ClientWebSocketResponse:
         """
         Connect to a websocket in order to use API parameters
 
         :param path: the url path
-        :rtype: aiohttp.ClientWebSocketResponse
+        :rtype: ClientWebSocketResponse
         """
         client = API(self.endpoint.conn_handler(self.session, self.proxy))
         return client.connect_ws(path)
