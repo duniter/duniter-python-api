@@ -206,7 +206,7 @@ async def history(client: Client, pubkey: str) -> dict:
 
     :param client: Client to connect to the api
     :param pubkey: Public key
-    :rtype: dict
+    :return:
     """
     return await client.get(MODULE + '/history/%s' % pubkey, schema=HISTORY_SCHEMA)
 
@@ -217,7 +217,7 @@ async def process(client: Client, transaction_signed_raw: str) -> ClientResponse
 
     :param client: Client to connect to the api
     :param transaction_signed_raw: Transaction signed raw document
-    :rtype: ClientResponse
+    :return:
     """
     return await client.post(MODULE + '/process', {'transaction': transaction_signed_raw}, rtype=RESPONSE_AIOHTTP)
 
@@ -228,7 +228,7 @@ async def sources(client: Client, pubkey: str) -> dict:
 
     :param client: Client to connect to the api
     :param pubkey: Public key
-    :rtype: dict
+    :return:
     """
     return await client.get(MODULE + '/sources/%s' % pubkey, schema=SOURCES_SCHEMA)
 
@@ -241,7 +241,7 @@ async def blocks(client: Client, pubkey: str, start: int, end: int) -> dict:
     :param pubkey: Public key
     :param start: Start from block number
     :param end: End to block number
-    :return: dict
+    :return:
     """
     return await client.get(MODULE + '/history/%s/blocks/%s/%s' % (pubkey, start, end), schema=HISTORY_SCHEMA)
 
@@ -254,6 +254,6 @@ async def times(client: Client, pubkey: str, start: int, end: int) -> dict:
     :param pubkey: Public key
     :param start: Start from timestamp
     :param end: End to timestamp
-    :return: dict
+    :return:
     """
     return await client.get(MODULE + '/history/%s/times/%s/%s' % (pubkey, start, end), schema=HISTORY_SCHEMA)

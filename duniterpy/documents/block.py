@@ -1,6 +1,7 @@
 import base64
 import hashlib
 import re
+from typing import Union, TypeVar, Type, Optional, List
 
 from .certification import Identity, Certification, Revocation
 from .document import Document, MalformedDocumentError
@@ -8,16 +9,8 @@ from .membership import Membership
 from .transaction import Transaction
 from ..constants import PUBKEY_REGEX, BLOCK_ID_REGEX, BLOCK_HASH_REGEX
 
-
-def block_uid(value):
-    if isinstance(value, BlockUID):
-        return value
-    elif isinstance(value, str):
-        return BlockUID.from_str(value)
-    elif value is None:
-        return BlockUID.empty()
-    else:
-        raise TypeError("Cannot convert {0} to BlockUID".format(type(value)))
+# required to type hint cls in classmethod
+BlockUIDType = TypeVar('BlockUIDType', bound='BlockUID')
 
 
 class BlockUID:
@@ -28,20 +21,20 @@ class BlockUID:
                                                                                block_hash_regex=BLOCK_HASH_REGEX))
     re_hash = re.compile("({block_hash_regex})".format(block_hash_regex=BLOCK_HASH_REGEX))
 
-    @classmethod
-    def empty(cls):
-        return cls(0, Block.Empty_Hash)
-
-    def __init__(self, number, sha_hash):
+    def __init__(self, number: int, sha_hash: str) -> None:
         assert (type(number) is int)
         assert (BlockUID.re_hash.match(sha_hash) is not None)
         self.number = number
         self.sha_hash = sha_hash
 
     @classmethod
-    def from_str(cls, blockid):
+    def empty(cls: Type[BlockUIDType]) -> BlockUIDType:
+        return cls(0, Block.Empty_Hash)
+
+    @classmethod
+    def from_str(cls: Type[BlockUIDType], blockid: str) -> BlockUIDType:
         """
-        :param str blockid: The block id
+        :param blockid: The block id
         """
         data = BlockUID.re_block_uid.match(blockid)
         try:
@@ -56,29 +49,50 @@ class BlockUID:
 
         return cls(number, sha_hash)
 
-    def __str__(self):
+    def __str__(self) -> str:
         return "{0}-{1}".format(self.number, self.sha_hash)
 
-    def __eq__(self, other):
+    def __eq__(self, other: Type[BlockUIDType]) -> bool:
         return self.number == other.number and self.sha_hash == other.sha_hash
 
-    def __lt__(self, other):
+    def __lt__(self, other: Type[BlockUIDType]) -> bool:
         return self.number < other.number
 
-    def __gt__(self, other):
+    def __gt__(self, other: Type[BlockUIDType]) -> bool:
         return self.number > other.number
 
-    def __le__(self, other):
+    def __le__(self, other: Type[BlockUIDType]) -> bool:
         return self.number <= other.number
 
-    def __ge__(self, other):
+    def __ge__(self, other: Type[BlockUIDType]) -> bool:
         return self.number >= other.number
 
-    def __hash__(self):
+    def __hash__(self) -> int:
         return hash((self.number, self.sha_hash))
 
-    def __bool__(self):
+    def __bool__(self) -> bool:
         return self != BlockUID.empty()
+
+
+def block_uid(value: Union[str, BlockUID, None]) -> BlockUID:
+    """
+    Convert value to BlockUID instance
+
+    :param value: Value to convert
+    :return:
+    """
+    if isinstance(value, BlockUID):
+        return value
+    elif isinstance(value, str):
+        return BlockUID.from_str(value)
+    elif value is None:
+        return BlockUID.empty()
+    else:
+        raise TypeError("Cannot convert {0} to BlockUID".format(type(value)))
+
+
+# required to type hint cls in classmethod
+BlockType = TypeVar('BlockType', bound='Block')
 
 
 class Block(Document):
@@ -183,47 +197,70 @@ The class Block handles Block documents.
         'Transactions': re_transactions,
         'InnerHash': re_hash,
         'Noonce': re_noonce,
-        }
     }
+                      }
 
     Empty_Hash = "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
 
-    def __init__(self, version, currency, number, powmin, time,
-                 mediantime, ud, unit_base, issuer, issuers_frame, issuers_frame_var,
-                 different_issuers_count, prev_hash, prev_issuer,
-                 parameters, members_count, identities, joiners,
-                 actives, leavers, revokations, excluded, certifications,
-                 transactions, inner_hash, noonce, signature):
+    def __init__(self,
+                 version: int,
+                 currency: str,
+                 number: int,
+                 powmin: int,
+                 time: int,
+                 mediantime: int,
+                 ud: Optional[int],
+                 unit_base: int,
+                 issuer: str,
+                 issuers_frame: int,
+                 issuers_frame_var: int,
+                 different_issuers_count: int,
+                 prev_hash: str,
+                 prev_issuer: str,
+                 parameters: str,
+                 members_count: int,
+                 identities: List[Identity],
+                 joiners: List[Membership],
+                 actives: List[Membership],
+                 leavers: List[Membership],
+                 revokations: List[Revocation],
+                 excluded: List[str],
+                 certifications: List[Certification],
+                 transactions: List[Transaction],
+                 inner_hash: str,
+                 noonce: int,
+                 signature: str
+                 ) -> None:
         """
         Constructor
 
-        :param int version: duniter protocol version
-        :param str currency: the block currency
-        :param int number: the number of the block
-        :param int powmin: the powmin value of this block
-        :param int time: the timestamp of this block
-        :param int ud: the dividend amount, or None if no dividend present in this block
-        :param int unit_base: the unit_base of the dividend, or None if no dividend present in this block
-        :param str issuer: the pubkey of the issuer of the block
-        :param int issuers_frame:
-        :param int issuers_frame_var:
-        :param int different_issuers_count: the count of issuers
-        :param str prev_hash: the previous block hash
-        :param str prev_issuer: the previous block issuer
-        :param Optional[Sequence[str]] parameters: the parameters of the currency. Should only be present in block 0.
-        :param int members_count: the number of members found in this block
-        :param list[duniterpy.documents.Identity] identities: the self certifications declared in this block
-        :param list[duniterpy.documents.Membership] joiners: the joiners memberships via "IN" documents
-        :param list[duniterpy.documents.Membership] actives: renewed memberships via "IN" documents
-        :param list[duniterpy.documents.Membership] leavers: the leavers memberships via "OUT" documents
-        :param list[duniterpy.documents.Revocation] revokations: revokations
-        :param list[str] excluded: members excluded because of missing certifications
-        :param list[duniterpy.documents.Membership] actives: renewed memberships via "IN" documents
-        :param list[duniterpy.documents.Certification] certifications: certifications documents
-        :param list[duniterpy.documents.Transaction] transactions: transactions documents
-        :param str inner_hash: the block hah
-        :param int noonce: the noonce value of the block
-        :param str signature: the block signature
+        :param version: duniter protocol version
+        :param currency: the block currency
+        :param number: the number of the block
+        :param powmin: the powmin value of this block
+        :param time: the timestamp of this block
+        :param mediantime: the timestamp of the median time of this block
+        :param ud: the dividend amount, or None if no dividend present in this block
+        :param unit_base: the unit_base of the dividend, or None if no dividend present in this block
+        :param issuer: the pubkey of the issuer of the block
+        :param issuers_frame:
+        :param issuers_frame_var:
+        :param different_issuers_count: the count of issuers
+        :param prev_hash: the previous block hash
+        :param prev_issuer: the previous block issuer
+        :param parameters: the parameters of the currency. Should only be present in block 0.
+        :param members_count: the number of members found in this block
+        :param identities: the self certifications declared in this block
+        :param joiners: the joiners memberships via "IN" documents
+        :param actives: renewed memberships via "IN" documents
+        :param leavers: the leavers memberships via "OUT" documents
+        :param revokations: revokations
+        :param excluded: members excluded because of missing certifications
+        :param certifications: certifications documents
+        :param transactions: transactions documents
+        :param inner_hash: the block hah
+        :param noonce: the noonce value of the block
+        :param signature: the block signature
         """
         super().__init__(version, currency, [signature])
         documents_versions = max(max([1] + [i.version for i in identities]),
@@ -260,11 +297,11 @@ The class Block handles Block documents.
         self.noonce = noonce
 
     @property
-    def blockUID(self):
+    def blockUID(self) -> BlockUIDType:
         return BlockUID(self.number, self.proof_of_work())
 
     @classmethod
-    def from_signed_raw(cls, signed_raw):
+    def from_signed_raw(cls: Type[BlockType], signed_raw: str) -> BlockType:
         lines = signed_raw.splitlines(True)
         n = 0
 
@@ -437,7 +474,7 @@ The class Block handles Block documents.
                    actives, leavers, revoked, excluded, certifications,
                    transactions, inner_hash, noonce, signature)
 
-    def raw(self):
+    def raw(self) -> str:
         doc = """Version: {version}
 Type: Block
 Currency: {currency}
@@ -512,14 +549,14 @@ PreviousIssuer: {1}\n".format(self.prev_hash, self.prev_issuer)
 
         return doc
 
-    def proof_of_work(self):
+    def proof_of_work(self) -> str:
         doc_str = """InnerHash: {inner_hash}
 Nonce: {nonce}
 {signature}
 """.format(inner_hash=self.inner_hash, nonce=self.noonce, signature=self.signatures[0])
         return hashlib.sha256(doc_str.encode('ascii')).hexdigest().upper()
 
-    def computed_inner_hash(self):
+    def computed_inner_hash(self) -> str:
         doc = self.signed_raw()
         inner_doc = '\n'.join(doc.split('\n')[:-2]) + '\n'
         return hashlib.sha256(inner_doc.encode("ascii")).hexdigest().upper()
@@ -534,17 +571,17 @@ Nonce: {nonce}
         signing = base64.b64encode(key.signature(bytes(signed, 'ascii')))
         self.signatures = [signing.decode("ascii")]
 
-    def __eq__(self, other):
+    def __eq__(self, other: Type[BlockType]) -> bool:
         return self.blockUID == other.blockUID
 
-    def __lt__(self, other):
+    def __lt__(self, other: Type[BlockType]) -> bool:
         return self.blockUID < other.blockUID
 
-    def __gt__(self, other):
+    def __gt__(self, other: Type[BlockType]) -> bool:
         return self.blockUID > other.blockUID
 
-    def __le__(self, other):
+    def __le__(self, other: Type[BlockType]) -> bool:
         return self.blockUID <= other.blockUID
 
-    def __ge__(self, other):
+    def __ge__(self, other: Type[BlockType]) -> bool:
         return self.blockUID >= other.blockUID

@@ -7,8 +7,8 @@ import logging
 from typing import Callable, Union, Any, Optional
 
 import jsonschema
-from aiohttp import ClientResponse, ClientWebSocketResponse, ClientSession
-
+from aiohttp import ClientResponse, ClientSession
+from aiohttp.client import _WSRequestContextManager
 import duniterpy.api.endpoint as endpoint
 from .errors import DuniterError
 
@@ -106,7 +106,7 @@ class API(object):
 
         :param scheme: Scheme of the url
         :param path: Path of the url
-        :return: str
+        :return:
         """
         # remove starting slash in path if present
         path = path.lstrip('/')
@@ -129,7 +129,7 @@ class API(object):
         Requests GET wrapper in order to use API parameters.
 
         :param path: the request path
-        :rtype: ClientResponse
+        :return:
         """
         logging.debug("Request : {0}".format(self.reverse_url(self.connection_handler.http_scheme, path)))
         url = self.reverse_url(self.connection_handler.http_scheme, path)
@@ -150,7 +150,7 @@ class API(object):
         Requests POST wrapper in order to use API parameters.
 
         :param path: the request path
-        :rtype: ClientResponse
+        :return:
         """
         if 'self_' in kwargs:
             kwargs['self'] = kwargs.pop('self_')
@@ -165,7 +165,7 @@ class API(object):
         )
         return response
 
-    def connect_ws(self, path: str) -> ClientWebSocketResponse:
+    def connect_ws(self, path: str) -> _WSRequestContextManager:
         """
         Connect to a websocket in order to use API parameters
 
@@ -175,7 +175,7 @@ class API(object):
         and close the ClientWebSocketResponse in it.
 
         :param path: the url path
-        :rtype: ClientWebSocketResponse
+        :return:
         """
         url = self.reverse_url(self.connection_handler.ws_scheme, path)
         return self.connection_handler.session.ws_connect(url, proxy=self.connection_handler.proxy)
@@ -274,12 +274,12 @@ class Client:
         elif rtype == RESPONSE_JSON:
             return await response.json()
 
-    def connect_ws(self, path: str) -> ClientWebSocketResponse:
+    def connect_ws(self, path: str) -> _WSRequestContextManager:
         """
         Connect to a websocket in order to use API parameters
 
         :param path: the url path
-        :rtype: ClientWebSocketResponse
+        :return:
         """
         client = API(self.endpoint.conn_handler(self.session, self.proxy))
         return client.connect_ws(path)

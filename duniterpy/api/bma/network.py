@@ -109,7 +109,7 @@ async def peering(client: Client) -> dict:
     GET peering information about a peer
 
     :param client: Client to connect to the api
-    :rtype: dict
+    :return:
     """
     return await client.get(MODULE + '/peering', schema=PEERING_SCHEMA)
 
@@ -121,7 +121,7 @@ async def peers(client: Client, leaves: bool = False, leaf: str = "") -> dict:
     :param client: Client to connect to the api
     :param leaves: True if leaves should be requested
     :param leaf: True if leaf should be requested
-    :rtype: dict
+    :return:
     """
     if leaves is True:
         return await client.get(MODULE + '/peering/peers', {"leaves": "true"}, schema=PEERS_SCHEMA)
@@ -135,6 +135,6 @@ async def peer(client: Client, peer_signed_raw: str) -> ClientResponse:
 
     :param client: Client to connect to the api
     :param peer_signed_raw: Peer signed raw document
-    :rtype: ClientResponse
+    :return:
     """
     return await client.post(MODULE + '/peering/peers', {'peer': peer_signed_raw}, rtype=RESPONSE_AIOHTTP)

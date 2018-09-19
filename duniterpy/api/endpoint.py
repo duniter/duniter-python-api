@@ -95,6 +95,13 @@ class UnknownEndpoint(Endpoint):
         return doc
 
     def conn_handler(self, session: ClientSession, proxy: str = None) -> ConnectionHandler:
+        """
+        Return connection handler from session
+
+        :param session: AIOHTTP Session
+        :param proxy: Proxy server
+        :return:
+        """
         return ConnectionHandler("", "", "", 0, "", ClientSession())
 
     def __str__(self) -> str:
@@ -154,7 +161,7 @@ class BMAEndpoint(Endpoint):
         """
         Return BMAEndpoint instance from endpoint string
 
-        :param inline:
+        :param inline: Endpoint string
         :return:
         """
         m = BMAEndpoint.re_inline.match(inline)
@@ -238,7 +245,7 @@ class SecuredBMAEndpoint(BMAEndpoint):
         """
         Return SecuredBMAEndpoint instance from endpoint string
 
-        :param inline:
+        :param inline: Endpoint string
         :return:
         """
         m = SecuredBMAEndpoint.re_inline.match(inline)
@@ -300,6 +307,12 @@ class WS2PEndpoint(Endpoint):
 
     @classmethod
     def from_inline(cls: Type[WS2PEndpointType], inline: str) -> WS2PEndpointType:
+        """
+        Return WS2PEndpoint instance from endpoint string
+
+        :param inline: Endpoint string
+        :return:
+        """
         m = WS2PEndpoint.re_inline.match(inline)
         if m is None:
             raise MalformedDocumentError(WS2PEndpoint.API)
@@ -312,6 +325,11 @@ class WS2PEndpoint(Endpoint):
         return cls(ws2pid, server, port, path)
 
     def inline(self) -> str:
+        """
+        Return endpoint string
+
+        :return:
+        """
         inlined = [str(info) for info in (self.ws2pid, self.server, self.port, self.path) if info]
         return WS2PEndpoint.API + " " + " ".join(inlined)
 
@@ -319,9 +337,9 @@ class WS2PEndpoint(Endpoint):
         """
         Return connection handler instance for the endpoint
 
-        :param aiohttp.ClientSession session: AIOHTTP client session instance
-        :param str proxy: Proxy url
-        :rtype: ConnectionHandler
+        :param session: AIOHTTP client session instance
+        :param proxy: Proxy url
+        :return:
         """
         return ConnectionHandler("https", "wss", self.server, self.port, self.path, session, proxy)
 
@@ -355,6 +373,12 @@ class ESCoreEndpoint(Endpoint):
 
     @classmethod
     def from_inline(cls: Type[ESCoreEndpointType], inline: str) -> ESCoreEndpointType:
+        """
+        Return ESCoreEndpoint instance from endpoint string
+
+        :param inline: Endpoint string
+        :return:
+        """
         m = ESCoreEndpoint.re_inline.match(inline)
         if m is None:
             raise MalformedDocumentError(ESCoreEndpoint.API)
@@ -363,6 +387,11 @@ class ESCoreEndpoint(Endpoint):
         return cls(server, port)
 
     def inline(self) -> str:
+        """
+        Return endpoint string
+
+        :return:
+        """
         inlined = [str(info) for info in (self.server, self.port) if info]
         return ESCoreEndpoint.API + " " + " ".join(inlined)
 
@@ -370,9 +399,9 @@ class ESCoreEndpoint(Endpoint):
         """
         Return connection handler instance for the endpoint
 
-        :param aiohttp.ClientSession session: AIOHTTP client session instance
-        :param str proxy: Proxy url
-        :rtype: ConnectionHandler
+        :param session: AIOHTTP client session instance
+        :param proxy: Proxy url
+        :return:
         """
         return ConnectionHandler("https", "wss", self.server, self.port, "", session, proxy)
 
@@ -405,6 +434,12 @@ class ESUserEndpoint(Endpoint):
 
     @classmethod
     def from_inline(cls: Type[ESUserEndpointType], inline: str) -> ESUserEndpointType:
+        """
+        Return ESUserEndpoint instance from endpoint string
+
+        :param inline: Endpoint string
+        :return:
+        """
         m = ESUserEndpoint.re_inline.match(inline)
         if m is None:
             raise MalformedDocumentError(ESUserEndpoint.API)
@@ -413,6 +448,11 @@ class ESUserEndpoint(Endpoint):
         return cls(server, port)
 
     def inline(self) -> str:
+        """
+        Return endpoint string
+
+        :return:
+        """
         inlined = [str(info) for info in (self.server, self.port) if info]
         return ESUserEndpoint.API + " " + " ".join(inlined)
 
@@ -420,9 +460,9 @@ class ESUserEndpoint(Endpoint):
         """
         Return connection handler instance for the endpoint
 
-        :param aiohttp.ClientSession session: AIOHTTP client session instance
-        :param str proxy: Proxy url
-        :rtype: ConnectionHandler
+        :param session: AIOHTTP client session instance
+        :param proxy: Proxy url
+        :return:
         """
         return ConnectionHandler("https", "wss", self.server, self.port, "", session, proxy)
 
@@ -455,6 +495,12 @@ class ESSubscribtionEndpoint(Endpoint):
 
     @classmethod
     def from_inline(cls: Type[ESSubscribtionEndpointType], inline: str) -> ESSubscribtionEndpointType:
+        """
+        Return ESSubscribtionEndpoint instance from endpoint string
+
+        :param inline: Endpoint string
+        :return:
+        """
         m = ESSubscribtionEndpoint.re_inline.match(inline)
         if m is None:
             raise MalformedDocumentError(ESSubscribtionEndpoint.API)
@@ -463,6 +509,11 @@ class ESSubscribtionEndpoint(Endpoint):
         return cls(server, port)
 
     def inline(self) -> str:
+        """
+        Return endpoint string
+
+        :return:
+        """
         inlined = [str(info) for info in (self.server, self.port) if info]
         return ESSubscribtionEndpoint.API + " " + " ".join(inlined)
 
@@ -470,9 +521,9 @@ class ESSubscribtionEndpoint(Endpoint):
         """
         Return connection handler instance for the endpoint
 
-        :param aiohttp.ClientSession session: AIOHTTP client session instance
-        :param str proxy: Proxy url
-        :rtype: ConnectionHandler
+        :param session: AIOHTTP client session instance
+        :param proxy: Proxy url
+        :return:
         """
         return ConnectionHandler("https", "wss", self.server, self.port, "", session, proxy)
 
@@ -500,6 +551,12 @@ MANAGED_API = {
 
 
 def endpoint(value: Any) -> Any:
+    """
+    Convert a endpoint string to the corresponding Endpoint instance type
+
+    :param value: Endpoint string or subclass
+    :return:
+    """
     if issubclass(type(value), Endpoint):
         return value
     elif isinstance(value, str):

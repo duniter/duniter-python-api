@@ -54,13 +54,4 @@ WS2P_HEADS_SCHEMA = {
     "required": ["heads"]
 }
 
-
-# fixme: ws2p heads support must be handled by websocket
-def heads(client: Client):
-    """
-    GET Certification data over a member
-
-    :param client: Client to connect to the api
-    :rtype: dict
-    """
-    return client.get(MODULE + '/ws2p/heads', schema=WS2P_HEADS_SCHEMA)
+# todo: support ws2p v1 api

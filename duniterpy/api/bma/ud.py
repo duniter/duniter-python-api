@@ -72,6 +72,6 @@ async def history(client: Client, pubkey: str) -> dict:
 
     :param client: Client to connect to the api
     :param pubkey:  Public key of the member
-    :rtype: dict
+    :return:
     """
     return await client.get(MODULE + '/history/%s' % pubkey, schema=UD_SCHEMA)

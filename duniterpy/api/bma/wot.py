@@ -305,7 +305,7 @@ async def add(client: Client, identity_signed_raw: str) -> ClientResponse:
 
     :param client: Client to connect to the api
     :param identity_signed_raw: Identity raw document
-    :rtype: aiohttp.ClientResponse
+    :return:
     """
     return await client.post(MODULE + '/add', {'identity': identity_signed_raw}, rtype=RESPONSE_AIOHTTP)
 
@@ -316,7 +316,7 @@ async def certify(client: Client, certification_signed_raw: str) -> ClientRespon
 
     :param client: Client to connect to the api
     :param certification_signed_raw: Certification raw document
-    :rtype: aiohttp.ClientResponse
+    :return:
     """
     return await client.post(MODULE + '/certify', {'cert': certification_signed_raw}, rtype=RESPONSE_AIOHTTP)
 
@@ -327,7 +327,7 @@ async def revoke(client: Client, revocation_signed_raw: str) -> ClientResponse:
 
     :param client: Client to connect to the api
     :param revocation_signed_raw: Certification raw document
-    :rtype: aiohttp.ClientResponse
+    :return:
     """
     return await client.post(MODULE + '/revoke', {'revocation': revocation_signed_raw}, rtype=RESPONSE_AIOHTTP)
 
@@ -338,7 +338,7 @@ async def lookup(client: Client, search: str) -> dict:
 
     :param client: Client to connect to the api
     :param search: UID or public key
-    :rtype: dict
+    :return:
     """
     return await client.get(MODULE + '/lookup/%s' % search, schema=LOOKUP_SCHEMA)
 
@@ -349,7 +349,7 @@ async def certifiers_of(client: Client, search: str) -> dict:
 
     :param client: Client to connect to the api
     :param search: UID or public key
-    :rtype: dict
+    :return:
     """
     return await client.get(MODULE + '/certifiers-of/%s' % search, schema=CERTIFICATIONS_SCHEMA)
 
@@ -360,7 +360,7 @@ async def certified_by(client: Client, search: str) -> dict:
 
     :param client: Client to connect to the api
     :param search: UID or public key
-    :rtype: dict
+    :return:
     """
     return await client.get(MODULE + '/certified-by/%s' % search, schema=CERTIFICATIONS_SCHEMA)
 
@@ -370,7 +370,7 @@ async def members(client: Client) -> dict:
     GET list of all current members of the Web of Trust
 
     :param client: Client to connect to the api
-    :rtype: dict
+    :return:
     """
     return await client.get(MODULE + '/members', schema=MEMBERS_SCHEMA)
 
@@ -381,6 +381,6 @@ async def requirements(client: Client, search: str) -> dict:
 
     :param client: Client to connect to the api
     :param search: UID or public key
-    :rtype: dict
+    :return:
     """
     return await client.get(MODULE + '/requirements/%s' % search, schema=REQUIREMENTS_SCHEMA)

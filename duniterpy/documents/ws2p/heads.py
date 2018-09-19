@@ -2,8 +2,8 @@ import re
 
 import attr
 
-from ..document import MalformedDocumentError
 from ..block import BlockUID
+from ..document import MalformedDocumentError
 from ...constants import WS2P_PUBLIC_PREFIX_REGEX, WS2P_PRIVATE_PREFIX_REGEX, WS2P_HEAD_REGEX, \
     PUBKEY_REGEX, SIGNATURE_REGEX, WS2PID_REGEX, BLOCK_UID_REGEX
 
@@ -18,21 +18,15 @@ class API:
         ws2p_public=WS2P_PUBLIC_PREFIX_REGEX))
 
     @classmethod
-    def from_inline(cls, inline):
+    def from_inline(cls, inline: str):
         data = API.re_inline.match(inline)
-        if data.group(1):
-            private = data.group(1)
-        else:
-            private = ""
-
-        if data.group(2):
-            public = data.group(2)
-        else:
-            public = ""
-
+        if data is None:
+            raise MalformedDocumentError("WS2P API Document")
+        private = data.group(1)
+        public = data.group(2)
         return cls(private, public)
 
-    def __str__(self):
+    def __str__(self) -> str:
         return "WS2P" + self.private + self.public
 
 
@@ -43,19 +37,18 @@ class Head:
     re_inline = re.compile(WS2P_HEAD_REGEX)
 
     @classmethod
-    def from_inline(cls, inline):
+    def from_inline(cls, inline: str):
         try:
             data = Head.re_inline.match(inline)
+            if data is None:
+                raise MalformedDocumentError("Head")
             head = data.group(0).split(':')
-            if len(head) == 2:
-                version = int(head[1])
-            else:
-                version = 0
+            version = int(head[1]) if len(head) == 2 else 0
             return cls(version)
         except AttributeError:
             raise MalformedDocumentError("Head")
 
-    def __str__(self):
+    def __str__(self) -> str:
         return "HEAD" if self.version == 0 else "HEAD:{}".format(str(self.version))
 
 
@@ -81,9 +74,11 @@ class HeadV0:
     re_signature = re.compile(SIGNATURE_REGEX)
 
     @classmethod
-    def from_inline(cls, inline, signature):
+    def from_inline(cls, inline: str, signature: str):
         try:
             data = HeadV0.re_inline.match(inline)
+            if data is None:
+                raise MalformedDocumentError("HeadV0")
             api = API.from_inline(data.group(1))
             head = Head.from_inline(data.group(2))
             pubkey = data.group(3)
@@ -93,7 +88,7 @@ class HeadV0:
         except AttributeError:
             raise MalformedDocumentError("HeadV0")
 
-    def inline(self):
+    def inline(self) -> str:
         values = (str(v) for v in attr.astuple(self, recurse=False,
                                                filter=attr.filters.exclude(attr.fields(HeadV0).signature)))
         return ":".join(values)
@@ -114,10 +109,12 @@ class HeadV1:
         pow_prefix="[0-9]+"))
 
     @classmethod
-    def from_inline(cls, inline, signature):
+    def from_inline(cls, inline: str, signature: str):
         try:
             v0, offload = HeadV0.from_inline(inline, signature)
             data = HeadV1.re_inline.match(offload)
+            if data is None:
+                raise MalformedDocumentError("HeadV1")
             ws2pid = data.group(1)
             software = data.group(2)
             software_version = data.group(3)
@@ -127,20 +124,20 @@ class HeadV1:
         except AttributeError:
             raise MalformedDocumentError("HeadV1")
 
-    def inline(self):
+    def inline(self) -> str:
         values = [str(v) for v in attr.astuple(self, True, filter=attr.filters.exclude(attr.fields(HeadV1).v0))]
         return self.v0.inline() + ":" + ":".join(values)
 
     @property
-    def pubkey(self):
+    def pubkey(self) -> str:
         return self.v0.pubkey
 
     @property
-    def signature(self):
+    def signature(self) -> str:
         return self.v0.signature
 
     @property
-    def blockstamp(self):
+    def blockstamp(self) -> BlockUID:
         return self.v0.blockstamp
 
 
@@ -155,28 +152,30 @@ class HeadV2:
         free_mirror_room="[0-9]+"))
 
     @classmethod
-    def from_inline(cls, inline, signature):
+    def from_inline(cls, inline: str, signature: str):
         try:
             v1, offload = HeadV1.from_inline(inline, signature)
             data = HeadV2.re_inline.match(offload)
+            if data is None:
+                raise MalformedDocumentError("HeadV2")
             free_member_room = int(data.group(1))
             free_mirror_room = int(data.group(2))
             return cls(v1, free_member_room, free_mirror_room), ""
         except AttributeError:
             raise MalformedDocumentError("HeadV2")
 
-    def inline(self):
+    def inline(self) -> str:
         values = (str(v) for v in attr.astuple(self, True, filter=attr.filters.exclude(attr.fields(HeadV2).v1)))
         return self.v1.inline() + ":" + ":".join(values)
 
     @property
-    def pubkey(self):
+    def pubkey(self) -> str:
         return self.v1.pubkey
 
     @property
-    def signature(self):
+    def signature(self) -> str:
         return self.v1.signature
 
     @property
-    def blockstamp(self):
+    def blockstamp(self) -> BlockUID:
         return self.v1.blockstamp

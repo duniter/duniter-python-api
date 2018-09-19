@@ -29,7 +29,7 @@ async def summary(client: Client) -> dict:
     GET Duniter node version and infos
 
     :param client: Client to connect to the api
-    :rtype: dict
+    :return:
     """
     schema = {
         "type": "object",
