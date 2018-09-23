@@ -22,8 +22,8 @@ class API:
         data = API.re_inline.match(inline)
         if data is None:
             raise MalformedDocumentError("WS2P API Document")
-        private = data.group(1)
-        public = data.group(2)
+        private = "" if data.group(1) is None else data.group(1)
+        public = "" if data.group(2) is None else data.group(2)
         return cls(private, public)
 
     def __str__(self) -> str:

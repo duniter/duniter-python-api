@@ -5,11 +5,12 @@ duniter public and private keys
 """
 
 import base64
+from typing import Any
+
 import libnacl.sign
 import libnacl.encode
 
 from duniterpy.documents import Document
-from duniterpy.documents.ws2p.heads import HeadV2
 from .base58 import Base58Encoder
 
 
@@ -41,10 +42,10 @@ class VerifyingKey(libnacl.sign.Verifier):
         except ValueError:
             return False
 
-    def verify_ws2p_head(self, head: HeadV2) -> bool:
+    def verify_ws2p_head(self, head: Any) -> bool:
         """
         Check specified document
-        :param HeadV2 head:
+        :param Any head:
         :return:
         """
         signature = base64.b64decode(head.signature)
