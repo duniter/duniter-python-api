@@ -47,7 +47,7 @@ class Test_Membership(unittest.TestCase):
 
     def test_fromraw_toraw(self):
         membership = Membership.from_signed_raw(membership_raw)
-        rendered_membership = membership.signed_raw_for_certified()
+        rendered_membership = membership.signed_raw()
         from_rendered_membership = Membership.from_signed_raw(rendered_membership)
         self.assertEqual(from_rendered_membership.issuer, "HnFcSms8jzwngtVomTTnzudZx7SHUQY8sVE1y8yBmULk")
         self.assertEqual(from_rendered_membership.membership_ts.number, 0)

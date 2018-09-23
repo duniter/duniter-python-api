@@ -6,7 +6,8 @@ Created on 6 déc. 2014
 
 import unittest
 from duniterpy.documents.certification import Identity, Certification, Revocation
-from duniterpy.documents import Block, BlockUID
+from duniterpy.documents.block import Block, BlockUID
+from duniterpy.constants import EMPTY_HASH
 
 selfcert_inlines = ["HnFcSms8jzwngtVomTTnzudZx7SHUQY8sVE1y8yBmULk:\
 h/H8tDIEbfA4yxMQcvfOXVDQhi1sUa9qYtPKrM59Bulv97ouwbAvAsEkC1Uyit1IOpeAV+CQQs4IaAyjE8F1Cw==:\
@@ -73,7 +74,7 @@ J3G9oM5AKYZNLAB5Wx499w61NuUoS57JVccTShUbGpCMjCqj9yXXqNq7dyZpDWA6BxipsiaMZhujMeBf
         self.assertEqual(cert.pubkey_from, "8Fi1VSTbjkXguwThF4v2ZxC5whK7pwG2vcGTkPUPjPGU")
         self.assertEqual(cert.pubkey_to, "HnFcSms8jzwngtVomTTnzudZx7SHUQY8sVE1y8yBmULk")
         self.assertEqual(cert.timestamp.number, 0)
-        self.assertEqual(cert.timestamp.sha_hash, Block.Empty_Hash)
+        self.assertEqual(cert.timestamp.sha_hash, EMPTY_HASH)
         self.assertEqual(cert.signatures[0], "TgmDuMxZdyutroj9jiLJA8tQp/389JIzDKuxW5+h7GIfjDu1ZbwI7HNm5rlUDhR2KreaV/QJjEaItT4Cf75rCQ==")
 
         cert = Certification.from_inline(version, currency, "DB30D958EE5CB75186972286ED3F4686B8A1C2CD", cert_inlines[1])

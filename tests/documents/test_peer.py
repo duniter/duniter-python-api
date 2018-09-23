@@ -59,7 +59,7 @@ class TestPeer(unittest.TestCase):
 
     def test_fromraw_toraw(self):
         peer = Peer.from_signed_raw(rawpeer)
-        rendered_peer = peer.signed_raw_for_certified()
+        rendered_peer = peer.signed_raw()
         from_rendered_peer = Peer.from_signed_raw(rendered_peer)
 
         self.assertEqual(from_rendered_peer.currency, "beta_brousouf")
@@ -87,9 +87,9 @@ class TestPeer(unittest.TestCase):
 
         self.assertEqual(from_rendered_peer.signatures[0],
                          "dkaXIiCYUJtCg8Feh/BKvPYf4uFH9CJ/zY6J4MlA9BsjmcMe4YAblvNt/gJy31b1aGq3ue3h14mLMCu84rraDg==")
-        self.assertEqual(rawpeer, from_rendered_peer.signed_raw_for_certified())
+        self.assertEqual(rawpeer, from_rendered_peer.signed_raw())
 
     def test_incorrect(self):
         peer = Peer.from_signed_raw(test_weird_ipv6_peer)
-        rendered_peer = peer.signed_raw_for_certified()
+        rendered_peer = peer.signed_raw()
         Peer.from_signed_raw(rendered_peer)

@@ -5,7 +5,8 @@ Created on 12 déc. 2014
 """
 import unittest
 
-from duniterpy.documents.block import Block, BlockUID, block_uid
+from duniterpy.documents.block import Block
+from duniterpy.documents.block_uid import BlockUID, block_uid
 
 raw_block = """Version: 2
 Type: Block

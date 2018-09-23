@@ -1,7 +1,7 @@
 import re
 
 import pypeg2
-
+from .block_uid import BlockUID
 from .document import Document, MalformedDocumentError
 from ..constants import PUBKEY_REGEX, TRANSACTION_HASH_REGEX, BLOCK_ID_REGEX, BLOCK_UID_REGEX
 from ..grammars import output
@@ -165,7 +165,6 @@ Comment: {comment}
 
     @classmethod
     def from_compact(cls, currency, compact):
-        from .block import BlockUID
         lines = compact.splitlines(True)
         n = 0
 
@@ -231,7 +230,6 @@ Comment: {comment}
 
     @classmethod
     def from_signed_raw(cls, raw):
-        from .block import BlockUID
         lines = raw.splitlines(True)
         n = 0
 

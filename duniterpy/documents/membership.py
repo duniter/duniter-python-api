@@ -4,7 +4,7 @@ Created on 2 déc. 2014
 @author: inso
 """
 import re
-
+from .block_uid import BlockUID
 from .document import Document, MalformedDocumentError
 from ..constants import BLOCK_UID_REGEX, SIGNATURE_REGEX, PUBKEY_REGEX
 
@@ -69,7 +69,6 @@ class Membership(Document):
 
     @classmethod
     def from_inline(cls, version, currency, membership_type, inline):
-        from .block import BlockUID
         data = Membership.re_inline.match(inline)
         if data is None:
             raise MalformedDocumentError("Inline membership ({0})".format(inline))
@@ -82,7 +81,6 @@ class Membership(Document):
 
     @classmethod
     def from_signed_raw(cls, signed_raw):
-        from .block import BlockUID
         lines = signed_raw.splitlines(True)
         n = 0
 

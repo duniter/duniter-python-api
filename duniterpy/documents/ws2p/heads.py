@@ -2,7 +2,7 @@ import re
 
 import attr
 
-from ..block import BlockUID
+from ..block_uid import BlockUID
 from ..document import MalformedDocumentError
 from ...constants import WS2P_PUBLIC_PREFIX_REGEX, WS2P_PRIVATE_PREFIX_REGEX, WS2P_HEAD_REGEX, \
     PUBKEY_REGEX, SIGNATURE_REGEX, WS2PID_REGEX, BLOCK_UID_REGEX

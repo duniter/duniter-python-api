@@ -1,9 +1,8 @@
 import base64
 import logging
 import re
-from typing import Optional, TypeVar, Type, List
-
-from duniterpy.documents import BlockUID
+from typing import Optional, TypeVar, Type
+from .block_uid import BlockUID
 from ..constants import PUBKEY_REGEX, SIGNATURE_REGEX, BLOCK_ID_REGEX, BLOCK_UID_REGEX, UID_REGEX
 from .document import Document, MalformedDocumentError
 
@@ -63,8 +62,6 @@ class Identity(Document):
         :param inline: Inline string of the Identity
         :return:
         """
-        from .block import BlockUID
-
         selfcert_data = Identity.re_inline.match(inline)
         if selfcert_data is None:
             raise MalformedDocumentError("Inline self certification")
@@ -82,8 +79,6 @@ class Identity(Document):
         :param signed_raw: Signed raw document
         :return:
         """
-        from .block import BlockUID
-
         n = 0
         lines = signed_raw.splitlines(True)
 
@@ -141,6 +136,8 @@ Timestamp: {timestamp}
 # required to type hint cls in classmethod
 CertificationType = TypeVar('CertificationType', bound='Certification')
 
+# todo: certification document should be created with the certified Identity document in arguments
+
 
 class Certification(Document):
     """
@@ -197,8 +194,6 @@ class Certification(Document):
         :param signed_raw: Signed raw document
         :return:
         """
-        from .block import BlockUID
-
         n = 0
         lines = signed_raw.splitlines(True)
 
@@ -245,7 +240,6 @@ class Certification(Document):
         :param inline: Inline document
         :return:
         """
-        from .block import BlockUID
         cert_data = Certification.re_inline.match(inline)
         if cert_data is None:
             raise MalformedDocumentError("Certification ({0})".format(inline))
@@ -324,6 +318,8 @@ CertTimestamp: {timestamp}
 
 # required to type hint cls in classmethod
 RevocationType = TypeVar('RevocationType', bound='Revocation')
+
+# todo: Revocation document should be created with the revoked Identity document in arguments
 
 
 class Revocation(Document):

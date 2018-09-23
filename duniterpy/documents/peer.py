@@ -2,7 +2,7 @@ import re
 
 from duniterpy.api.endpoint import endpoint
 from .document import Document
-from . import BlockUID
+from .block_uid import BlockUID
 from ..constants import BLOCK_HASH_REGEX, PUBKEY_REGEX
 
 
