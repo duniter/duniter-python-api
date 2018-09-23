@@ -299,7 +299,7 @@ class Test_Transaction(unittest.TestCase):
 
     def test_fromraw_toraw(self):
         tx = Transaction.from_signed_raw(tx_raw)
-        rendered_tx = tx.signed_raw()
+        rendered_tx = tx.signed_raw_for_certified()
         from_rendered_tx = Transaction.from_signed_raw(rendered_tx)
 
         self.assertEqual(tx.version, 2)
@@ -366,7 +366,7 @@ class Test_Transaction(unittest.TestCase):
 
     def test_fromraw_toraw_v3(self):
         tx = Transaction.from_signed_raw(tx_raw_v3)
-        rendered_tx = tx.signed_raw()
+        rendered_tx = tx.signed_raw_for_certified()
         from_rendered_tx = Transaction.from_signed_raw(rendered_tx)
 
         self.assertEqual(tx.version, 3)
@@ -435,7 +435,7 @@ class Test_Transaction(unittest.TestCase):
 
     def test_compact_change(self):
         tx = Transaction.from_compact("gtest", compact_change)
-        rendered_tx = tx.signed_raw()
+        rendered_tx = tx.signed_raw_for_certified()
         from_rendered_tx = Transaction.from_signed_raw(rendered_tx)
 
     def test_reduce_base(self):

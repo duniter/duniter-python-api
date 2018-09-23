@@ -80,7 +80,7 @@ def get_certification_document(current_block: dict, self_cert_document: Identity
     )
     # sign document
     key = SigningKey(salt, password)
-    certification.sign(self_cert_document, [key])
+    certification.sign_for_certified(self_cert_document, [key])
 
     return certification
 
@@ -118,7 +118,7 @@ async def main():
     certification = get_certification_document(current_block, identity, pubkey_from, salt, password)
 
     # Here we request for the path wot/certify
-    response = await client(bma.wot.certify, certification.signed_raw(identity))
+    response = await client(bma.wot.certify, certification.signed_raw_for_certified(identity))
 
     if response.status == 200:
         print(await response.text())

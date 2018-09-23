@@ -2,6 +2,7 @@ import base64
 import hashlib
 import logging
 import re
+from typing import TypeVar, Type, Any, List
 
 from ..constants import SIGNATURE_REGEX
 
@@ -11,8 +12,17 @@ class MalformedDocumentError(Exception):
     Malformed document exception
     """
 
-    def __init__(self, field_name):
+    def __init__(self, field_name: str) -> None:
+        """
+        Init exception instance
+
+        :param field_name: Name of the wrong field
+        """
         super().__init__("Could not parse field {0}".format(field_name))
+
+
+# required to type hint cls in classmethod
+DocumentType = TypeVar('DocumentType', bound='Document')
 
 
 class Document:
@@ -26,21 +36,14 @@ class Document:
         "Signature": re_signature
     }
 
-    @classmethod
-    def parse_field(cls, field_name, line):
+    def __init__(self, version: int, currency: str, signatures: List[str]) -> None:
         """
+        Init Document instance
 
-        :param field_name:
-        :param line:
-        :return:
+        :param version: Version of the Document
+        :param currency: Name of the currency
+        :param signatures: List of signatures
         """
-        try:
-            value = cls.fields_parsers[field_name].match(line).group(1)
-        except AttributeError:
-            raise MalformedDocumentError(field_name)
-        return value
-
-    def __init__(self, version, currency, signatures):
         if version < 2:
             raise MalformedDocumentError("Version 1 documents are not handled by duniterpy>0.2")
         self.version = version
@@ -50,10 +53,31 @@ class Document:
         else:
             self.signatures = []
 
-    def sign(self, keys):
+    @classmethod
+    def parse_field(cls: Type[DocumentType], field_name: str, line: str) -> Any:
+        """
+        Parse a document field with regular expression and return the value
+
+        :param field_name: Name of the field
+        :param line: Line string to parse
+        :return:
+        """
+        try:
+            match = cls.fields_parsers[field_name].match(line)
+            if match is None:
+                raise AttributeError
+            value = match.group(1)
+        except AttributeError:
+            raise MalformedDocumentError(field_name)
+        return value
+
+    def sign(self, keys: list) -> None:
         """
         Sign the current document.
+
         Warning : current signatures will be replaced with the new ones.
+
+        :param keys: List of libnacl keys instance
         """
         self.signatures = []
         for key in keys:
@@ -61,16 +85,17 @@ class Document:
             logging.debug("Signature : \n{0}".format(signing.decode("ascii")))
             self.signatures.append(signing.decode("ascii"))
 
-    def raw(self, **kwargs):
+    def raw(self) -> str:
         """
         Returns the raw document in string format
         """
         raise NotImplementedError()
 
-    def signed_raw(self, *args):
+    def signed_raw(self) -> str:
         """
         If keys are None, returns the raw + current signatures
         If keys are present, returns the raw signed by these keys
+        :return:
         """
         raw = self.raw()
         signed = "\n".join(self.signatures)
@@ -78,5 +103,10 @@ class Document:
         return signed_raw
 
     @property
-    def sha_hash(self):
+    def sha_hash(self) -> str:
+        """
+        Return uppercase hex sha256 hash from signed raw document
+
+        :return:
+        """
         return hashlib.sha256(self.signed_raw().encode("ascii")).hexdigest().upper()

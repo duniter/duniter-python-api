@@ -17,6 +17,7 @@ class VerifyingKey(libnacl.sign.Verifier):
     """
     Class to verify documents
     """
+
     def __init__(self, pubkey: str) -> None:
         """
         Creates a Verify class from base58 pubkey
@@ -25,14 +26,14 @@ class VerifyingKey(libnacl.sign.Verifier):
         key = libnacl.encode.hex_encode(Base58Encoder.decode(pubkey))
         super().__init__(key)
 
-    def verify_document(self, document: Document, **kwargs) -> bool:
+    def verify_document(self, document: Document) -> bool:
         """
         Check specified document
         :param duniterpy.documents.Document document:
         :return:
         """
         signature = base64.b64decode(document.signatures[0])
-        prepended = signature + bytes(document.raw(**kwargs), 'ascii')
+        prepended = signature + bytes(document.raw(), 'ascii')
 
         try:
             self.verify(prepended)
@@ -66,4 +67,3 @@ class VerifyingKey(libnacl.sign.Verifier):
         :return str:
         """
         return self.verify(message).decode('utf-8')
-

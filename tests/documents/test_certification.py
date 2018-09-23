@@ -107,10 +107,10 @@ IdtySignature: J3G9oM5AKYZNLAB5Wx499w61NuUoS57JVccTShUbGpCMjCqj9yXXqNq7dyZpDWA6B
 CertTimestamp: 36-1076F10A7397715D2BEE82579861999EA1F274AC
 SoKwoa8PFfCDJWZ6dNCv7XstezHcc2BbKiJgVDXv82R5zYR83nis9dShLgWJ5w48noVUHimdngzYQneNYSMV3rk
 """
-        self.assertEqual(certification.signed_raw(selfcert), result)
+        self.assertEqual(certification.signed_raw_for_certified(selfcert), result)
 
-        from_raw = Certification.from_signed_raw(certification.signed_raw(selfcert))
-        self.assertEqual(from_raw.signed_raw(selfcert), result)
+        from_raw = Certification.from_signed_raw(certification.signed_raw_for_certified(selfcert))
+        self.assertEqual(from_raw.signed_raw_for_certified(selfcert), result)
 
     def test_revokation_from_inline(self):
         version = 2
@@ -139,7 +139,7 @@ IdtyTimestamp: 32-DB30D958EE5CB75186972286ED3F4686B8A1C2CD
 IdtySignature: J3G9oM5AKYZNLAB5Wx499w61NuUoS57JVccTShUbGpCMjCqj9yXXqNq7dyZpDWA6BxipsiaMZhujMeBfCznzyci
 SoKwoa8PFfCDJWZ6dNCv7XstezHcc2BbKiJgVDXv82R5zYR83nis9dShLgWJ5w48noVUHimdngzYQneNYSMV3rk
 """
-        self.assertEqual(revokation.signed_raw(selfcert), result)
+        self.assertEqual(revokation.signed_raw_for_revoked(selfcert), result)
 
     def test_revokation_from_signed_raw(self):
         signed_raw = """Version: 2
@@ -153,4 +153,4 @@ SoKwoa8PFfCDJWZ6dNCv7XstezHcc2BbKiJgVDXv82R5zYR83nis9dShLgWJ5w48noVUHimdngzYQneN
 """
         revocation = Revocation.from_signed_raw(signed_raw)
         selfcert = Revocation.extract_self_cert(signed_raw)
-        self.assertEqual(revocation.signed_raw(selfcert), signed_raw)
+        self.assertEqual(revocation.signed_raw_for_revoked(selfcert), signed_raw)

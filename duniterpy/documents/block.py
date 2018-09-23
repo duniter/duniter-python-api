@@ -1,7 +1,7 @@
 import base64
 import hashlib
 import re
-from typing import Union, TypeVar, Type, Optional, List
+from typing import Union, TypeVar, Type, Optional, List, Sequence
 
 from .certification import Identity, Certification, Revocation
 from .document import Document, MalformedDocumentError
@@ -37,6 +37,8 @@ class BlockUID:
         :param blockid: The block id
         """
         data = BlockUID.re_block_uid.match(blockid)
+        if data is None:
+            raise MalformedDocumentError("BlockUID")
         try:
             number = int(data.group(1))
         except AttributeError:
@@ -52,19 +54,29 @@ class BlockUID:
     def __str__(self) -> str:
         return "{0}-{1}".format(self.number, self.sha_hash)
 
-    def __eq__(self, other: Type[BlockUIDType]) -> bool:
+    def __eq__(self, other: object) -> bool:
+        if not isinstance(other, BlockUID):
+            return False
         return self.number == other.number and self.sha_hash == other.sha_hash
 
-    def __lt__(self, other: Type[BlockUIDType]) -> bool:
+    def __lt__(self, other: object) -> bool:
+        if not isinstance(other, BlockUID):
+            return False
         return self.number < other.number
 
-    def __gt__(self, other: Type[BlockUIDType]) -> bool:
+    def __gt__(self, other: object) -> bool:
+        if not isinstance(other, BlockUID):
+            return False
         return self.number > other.number
 
-    def __le__(self, other: Type[BlockUIDType]) -> bool:
+    def __le__(self, other: object) -> bool:
+        if not isinstance(other, BlockUID):
+            return False
         return self.number <= other.number
 
-    def __ge__(self, other: Type[BlockUIDType]) -> bool:
+    def __ge__(self, other: object) -> bool:
+        if not isinstance(other, BlockUID):
+            return False
         return self.number >= other.number
 
     def __hash__(self) -> int:
@@ -215,9 +227,9 @@ The class Block handles Block documents.
                  issuers_frame: int,
                  issuers_frame_var: int,
                  different_issuers_count: int,
-                 prev_hash: str,
-                 prev_issuer: str,
-                 parameters: str,
+                 prev_hash: Optional[str],
+                 prev_issuer: Optional[str],
+                 parameters: Optional[Sequence[str]],
                  members_count: int,
                  identities: List[Identity],
                  joiners: List[Membership],
@@ -297,7 +309,7 @@ The class Block handles Block documents.
         self.noonce = noonce
 
     @property
-    def blockUID(self) -> BlockUIDType:
+    def blockUID(self) -> BlockUID:
         return BlockUID(self.number, self.proof_of_work())
 
     @classmethod
@@ -326,9 +338,10 @@ The class Block handles Block documents.
         mediantime = int(Block.parse_field("MedianTime", lines[n]))
         n += 1
 
-        ud = Block.re_universaldividend.match(lines[n])
-        unit_base = None
-        if ud is not None:
+        ud_match = Block.re_universaldividend.match(lines[n])
+        ud = None
+        unit_base = 0
+        if ud_match is not None:
             ud = int(Block.parse_field("UD", lines[n]))
             n += 1
 
@@ -354,19 +367,25 @@ The class Block handles Block documents.
         prev_hash = None
         prev_issuer = None
         if number > 0:
-            prev_hash = Block.parse_field("PreviousHash", lines[n])
+            prev_hash = str(Block.parse_field("PreviousHash", lines[n]))
             n += 1
 
-            prev_issuer = Block.parse_field("PreviousIssuer", lines[n])
+            prev_issuer = str(Block.parse_field("PreviousIssuer", lines[n]))
             n += 1
 
         parameters = None
         if number == 0:
             try:
                 if version >= 10:
-                    parameters = Block.re_parameters_v10.match(lines[n]).groups()
+                    params_match = Block.re_parameters_v10.match(lines[n])
+                    if params_match is None:
+                        raise MalformedDocumentError("Parameters")
+                    parameters = params_match.groups()
                 else:
-                    parameters = Block.re_parameters.match(lines[n]).groups()
+                    params_match = Block.re_parameters.match(lines[n])
+                    if params_match is None:
+                        raise MalformedDocumentError("Parameters")
+                    parameters = params_match.groups()
                 n += 1
             except AttributeError:
                 raise MalformedDocumentError("Parameters")
@@ -421,8 +440,10 @@ The class Block handles Block documents.
         if Block.re_excluded.match(lines[n]):
             n += 1
             while Block.re_certifications.match(lines[n]) is None:
-                exclusion = Block.re_exclusion.match(lines[n]).group(1)
-                excluded.append(exclusion)
+                exclusion_match = Block.re_exclusion.match(lines[n])
+                if exclusion_match is not None:
+                    exclusion = exclusion_match.group(1)
+                    excluded.append(exclusion)
                 n += 1
 
         if Block.re_certifications.match(lines[n]):
@@ -502,7 +523,7 @@ IssuersFrameVar: {1}
 DifferentIssuersCount: {2}
 """.format(self.issuers_frame, self.issuers_frame_var, self.different_issuers_count)
 
-        if self.number == 0:
+        if self.number == 0 and self.parameters is not None:
             str_params = ":".join([str(p) for p in self.parameters])
             doc += "Parameters: {0}\n".format(str_params)
         else:
@@ -571,17 +592,27 @@ Nonce: {nonce}
         signing = base64.b64encode(key.signature(bytes(signed, 'ascii')))
         self.signatures = [signing.decode("ascii")]
 
-    def __eq__(self, other: Type[BlockType]) -> bool:
+    def __eq__(self, other: object) -> bool:
+        if not isinstance(other, Block):
+            return False
         return self.blockUID == other.blockUID
 
-    def __lt__(self, other: Type[BlockType]) -> bool:
+    def __lt__(self, other: object) -> bool:
+        if not isinstance(other, Block):
+            return False
         return self.blockUID < other.blockUID
 
-    def __gt__(self, other: Type[BlockType]) -> bool:
+    def __gt__(self, other: object) -> bool:
+        if not isinstance(other, Block):
+            return False
         return self.blockUID > other.blockUID
 
-    def __le__(self, other: Type[BlockType]) -> bool:
+    def __le__(self, other: object) -> bool:
+        if not isinstance(other, Block):
+            return False
         return self.blockUID <= other.blockUID
 
-    def __ge__(self, other: Type[BlockType]) -> bool:
+    def __ge__(self, other: object) -> bool:
+        if not isinstance(other, Block):
+            return False
         return self.blockUID >= other.blockUID
