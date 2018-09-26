@@ -70,17 +70,12 @@ def get_certification_document(current_block: dict, self_cert_document: Identity
     :rtype: Certification
     """
     # construct Certification Document
-    certification = Certification(
-        version=10,
-        currency=current_block['currency'],
-        pubkey_from=from_pubkey,
-        pubkey_to=self_cert_document.pubkey,
-        timestamp=BlockUID(current_block['number'], current_block['hash']),
-        signature=""
-    )
+    certification = Certification(version=10, currency=current_block['currency'], pubkey_from=from_pubkey,
+                                  identity=self_cert_document,
+                                  timestamp=BlockUID(current_block['number'], current_block['hash']), signature="")
     # sign document
     key = SigningKey(salt, password)
-    certification.sign_for_certified(self_cert_document, [key])
+    certification.sign([key])
 
     return certification
 
@@ -118,7 +113,7 @@ async def main():
     certification = get_certification_document(current_block, identity, pubkey_from, salt, password)
 
     # Here we request for the path wot/certify
-    response = await client(bma.wot.certify, certification.signed_raw_for_certified(identity))
+    response = await client(bma.wot.certify, certification.signed_raw())
 
     if response.status == 200:
         print(await response.text())

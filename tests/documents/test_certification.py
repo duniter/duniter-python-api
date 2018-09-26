@@ -91,11 +91,11 @@ J3G9oM5AKYZNLAB5Wx499w61NuUoS57JVccTShUbGpCMjCqj9yXXqNq7dyZpDWA6BxipsiaMZhujMeBf
         pubkey_to = "HgTTJLAQ5sqfknMq7yLPZbehtuLSsKj9CxWN7k8QvYJd"
         timestamp = BlockUID(36, "1076F10A7397715D2BEE82579861999EA1F274AC")
         signature = "SoKwoa8PFfCDJWZ6dNCv7XstezHcc2BbKiJgVDXv82R5zYR83nis9dShLgWJ5w48noVUHimdngzYQneNYSMV3rk"
-        selfcert = Identity(version, currency, pubkey_to, "lolcat",
+        identity = Identity(version, currency, pubkey_to, "lolcat",
                             BlockUID(32, "DB30D958EE5CB75186972286ED3F4686B8A1C2CD"),
                                      "J3G9oM5AKYZNLAB5Wx499w61NuUoS57JVccTShUbGpCMjCqj9yXXqNq7dyZpDWA6BxipsiaMZhujMeBfCznzyci")
 
-        certification = Certification(version, currency, pubkey_from, pubkey_to, timestamp, signature)
+        certification = Certification(version, currency, pubkey_from, identity, timestamp, signature)
 
         result = """Version: 2
 Type: Certification
@@ -108,10 +108,10 @@ IdtySignature: J3G9oM5AKYZNLAB5Wx499w61NuUoS57JVccTShUbGpCMjCqj9yXXqNq7dyZpDWA6B
 CertTimestamp: 36-1076F10A7397715D2BEE82579861999EA1F274AC
 SoKwoa8PFfCDJWZ6dNCv7XstezHcc2BbKiJgVDXv82R5zYR83nis9dShLgWJ5w48noVUHimdngzYQneNYSMV3rk
 """
-        self.assertEqual(certification.signed_raw_for_certified(selfcert), result)
+        self.assertEqual(certification.signed_raw(), result)
 
-        from_raw = Certification.from_signed_raw(certification.signed_raw_for_certified(selfcert))
-        self.assertEqual(from_raw.signed_raw_for_certified(selfcert), result)
+        from_raw = Certification.from_signed_raw(certification.signed_raw())
+        self.assertEqual(from_raw.signed_raw(), result)
 
     def test_revokation_from_inline(self):
         version = 2

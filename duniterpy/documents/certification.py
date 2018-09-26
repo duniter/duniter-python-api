@@ -1,7 +1,7 @@
 import base64
 import logging
 import re
-from typing import Optional, TypeVar, Type
+from typing import Optional, TypeVar, Type, Union
 from .block_uid import BlockUID
 from ..constants import PUBKEY_REGEX, SIGNATURE_REGEX, BLOCK_ID_REGEX, BLOCK_UID_REGEX, UID_REGEX
 from .document import Document, MalformedDocumentError
@@ -136,8 +136,6 @@ Timestamp: {timestamp}
 # required to type hint cls in classmethod
 CertificationType = TypeVar('CertificationType', bound='Certification')
 
-# todo: certification document should be created with the certified Identity document in arguments
-
 
 class Certification(Document):
     """
@@ -169,7 +167,7 @@ class Certification(Document):
         "IdtyTimestamp": re_idty_timestamp
     }}
 
-    def __init__(self, version: int, currency: str, pubkey_from: str, pubkey_to: str,
+    def __init__(self, version: int, currency: str, pubkey_from: str, identity: Union[Identity, str],
                  timestamp: BlockUID, signature: str) -> None:
         """
         Constructor
@@ -177,13 +175,14 @@ class Certification(Document):
         :param version: the UCP version
         :param currency: the currency of the blockchain
         :param pubkey_from: Pubkey of the certifier
-        :param pubkey_to: Pubkey of the certified
+        :param identity: Document instance of the certified identity or identity pubkey string
         :param timestamp: the blockuid
         :param signature: the signature of the document
         """
         super().__init__(version, currency, [signature])
         self.pubkey_from = pubkey_from
-        self.pubkey_to = pubkey_to
+        self.identity = identity if isinstance(identity, Identity) else None
+        self.pubkey_to = identity.pubkey if isinstance(identity, Identity) else identity
         self.timestamp = timestamp
 
     @classmethod
@@ -209,16 +208,16 @@ class Certification(Document):
         pubkey_from = Certification.parse_field("Issuer", lines[n])
         n += 1
 
-        pubkey_to = Certification.parse_field("IdtyIssuer", lines[n])
+        identity_pubkey = Certification.parse_field("IdtyIssuer", lines[n])
         n += 1
 
-        Certification.parse_field("IdtyUniqueID", lines[n])
+        identity_uid = Certification.parse_field("IdtyUniqueID", lines[n])
         n += 1
 
-        BlockUID.from_str(Certification.parse_field("IdtyTimestamp", lines[n]))
+        identity_timestamp = BlockUID.from_str(Certification.parse_field("IdtyTimestamp", lines[n]))
         n += 1
 
-        Certification.parse_field("IdtySignature", lines[n])
+        identity_signature = Certification.parse_field("IdtySignature", lines[n])
         n += 1
 
         timestamp = BlockUID.from_str(Certification.parse_field("CertTimestamp", lines[n]))
@@ -226,13 +225,18 @@ class Certification(Document):
 
         signature = Certification.parse_field("Signature", lines[n])
 
-        return cls(version, currency, pubkey_from, pubkey_to, timestamp, signature)
+        identity = Identity(version, currency, identity_pubkey, identity_uid, identity_timestamp, identity_signature)
+
+        return cls(version, currency, pubkey_from, identity, timestamp, signature)
 
     @classmethod
     def from_inline(cls: Type[CertificationType], version: int, currency: str, blockhash: Optional[str],
                     inline: str) -> CertificationType:
         """
         Return Certification instance from inline document
+
+        Only self.pubkey_to is populated.
+        You must populate self.identity with an Identity instance to use raw/sign/signed_raw methods
 
         :param version: Version of document
         :param currency: Name of the currency
@@ -254,13 +258,13 @@ class Certification(Document):
         signature = cert_data.group(4)
         return cls(version, currency, pubkey_from, pubkey_to, timestamp, signature)
 
-    def raw_for_certified(self, certified: Identity) -> str:
+    def raw(self) -> str:
         """
-        Return a raw document of the self-certification of the Identity
+        Return a raw document of the certification
+        """
+        if not isinstance(self.identity, Identity):
+            raise MalformedDocumentError("Can not return full certification document created from inline")
 
-        :param Identity certified: Identity document instance
-        :return:
-        """
         return """Version: {version}
 Type: Certification
 Currency: {currency}
@@ -273,35 +277,39 @@ CertTimestamp: {timestamp}
 """.format(version=self.version,
            currency=self.currency,
            issuer=self.pubkey_from,
-           certified_pubkey=certified.pubkey,
-           certified_uid=certified.uid,
-           certified_ts=certified.timestamp,
-           certified_signature=certified.signatures[0],
+           certified_pubkey=self.identity.pubkey,
+           certified_uid=self.identity.uid,
+           certified_ts=self.identity.timestamp,
+           certified_signature=self.identity.signatures[0],
            timestamp=self.timestamp)
 
-    def sign_for_certified(self, certified: Identity, keys: list) -> None:
+    def sign(self, keys: list) -> None:
         """
         Sign the current document with the keys for the certified Identity given
 
         Warning : current signatures will be replaced with the new ones.
 
-        :param certified: Identity instance certified
         :param keys: List of libnacl key instances
         """
+        if not isinstance(self.identity, Identity):
+            raise MalformedDocumentError("Can not return full certification document created from inline")
+
         self.signatures = []
         for key in keys:
-            signing = base64.b64encode(key.signature(bytes(self.raw_for_certified(certified), 'ascii')))
+            signing = base64.b64encode(key.signature(bytes(self.raw(), 'ascii')))
             logging.debug("Signature : \n{0}".format(signing.decode("ascii")))
             self.signatures.append(signing.decode("ascii"))
 
-    def signed_raw_for_certified(self, certified: Identity) -> str:
+    def signed_raw(self) -> str:
         """
         Return signed raw document of the certification for the certified Identity instance
 
-        :param certified: Certified Identity instance
         :return:
         """
-        raw = self.raw_for_certified(certified)
+        if not isinstance(self.identity, Identity):
+            raise MalformedDocumentError("Can not return full certification document created from inline")
+
+        raw = self.raw()
         signed = "\n".join(self.signatures)
         signed_raw = raw + signed + "\n"
         return signed_raw
@@ -318,6 +326,7 @@ CertTimestamp: {timestamp}
 
 # required to type hint cls in classmethod
 RevocationType = TypeVar('RevocationType', bound='Revocation')
+
 
 # todo: Revocation document should be created with the revoked Identity document in arguments
 
