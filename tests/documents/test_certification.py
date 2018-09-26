@@ -126,10 +126,10 @@ SoKwoa8PFfCDJWZ6dNCv7XstezHcc2BbKiJgVDXv82R5zYR83nis9dShLgWJ5w48noVUHimdngzYQneN
         currency = "beta_brousouf"
         pubkey = "HgTTJLAQ5sqfknMq7yLPZbehtuLSsKj9CxWN7k8QvYJd"
         signature = "SoKwoa8PFfCDJWZ6dNCv7XstezHcc2BbKiJgVDXv82R5zYR83nis9dShLgWJ5w48noVUHimdngzYQneNYSMV3rk"
-        revokation = Revocation(version, currency, pubkey, signature)
-        selfcert = Identity(version, currency, pubkey, "lolcat",
+        identity = Identity(version, currency, pubkey, "lolcat",
                             BlockUID(32, "DB30D958EE5CB75186972286ED3F4686B8A1C2CD"),
                                      "J3G9oM5AKYZNLAB5Wx499w61NuUoS57JVccTShUbGpCMjCqj9yXXqNq7dyZpDWA6BxipsiaMZhujMeBfCznzyci")
+        revokation = Revocation(version, currency, identity, signature)
 
         result = """Version: 2
 Type: Revocation
@@ -140,7 +140,7 @@ IdtyTimestamp: 32-DB30D958EE5CB75186972286ED3F4686B8A1C2CD
 IdtySignature: J3G9oM5AKYZNLAB5Wx499w61NuUoS57JVccTShUbGpCMjCqj9yXXqNq7dyZpDWA6BxipsiaMZhujMeBfCznzyci
 SoKwoa8PFfCDJWZ6dNCv7XstezHcc2BbKiJgVDXv82R5zYR83nis9dShLgWJ5w48noVUHimdngzYQneNYSMV3rk
 """
-        self.assertEqual(revokation.signed_raw_for_revoked(selfcert), result)
+        self.assertEqual(revokation.signed_raw(), result)
 
     def test_revokation_from_signed_raw(self):
         signed_raw = """Version: 2
@@ -153,5 +153,5 @@ IdtySignature: J3G9oM5AKYZNLAB5Wx499w61NuUoS57JVccTShUbGpCMjCqj9yXXqNq7dyZpDWA6B
 SoKwoa8PFfCDJWZ6dNCv7XstezHcc2BbKiJgVDXv82R5zYR83nis9dShLgWJ5w48noVUHimdngzYQneNYSMV3rk
 """
         revocation = Revocation.from_signed_raw(signed_raw)
-        selfcert = Revocation.extract_self_cert(signed_raw)
-        self.assertEqual(revocation.signed_raw_for_revoked(selfcert), signed_raw)
+        self.assertTrue(isinstance(Revocation.extract_self_cert(signed_raw), Identity))
+        self.assertEqual(revocation.signed_raw(), signed_raw)

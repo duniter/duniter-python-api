@@ -84,11 +84,11 @@ def get_signed_raw_revocation_document(identity: Identity, salt: str, password: 
 
     :rtype: str
     """
-    revocation = Revocation(PROTOCOL_VERSION, identity.currency, identity.pubkey, "")
+    revocation = Revocation(PROTOCOL_VERSION, identity.currency, identity, "")
 
     key = SigningKey(salt, password)
-    revocation.sign_for_revoked(identity, [key])
-    return revocation.signed_raw_for_revoked(identity)
+    revocation.sign([key])
+    return revocation.signed_raw()
 
 
 async def main():
