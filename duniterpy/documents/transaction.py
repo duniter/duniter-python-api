@@ -1,31 +1,361 @@
 import re
+from typing import TypeVar, List, Type, Optional, Dict, Union
 
 import pypeg2
+
+from duniterpy.grammars.output import Condition
 from .block_uid import BlockUID
 from .document import Document, MalformedDocumentError
 from ..constants import PUBKEY_REGEX, TRANSACTION_HASH_REGEX, BLOCK_ID_REGEX, BLOCK_UID_REGEX
 from ..grammars import output
 
 
-def reduce_base(amount, base):
+def reduce_base(amount: int, base: int) -> tuple:
     """
     Compute the reduced base of the given parameters
-    :param int amount: the amount value
-    :param int base: current base value
+
+    :param amount: the amount value
+    :param base: current base value
+
     :return: tuple containing computed (amount, base)
-    :rtype: tuple
     """
     if amount == 0:
         return 0, 0
 
     next_amount = amount
     next_base = base
-    while int(next_amount) == next_amount:
+    next_amount_is_integer = True
+    while next_amount_is_integer:
         amount = next_amount
         base = next_base
-        next_amount /= 10
-        next_base += 1
+        if next_amount % 10 == 0:
+            next_amount = int(next_amount / 10)
+            next_base += 1
+        else:
+            next_amount_is_integer = False
+
     return int(amount), int(base)
+
+
+# required to type hint cls in classmethod
+InputSourceType = TypeVar('InputSourceType', bound='InputSource')
+
+
+class InputSource:
+    """
+    A Transaction INPUT
+
+.. note:: Compact :
+    INDEX:SOURCE:FINGERPRINT:AMOUNT
+
+    """
+    re_inline = re.compile(
+        "(?:(?:(D):({pubkey_regex}):({block_id_regex}))|(?:(T):({transaction_hash_regex}):([0-9]+)))\n"
+        .format(pubkey_regex=PUBKEY_REGEX,
+                block_id_regex=BLOCK_ID_REGEX,
+                transaction_hash_regex=TRANSACTION_HASH_REGEX))
+    re_inline_v3 = re.compile(
+        "([0-9]+):([0-9]+):(?:(?:(D):({pubkey_regex}):({block_id_regex}))|(?:(T):({transaction_hash_regex}):\
+([0-9]+)))\n"
+        .format(pubkey_regex=PUBKEY_REGEX,
+                block_id_regex=BLOCK_ID_REGEX,
+                transaction_hash_regex=TRANSACTION_HASH_REGEX))
+
+    def __init__(self, amount: int, base: int, source: str, origin_id: str, index: int) -> None:
+        """
+        An input source can come from a dividend or a transaction.
+
+        :param amount: amount of the input
+        :param base: base of the input
+        :param source: D if dividend, T if transaction
+        :param origin_id: a Public key if a dividend, a tx hash if a transaction
+        :param index: a block id if a dividend, an tx index if a transaction
+        :return:
+        """
+        self.amount = amount
+        self.base = base
+        self.source = source
+        self.origin_id = origin_id
+        self.index = index
+
+    @classmethod
+    def from_inline(cls: Type[InputSourceType], tx_version: int, inline: str) -> InputSourceType:
+        """
+        Return Transaction instance from inline string format
+
+        :param tx_version: Version number of the document
+        :param inline: Inline string format
+        :return:
+        """
+        if tx_version == 2:
+            data = InputSource.re_inline.match(inline)
+            if data is None:
+                raise MalformedDocumentError("Inline input")
+            source_offset = 0
+            amount = 0
+            base = 0
+        else:
+            data = InputSource.re_inline_v3.match(inline)
+            if data is None:
+                raise MalformedDocumentError("Inline input")
+            source_offset = 2
+            amount = int(data.group(1))
+            base = int(data.group(2))
+        if data.group(1 + source_offset):
+            source = data.group(1 + source_offset)
+            origin_id = data.group(2 + source_offset)
+            index = int(data.group(3 + source_offset))
+        else:
+            source = data.group(4 + source_offset)
+            origin_id = data.group(5 + source_offset)
+            index = int(data.group(6 + source_offset))
+
+        return cls(amount, base, source, origin_id, index)
+
+    def inline(self, tx_version: int) -> str:
+        """
+        Return an inline string format of the document
+
+        :param tx_version: Version number of the document
+        :return:
+        """
+        if tx_version == 2:
+            return "{0}:{1}:{2}".format(self.source,
+                                        self.origin_id,
+                                        self.index)
+        else:
+            return "{0}:{1}:{2}:{3}:{4}".format(self.amount,
+                                                self.base,
+                                                self.source,
+                                                self.origin_id,
+                                                self.index)
+
+
+# required to type hint cls in classmethod
+OutputSourceType = TypeVar('OutputSourceType', bound='OutputSource')
+
+
+class OutputSource:
+    """
+    A Transaction OUTPUT
+    """
+    re_inline = re.compile("([0-9]+):([0-9]+):(.*)\n")
+
+    def __init__(self, amount: int, base: int, conditions: Union[str, Condition]) -> None:
+        """
+        Init OutputSource instance
+
+        :param amount: Amount of the output
+        :param base: Base number
+        :param conditions: Conditions expression
+        """
+        self.amount = amount
+        self.base = base
+        self.conditions = conditions
+
+    @classmethod
+    def from_inline(cls: Type[OutputSourceType], inline: str) -> OutputSourceType:
+        """
+        Return OutputSource instance from inline string format
+
+        :param inline: Inline string format
+        :return:
+        """
+        data = OutputSource.re_inline.match(inline)
+        if data is None:
+            raise MalformedDocumentError("Inline output")
+        amount = int(data.group(1))
+        base = int(data.group(2))
+        conditions_text = data.group(3)
+        try:
+            conditions = pypeg2.parse(conditions_text, output.Condition)
+        except SyntaxError:
+            # Invalid conditions are possible, see https://github.com/duniter/duniter/issues/1156
+            # In such a case, they are store "as-is" and considered unlockable
+            conditions = conditions_text
+        return cls(amount, base, conditions)
+
+    def inline(self) -> str:
+        """
+        Return an inline string format of the document
+
+        :return:
+        """
+        if type(self.conditions) is str:
+            return "{0}:{1}:{2}".format(self.amount, self.base, self.conditions)
+        else:
+            return "{0}:{1}:{2}".format(self.amount, self.base,
+                                        pypeg2.compose(self.conditions, output.Condition))
+
+
+# required to type hint cls in classmethod
+SIGParameterType = TypeVar('SIGParameterType', bound='SIGParameter')
+
+
+class SIGParameter:
+    """
+    A Transaction UNLOCK SIG parameter
+    """
+    re_sig = re.compile("SIG\(([0-9]+)\)")
+
+    def __init__(self, index: int) -> None:
+        """
+        Init SIGParameter instance
+
+        :param index: Index in list
+        """
+        self.index = index
+
+    @classmethod
+    def from_parameter(cls: Type[SIGParameterType], parameter: str) -> Optional[SIGParameterType]:
+        """
+        Return a SIGParameter instance from an index parameter
+
+        :param parameter: Index parameter
+
+        :return:
+        """
+        sig = SIGParameter.re_sig.match(parameter)
+        if sig:
+            return cls(int(sig.group(1)))
+
+        return None
+
+    def __str__(self):
+        """
+        Return a string representation of the SIGParameter instance
+
+        :return:
+        """
+        return "SIG({0})".format(self.index)
+
+
+# required to type hint cls in classmethod
+XHXParameterType = TypeVar('XHXParameterType', bound='XHXParameter')
+
+
+class XHXParameter:
+    """
+    A Transaction UNLOCK XHX parameter
+    """
+    re_xhx = re.compile("XHX\(([0-9]+)\)")
+
+    def __init__(self, integer: int) -> None:
+        """
+        Init XHXParameter instance
+
+        :param integer: XHX number
+        """
+        self.integer = integer
+
+    @classmethod
+    def from_parameter(cls: Type[XHXParameterType], parameter: str) -> Optional[XHXParameterType]:
+        """
+        Return a XHXParameter instance from an index parameter
+
+        :param parameter: Index parameter
+
+        :return:
+        """
+        xhx = XHXParameter.re_xhx.match(parameter)
+        if xhx:
+            return cls(int(xhx.group(1)))
+
+        return None
+
+    def compute(self):
+        pass
+
+    def __str__(self):
+        """
+        Return a string representation of the XHXParameter instance
+
+        :return:
+        """
+        return "XHX({0})".format(self.integer)
+
+
+# required to type hint cls in classmethod
+UnlockParameterType = TypeVar('UnlockParameterType', bound='UnlockParameter')
+
+
+class UnlockParameter:
+
+    @classmethod
+    def from_parameter(cls: Type[UnlockParameterType], parameter: str) -> Optional[Union[SIGParameter, XHXParameter]]:
+        """
+        Return UnlockParameter instance from parameter string
+
+        :param parameter: Parameter string
+        :return:
+        """
+
+        sig_param = SIGParameter.from_parameter(parameter)
+        if sig_param:
+            return sig_param
+        else:
+            xhx_param = XHXParameter.from_parameter(parameter)
+            if xhx_param:
+                return xhx_param
+
+        return None
+
+    def compute(self):
+        pass
+
+
+# required to type hint cls in classmethod
+UnlockType = TypeVar('UnlockType', bound='Unlock')
+
+
+class Unlock:
+    """
+    A Transaction UNLOCK
+    """
+    re_inline = re.compile("([0-9]+):((?:SIG\([0-9]+\)|XHX\([0-9]+\)|\s)+)\n")
+
+    def __init__(self, index: int, parameters: List[Union[SIGParameter, XHXParameter]]) -> None:
+        """
+        Init Unlock instance
+
+        :param index: Index number
+        :param parameters: List of UnlockParameter instances
+        """
+        self.index = index
+        self.parameters = parameters
+
+    @classmethod
+    def from_inline(cls: Type[UnlockType], inline: str) -> UnlockType:
+        """
+        Return an Unlock instance from inline string format
+
+        :param inline: Inline string format
+
+        :return:
+        """
+        data = Unlock.re_inline.match(inline)
+        if data is None:
+            raise MalformedDocumentError("Inline input")
+        index = int(data.group(1))
+        parameters_str = data.group(2).split(' ')
+        parameters = []
+        for p in parameters_str:
+            param = UnlockParameter.from_parameter(p)
+            if param:
+                parameters.append(param)
+        return cls(index, parameters)
+
+    def inline(self) -> str:
+        """
+        Return inline string format of the instance
+
+        :return:
+        """
+        return "{0}:{1}".format(self.index, ' '.join([str(p) for p in self.parameters]))
+
+
+# required to type hint cls in classmethod
+TransactionType = TypeVar('TransactionType', bound='Transaction')
 
 
 class Transaction(Document):
@@ -92,20 +422,22 @@ class Transaction(Document):
     }
                       }
 
-    def __init__(self, version, currency, blockstamp, locktime, issuers, inputs, unlocks, outputs,
-                 comment, signatures):
+    def __init__(self, version: int, currency: str, blockstamp: Optional[BlockUID], locktime: int, issuers: List[str],
+                 inputs: List[InputSource], unlocks: List[Unlock], outputs: List[OutputSource],
+                 comment: str, signatures: List[str]) -> None:
         """
+        Init Transaction instance
 
-        :param int version:
-        :param str currency:
-        :param BlockUID blockstamp:
-        :param int locktime:
-        :param list[str] issuers:
-        :param list[InputSource] inputs:
-        :param list[Unlock] unlocks:
-        :param list[OutputSource] outputs:
-        :param comment:
-        :param signatures:
+        :param version: Version number of the document
+        :param currency: Name of the currency
+        :param blockstamp: BlockUID timestamp of the block
+        :param locktime: Lock time in seconds
+        :param issuers: List of issuers public key
+        :param inputs: List of InputSource instances
+        :param unlocks: List of Unlock instances
+        :param outputs: List of OutputSource instances
+        :param comment: Comment field
+        :param signatures: List of signatures
         """
         super().__init__(version, currency, signatures)
         self.blockstamp = blockstamp
@@ -117,12 +449,14 @@ class Transaction(Document):
         self.comment = comment
 
     @classmethod
-    def from_bma_history(cls, currency, tx_data):
+    def from_bma_history(cls: Type[TransactionType], currency: str, tx_data: Dict) -> TransactionType:
         """
-        Get the transaction from json
-        :param str currency: the currency of the tx
-        :param dict tx_data: json data of the transaction
-        :rtype: Transaction
+        Get the transaction instance from json
+
+        :param currency: the currency of the tx
+        :param tx_data: json data of the transaction
+
+        :return:
         """
         tx_data = tx_data.copy()
         tx_data["currency"] = currency
@@ -161,10 +495,17 @@ Outputs:
 Comment: {comment}
 {multiline_signatures}
 """.format(**tx_data)
-        return Transaction.from_signed_raw(signed_raw)
+        return cls.from_signed_raw(signed_raw)
 
     @classmethod
-    def from_compact(cls, currency, compact):
+    def from_compact(cls: Type[TransactionType], currency: str, compact: str) -> TransactionType:
+        """
+        Return Transaction instance from compact string format
+
+        :param currency: Name of the currency
+        :param compact: Compact format string
+        :return:
+        """
         lines = compact.splitlines(True)
         n = 0
 
@@ -180,11 +521,10 @@ Comment: {comment}
         locktime = int(header_data.group(7))
         n += 1
 
+        blockstamp = None  # type: Optional[BlockUID]
         if version >= 3:
             blockstamp = BlockUID.from_str(Transaction.parse_field("CompactBlockstamp", lines[n]))
             n += 1
-        else:
-            blockstamp = None
 
         issuers = []
         inputs = []
@@ -213,15 +553,17 @@ Comment: {comment}
 
         comment = ""
         if has_comment == 1:
-            if Transaction.re_compact_comment.match(lines[n]):
-                comment = Transaction.re_compact_comment.match(lines[n]).group(1)
+            data = Transaction.re_compact_comment.match(lines[n])
+            if data:
+                comment = data.group(1)
                 n += 1
             else:
                 raise MalformedDocumentError("Compact TX Comment")
 
         while n < len(lines):
-            if Transaction.re_signature.match(lines[n]):
-                signatures.append(Transaction.re_signature.match(lines[n]).group(1))
+            data = Transaction.re_signature.match(lines[n])
+            if data:
+                signatures.append(data.group(1))
                 n += 1
             else:
                 raise MalformedDocumentError("Compact TX Signatures")
@@ -229,7 +571,14 @@ Comment: {comment}
         return cls(version, currency, blockstamp, locktime, issuers, inputs, unlocks, outputs, comment, signatures)
 
     @classmethod
-    def from_signed_raw(cls, raw):
+    def from_signed_raw(cls: Type[TransactionType], raw: str) -> TransactionType:
+        """
+        Return a Transaction instance from a raw string format
+
+        :param raw: Raw string format
+
+        :return:
+        """
         lines = raw.splitlines(True)
         n = 0
 
@@ -242,11 +591,10 @@ Comment: {comment}
         currency = Transaction.parse_field("Currency", lines[n])
         n += 1
 
+        blockstamp = None  # type: Optional[BlockUID]
         if version >= 3:
             blockstamp = BlockUID.from_str(Transaction.parse_field("Blockstamp", lines[n]))
             n += 1
-        else:
-            blockstamp = None
 
         locktime = Transaction.parse_field("Locktime", lines[n])
         n += 1
@@ -297,7 +645,12 @@ Comment: {comment}
         return cls(version, currency, blockstamp, locktime, issuers, inputs, unlocks, outputs,
                    comment, signatures)
 
-    def raw(self):
+    def raw(self) -> str:
+        """
+        Return raw string format from the instance
+
+        :return:
+        """
         doc = """Version: {0}
 Type: Transaction
 Currency: {1}
@@ -330,9 +683,11 @@ Currency: {1}
 
         return doc
 
-    def compact(self):
+    def compact(self) -> str:
         """
-        Return a transaction in its compact format.
+        Return a transaction in its compact format from the instance
+
+        :return:
         """
         """TX:VERSION:NB_ISSUERS:NB_INPUTS:NB_UNLOCKS:NB_OUTPUTS:HAS_COMMENT:LOCKTIME
 PUBLIC_KEY:INDEX
@@ -375,34 +730,37 @@ class SimpleTransaction(Transaction):
     ...
     """
 
-    def __init__(self, version, currency, blockstamp, locktime, issuer,
-                 single_input, unlocks, outputs, comment, signature):
+    def __init__(self, version: int, currency: str, blockstamp: BlockUID, locktime: int, issuer: str,
+                 single_input: InputSource, unlocks: List[Unlock], outputs: List[OutputSource], comment: str,
+                 signature: str) -> None:
         """
         Init instance
 
-        :param version:
-        :param currency:
-        :param blockstamp:
-        :param locktime:
-        :param issuer:
-        :param single_input:
-        :param unlocks:
-        :param outputs:
-        :param comment:
-        :param signature:
+        :param version: Version number of the document
+        :param currency: Name of the currency
+        :param blockstamp: BlockUID timestamp
+        :param locktime: Lock time in seconds
+        :param issuer: Issuer public key
+        :param single_input: InputSource instance
+        :param unlocks: List of Unlock instances
+        :param outputs: List of OutputSource instances
+        :param comment: Comment field
+        :param signature: Signature
         """
         super().__init__(version, currency, blockstamp, locktime, [issuer], [single_input], unlocks,
                          outputs, comment, [signature])
 
     @staticmethod
-    def is_simple(tx):
+    def is_simple(tx: Transaction) -> bool:
         """
         Filter a transaction and checks if it is a basic one
         A simple transaction is a tx which has only one issuer
         and two outputs maximum. The unlocks must be done with
         simple "SIG" functions, and the outputs must be simple
         SIG conditions.
+
         :param duniterpy.documents.Transaction tx: the transaction to check
+
         :return: True if a simple transaction
         """
         simple = True
@@ -423,204 +781,3 @@ class SimpleTransaction(Transaction):
                 elif type(o.conditions.left) is not output.SIG:
                     simple = False
         return simple
-
-
-class InputSource:
-    """
-    A Transaction INPUT
-
-.. note:: Compact :
-    INDEX:SOURCE:FINGERPRINT:AMOUNT
-
-    """
-    re_inline = re.compile(
-        "(?:(?:(D):({pubkey_regex}):({block_id_regex}))|(?:(T):({transaction_hash_regex}):([0-9]+)))\n"
-        .format(pubkey_regex=PUBKEY_REGEX,
-                block_id_regex=BLOCK_ID_REGEX,
-                transaction_hash_regex=TRANSACTION_HASH_REGEX))
-    re_inline_v3 = re.compile(
-        "([0-9]+):([0-9]+):(?:(?:(D):({pubkey_regex}):({block_id_regex}))|(?:(T):({transaction_hash_regex}):\
-([0-9]+)))\n"
-        .format(pubkey_regex=PUBKEY_REGEX,
-                block_id_regex=BLOCK_ID_REGEX,
-                transaction_hash_regex=TRANSACTION_HASH_REGEX))
-
-    def __init__(self, amount, base, source, origin_id, index):
-        """
-        An input source can come from a dividend or a transaction.
-
-        :param int amount: amount of the input
-        :param int base: base of the input
-        :param str source: D if dividend, T if transaction
-        :param str origin_id: a Public key if a dividend, a tx hash if a transaction
-        :param int index: a block id if a dividend, an tx index if a transaction
-        :return:
-        """
-        self.amount = amount
-        self.base = base
-        self.source = source
-        self.origin_id = origin_id
-        self.index = index
-
-    @classmethod
-    def from_inline(cls, tx_version, inline):
-        if tx_version == 2:
-            data = InputSource.re_inline.match(inline)
-            if data is None:
-                raise MalformedDocumentError("Inline input")
-            source_offset = 0
-            amount = 0
-            base = 0
-        else:
-            data = InputSource.re_inline_v3.match(inline)
-            if data is None:
-                raise MalformedDocumentError("Inline input")
-            source_offset = 2
-            amount = data.group(1)
-            base = data.group(2)
-        if data.group(1 + source_offset):
-            source = data.group(1 + source_offset)
-            origin_id = data.group(2 + source_offset)
-            index = int(data.group(3 + source_offset))
-        else:
-            source = data.group(4 + source_offset)
-            origin_id = data.group(5 + source_offset)
-            index = int(data.group(6 + source_offset))
-
-        return cls(amount, base, source, origin_id, index)
-
-    def inline(self, tx_version):
-        if tx_version == 2:
-            return "{0}:{1}:{2}".format(self.source,
-                                        self.origin_id,
-                                        self.index)
-        else:
-            return "{0}:{1}:{2}:{3}:{4}".format(self.amount,
-                                                self.base,
-                                                self.source,
-                                                self.origin_id,
-                                                self.index)
-
-
-class UnlockParameter:
-
-    def __init__(self):
-        pass
-
-    @classmethod
-    def from_parameter(cls, parameter):
-        for params_type in (SIGParameter, XHXParameter):
-            param = params_type.from_parameter(parameter)
-            if param:
-                return param
-
-    def compute(self):
-        pass
-
-
-class SIGParameter:
-    """
-    A Transaction UNLOCK SIG parameter
-    """
-    re_sig = re.compile("SIG\(([0-9]+)\)")
-
-    def __init__(self, index):
-        self.index = index
-
-    @classmethod
-    def from_parameter(cls, parameter):
-        sig = SIGParameter.re_sig.match(parameter)
-        if sig:
-            return SIGParameter(sig.group(1))
-        else:
-            return None
-
-    def __str__(self):
-        return "SIG({0})".format(self.index)
-
-
-class XHXParameter:
-    """
-    A Transaction UNLOCK XHX parameter
-    """
-    re_xhx = re.compile("XHX\(([0-9]+)\)")
-
-    def __init__(self, integer):
-        self.integer = integer
-
-    @classmethod
-    def from_parameter(cls, parameter):
-        xhx = XHXParameter.re_xhx.match(parameter)
-        if xhx:
-            return XHXParameter(xhx.group(1))
-        else:
-            return None
-
-    def compute(self):
-        return
-
-    def __str__(self):
-        return "XHX({0})".format(self.integer)
-
-
-class Unlock:
-    """
-    A Transaction UNLOCK
-    """
-    re_inline = re.compile("([0-9]+):((?:SIG\([0-9]+\)|XHX\([0-9]+\)|\s)+)\n")
-
-    def __init__(self, index, parameters):
-        self.index = index
-        self.parameters = parameters
-
-    @classmethod
-    def from_inline(cls, inline):
-        data = Unlock.re_inline.match(inline)
-        if data is None:
-            raise MalformedDocumentError("Inline input")
-        index = int(data.group(1))
-        parameters_str = data.group(2).split(' ')
-        parameters = []
-        for p in parameters_str:
-            param = UnlockParameter.from_parameter(p)
-            if param:
-                parameters.append(param)
-        return cls(index, parameters)
-
-    def inline(self):
-        return "{0}:{1}".format(self.index, ' '.join([str(p) for p in self.parameters]))
-
-
-class OutputSource:
-    """
-    A Transaction OUTPUT
-    """
-    re_inline = re.compile("([0-9]+):([0-9]+):(.*)\n")
-
-    def __init__(self, amount, base, conditions):
-        self.amount = amount
-        self.base = base
-        self.conditions = conditions
-
-    @classmethod
-    def from_inline(cls, inline):
-        data = OutputSource.re_inline.match(inline)
-        if data is None:
-            raise MalformedDocumentError("Inline output")
-        amount = int(data.group(1))
-        base = int(data.group(2))
-        conditions_text = data.group(3)
-        try:
-            conditions = pypeg2.parse(conditions_text, output.Condition)
-        except SyntaxError:
-            # Invalid conditions are possible, see https://github.com/duniter/duniter/issues/1156
-            # In such a case, they are store "as-is" and considered unlockable
-            conditions = conditions_text
-        return cls(amount, base, conditions)
-
-    def inline(self):
-        if type(self.conditions) is str:
-            return "{0}:{1}:{2}".format(self.amount, self.base, self.conditions)
-        else:
-            return "{0}:{1}:{2}".format(self.amount, self.base,
-                                        pypeg2.compose(self.conditions, output.Condition))

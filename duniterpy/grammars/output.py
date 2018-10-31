@@ -84,6 +84,18 @@ class Condition(str):
 
     grammar = None
 
+    # value argument mandatory ! dont remove it !
+    def __init__(self, value: str = '') -> None:
+        """
+        Init Condition instance
+        """
+        super().__init__()
+
+        # custom fields
+        self.left = None
+        self.right = None
+        self.op = None
+
     @classmethod
     def token(cls, left, op=None, right=None):
         condition = cls()
