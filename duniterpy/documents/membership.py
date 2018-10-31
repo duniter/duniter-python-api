@@ -4,9 +4,14 @@ Created on 2 déc. 2014
 @author: inso
 """
 import re
+from typing import TypeVar, Type
+
 from .block_uid import BlockUID
 from .document import Document, MalformedDocumentError
 from ..constants import BLOCK_UID_REGEX, SIGNATURE_REGEX, PUBKEY_REGEX
+
+# required to type hint cls in classmethod
+MembershipType = TypeVar('MembershipType', bound='Membership')
 
 
 class Membership(Document):
@@ -46,19 +51,19 @@ class Membership(Document):
         "CertTS": re_certts
     }}
 
-    def __init__(self, version, currency, issuer, membership_ts,
-                 membership_type, uid, identity_ts, signature):
+    def __init__(self, version: int, currency: str, issuer: str, membership_ts: BlockUID,
+                 membership_type: str, uid: str, identity_ts: BlockUID, signature: str) -> None:
         """
         Create a membership document
 
-        :param int version: Version of the document
+        :param version: Version of the document
         :param currency: Name of the currency
         :param issuer: Public key of the issuer
-        :param BlockUID membership_ts: BlockUID of this membership
+        :param membership_ts: BlockUID of this membership
         :param membership_type: "IN" or "OUT" to enter or quit the community
-        :param str uid: Unique identifier of the identity
-        :param BlockUID identity_ts:  BlockUID of the identity
-        :param str|None signature: Signature of the document
+        :param uid: Unique identifier of the identity
+        :param identity_ts:  BlockUID of the identity
+        :param signature: Signature of the document
         """
         super().__init__(version, currency, [signature])
         self.issuer = issuer
@@ -68,7 +73,17 @@ class Membership(Document):
         self.identity_ts = identity_ts
 
     @classmethod
-    def from_inline(cls, version, currency, membership_type, inline):
+    def from_inline(cls: Type[MembershipType], version: int, currency: str, membership_type: str,
+                    inline: str) -> MembershipType:
+        """
+        Return Membership instance from inline format
+
+        :param version: Version of the document
+        :param currency: Name of the currency
+        :param membership_type: "IN" or "OUT" to enter or exit membership
+        :param inline: Inline string format
+        :return:
+        """
         data = Membership.re_inline.match(inline)
         if data is None:
             raise MalformedDocumentError("Inline membership ({0})".format(inline))
@@ -80,7 +95,13 @@ class Membership(Document):
         return cls(version, currency, issuer, membership_ts, membership_type, uid, identity_ts, signature)
 
     @classmethod
-    def from_signed_raw(cls, signed_raw):
+    def from_signed_raw(cls: Type[MembershipType], signed_raw: str) -> MembershipType:
+        """
+        Return Membership instance from signed raw format
+
+        :param signed_raw: Signed raw format string
+        :return:
+        """
         lines = signed_raw.splitlines(True)
         n = 0
 
@@ -114,7 +135,12 @@ class Membership(Document):
         return cls(version, currency, issuer, membership_ts,
                    membership_type, uid, identity_ts, signature)
 
-    def raw(self):
+    def raw(self) -> str:
+        """
+        Return signed raw format string of the Membership instance
+
+        :return:
+        """
         return """Version: {0}
 Type: Membership
 Currency: {1}
@@ -131,7 +157,11 @@ CertTS: {6}
            self.uid,
            self.identity_ts)
 
-    def inline(self):
+    def inline(self) -> str:
+        """
+        Return inline string format of the Membership instance
+        :return:
+        """
         return "{0}:{1}:{2}:{3}:{4}".format(self.issuer,
                                             self.signatures[0],
                                             self.membership_ts,
