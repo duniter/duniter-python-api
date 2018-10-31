@@ -1,9 +1,13 @@
 import re
+from typing import TypeVar, List, Type
 
-from duniterpy.api.endpoint import endpoint
-from .document import Document
+from duniterpy.api.endpoint import endpoint, Endpoint
+from .document import Document, MalformedDocumentError
 from .block_uid import BlockUID
 from ..constants import BLOCK_HASH_REGEX, PUBKEY_REGEX
+
+# required to type hint cls in classmethod
+PeerType = TypeVar('PeerType', bound='Peer')
 
 
 class Peer(Document):
@@ -35,8 +39,18 @@ class Peer(Document):
         "Endpoints": re_endpoints
     }}
 
-    def __init__(self, version, currency, pubkey, block_uid,
-                 endpoints, signature):
+    def __init__(self, version: int, currency: str, pubkey: str, block_uid: BlockUID,
+                 endpoints: List[Endpoint], signature: str) -> None:
+        """
+        Init Peer instance
+
+        :param version: Version of the document
+        :param currency: Name of the currency
+        :param pubkey: Public key of the issuer
+        :param block_uid: BlockUID instance timestamp
+        :param endpoints: List of endpoints string
+        :param signature: Signature of the document
+        """
         super().__init__(version, currency, [signature])
 
         self.pubkey = pubkey
@@ -44,7 +58,13 @@ class Peer(Document):
         self.endpoints = endpoints
 
     @classmethod
-    def from_signed_raw(cls, raw):
+    def from_signed_raw(cls: Type[PeerType], raw: str) -> PeerType:
+        """
+        Return a Peer instance from a signed raw format string
+
+        :param raw: Signed raw format string
+        :return:
+        """
         lines = raw.splitlines(True)
         n = 0
 
@@ -71,11 +91,19 @@ class Peer(Document):
             endpoints.append(endpoint(lines[n]))
             n += 1
 
-        signature = Peer.re_signature.match(lines[n]).group(1)
+        data = Peer.re_signature.match(lines[n])
+        if data is None:
+            raise MalformedDocumentError("Peer")
+        signature = data.group(1)
 
         return cls(version, currency, pubkey, block_uid, endpoints, signature)
 
-    def raw(self):
+    def raw(self) -> str:
+        """
+        Return a raw format string of the Peer document
+
+        :return:
+        """
         doc = """Version: {0}
 Type: Peer
 Currency: {1}
