@@ -62,9 +62,13 @@ Development
 
     make check
 
-* Run unit tests with::
+* Run all unit tests with::
 
     make tests
+
+* Run only some unit tests with::
+
+    make tests test_filter=tests.documents.test_block.TestBlock.test_fromraw
 
 Documentation
 -------------
