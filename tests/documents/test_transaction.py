@@ -191,13 +191,13 @@ class Test_Transaction(unittest.TestCase):
 
         self.assertEqual(tx.outputs[0].amount, 120)
         self.assertEqual(tx.outputs[0].base, 2)
-        self.assertEqual(pypeg2.compose(tx.outputs[0].conditions, output.Condition), "SIG(BYfWYFrsyjpvpFysgu19rGK3VHBkz4MqmQbNyEuVU64g)")
+        self.assertEqual(pypeg2.compose(tx.outputs[0].condition, output.Condition), "SIG(BYfWYFrsyjpvpFysgu19rGK3VHBkz4MqmQbNyEuVU64g)")
         self.assertEqual(tx.outputs[1].amount, 146)
         self.assertEqual(tx.outputs[1].base, 2)
-        self.assertEqual(pypeg2.compose(tx.outputs[1].conditions, output.Condition), "SIG(DSz4rgncXCytsUMW2JU2yhLquZECD2XpEkpP9gG5HyAx)")
+        self.assertEqual(pypeg2.compose(tx.outputs[1].condition, output.Condition), "SIG(DSz4rgncXCytsUMW2JU2yhLquZECD2XpEkpP9gG5HyAx)")
         self.assertEqual(tx.outputs[2].amount, 49)
         self.assertEqual(tx.outputs[2].base, 2)
-        self.assertEqual(pypeg2.compose(tx.outputs[2].conditions, output.Condition), "(SIG(6DyGr5LFtFmbaJYRvcs9WmBsr4cbJbJ1EV9zBbqG7A6i) || XHX(8FAA0ED653CA4D2C1156D511F0D0036F5168ABA4DAC2929676D279C8A2A12E36))")
+        self.assertEqual(pypeg2.compose(tx.outputs[2].condition, output.Condition), "(SIG(6DyGr5LFtFmbaJYRvcs9WmBsr4cbJbJ1EV9zBbqG7A6i) || XHX(8FAA0ED653CA4D2C1156D511F0D0036F5168ABA4DAC2929676D279C8A2A12E36))")
 
         self.assertEqual(tx.comment, "-----@@@----- (why not this comment?)")
 
@@ -225,12 +225,12 @@ class Test_Transaction(unittest.TestCase):
 
         self.assertEqual(tx.outputs[0].amount, 90)
         self.assertEqual(tx.outputs[0].base, 0)
-        self.assertEqual(pypeg2.compose(tx.outputs[0].conditions, output.Condition), "SIG(5zDvFjJB1PGDQNiExpfzL9c1tQGs6xPA8mf1phr3VoVi)")
-        self.assertEqual(type(tx.outputs[0].conditions.left), output.SIG)
+        self.assertEqual(pypeg2.compose(tx.outputs[0].condition, output.Condition), "SIG(5zDvFjJB1PGDQNiExpfzL9c1tQGs6xPA8mf1phr3VoVi)")
+        self.assertEqual(type(tx.outputs[0].condition.left), output.SIG)
         self.assertEqual(tx.outputs[1].amount, 10)
         self.assertEqual(tx.outputs[1].base, 0)
-        self.assertEqual(pypeg2.compose(tx.outputs[1].conditions, output.Condition), "SIG(GNPdPNwSJAYw7ixkDeibo3YpdELgLmrZ2Q86HF4cyg92)")
-        self.assertEqual(type(tx.outputs[1].conditions.left), output.SIG)
+        self.assertEqual(pypeg2.compose(tx.outputs[1].condition, output.Condition), "SIG(GNPdPNwSJAYw7ixkDeibo3YpdELgLmrZ2Q86HF4cyg92)")
+        self.assertEqual(type(tx.outputs[1].condition.left), output.SIG)
         self.assertEqual(tx.signatures[0], "XDQeEMcJDd+XVGaFIZc8d4kKRJgsPuWAPVNG5UKNk8mDZx2oE1kTP/hbxiFx6yDouBELCswuf/X6POK9ES7JCA==")
 
     def test_fromraw(self):
@@ -283,13 +283,13 @@ class Test_Transaction(unittest.TestCase):
 
         self.assertEqual(tx.outputs[0].amount, 120)
         self.assertEqual(tx.outputs[0].base, 2)
-        self.assertEqual(pypeg2.compose(tx.outputs[0].conditions, output.Condition), "SIG(BYfWYFrsyjpvpFysgu19rGK3VHBkz4MqmQbNyEuVU64g)")
+        self.assertEqual(pypeg2.compose(tx.outputs[0].condition, output.Condition), "SIG(BYfWYFrsyjpvpFysgu19rGK3VHBkz4MqmQbNyEuVU64g)")
         self.assertEqual(tx.outputs[1].amount, 146)
         self.assertEqual(tx.outputs[1].base, 2)
-        self.assertEqual(pypeg2.compose(tx.outputs[1].conditions, output.Condition), "SIG(DSz4rgncXCytsUMW2JU2yhLquZECD2XpEkpP9gG5HyAx)")
+        self.assertEqual(pypeg2.compose(tx.outputs[1].condition, output.Condition), "SIG(DSz4rgncXCytsUMW2JU2yhLquZECD2XpEkpP9gG5HyAx)")
         self.assertEqual(tx.outputs[2].amount, 49)
         self.assertEqual(tx.outputs[2].base, 2)
-        self.assertEqual(pypeg2.compose(tx.outputs[2].conditions, output.Condition), "(SIG(6DyGr5LFtFmbaJYRvcs9WmBsr4cbJbJ1EV9zBbqG7A6i) || XHX(8FAA0ED653CA4D2C1156D511F0D0036F5168ABA4DAC2929676D279C8A2A12E36))")
+        self.assertEqual(pypeg2.compose(tx.outputs[2].condition, output.Condition), "(SIG(6DyGr5LFtFmbaJYRvcs9WmBsr4cbJbJ1EV9zBbqG7A6i) || XHX(8FAA0ED653CA4D2C1156D511F0D0036F5168ABA4DAC2929676D279C8A2A12E36))")
 
         self.assertEqual(tx.comment, "-----@@@----- (why not this comment?)")
 
@@ -350,13 +350,13 @@ class Test_Transaction(unittest.TestCase):
 
         self.assertEqual(tx.outputs[0].amount, 120)
         self.assertEqual(tx.outputs[0].base, 2)
-        self.assertEqual(pypeg2.compose(tx.outputs[0].conditions, output.Condition), "SIG(BYfWYFrsyjpvpFysgu19rGK3VHBkz4MqmQbNyEuVU64g)")
+        self.assertEqual(pypeg2.compose(tx.outputs[0].condition, output.Condition), "SIG(BYfWYFrsyjpvpFysgu19rGK3VHBkz4MqmQbNyEuVU64g)")
         self.assertEqual(tx.outputs[1].amount, 146)
         self.assertEqual(tx.outputs[1].base, 2)
-        self.assertEqual(pypeg2.compose(tx.outputs[1].conditions, output.Condition), "SIG(DSz4rgncXCytsUMW2JU2yhLquZECD2XpEkpP9gG5HyAx)")
+        self.assertEqual(pypeg2.compose(tx.outputs[1].condition, output.Condition), "SIG(DSz4rgncXCytsUMW2JU2yhLquZECD2XpEkpP9gG5HyAx)")
         self.assertEqual(tx.outputs[2].amount, 49)
         self.assertEqual(tx.outputs[2].base, 2)
-        self.assertEqual(pypeg2.compose(tx.outputs[2].conditions, output.Condition), "(SIG(6DyGr5LFtFmbaJYRvcs9WmBsr4cbJbJ1EV9zBbqG7A6i) || XHX(8FAA0ED653CA4D2C1156D511F0D0036F5168ABA4DAC2929676D279C8A2A12E36))")
+        self.assertEqual(pypeg2.compose(tx.outputs[2].condition, output.Condition), "(SIG(6DyGr5LFtFmbaJYRvcs9WmBsr4cbJbJ1EV9zBbqG7A6i) || XHX(8FAA0ED653CA4D2C1156D511F0D0036F5168ABA4DAC2929676D279C8A2A12E36))")
 
         self.assertEqual(tx.comment, "-----@@@----- (why not this comment?)")
 
@@ -419,13 +419,13 @@ class Test_Transaction(unittest.TestCase):
 
         self.assertEqual(tx.outputs[0].amount, 120)
         self.assertEqual(tx.outputs[0].base, 2)
-        self.assertEqual(pypeg2.compose(tx.outputs[0].conditions, output.Condition), "SIG(BYfWYFrsyjpvpFysgu19rGK3VHBkz4MqmQbNyEuVU64g)")
+        self.assertEqual(pypeg2.compose(tx.outputs[0].condition, output.Condition), "SIG(BYfWYFrsyjpvpFysgu19rGK3VHBkz4MqmQbNyEuVU64g)")
         self.assertEqual(tx.outputs[1].amount, 146)
         self.assertEqual(tx.outputs[1].base, 2)
-        self.assertEqual(pypeg2.compose(tx.outputs[1].conditions, output.Condition), "SIG(DSz4rgncXCytsUMW2JU2yhLquZECD2XpEkpP9gG5HyAx)")
+        self.assertEqual(pypeg2.compose(tx.outputs[1].condition, output.Condition), "SIG(DSz4rgncXCytsUMW2JU2yhLquZECD2XpEkpP9gG5HyAx)")
         self.assertEqual(tx.outputs[2].amount, 49)
         self.assertEqual(tx.outputs[2].base, 2)
-        self.assertEqual(pypeg2.compose(tx.outputs[2].conditions, output.Condition), "(SIG(6DyGr5LFtFmbaJYRvcs9WmBsr4cbJbJ1EV9zBbqG7A6i) || XHX(8FAA0ED653CA4D2C1156D511F0D0036F5168ABA4DAC2929676D279C8A2A12E36))")
+        self.assertEqual(pypeg2.compose(tx.outputs[2].condition, output.Condition), "(SIG(6DyGr5LFtFmbaJYRvcs9WmBsr4cbJbJ1EV9zBbqG7A6i) || XHX(8FAA0ED653CA4D2C1156D511F0D0036F5168ABA4DAC2929676D279C8A2A12E36))")
 
         self.assertEqual(tx.comment, "-----@@@----- (why not this comment?)")
 

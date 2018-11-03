@@ -141,17 +141,17 @@ class OutputSource:
     """
     re_inline = re.compile("([0-9]+):([0-9]+):(.*)\n")
 
-    def __init__(self, amount: int, base: int, conditions: Union[str, Condition]) -> None:
+    def __init__(self, amount: int, base: int, condition: str) -> None:
         """
         Init OutputSource instance
 
         :param amount: Amount of the output
         :param base: Base number
-        :param conditions: Conditions expression
+        :param condition: Condition expression
         """
         self.amount = amount
         self.base = base
-        self.conditions = conditions
+        self.condition = self.condition_from_text(condition)
 
     @classmethod
     def from_inline(cls: Type[OutputSourceType], inline: str) -> OutputSourceType:
@@ -166,14 +166,9 @@ class OutputSource:
             raise MalformedDocumentError("Inline output")
         amount = int(data.group(1))
         base = int(data.group(2))
-        conditions_text = data.group(3)
-        try:
-            conditions = pypeg2.parse(conditions_text, output.Condition)
-        except SyntaxError:
-            # Invalid conditions are possible, see https://github.com/duniter/duniter/issues/1156
-            # In such a case, they are store "as-is" and considered unlockable
-            conditions = conditions_text
-        return cls(amount, base, conditions)
+        condition_text = data.group(3)
+
+        return cls(amount, base, condition_text)
 
     def inline(self) -> str:
         """
@@ -181,11 +176,24 @@ class OutputSource:
 
         :return:
         """
-        if type(self.conditions) is str:
-            return "{0}:{1}:{2}".format(self.amount, self.base, self.conditions)
-        else:
-            return "{0}:{1}:{2}".format(self.amount, self.base,
-                                        pypeg2.compose(self.conditions, output.Condition))
+        return "{0}:{1}:{2}".format(self.amount, self.base,
+                                    pypeg2.compose(self.condition, output.Condition))
+
+    @staticmethod
+    def condition_from_text(text) -> Condition:
+        """
+        Return a Condition instance with PEG grammar from text
+
+        :param text: PEG parsable string
+        :return:
+        """
+        try:
+            condition = pypeg2.parse(text, output.Condition)
+        except SyntaxError:
+            # Invalid conditions are possible, see https://github.com/duniter/duniter/issues/1156
+            # In such a case, they are store as empty PEG grammar object and considered unlockable
+            condition = Condition(text)
+        return condition
 
 
 # required to type hint cls in classmethod
@@ -759,7 +767,7 @@ class SimpleTransaction(Transaction):
         simple "SIG" functions, and the outputs must be simple
         SIG conditions.
 
-        :param duniterpy.documents.Transaction tx: the transaction to check
+        :param tx: the transaction to check
 
         :return: True if a simple transaction
         """
@@ -772,12 +780,11 @@ class SimpleTransaction(Transaction):
             elif type(unlock.parameters[0]) is not SIGParameter:
                 simple = False
         for o in tx.outputs:
-            # If condition is str type, it is unlockable
-            if type(o.conditions) is str:
+            # if right condition is not None...
+            if getattr('right', o.condition, None):
                 simple = False
-            else:
-                if getattr('right', o.conditions, None):
-                    simple = False
-                elif type(o.conditions.left) is not output.SIG:
-                    simple = False
+                # if left is not SIG...
+            elif type(o.condition.left) is not output.SIG:
+                simple = False
+
         return simple

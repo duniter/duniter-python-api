@@ -5,7 +5,6 @@ from duniterpy.api import bma
 from duniterpy.api.client import Client
 from duniterpy.documents import BlockUID, Transaction
 from duniterpy.documents.transaction import InputSource, OutputSource, Unlock, SIGParameter
-from duniterpy.grammars.output import Condition, SIG
 from duniterpy.key import SigningKey
 
 # CONFIG #######################################
@@ -61,12 +60,7 @@ def get_transaction_document(current_block: dict, source: dict, from_pubkey: str
 
     # lists of outputs
     outputs = [
-        OutputSource(
-            amount=source['amount'],
-            base=source['base'],
-            # only the receiver of the output can use it as input in another transaction
-            conditions=Condition.token(SIG.token(to_pubkey))
-        )
+        OutputSource(amount=source['amount'], base=source['base'], condition="SIG({0})".format(to_pubkey))
     ]
 
     transaction = Transaction(
@@ -79,7 +73,7 @@ def get_transaction_document(current_block: dict, source: dict, from_pubkey: str
         unlocks=unlocks,
         outputs=outputs,
         comment='',
-        signatures=None
+        signatures=[]
     )
 
     return transaction
