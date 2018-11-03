@@ -1,103 +1,281 @@
+from typing import Optional, TypeVar, Type, Any
+
 from pypeg2 import re, attr, Keyword, Enum, contiguous, maybe_some, whitespace, K
 
 from ..constants import PUBKEY_REGEX, HASH_REGEX
 
 
 class Pubkey(str):
+    """
+    Pubkey in transaction output condition
+    """
     regex = re.compile(PUBKEY_REGEX)
 
 
 class Hash(str):
+    """
+    Hash in transaction output condition
+    """
     regex = re.compile(HASH_REGEX)
 
 
 class Int(str):
+    """
+    Integer in transaction output condition
+    """
     regex = re.compile(r"[0-9]+")
 
 
-class SIG(str):
+# required to type hint cls in classmethod
+SIGType = TypeVar('SIGType', bound='SIG')
+
+
+class SIG:
+    """
+    Signature function in transaction output condition
+    """
     grammar = "SIG(", attr('pubkey', Pubkey), ")"
 
+    def __init__(self, value: str = '') -> None:
+        """
+        Init SIG instance
+
+        :param value: Content of the string
+        """
+        self.value = value
+        self.pubkey = ''
+
+    def __str__(self) -> str:
+        return self.value
+
     @classmethod
-    def token(cls, pubkey):
+    def token(cls: Type[SIGType], pubkey: str) -> SIGType:
+        """
+        Return SIG instance from pubkey
+
+        :param pubkey: Public key of the signature issuer
+        :return:
+        """
         sig = cls()
         sig.pubkey = pubkey
         return sig
 
-    def compose(self, parser, grammar=None, attr_of=None):
+    def compose(self, parser: Any, grammar: Any = None, attr_of: Any = None) -> str:
+        """
+        Return the SIG(pubkey) expression as string format
+
+        :param parser: Parser instance
+        :param grammar: Grammar
+        :param attr_of: Attribute of...
+        :return:
+        """
         return "SIG({0})".format(self.pubkey)
 
 
-class CSV(str):
+# required to type hint cls in classmethod
+CSVType = TypeVar('CSVType', bound='CSV')
+
+
+class CSV:
+    """
+    CSV function in transaction output condition
+    """
     grammar = "CSV(", attr('time', Int), ")"
 
+    def __init__(self, value: str = '') -> None:
+        """
+        Init CSV instance
+
+        :param value: Content of the string
+        """
+        self.value = value
+        self.time = ''
+
+    def __str__(self) -> str:
+        return self.value
+
     @classmethod
-    def token(cls, time):
+    def token(cls: Type[CSVType], time: int) -> CSVType:
+        """
+        Return CSV instance from time
+
+        :param time: Timestamp
+        :return:
+        """
         csv = cls()
         csv.time = str(time)
         return csv
 
-    def compose(self, parser, grammar=None, attr_of=None):
+    def compose(self, parser: Any, grammar: Any = None, attr_of: str = None):
+        """
+        Return the CSV(time) expression as string format
+
+        :param parser: Parser instance
+        :param grammar: Grammar
+        :param attr_of: Attribute of...
+        """
         return "CSV({0})".format(self.time)
 
 
-class CLTV(str):
+# required to type hint cls in classmethod
+CLTVType = TypeVar('CLTVType', bound='CLTV')
+
+
+class CLTV:
+    """
+    CLTV function in transaction output condition
+    """
     grammar = "CLTV(", attr('timestamp', Int), ")"
 
+    def __init__(self, value: str = '') -> None:
+        """
+        Init CLTV instance
+
+        :param value: Content of the string
+        """
+        self.value = value
+        self.timestamp = ''
+
+    def __str__(self) -> str:
+        return self.value
+
     @classmethod
-    def token(cls, timestamp):
+    def token(cls: Type[CLTVType], timestamp: int) -> CLTVType:
+        """
+        Return CLTV instance from timestamp
+
+        :param timestamp: Timestamp
+        :return:
+        """
         cltv = cls()
         cltv.timestamp = str(timestamp)
         return cltv
 
-    def compose(self, parser, grammar=None, attr_of=None):
+    def compose(self, parser: Any, grammar: Any = None, attr_of: str = None):
+        """
+        Return the CLTV(timestamp) expression as string format
+
+        :param parser: Parser instance
+        :param grammar: Grammar
+        :param attr_of: Attribute of...
+        """
         return "CLTV({0})".format(self.timestamp)
 
 
-class XHX(str):
+# required to type hint cls in classmethod
+XHXType = TypeVar('XHXType', bound='XHX')
+
+
+class XHX:
+    """
+    XHX function in transaction output condition
+    """
     grammar = "XHX(", attr('sha_hash', Hash), ")"
 
+    def __init__(self, value: str = '') -> None:
+        """
+        Init XHX instance
+
+        :param value: Content of the string
+        """
+        self.value = value
+        self.sha_hash = ''
+
+    def __str__(self) -> str:
+        return self.value
+
     @classmethod
-    def token(cls, sha_hash):
+    def token(cls: Type[XHXType], sha_hash: str) -> XHXType:
+        """
+        Return XHX instance from sha_hash
+
+        :param sha_hash: SHA256 hash
+        :return:
+        """
         xhx = cls()
         xhx.sha_hash = sha_hash
         return xhx
 
-    def compose(self, parser, grammar=None, attr_of=None):
+    def compose(self, parser: Any, grammar: Any = None, attr_of: str = None) -> str:
+        """
+        Return the XHX(sha_hash) expression as string format
+
+        :param parser: Parser instance
+        :param grammar: Grammar
+        :param attr_of: Attribute of...
+        """
         return "XHX({0})".format(self.sha_hash)
 
 
+# required to type hint cls in classmethod
+OperatorType = TypeVar('OperatorType', bound='Operator')
+
+
 class Operator(Keyword):
+    """
+    Operator in transaction output condition
+    """
     grammar = Enum(K("&&"), K("||"), K("AND"), K("OR"))
     regex = re.compile(r"[&&|\|\||\w]+")
 
     @classmethod
-    def token(cls, keyword):
+    def token(cls: Type[OperatorType], keyword: str) -> OperatorType:
+        """
+        Return Operator instance from keyword
+
+        :param keyword: Operator keyword in expression
+        :return:
+        """
         op = cls(keyword)
         return op
 
-    def compose(self, parser, grammar=None, attr_of=None):
+    def compose(self, parser: Any, grammar: Any = None, attr_of: str = None) -> str:
+        """
+        Return the Operator keyword as string format
+
+        :param parser: Parser instance
+        :param grammar: Grammar
+        :param attr_of: Attribute of...
+        """
         return "{0}".format(self.name)
 
 
-class Condition(str):
+# required to type hint cls in classmethod
+ConditionType = TypeVar('ConditionType', bound='Condition')
 
+
+class Condition:
+    """
+    Condition expression in transaction output
+
+    """
     grammar = None
 
-    # value argument mandatory ! dont remove it !
     def __init__(self, value: str = '') -> None:
         """
         Init Condition instance
-        """
-        super().__init__()
 
-        # custom fields
-        self.left = None
-        self.right = None
-        self.op = None
+        :param value: Content of the condition as string
+        """
+        self.value = value
+        self.left = ''
+        self.right = ''
+        self.op = ''
+
+    def __str__(self) -> str:
+        return self.value
 
     @classmethod
-    def token(cls, left, op=None, right=None):
+    def token(cls: Type[ConditionType], left: str, op: Optional[str] = None,
+              right: Optional[str] = None) -> ConditionType:
+        """
+        Return Condition instance from arguments and Operator
+
+        :param left: Left argument
+        :param op: Operator
+        :param right: Right argument
+        :return:
+        """
         condition = cls()
         condition.left = left
         if op:
@@ -106,7 +284,14 @@ class Condition(str):
             condition.right = right
         return condition
 
-    def compose(self, parser, grammar=None, attr_of=None):
+    def compose(self, parser: Any, grammar: Any = None, attr_of: str = None) -> str:
+        """
+        Return the Condition as string format
+
+        :param parser: Parser instance
+        :param grammar: Grammar
+        :param attr_of: Attribute of...
+        """
         if type(self.left) is Condition:
             left = "({0})".format(parser.compose(self.left, grammar=grammar, attr_of=attr_of))
         else:

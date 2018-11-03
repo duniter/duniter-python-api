@@ -781,7 +781,7 @@ class SimpleTransaction(Transaction):
                 simple = False
         for o in tx.outputs:
             # if right condition is not None...
-            if getattr('right', o.condition, None):
+            if getattr(o.condition, 'right', None):
                 simple = False
                 # if left is not SIG...
             elif type(o.condition.left) is not output.SIG:
