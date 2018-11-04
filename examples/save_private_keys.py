@@ -30,7 +30,7 @@ password = getpass.getpass("Enter your password: ")
 pubkey = input("Enter your public key: ")
 
 # init signer instance
-signer = SigningKey(salt, password)\
+signer = SigningKey(salt, password)
 
 # check public key
 if signer.pubkey != pubkey:

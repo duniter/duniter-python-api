@@ -67,8 +67,6 @@ async def main():
         print("{:}:{:}".format(str(e.__class__.__name__), str(e)))
 
 
-
-
 # Latest duniter-python-api is asynchronous and you have to use asyncio, an asyncio loop and a "as" on the data.
 # ( https://docs.python.org/3/library/asyncio.html )
 asyncio.get_event_loop().run_until_complete(main())

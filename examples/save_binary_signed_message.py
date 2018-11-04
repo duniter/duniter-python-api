@@ -7,7 +7,6 @@ import libnacl.sign
 SIGNED_MESSAGE_FILENAME = 'duniter_signed_message.bin'
 
 if __name__ == '__main__':
-
     # prompt hidden user entry
     salt = getpass.getpass("Enter your passphrase (salt): ")
 

@@ -4,7 +4,6 @@ from duniterpy.key import SigningKey
 ################################################
 
 if __name__ == '__main__':
-
     # prompt hidden user entry
     salt = getpass.getpass("Enter your passphrase (salt): ")
 
@@ -16,5 +15,3 @@ if __name__ == '__main__':
 
     # Display your public key
     print("Public key for your credentials: %s" % key.pubkey)
-
-

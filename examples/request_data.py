@@ -9,6 +9,7 @@ from duniterpy.api import bma
 # Here we use the secure BASIC_MERKLED_API (BMAS)
 BMAS_ENDPOINT = "BMAS g1-test.duniter.org 443"
 
+
 ################################################
 
 
@@ -69,6 +70,7 @@ async def main():
 
     # Close client aiohttp session
     await client.close()
+
 
 # Latest duniter-python-api is asynchronous and you have to use asyncio, an asyncio loop and a "as" on the data.
 # ( https://docs.python.org/3/library/asyncio.html )
