@@ -266,8 +266,8 @@ class Condition:
         return self.value
 
     @classmethod
-    def token(cls: Type[ConditionType], left: str, op: Optional[str] = None,
-              right: Optional[str] = None) -> ConditionType:
+    def token(cls: Type[ConditionType], left: Any, op: Optional[Any] = None,
+              right: Optional[Any] = None) -> ConditionType:
         """
         Return Condition instance from arguments and Operator
 
