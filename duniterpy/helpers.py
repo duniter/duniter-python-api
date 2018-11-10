@@ -1,6 +1,7 @@
+from typing import Union
 
 
-def ensure_bytes(data):
+def ensure_bytes(data: Union[str, bytes]) -> bytes:
     """
     Convert data in bytes if data is a string
 
@@ -13,7 +14,7 @@ def ensure_bytes(data):
     return data
 
 
-def ensure_str(data):
+def ensure_str(data: Union[str, bytes]) -> str:
     """
     Convert data in str if data are bytes
 

@@ -3,7 +3,7 @@ duniter public and private keys
 
 @author: inso
 """
-from typing import Optional
+from typing import Optional, Union
 
 import libnacl.sign
 from pylibscrypt import scrypt
@@ -30,7 +30,8 @@ class ScryptParams:
 
 
 class SigningKey(libnacl.sign.Signer):
-    def __init__(self, salt: str, password: str, scrypt_params: Optional[ScryptParams] = None) -> None:
+    def __init__(self, salt: Union[str, bytes], password: Union[str, bytes],
+                 scrypt_params: Optional[ScryptParams] = None) -> None:
         """
         Init a SigningKey object from credentials
 
