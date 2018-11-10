@@ -356,7 +356,8 @@ class TestBmaBlockchain(WebFunctionalSetupMixin, unittest.TestCase):
 
         async def go():
             _, port, url = await self.create_server('GET',
-                                                    '/blockchain/memberships/8Fi1VSTbjkXguwThF4v2ZxC5whK7pwG2vcGTkPUPjPGU',
+                                                    '/blockchain/memberships'
+                                                    '/8Fi1VSTbjkXguwThF4v2ZxC5whK7pwG2vcGTkPUPjPGU',
                                                     handler)
             with self.assertRaises(jsonschema.exceptions.ValidationError):
                 client = Client(BMAEndpoint("127.0.0.1", "", "", port))

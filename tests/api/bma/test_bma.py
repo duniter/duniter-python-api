@@ -27,6 +27,7 @@ class TestBmaApi(unittest.TestCase):
             api = API(endpoint.conn_handler(session), )
             self.assertEqual(api.reverse_url("http", "/test/url"), "http://test.com:9092/test/url")
             await session.close()
+
         self.loop.run_until_complete(go())
 
     def test_reverse_url_only_ipv4(self):
@@ -37,6 +38,7 @@ class TestBmaApi(unittest.TestCase):
             api = API(endpoint.conn_handler(session), )
             self.assertEqual(api.reverse_url("http", "/test/url"), "http://124.2.2.1:9092/test/url")
             await session.close()
+
         self.loop.run_until_complete(go())
 
     def test_reverse_url_only_ipv6(self):
@@ -47,6 +49,7 @@ class TestBmaApi(unittest.TestCase):
             self.assertEqual(api.reverse_url("http", "/test/url"),
                              "http://[2001:0db8:0000:85a3:0000:0000:ac1f:8001]:9092/test/url")
             await session.close()
+
         self.loop.run_until_complete(go())
 
     def test_parse_error(self):

@@ -8,7 +8,6 @@ import pypeg2
 from duniterpy.grammars import output
 from duniterpy.documents.transaction import Transaction, reduce_base, SimpleTransaction
 
-
 compact_change = """TX:10:1:1:1:1:1:0
 13410-000041DF0CCA173F09B5FBA48F619D4BC934F12ADF1D0B798639EB2149C4A8CC
 D8BsQZN9hangHVuqwD6McfxM1xvGJ8DPuPYrswwnSif3
@@ -18,7 +17,6 @@ D8BsQZN9hangHVuqwD6McfxM1xvGJ8DPuPYrswwnSif3
 META tic to toc
 eNAZpJjhZaPKbx5pUvuDDM1j4XNWJ4ABK48ouTvimvg3ceIcoZUvgLHmXuSwk2bgxZaB5qSKP9H6T7qsBcLtBg==
 """
-
 
 xhx_output = """Version: 10
 Type: Transaction
@@ -36,7 +34,6 @@ Outputs:
 Comment: XHX for pubkey DCYELkvV1aAsxFv58SbfRerHy5giJwKA1i4ZKTTcVGZe
 GXGephqTSJfb+8xsG/UMKRW0y+edL4RoMHM+OlgFq1aYOuaQ3/CtBKVSA01n2mkI7zwepeIABSjS94iVH4vZDg==
 """
-
 
 tx_compact = """TX:2:3:6:6:3:1:0
 HsLShAtzXTVxeUtQd7yi5Z5Zh4zNvbu8sTEZ53nfKcqY
@@ -62,7 +59,6 @@ D:9WYHTavL1pmhunFCzUwiiq4pXwvgGG5ysjZnjz9H8yB:46
 2D96KZwNUvVtcapQPq2mm7J9isFcDCfykwJpVEZwBc7tCgL4qPyu17BT5ePozAE9HS6Yvj51f62Mp4n9d9dkzJoX
 2XiBDpuUdu6zCPWGzHXXy8c4ATSscfFQG9DjmqMZUxDZVt1Dp4m2N5oHYVUfoPdrU9SLk4qxi65RNrfCVnvQtQJk
 """
-
 
 tx_compact_2 = """TX:2:1:1:1:2:0:0
 GNPdPNwSJAYw7ixkDeibo3YpdELgLmrZ2Q86HF4cyg92
@@ -105,7 +101,6 @@ Comment: -----@@@----- (why not this comment?)
 2XiBDpuUdu6zCPWGzHXXy8c4ATSscfFQG9DjmqMZUxDZVt1Dp4m2N5oHYVUfoPdrU9SLk4qxi65RNrfCVnvQtQJk
 """
 
-
 tx_raw_v3 = """Version: 3
 Type: Transaction
 Currency: beta_brousouf
@@ -140,7 +135,7 @@ Comment: -----@@@----- (why not this comment?)
 """
 
 
-class Test_Transaction(unittest.TestCase):
+class TestTransaction(unittest.TestCase):
     def test_fromcompact(self):
         tx = Transaction.from_compact("zeta_brousouf", tx_compact)
         self.assertEqual(tx.version, 2)
@@ -191,19 +186,25 @@ class Test_Transaction(unittest.TestCase):
 
         self.assertEqual(tx.outputs[0].amount, 120)
         self.assertEqual(tx.outputs[0].base, 2)
-        self.assertEqual(pypeg2.compose(tx.outputs[0].condition, output.Condition), "SIG(BYfWYFrsyjpvpFysgu19rGK3VHBkz4MqmQbNyEuVU64g)")
+        self.assertEqual(pypeg2.compose(tx.outputs[0].condition, output.Condition),
+                         "SIG(BYfWYFrsyjpvpFysgu19rGK3VHBkz4MqmQbNyEuVU64g)")
         self.assertEqual(tx.outputs[1].amount, 146)
         self.assertEqual(tx.outputs[1].base, 2)
-        self.assertEqual(pypeg2.compose(tx.outputs[1].condition, output.Condition), "SIG(DSz4rgncXCytsUMW2JU2yhLquZECD2XpEkpP9gG5HyAx)")
+        self.assertEqual(pypeg2.compose(tx.outputs[1].condition, output.Condition),
+                         "SIG(DSz4rgncXCytsUMW2JU2yhLquZECD2XpEkpP9gG5HyAx)")
         self.assertEqual(tx.outputs[2].amount, 49)
         self.assertEqual(tx.outputs[2].base, 2)
-        self.assertEqual(pypeg2.compose(tx.outputs[2].condition, output.Condition), "(SIG(6DyGr5LFtFmbaJYRvcs9WmBsr4cbJbJ1EV9zBbqG7A6i) || XHX(8FAA0ED653CA4D2C1156D511F0D0036F5168ABA4DAC2929676D279C8A2A12E36))")
+        self.assertEqual(pypeg2.compose(tx.outputs[2].condition, output.Condition),
+                         "(SIG(6DyGr5LFtFmbaJYRvcs9WmBsr4cbJbJ1EV9zBbqG7A6i) || XHX(8FAA0ED653CA4D2C1156D511F0D0036F5168ABA4DAC2929676D279C8A2A12E36))")
 
         self.assertEqual(tx.comment, "-----@@@----- (why not this comment?)")
 
-        self.assertEqual(tx.signatures[0], "42yQm4hGTJYWkPg39hQAUgP6S6EQ4vTfXdJuxKEHL1ih6YHiDL2hcwrFgBHjXLRgxRhj2VNVqqc6b4JayKqTE14r")
-        self.assertEqual(tx.signatures[1], "2D96KZwNUvVtcapQPq2mm7J9isFcDCfykwJpVEZwBc7tCgL4qPyu17BT5ePozAE9HS6Yvj51f62Mp4n9d9dkzJoX")
-        self.assertEqual(tx.signatures[2], "2XiBDpuUdu6zCPWGzHXXy8c4ATSscfFQG9DjmqMZUxDZVt1Dp4m2N5oHYVUfoPdrU9SLk4qxi65RNrfCVnvQtQJk")
+        self.assertEqual(tx.signatures[0],
+                         "42yQm4hGTJYWkPg39hQAUgP6S6EQ4vTfXdJuxKEHL1ih6YHiDL2hcwrFgBHjXLRgxRhj2VNVqqc6b4JayKqTE14r")
+        self.assertEqual(tx.signatures[1],
+                         "2D96KZwNUvVtcapQPq2mm7J9isFcDCfykwJpVEZwBc7tCgL4qPyu17BT5ePozAE9HS6Yvj51f62Mp4n9d9dkzJoX")
+        self.assertEqual(tx.signatures[2],
+                         "2XiBDpuUdu6zCPWGzHXXy8c4ATSscfFQG9DjmqMZUxDZVt1Dp4m2N5oHYVUfoPdrU9SLk4qxi65RNrfCVnvQtQJk")
 
     def test_fromcompact2(self):
         tx = Transaction.from_compact("zeta_brousouf", tx_compact_2)
@@ -225,13 +226,16 @@ class Test_Transaction(unittest.TestCase):
 
         self.assertEqual(tx.outputs[0].amount, 90)
         self.assertEqual(tx.outputs[0].base, 0)
-        self.assertEqual(pypeg2.compose(tx.outputs[0].condition, output.Condition), "SIG(5zDvFjJB1PGDQNiExpfzL9c1tQGs6xPA8mf1phr3VoVi)")
+        self.assertEqual(pypeg2.compose(tx.outputs[0].condition, output.Condition),
+                         "SIG(5zDvFjJB1PGDQNiExpfzL9c1tQGs6xPA8mf1phr3VoVi)")
         self.assertEqual(type(tx.outputs[0].condition.left), output.SIG)
         self.assertEqual(tx.outputs[1].amount, 10)
         self.assertEqual(tx.outputs[1].base, 0)
-        self.assertEqual(pypeg2.compose(tx.outputs[1].condition, output.Condition), "SIG(GNPdPNwSJAYw7ixkDeibo3YpdELgLmrZ2Q86HF4cyg92)")
+        self.assertEqual(pypeg2.compose(tx.outputs[1].condition, output.Condition),
+                         "SIG(GNPdPNwSJAYw7ixkDeibo3YpdELgLmrZ2Q86HF4cyg92)")
         self.assertEqual(type(tx.outputs[1].condition.left), output.SIG)
-        self.assertEqual(tx.signatures[0], "XDQeEMcJDd+XVGaFIZc8d4kKRJgsPuWAPVNG5UKNk8mDZx2oE1kTP/hbxiFx6yDouBELCswuf/X6POK9ES7JCA==")
+        self.assertEqual(tx.signatures[0],
+                         "XDQeEMcJDd+XVGaFIZc8d4kKRJgsPuWAPVNG5UKNk8mDZx2oE1kTP/hbxiFx6yDouBELCswuf/X6POK9ES7JCA==")
 
     def test_fromraw(self):
         tx = Transaction.from_signed_raw(tx_raw)
@@ -283,19 +287,25 @@ class Test_Transaction(unittest.TestCase):
 
         self.assertEqual(tx.outputs[0].amount, 120)
         self.assertEqual(tx.outputs[0].base, 2)
-        self.assertEqual(pypeg2.compose(tx.outputs[0].condition, output.Condition), "SIG(BYfWYFrsyjpvpFysgu19rGK3VHBkz4MqmQbNyEuVU64g)")
+        self.assertEqual(pypeg2.compose(tx.outputs[0].condition, output.Condition),
+                         "SIG(BYfWYFrsyjpvpFysgu19rGK3VHBkz4MqmQbNyEuVU64g)")
         self.assertEqual(tx.outputs[1].amount, 146)
         self.assertEqual(tx.outputs[1].base, 2)
-        self.assertEqual(pypeg2.compose(tx.outputs[1].condition, output.Condition), "SIG(DSz4rgncXCytsUMW2JU2yhLquZECD2XpEkpP9gG5HyAx)")
+        self.assertEqual(pypeg2.compose(tx.outputs[1].condition, output.Condition),
+                         "SIG(DSz4rgncXCytsUMW2JU2yhLquZECD2XpEkpP9gG5HyAx)")
         self.assertEqual(tx.outputs[2].amount, 49)
         self.assertEqual(tx.outputs[2].base, 2)
-        self.assertEqual(pypeg2.compose(tx.outputs[2].condition, output.Condition), "(SIG(6DyGr5LFtFmbaJYRvcs9WmBsr4cbJbJ1EV9zBbqG7A6i) || XHX(8FAA0ED653CA4D2C1156D511F0D0036F5168ABA4DAC2929676D279C8A2A12E36))")
+        self.assertEqual(pypeg2.compose(tx.outputs[2].condition, output.Condition),
+                         "(SIG(6DyGr5LFtFmbaJYRvcs9WmBsr4cbJbJ1EV9zBbqG7A6i) || XHX(8FAA0ED653CA4D2C1156D511F0D0036F5168ABA4DAC2929676D279C8A2A12E36))")
 
         self.assertEqual(tx.comment, "-----@@@----- (why not this comment?)")
 
-        self.assertEqual(tx.signatures[0], "42yQm4hGTJYWkPg39hQAUgP6S6EQ4vTfXdJuxKEHL1ih6YHiDL2hcwrFgBHjXLRgxRhj2VNVqqc6b4JayKqTE14r")
-        self.assertEqual(tx.signatures[1], "2D96KZwNUvVtcapQPq2mm7J9isFcDCfykwJpVEZwBc7tCgL4qPyu17BT5ePozAE9HS6Yvj51f62Mp4n9d9dkzJoX")
-        self.assertEqual(tx.signatures[2], "2XiBDpuUdu6zCPWGzHXXy8c4ATSscfFQG9DjmqMZUxDZVt1Dp4m2N5oHYVUfoPdrU9SLk4qxi65RNrfCVnvQtQJk")
+        self.assertEqual(tx.signatures[0],
+                         "42yQm4hGTJYWkPg39hQAUgP6S6EQ4vTfXdJuxKEHL1ih6YHiDL2hcwrFgBHjXLRgxRhj2VNVqqc6b4JayKqTE14r")
+        self.assertEqual(tx.signatures[1],
+                         "2D96KZwNUvVtcapQPq2mm7J9isFcDCfykwJpVEZwBc7tCgL4qPyu17BT5ePozAE9HS6Yvj51f62Mp4n9d9dkzJoX")
+        self.assertEqual(tx.signatures[2],
+                         "2XiBDpuUdu6zCPWGzHXXy8c4ATSscfFQG9DjmqMZUxDZVt1Dp4m2N5oHYVUfoPdrU9SLk4qxi65RNrfCVnvQtQJk")
 
     def test_fromraw_toraw(self):
         tx = Transaction.from_signed_raw(tx_raw)
@@ -350,19 +360,25 @@ class Test_Transaction(unittest.TestCase):
 
         self.assertEqual(tx.outputs[0].amount, 120)
         self.assertEqual(tx.outputs[0].base, 2)
-        self.assertEqual(pypeg2.compose(tx.outputs[0].condition, output.Condition), "SIG(BYfWYFrsyjpvpFysgu19rGK3VHBkz4MqmQbNyEuVU64g)")
+        self.assertEqual(pypeg2.compose(tx.outputs[0].condition, output.Condition),
+                         "SIG(BYfWYFrsyjpvpFysgu19rGK3VHBkz4MqmQbNyEuVU64g)")
         self.assertEqual(tx.outputs[1].amount, 146)
         self.assertEqual(tx.outputs[1].base, 2)
-        self.assertEqual(pypeg2.compose(tx.outputs[1].condition, output.Condition), "SIG(DSz4rgncXCytsUMW2JU2yhLquZECD2XpEkpP9gG5HyAx)")
+        self.assertEqual(pypeg2.compose(tx.outputs[1].condition, output.Condition),
+                         "SIG(DSz4rgncXCytsUMW2JU2yhLquZECD2XpEkpP9gG5HyAx)")
         self.assertEqual(tx.outputs[2].amount, 49)
         self.assertEqual(tx.outputs[2].base, 2)
-        self.assertEqual(pypeg2.compose(tx.outputs[2].condition, output.Condition), "(SIG(6DyGr5LFtFmbaJYRvcs9WmBsr4cbJbJ1EV9zBbqG7A6i) || XHX(8FAA0ED653CA4D2C1156D511F0D0036F5168ABA4DAC2929676D279C8A2A12E36))")
+        self.assertEqual(pypeg2.compose(tx.outputs[2].condition, output.Condition),
+                         "(SIG(6DyGr5LFtFmbaJYRvcs9WmBsr4cbJbJ1EV9zBbqG7A6i) || XHX(8FAA0ED653CA4D2C1156D511F0D0036F5168ABA4DAC2929676D279C8A2A12E36))")
 
         self.assertEqual(tx.comment, "-----@@@----- (why not this comment?)")
 
-        self.assertEqual(tx.signatures[0], "42yQm4hGTJYWkPg39hQAUgP6S6EQ4vTfXdJuxKEHL1ih6YHiDL2hcwrFgBHjXLRgxRhj2VNVqqc6b4JayKqTE14r")
-        self.assertEqual(tx.signatures[1], "2D96KZwNUvVtcapQPq2mm7J9isFcDCfykwJpVEZwBc7tCgL4qPyu17BT5ePozAE9HS6Yvj51f62Mp4n9d9dkzJoX")
-        self.assertEqual(tx.signatures[2], "2XiBDpuUdu6zCPWGzHXXy8c4ATSscfFQG9DjmqMZUxDZVt1Dp4m2N5oHYVUfoPdrU9SLk4qxi65RNrfCVnvQtQJk")
+        self.assertEqual(tx.signatures[0],
+                         "42yQm4hGTJYWkPg39hQAUgP6S6EQ4vTfXdJuxKEHL1ih6YHiDL2hcwrFgBHjXLRgxRhj2VNVqqc6b4JayKqTE14r")
+        self.assertEqual(tx.signatures[1],
+                         "2D96KZwNUvVtcapQPq2mm7J9isFcDCfykwJpVEZwBc7tCgL4qPyu17BT5ePozAE9HS6Yvj51f62Mp4n9d9dkzJoX")
+        self.assertEqual(tx.signatures[2],
+                         "2XiBDpuUdu6zCPWGzHXXy8c4ATSscfFQG9DjmqMZUxDZVt1Dp4m2N5oHYVUfoPdrU9SLk4qxi65RNrfCVnvQtQJk")
 
     def test_fromraw_toraw_v3(self):
         tx = Transaction.from_signed_raw(tx_raw_v3)
@@ -419,19 +435,25 @@ class Test_Transaction(unittest.TestCase):
 
         self.assertEqual(tx.outputs[0].amount, 120)
         self.assertEqual(tx.outputs[0].base, 2)
-        self.assertEqual(pypeg2.compose(tx.outputs[0].condition, output.Condition), "SIG(BYfWYFrsyjpvpFysgu19rGK3VHBkz4MqmQbNyEuVU64g)")
+        self.assertEqual(pypeg2.compose(tx.outputs[0].condition, output.Condition),
+                         "SIG(BYfWYFrsyjpvpFysgu19rGK3VHBkz4MqmQbNyEuVU64g)")
         self.assertEqual(tx.outputs[1].amount, 146)
         self.assertEqual(tx.outputs[1].base, 2)
-        self.assertEqual(pypeg2.compose(tx.outputs[1].condition, output.Condition), "SIG(DSz4rgncXCytsUMW2JU2yhLquZECD2XpEkpP9gG5HyAx)")
+        self.assertEqual(pypeg2.compose(tx.outputs[1].condition, output.Condition),
+                         "SIG(DSz4rgncXCytsUMW2JU2yhLquZECD2XpEkpP9gG5HyAx)")
         self.assertEqual(tx.outputs[2].amount, 49)
         self.assertEqual(tx.outputs[2].base, 2)
-        self.assertEqual(pypeg2.compose(tx.outputs[2].condition, output.Condition), "(SIG(6DyGr5LFtFmbaJYRvcs9WmBsr4cbJbJ1EV9zBbqG7A6i) || XHX(8FAA0ED653CA4D2C1156D511F0D0036F5168ABA4DAC2929676D279C8A2A12E36))")
+        self.assertEqual(pypeg2.compose(tx.outputs[2].condition, output.Condition),
+                         "(SIG(6DyGr5LFtFmbaJYRvcs9WmBsr4cbJbJ1EV9zBbqG7A6i) || XHX(8FAA0ED653CA4D2C1156D511F0D0036F5168ABA4DAC2929676D279C8A2A12E36))")
 
         self.assertEqual(tx.comment, "-----@@@----- (why not this comment?)")
 
-        self.assertEqual(tx.signatures[0], "42yQm4hGTJYWkPg39hQAUgP6S6EQ4vTfXdJuxKEHL1ih6YHiDL2hcwrFgBHjXLRgxRhj2VNVqqc6b4JayKqTE14r")
-        self.assertEqual(tx.signatures[1], "2D96KZwNUvVtcapQPq2mm7J9isFcDCfykwJpVEZwBc7tCgL4qPyu17BT5ePozAE9HS6Yvj51f62Mp4n9d9dkzJoX")
-        self.assertEqual(tx.signatures[2], "2XiBDpuUdu6zCPWGzHXXy8c4ATSscfFQG9DjmqMZUxDZVt1Dp4m2N5oHYVUfoPdrU9SLk4qxi65RNrfCVnvQtQJk")
+        self.assertEqual(tx.signatures[0],
+                         "42yQm4hGTJYWkPg39hQAUgP6S6EQ4vTfXdJuxKEHL1ih6YHiDL2hcwrFgBHjXLRgxRhj2VNVqqc6b4JayKqTE14r")
+        self.assertEqual(tx.signatures[1],
+                         "2D96KZwNUvVtcapQPq2mm7J9isFcDCfykwJpVEZwBc7tCgL4qPyu17BT5ePozAE9HS6Yvj51f62Mp4n9d9dkzJoX")
+        self.assertEqual(tx.signatures[2],
+                         "2XiBDpuUdu6zCPWGzHXXy8c4ATSscfFQG9DjmqMZUxDZVt1Dp4m2N5oHYVUfoPdrU9SLk4qxi65RNrfCVnvQtQJk")
 
     def test_compact_change(self):
         tx = Transaction.from_compact("gtest", compact_change)
