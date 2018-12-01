@@ -57,6 +57,10 @@ Development
 
 * Before submit a merge requests, please check the static typing and tests.
 
+* Install dev dependencies::
+
+    pip install -r requirements_dev.txt
+
 * Check static typing with `mypy <http://mypy-lang.org/>`_::
 
     make check

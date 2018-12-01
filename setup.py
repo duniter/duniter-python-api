@@ -24,7 +24,10 @@ def which(program):
 
     return None
 
-EDITABLE_REQUIREMENT = re.compile(r'^-e (?P<link>(?P<vcs>git|svn|hg|bzr).+#egg=(?P<package>.+)-(?P<version>\d(?:\.\d)*))$')
+
+EDITABLE_REQUIREMENT = re.compile(
+    r'^-e (?P<link>(?P<vcs>git|svn|hg|bzr).+#egg=(?P<package>.+)-(?P<version>\d(?:\.\d)*))$'
+)
 
 install_requires = []
 dependency_links = []
@@ -46,27 +49,27 @@ setup(
 
     packages=find_packages(),
 
-    author="inso, canercanda, s_b",
+    author="inso, canercanda, s_b, vit",
 
     author_email="insomniak.fr@gmail.com",
 
-    description="A python implementation of [duniter](https://github.com/duniter/duniter) API",
+    description="A python implementation of [duniter](https://git.duniter.org/nodes/typescript/duniter) API",
 
     long_description=open('README.rst').read(),
 
     # Active la prise en compte du fichier MANIFEST.in
     include_package_data=True,
-    url='https://github.com/duniter/duniter-python-api',
+    url='https://git.duniter.org/clients/python/duniterpy',
     test_suite="tests",
 
     classifiers=[
         "Programming Language :: Python",
-        "Development Status :: 4 - Beta",
+        "Development Status :: 5 - Production/Stable",
         "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
-        "Natural Language :: French",
+        "Natural Language :: English",
         "Operating System :: OS Independent",
         "Programming Language :: Python :: 3.5",
-        "Topic :: Communications",
+        "Topic :: Software Development :: Libraries",
     ],
     install_requires=install_requires,
     dependency_links=dependency_links
