@@ -2,7 +2,6 @@ stages:
   - github-sync
   - prepare
   - build
-  - mypy
   - test
   - release
 
@@ -56,7 +55,7 @@ test:
 
 mypy:
   <<: *pyenv
-  stage: mypy
+  stage: test
   script:
     - pip install -r requirements_dev.txt
     - mypy duniterpy --ignore-missing-imports
