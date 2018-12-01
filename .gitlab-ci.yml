@@ -2,6 +2,7 @@ stages:
   - github-sync
   - prepare
   - build
+  - mypy
   - test
   - release
 
@@ -52,6 +53,13 @@ test:
     - pip install coveralls
     - pip install -r requirements.txt
     - coverage run --source=duniterpy setup.py test
+
+mypy:
+  <<: *pyenv
+  stage: mypy
+  script:
+    - pip install -r requirements_dev.txt
+    - mypy duniterpy --ignore-missing-imports
 
 releases:
   <<: *pyenv
