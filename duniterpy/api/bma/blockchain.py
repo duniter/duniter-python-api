@@ -303,6 +303,38 @@ HARDSHIP_SCHEMA = {
     "required": ["block", "level"]
 }
 
+DIFFICULTIES_SCHEMA = {
+  "type": "object",
+  "properties": {
+    "block": {
+      "type": "number"
+    },
+    "levels": {
+      "type": "array",
+      "items": [
+        {
+          "type": "object",
+          "properties": {
+            "uid": {
+              "type": "string"
+            },
+            "level": {
+              "type": "number"
+            }
+          },
+          "required": [
+            "uid",
+            "level"
+          ]
+        }
+      ]
+    }
+  },
+  "required": [
+    "block",
+    "levels"
+  ]
+}
 
 async def parameters(client: Client) -> dict:
     """
@@ -389,6 +421,16 @@ async def hardship(client: Client, pubkey: str) -> dict:
     :return:
     """
     return await client.get(MODULE + '/hardship/%s' % pubkey, schema=HARDSHIP_SCHEMA)
+
+
+async def difficulties(client: Client) -> dict:
+    """
+    GET difficulties levels for members into current window for writing next block
+
+    :param client: Client to connect to the api
+    :return:
+    """
+    return await client.get(MODULE + '/difficulties', schema=DIFFICULTIES_SCHEMA)
 
 
 async def newcomers(client: Client) -> dict:
