@@ -208,10 +208,16 @@ PARAMETERS_SCHEMA = {
             "sigQty": {
                 "type": "number"
             },
+            "sigReplay": {
+                "type": "number"
+            },
             "xpercent": {
                 "type": "number"
             },
             "msValidity": {
+                "type": "number"
+            },
+            "msPeriod": {
                 "type": "number"
             },
             "stepMax": {
