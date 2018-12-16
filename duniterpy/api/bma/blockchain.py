@@ -342,6 +342,14 @@ DIFFICULTIES_SCHEMA = {
   ]
 }
 
+BRANCHES_SCHEMA = {
+    "type": "object",
+    "properties": {
+        "blocks": BLOCKS_SCHEMA
+    }
+}
+
+
 async def parameters(client: Client) -> dict:
     """
     GET the blockchain parameters used by this node
@@ -439,6 +447,16 @@ async def difficulties(client: Client) -> dict:
     return await client.get(MODULE + '/difficulties', schema=DIFFICULTIES_SCHEMA)
 
 
+async def branches(client: Client) -> list:
+    """
+    GET current branches of the node (top block of each branch)
+
+    :param client: Client to connect to the api
+    :return:
+    """
+    return await client.get(MODULE + '/branches', schema=BRANCHES_SCHEMA)
+
+
 async def newcomers(client: Client) -> dict:
     """
     GET the block numbers containing newcomers
@@ -487,6 +505,16 @@ async def leavers(client: Client) -> dict:
     :return:
     """
     return await client.get(MODULE + '/with/leavers', schema=BLOCK_NUMBERS_SCHEMA)
+
+
+async def revoked(client: Client) -> dict:
+    """
+    GET the block numbers containing revoked members.
+
+    :param client: Client to connect to the api
+    :return:
+    """
+    return await client.get(MODULE + '/with/excluded', schema=BLOCK_NUMBERS_SCHEMA)
 
 
 async def excluded(client: Client) -> dict:
