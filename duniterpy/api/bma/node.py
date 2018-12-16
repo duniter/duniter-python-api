@@ -23,6 +23,51 @@ logger = logging.getLogger("duniter/node")
 
 MODULE = 'node'
 
+SUMMARY_SCHEMA = {
+    "type": "object",
+    "properties": {
+        "duniter": {
+            "type": "object",
+            "properties": {
+                "software": {
+                    "type": "string"
+                },
+                "version": {
+                    "type": "string",
+                },
+                "forkWindowSize": {
+                    "type": "number"
+                }
+            },
+            "required": ["software", "version"]
+        },
+    },
+    "required": ["duniter"]
+}
+
+SANDBOX_SCHEMA = {
+    "type": "object",
+    "properties": {
+        "size": {
+            "type": "number"
+        },
+        "free": {
+            "type": "number"
+        }
+    },
+    "required": ["size", "free"]
+}
+
+SANDBOXES_SCHEMA = {
+    "type": "object",
+    "properties": {
+        "identities": SANDBOX_SCHEMA,
+        "memberships": SANDBOX_SCHEMA,
+        "transactions": SANDBOX_SCHEMA
+    },
+    "required": ["identities", "memberships", "transactions"]
+}
+
 
 async def summary(client: Client) -> dict:
     """
@@ -31,26 +76,14 @@ async def summary(client: Client) -> dict:
     :param client: Client to connect to the api
     :return:
     """
-    schema = {
-        "type": "object",
-        "properties": {
-            "duniter": {
-                "type": "object",
-                "properties": {
-                    "software": {
-                        "type": "string"
-                    },
-                    "version": {
-                        "type": "string",
-                    },
-                    "forkWindowSize": {
-                        "type": "number"
-                    }
-                },
-                "required": ["software", "version"]
-            },
-        },
-        "required": ["duniter"]
-    }
+    return await client.get(MODULE + '/summary', schema=SUMMARY_SCHEMA)
 
-    return await client.get(MODULE + '/summary', schema=schema)
+
+async def sandboxes(client: Client) -> dict:
+    """
+    GET Duniter node version and infos
+
+    :param client: Client to connect to the api
+    :return:
+    """
+    return await client.get(MODULE + '/sandboxes', schema=SANDBOXES_SCHEMA)
