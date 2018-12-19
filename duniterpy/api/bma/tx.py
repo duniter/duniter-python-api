@@ -49,8 +49,11 @@ HISTORY_SCHEMA = {
                 "receiving": {
                     "$ref": "#/definitions/transactioning_data"
                 },
+                "pending": {
+                    "$ref": "#/definitions/transactioning_data"
+                }
             },
-            "required": ["sent", "received", "sending", "receiving"]
+            "required": ["sent", "received", "sending", "receiving", "pending"]
         }
     },
     "definitions": {
@@ -231,6 +234,17 @@ async def sources(client: Client, pubkey: str) -> dict:
     :return:
     """
     return await client.get(MODULE + '/sources/%s' % pubkey, schema=SOURCES_SCHEMA)
+
+
+async def pending(client: Client, pubkey: str) -> dict:
+    """
+    GET pending transaction history for the given pubkey
+
+    :param client: Client to connect to the api
+    :param pubkey: Public key
+    :return:
+    """
+    return await client.get(MODULE + '/history/%s/pending' % pubkey, schema=HISTORY_SCHEMA)
 
 
 async def blocks(client: Client, pubkey: str, start: int, end: int) -> dict:
