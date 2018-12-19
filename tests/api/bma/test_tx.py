@@ -117,7 +117,27 @@ class TestBmaTx(WebFunctionalSetupMixin, unittest.TestCase):
                         ],
                         "hash": "A0A511131CD0E837204A9441B3354918AC4CE671"
                     }
-                ]
+                ],
+                "pending": [
+                    {
+                        "version": 1,
+                        "issuers": [
+                            "HnFcSms8jzwngtVomTTnzudZx7SHUQY8sVE1y8yBmULk"
+                        ],
+                        "inputs": [
+                            "0:D:8196:000022AD426FE727C707D847EC2168A64C577706:5872"
+                        ],
+                        "outputs": [
+                            "HnFcSms8jzwngtVomTTnzudZx7SHUQY8sVE1y8yBmULk:5871"
+                            "2sq8bBDQGK74f1eD3mAPQVgHCmFdijZr9nbv16FwbokX:1",
+                        ],
+                        "comment": "some comment",
+                        "signatures": [
+                            "kLOAAy7/UldQk7zz4I7Jhv9ICuGYRx7upl8wH8RYL43MMF6+7MbPh3QRN1qNFGpAfa3XMWIQmbUWtjZKP6OfDA=="
+                        ],
+                        "hash": "BA41013F2CD38EDFFA9D38A275F8532DD906A2DE"
+                    }
+                ],
             }
         }
         jsonschema.validate(json_sample, HISTORY_SCHEMA)

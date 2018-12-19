@@ -298,6 +298,21 @@ LOOKUP_SCHEMA = {
     "required": ["partial", "results"]
 }
 
+IDENTITY_OF_SCHEMA = {
+    "type": "object",
+    "properties": {
+        "pubkey": {
+            "type": "string"
+        },
+        "uid": {
+            "type": "string"
+        },
+        "sigDate": {
+            "type": "string"
+        }
+    }
+}
+
 
 async def add(client: Client, identity_signed_raw: str) -> ClientResponse:
     """
@@ -384,3 +399,14 @@ async def requirements(client: Client, search: str) -> dict:
     :return:
     """
     return await client.get(MODULE + '/requirements/%s' % search, schema=REQUIREMENTS_SCHEMA)
+
+
+async def identity_of(client: Client, search: str) -> dict:
+    """
+    GET Identity data written in the blockchain
+
+    :param client: Client to connect to the api
+    :param search: UID or public key
+    :return:
+    """
+    return await client.get(MODULE + '/identity-of/%s' % search, schema=IDENTITY_OF_SCHEMA)
