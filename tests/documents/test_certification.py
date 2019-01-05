@@ -5,7 +5,8 @@ Created on 6 déc. 2014
 """
 
 import unittest
-from duniterpy.documents.certification import Identity, Certification, Revocation
+from duniterpy.documents.certification import Certification, Revocation
+from duniterpy.documents.identity import Identity
 from duniterpy.documents.block import BlockUID
 from duniterpy.constants import EMPTY_HASH
 
