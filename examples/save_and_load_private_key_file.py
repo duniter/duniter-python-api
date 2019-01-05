@@ -1,4 +1,5 @@
 from duniterpy.key import SigningKey
+from libnacl.utils import load_key
 import getpass
 import os
 
@@ -42,3 +43,11 @@ signer.save(PRIVATE_KEYS_FILE_PATH)
 
 # document saved
 print("Private keys for public key %s saved in %s" % (pubkey, PRIVATE_KEYS_FILE_PATH))
+
+# load private keys from file
+loaded_signer = load_key(PRIVATE_KEYS_FILE_PATH)
+
+# check public key from file
+print("Public key %s loaded from file %s" % (pubkey, PRIVATE_KEYS_FILE_PATH))
+
+exit(0)
