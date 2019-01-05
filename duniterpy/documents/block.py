@@ -3,7 +3,8 @@ import hashlib
 import re
 from typing import TypeVar, Type, Optional, List, Sequence
 from .block_uid import BlockUID
-from .certification import Certification, Revocation
+from .certification import Certification
+from .revocation import Revocation
 from .identity import Identity
 from .document import Document, MalformedDocumentError
 from .membership import Membership
