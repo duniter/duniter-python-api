@@ -11,7 +11,7 @@ if __name__ == '__main__':
     password = getpass.getpass("Enter your password: ")
 
     # Create key object
-    key = SigningKey(salt, password)
+    key = SigningKey.from_credentials(salt, password)
 
     # Display your public key
     print("Public key for your credentials: %s" % key.pubkey)

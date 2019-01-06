@@ -17,7 +17,7 @@ else:
 # WARNING : Hide this file in a safe and secure place
 # If one day you forget your credentials,
 # you'll have to use one of your private keys instead
-PRIVATE_KEYS_FILE_PATH = os.path.join(home_path, ".duniter_account_private_keys.txt")
+PRIVATE_KEY_FILE_PATH = os.path.join(home_path, ".duniter_account_wif_v1.duniterkey")
 
 ################################################
 
@@ -38,16 +38,22 @@ if signer.pubkey != pubkey:
     print("Bad credentials!")
     exit(1)
 
-# save private keys in a file (json format)
-signer.save(PRIVATE_KEYS_FILE_PATH)
+# save private key in a file (WIF v1 format)
+signer.save_wif(PRIVATE_KEY_FILE_PATH)
 
 # document saved
-print("Private keys for public key %s saved in %s" % (pubkey, PRIVATE_KEYS_FILE_PATH))
+print("Private key for public key %s saved in %s" % (signer.pubkey, PRIVATE_KEY_FILE_PATH))
 
-# load private keys from file
-loaded_signer = load_key(PRIVATE_KEYS_FILE_PATH)
+try:
+    # load private keys from file
+    loaded_signer = SigningKey.from_wif_file(PRIVATE_KEY_FILE_PATH)
 
-# check public key from file
-print("Public key %s loaded from file %s" % (pubkey, PRIVATE_KEYS_FILE_PATH))
+    # check public key from file
+    print("Public key %s loaded from file %s" % (loaded_signer.pubkey, PRIVATE_KEY_FILE_PATH))
+
+except Exception as e:
+    print(e)
+    exit(1)
+
 
 exit(0)

@@ -33,7 +33,7 @@ def get_identity_document(current_block: dict, uid: str, salt: str, password: st
     timestamp = BlockUID(current_block['number'], current_block['hash'])
 
     # create keys from credentials
-    key = SigningKey(salt, password)
+    key = SigningKey.from_credentials(salt, password)
 
     # create identity document
     identity = Identity(

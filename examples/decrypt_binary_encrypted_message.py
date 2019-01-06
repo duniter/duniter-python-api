@@ -21,7 +21,7 @@ if __name__ == '__main__':
     password = getpass.getpass("Enter your password: ")
 
     # Create key object
-    signing_key_instance = SigningKey(salt, password)
+    signing_key_instance = SigningKey.from_credentials(salt, password)
 
     # open encrypted message file
     with open(signed_message_path, 'rb') as file_handler:

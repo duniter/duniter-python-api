@@ -86,7 +86,7 @@ def get_signed_raw_revocation_document(identity: Identity, salt: str, password: 
     """
     revocation = Revocation(PROTOCOL_VERSION, identity.currency, identity, "")
 
-    key = SigningKey(salt, password)
+    key = SigningKey.from_credentials(salt, password)
     revocation.sign([key])
     return revocation.signed_raw()
 
@@ -112,7 +112,7 @@ async def main():
     pubkey = input("Enter your public key: ")
 
     # init signer instance
-    signer = SigningKey(salt, password)
+    signer = SigningKey.from_credentials(salt, password)
 
     # check public key
     if signer.pubkey != pubkey:

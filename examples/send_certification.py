@@ -74,7 +74,7 @@ def get_certification_document(current_block: dict, self_cert_document: Identity
                                   identity=self_cert_document,
                                   timestamp=BlockUID(current_block['number'], current_block['hash']), signature="")
     # sign document
-    key = SigningKey(salt, password)
+    key = SigningKey.from_credentials(salt, password)
     certification.sign([key])
 
     return certification

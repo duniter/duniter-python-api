@@ -119,7 +119,7 @@ async def main():
     transaction = get_transaction_document(current_block, source, pubkey_from, pubkey_to)
 
     # create keys from credentials
-    key = SigningKey(salt, password)
+    key = SigningKey.from_credentials(salt, password)
 
     # sign document
     transaction.sign([key])
