@@ -7,10 +7,11 @@ from re import compile, MULTILINE, search
 from typing import Optional, Union, TypeVar, Type
 
 import libnacl.sign
+import pyaes
 from pylibscrypt import scrypt
 
 from .base58 import Base58Encoder
-from ..helpers import ensure_bytes
+from ..helpers import ensure_bytes, xor_bytes
 
 SEED_LENGTH = 32  # Length of the key
 crypto_sign_BYTES = 64
@@ -81,7 +82,7 @@ class SigningKey(libnacl.sign.Signer):
     @classmethod
     def from_wif_file(cls: Type[SigningKeyType], path: str) -> SigningKeyType:
         """
-        Return SigningKey instance from Duniter WIF v1 file
+        Return SigningKey instance from Duniter WIF file
 
         :param path: Path to WIF file
         """
@@ -113,17 +114,17 @@ class SigningKey(libnacl.sign.Signer):
 
         return cls(seed)
 
-    def save_wif(self, path: str) -> None:
+    def save_wif_file(self, path: str) -> None:
         """
-        Save a Wallet Import Format file (v1)
+        Save a Wallet Import Format file (WIF) v1
 
         :param path: Path to file
         """
         # Cesium v1
         version = 1
 
-        # add version to seed
-        seed_fi = version.to_bytes(version, 'little') + self.seed
+        # add format to seed (1=WIF,2=EWIF)
+        seed_fi = b"\x01" + self.seed
 
         # calculate checksum
         sha256_v1 = libnacl.crypto_hash_sha256(seed_fi)
@@ -136,5 +137,116 @@ class SigningKey(libnacl.sign.Signer):
             fh.write(
                 """Type: WIF
 Version: {version}
-Data: {data}""".format(version=1, data=wif_key)
+Data: {data}""".format(version=version, data=wif_key)
+            )
+
+    @classmethod
+    def from_ewif_file(cls: Type[SigningKeyType], path: str, password: str) -> SigningKeyType:
+        """
+        Return SigningKey instance from Duniter EWIF file
+
+        :param path: Path to WIF file
+        :param password: Password of the encrypted seed
+        """
+        with open(path, 'r') as fh:
+            wif_content = fh.read()
+
+        regex = compile('Data: ([1-9A-HJ-NP-Za-km-z]+)', MULTILINE)
+        match = search(regex, wif_content)
+        if not match:
+            raise Exception('Error: Bad format EWIF v1 file')
+
+        ewif_hex = match.groups()[0]
+        ewif_bytes = Base58Encoder.decode(ewif_hex)
+        if len(ewif_bytes) != 39:
+            raise Exception("Error: the size of EWIF is invalid")
+
+        fi = ewif_bytes[0:1]
+        checksum_from_ewif = ewif_bytes[-2:]
+        ewif_no_checksum = ewif_bytes[0:-2]
+        salt = ewif_bytes[1:5]
+        encryptedhalf1 = ewif_bytes[5:21]
+        encryptedhalf2 = ewif_bytes[21:37]
+
+        if fi != b"\x02":
+            raise Exception("Error: bad EWIF version")
+
+        # checksum control
+        checksum = libnacl.crypto_hash_sha256(libnacl.crypto_hash_sha256(ewif_no_checksum))[0:2]
+        if checksum_from_ewif != checksum:
+            raise Exception("Error: bad checksum of the EWIF")
+
+        # SCRYPT
+        password_bytes = password.encode("utf-8")
+        scrypt_seed = scrypt(password_bytes, salt, 16384, 8, 8, 64)
+        derivedhalf1 = scrypt_seed[0:32]
+        derivedhalf2 = scrypt_seed[32:64]
+
+        # AES
+        aes = pyaes.AESModeOfOperationECB(derivedhalf2)
+        decryptedhalf1 = aes.decrypt(encryptedhalf1)
+        decryptedhalf2 = aes.decrypt(encryptedhalf2)
+
+        # XOR
+        seed1 = xor_bytes(decryptedhalf1, derivedhalf1[0:16])
+        seed2 = xor_bytes(decryptedhalf2, derivedhalf1[16:32])
+        seed = bytes(seed1 + seed2)
+
+        # Password Control
+        signer = SigningKey(seed)
+        salt_from_seed = libnacl.crypto_hash_sha256(
+            libnacl.crypto_hash_sha256(
+                Base58Encoder.decode(signer.pubkey)))[0:4]
+        if salt_from_seed != salt:
+            raise Exception("Error: bad Password of EWIF address")
+
+        return cls(seed)
+
+    def save_ewif_file(self, path: str, password: str) -> None:
+        """
+        Save an Encrypted Wallet Import Format file (WIF v2)
+
+        :param path: Path to file
+        :param password:
+        """
+        # WIF Format version
+        version = 1
+
+        # add version to seed
+        salt = libnacl.crypto_hash_sha256(
+            libnacl.crypto_hash_sha256(
+                Base58Encoder.decode(self.pubkey)))[0:4]
+
+        # SCRYPT
+        password_bytes = password.encode("utf-8")
+        scrypt_seed = scrypt(password_bytes, salt, 16384, 8, 8, 64)
+        derivedhalf1 = scrypt_seed[0:32]
+        derivedhalf2 = scrypt_seed[32:64]
+
+        # XOR
+        seed1_xor_derivedhalf1_1 = bytes(xor_bytes(self.seed[0:16], derivedhalf1[0:16]))
+        seed2_xor_derivedhalf1_2 = bytes(xor_bytes(self.seed[16:32], derivedhalf1[16:32]))
+
+        # AES
+        aes = pyaes.AESModeOfOperationECB(derivedhalf2)
+        encryptedhalf1 = aes.encrypt(seed1_xor_derivedhalf1_1)
+        encryptedhalf2 = aes.encrypt(seed2_xor_derivedhalf1_2)
+
+        # add format to final seed (1=WIF,2=EWIF)
+        seed_bytes = b'\x02' + salt + encryptedhalf1 + encryptedhalf2
+
+        # calculate checksum
+        sha256_v1 = libnacl.crypto_hash_sha256(seed_bytes)
+        sha256_v2 = libnacl.crypto_hash_sha256(sha256_v1)
+        checksum = sha256_v2[0:2]
+
+        # B58 encode final key string
+        ewif_key = Base58Encoder.encode(seed_bytes + checksum)
+
+        # save file
+        with open(path, 'w') as fh:
+            fh.write(
+                """Type: EWIF
+Version: {version}
+Data: {data}""".format(version=version, data=ewif_key)
             )

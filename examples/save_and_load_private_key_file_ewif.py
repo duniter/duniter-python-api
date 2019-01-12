@@ -16,7 +16,7 @@ else:
 # WARNING : Hide this file in a safe and secure place
 # If one day you forget your credentials,
 # you'll have to use one of your private keys instead
-PRIVATE_KEY_FILE_PATH = os.path.join(home_path, ".duniter_account_wif_v1.duniterkey")
+PRIVATE_KEY_FILE_PATH = os.path.join(home_path, ".duniter_account_ewif_v1.duniterkey")
 
 ################################################
 
@@ -37,15 +37,18 @@ if signer.pubkey != pubkey:
     print("Bad credentials!")
     exit(1)
 
-# save private key in a file (WIF v1 format)
-signer.save_wif_file(PRIVATE_KEY_FILE_PATH)
+# prompt hidden user entry
+ewif_password = getpass.getpass("Enter an encryption password: ")
+
+# save private key in a file (EWIF v1 format)
+signer.save_ewif_file(PRIVATE_KEY_FILE_PATH, ewif_password)
 
 # document saved
 print("Private key for public key %s saved in %s" % (signer.pubkey, PRIVATE_KEY_FILE_PATH))
 
 try:
     # load private keys from file
-    loaded_signer = SigningKey.from_wif_file(PRIVATE_KEY_FILE_PATH)
+    loaded_signer = SigningKey.from_ewif_file(PRIVATE_KEY_FILE_PATH, ewif_password)
 
     # check public key from file
     print("Public key %s loaded from file %s" % (loaded_signer.pubkey, PRIVATE_KEY_FILE_PATH))

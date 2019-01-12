@@ -5,3 +5,4 @@ base58 >= 1.0.0
 jsonschema >= 2.6.0
 pypeg2 >= 2.15.2
 attr >= 0.3.1
+pyaes >= 1.6.1
