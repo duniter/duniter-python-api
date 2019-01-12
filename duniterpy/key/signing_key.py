@@ -8,6 +8,7 @@ from typing import Optional, Union, TypeVar, Type
 
 import libnacl.sign
 import pyaes
+from libnacl.utils import load_key
 from pylibscrypt import scrypt
 
 from .base58 import Base58Encoder
@@ -66,6 +67,28 @@ class SigningKey(libnacl.sign.Signer):
                       SEED_LENGTH)
 
         return cls(seed)
+
+
+    def save_private_key(self, path: str) -> None:
+        """
+        Save authentication file
+
+        :param path: Authentication file path
+        """
+        self.save(path)
+
+
+    def from_private_key(path: str) -> SigningKeyType:
+        """
+        Read authentication file
+        Add public key attribute
+
+        :param path: Authentication file path
+        """
+        key = load_key(path)
+        key.pubkey = Base58Encoder.encode(key.vk)
+        return key
+
 
     def decrypt_seal(self, message: bytes) -> str:
         """
