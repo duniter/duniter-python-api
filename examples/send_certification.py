@@ -56,28 +56,20 @@ async def get_identity_document(client: Client, current_block: dict, pubkey: str
             )
 
 
-def get_certification_document(current_block: dict, self_cert_document: Identity, from_pubkey: str, salt: str,
-                               password: str) -> Certification:
+def get_certification_document(current_block: dict, self_cert_document: Identity, from_pubkey: str) -> Certification:
     """
     Create and return a Certification document
 
     :param current_block: Current block data
     :param self_cert_document: Identity document
     :param from_pubkey: Pubkey of the certifier
-    :param salt: Secret salt (DO NOT SHOW IT ANYWHERE, IT IS SECRET !!!)
-    :param password: Secret password (DO NOT SHOW IT ANYWHERE, IT IS SECRET !!!)
 
     :rtype: Certification
     """
     # construct Certification Document
-    certification = Certification(version=10, currency=current_block['currency'], pubkey_from=from_pubkey,
+    return Certification(version=10, currency=current_block['currency'], pubkey_from=from_pubkey,
                                   identity=self_cert_document,
                                   timestamp=BlockUID(current_block['number'], current_block['hash']), signature="")
-    # sign document
-    key = SigningKey.from_credentials(salt, password)
-    certification.sign([key])
-
-    return certification
 
 
 async def main():
@@ -97,8 +89,9 @@ async def main():
     # prompt hidden user entry
     password = getpass.getpass("Enter your password: ")
 
-    # prompt entry
-    pubkey_from = input("Enter your pubkey: ")
+    # create key from credentials
+    key = SigningKey.from_credentials(salt, password)
+    pubkey_from = key.pubkey
 
     # prompt entry
     pubkey_to = input("Enter certified pubkey: ")
@@ -110,7 +103,10 @@ async def main():
     identity = await get_identity_document(client, current_block, pubkey_to)
 
     # send the Certification document to the node
-    certification = get_certification_document(current_block, identity, pubkey_from, salt, password)
+    certification = get_certification_document(current_block, identity, pubkey_from)
+
+    # sign document
+    certification.sign([key])
 
     # Here we request for the path wot/certify
     response = await client(bma.wot.certify, certification.signed_raw())
