@@ -42,7 +42,7 @@ class SecretKey(libnacl.public.SecretKey):
 
     def encrypt(self, pubkey: str, nonce: Union[str, bytes], text: Union[str, bytes]) -> str:
         """
-        Encrypt message text with the public key of the recipient and a noonce
+        Encrypt message text with the public key of the recipient and a nonce
 
         The nonce must be a 24 character string (you can use libnacl.utils.rand_nonce() to get one)
         and unique for each encrypted message.
