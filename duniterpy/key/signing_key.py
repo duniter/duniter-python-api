@@ -80,6 +80,60 @@ class SigningKey(libnacl.sign.Signer):
         return libnacl.crypto_box_seal_open(message, curve25519_public_key, curve25519_secret_key).decode('utf-8')
 
     @classmethod
+    def from_pubsec_file(cls: Type[SigningKeyType], path: str) -> SigningKeyType:
+        """
+        Return SigningKey instance from Duniter WIF file
+
+        :param path: Path to WIF file
+        """
+        with open(path, 'r') as fh:
+            pubsec_content = fh.read()
+
+        # line patterns
+        regex_pubkey = compile("pub: ([1-9A-HJ-NP-Za-km-z]+)", MULTILINE)
+        regex_signkey = compile("sec: ([1-9A-HJ-NP-Za-km-z]+)", MULTILINE)
+
+        # check public key field
+        match = search(regex_pubkey, pubsec_content)
+        if not match:
+            raise Exception('Error: Bad format PubSec v1 file, missing public key')
+
+        # check signkey field
+        match = search(regex_signkey, pubsec_content)
+        if not match:
+            raise Exception('Error: Bad format PubSec v1 file, missing sec key')
+
+        # capture signkey
+        signkey_hex = match.groups()[0]
+
+        # extract seed from signkey
+        seed = bytes(Base58Encoder.decode(signkey_hex)[0:32])
+
+        return cls(seed)
+
+    def save_pubsec_file(self, path: str) -> None:
+            """
+            Save a Duniter PubSec file (PubSec) v1
+
+            :param path: Path to file
+            """
+            # version
+            version = 1
+
+            # base58 encode keys
+            base58_signing_key = Base58Encoder.encode(self.sk)
+            base58_public_key = self.pubkey
+
+            # save file
+            with open(path, 'w') as fh:
+                fh.write(
+                    """Type: PubSec
+Version: {version}
+pub: {pubkey}
+sec: {signkey}""".format(version=version, pubkey=base58_public_key, signkey=base58_signing_key)
+                )
+
+    @classmethod
     def from_wif_file(cls: Type[SigningKeyType], path: str) -> SigningKeyType:
         """
         Return SigningKey instance from Duniter WIF file
@@ -89,23 +143,27 @@ class SigningKey(libnacl.sign.Signer):
         with open(path, 'r') as fh:
             wif_content = fh.read()
 
+        # check data field
         regex = compile('Data: ([1-9A-HJ-NP-Za-km-z]+)', MULTILINE)
         match = search(regex, wif_content)
         if not match:
             raise Exception('Error: Bad format WIF v1 file')
 
+        # capture hexa wif key
         wif_hex = match.groups()[0]
         wif_bytes = Base58Encoder.decode(wif_hex)
         if len(wif_bytes) != 35:
             raise Exception("Error: the size of WIF is invalid")
 
+        # extract data
         checksum_from_wif = wif_bytes[-2:]
         fi = wif_bytes[0:1]
         seed = wif_bytes[1:-2]
         seed_fi = wif_bytes[0:-2]
 
+        # check WIF format flag
         if fi != b"\x01":
-            raise Exception("Error: bad WIF version")
+            raise Exception("Error: bad format version, not WIF")
 
         # checksum control
         checksum = libnacl.crypto_hash_sha256(libnacl.crypto_hash_sha256(seed_fi))[0:2]
@@ -120,7 +178,7 @@ class SigningKey(libnacl.sign.Signer):
 
         :param path: Path to file
         """
-        # Cesium v1
+        # version
         version = 1
 
         # add format to seed (1=WIF,2=EWIF)
@@ -131,6 +189,7 @@ class SigningKey(libnacl.sign.Signer):
         sha256_v2 = libnacl.crypto_hash_sha256(sha256_v1)
         checksum = sha256_v2[0:2]
 
+        # base58 encode key and checksum
         wif_key = Base58Encoder.encode(seed_fi + checksum)
 
         with open(path, 'w') as fh:
@@ -151,16 +210,19 @@ Data: {data}""".format(version=version, data=wif_key)
         with open(path, 'r') as fh:
             wif_content = fh.read()
 
+        # check data field
         regex = compile('Data: ([1-9A-HJ-NP-Za-km-z]+)', MULTILINE)
         match = search(regex, wif_content)
         if not match:
             raise Exception('Error: Bad format EWIF v1 file')
 
+        # capture ewif key
         ewif_hex = match.groups()[0]
         ewif_bytes = Base58Encoder.decode(ewif_hex)
         if len(ewif_bytes) != 39:
             raise Exception("Error: the size of EWIF is invalid")
 
+        # extract data
         fi = ewif_bytes[0:1]
         checksum_from_ewif = ewif_bytes[-2:]
         ewif_no_checksum = ewif_bytes[0:-2]
@@ -168,8 +230,9 @@ Data: {data}""".format(version=version, data=wif_key)
         encryptedhalf1 = ewif_bytes[5:21]
         encryptedhalf2 = ewif_bytes[21:37]
 
+        # check format flag
         if fi != b"\x02":
-            raise Exception("Error: bad EWIF version")
+            raise Exception("Error: bad format version, not EWIF")
 
         # checksum control
         checksum = libnacl.crypto_hash_sha256(libnacl.crypto_hash_sha256(ewif_no_checksum))[0:2]
@@ -209,7 +272,7 @@ Data: {data}""".format(version=version, data=wif_key)
         :param path: Path to file
         :param password:
         """
-        # WIF Format version
+        # version
         version = 1
 
         # add version to seed
