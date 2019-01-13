@@ -68,7 +68,6 @@ class SigningKey(libnacl.sign.Signer):
 
         return cls(seed)
 
-
     def save_private_key(self, path: str) -> None:
         """
         Save authentication file
@@ -77,7 +76,7 @@ class SigningKey(libnacl.sign.Signer):
         """
         self.save(path)
 
-
+    @staticmethod
     def from_private_key(path: str) -> SigningKeyType:
         """
         Read authentication file
@@ -88,7 +87,6 @@ class SigningKey(libnacl.sign.Signer):
         key = load_key(path)
         key.pubkey = Base58Encoder.encode(key.vk)
         return key
-
 
     def decrypt_seal(self, message: bytes) -> str:
         """
@@ -135,26 +133,26 @@ class SigningKey(libnacl.sign.Signer):
         return cls(seed)
 
     def save_pubsec_file(self, path: str) -> None:
-            """
-            Save a Duniter PubSec file (PubSec) v1
+        """
+        Save a Duniter PubSec file (PubSec) v1
 
-            :param path: Path to file
-            """
-            # version
-            version = 1
+        :param path: Path to file
+        """
+        # version
+        version = 1
 
-            # base58 encode keys
-            base58_signing_key = Base58Encoder.encode(self.sk)
-            base58_public_key = self.pubkey
+        # base58 encode keys
+        base58_signing_key = Base58Encoder.encode(self.sk)
+        base58_public_key = self.pubkey
 
-            # save file
-            with open(path, 'w') as fh:
-                fh.write(
-                    """Type: PubSec
+        # save file
+        with open(path, 'w') as fh:
+            fh.write(
+                """Type: PubSec
 Version: {version}
 pub: {pubkey}
 sec: {signkey}""".format(version=version, pubkey=base58_public_key, signkey=base58_signing_key)
-                )
+            )
 
     @classmethod
     def from_wif_file(cls: Type[SigningKeyType], path: str) -> SigningKeyType:
