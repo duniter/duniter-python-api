@@ -154,8 +154,42 @@ pub: {pubkey}
 sec: {signkey}""".format(version=version, pubkey=base58_public_key, signkey=base58_signing_key)
             )
 
-    @classmethod
-    def from_wif_file(cls: Type[SigningKeyType], path: str) -> SigningKeyType:
+    def from_wif_or_ewif_file(path: str, password: str=None) -> SigningKeyType:
+        """
+        Return SigningKey instance from Duniter WIF or EWIF file
+
+        :param path: Path to WIF of EWIF file
+        """
+        with open(path, 'r') as fh:
+            wif_content = fh.read()
+
+        # check data field
+        regex = compile('Data: ([1-9A-HJ-NP-Za-km-z]+)', MULTILINE)
+        match = search(regex, wif_content)
+        if not match:
+            raise Exception('Error: Bad format WIF or EWIF v1 file')
+
+        # capture hexa wif key
+        wif_hex = match.groups()[0]
+        return SigningKey.from_wif_or_ewif_hex(wif_hex, password)
+
+    def from_wif_or_ewif_hex(wif_hex: str, password: str=None) -> SigningKeyType:
+        """
+        Return SigningKey instance from Duniter WIF or EWIF in hexadecimal format
+
+        :param wif_hex: WIF or EWIF string in hexadecimal format
+        :param password: Password of EWIF encrypted seed
+        """
+        wif_bytes = Base58Encoder.decode(wif_hex)
+
+        fi = wif_bytes[0:1]
+
+        if fi == b"\x01":
+            return SigningKey.from_wif_hex(wif_hex)
+        elif fi == b"\x02":
+            return SigningKey.from_ewif_hex(wif_hex, password)
+
+    def from_wif_file(path: str) -> SigningKeyType:
         """
         Return SigningKey instance from Duniter WIF file
 
@@ -172,6 +206,15 @@ sec: {signkey}""".format(version=version, pubkey=base58_public_key, signkey=base
 
         # capture hexa wif key
         wif_hex = match.groups()[0]
+        return SigningKey.from_wif_hex(wif_hex)
+
+    @classmethod
+    def from_wif_hex(cls: Type[SigningKeyType], wif_hex: str) -> SigningKeyType:
+        """
+        Return SigningKey instance from Duniter WIF in hexadecimal format
+
+        :param wif_hex: WIF string in hexadecimal format
+        """
         wif_bytes = Base58Encoder.decode(wif_hex)
         if len(wif_bytes) != 35:
             raise Exception("Error: the size of WIF is invalid")
@@ -220,12 +263,11 @@ Version: {version}
 Data: {data}""".format(version=version, data=wif_key)
             )
 
-    @classmethod
-    def from_ewif_file(cls: Type[SigningKeyType], path: str, password: str) -> SigningKeyType:
+    def from_ewif_file(path: str, password: str) -> SigningKeyType:
         """
         Return SigningKey instance from Duniter EWIF file
 
-        :param path: Path to WIF file
+        :param path: Path to EWIF file
         :param password: Password of the encrypted seed
         """
         with open(path, 'r') as fh:
@@ -239,6 +281,16 @@ Data: {data}""".format(version=version, data=wif_key)
 
         # capture ewif key
         ewif_hex = match.groups()[0]
+        return SigningKey.from_ewif_hex(ewif_hex, password)
+
+    @classmethod
+    def from_ewif_hex(cls: Type[SigningKeyType], ewif_hex: str, password: str) -> SigningKeyType:
+        """
+        Return SigningKey instance from Duniter EWIF in hexadecimal format
+
+        :param ewif_hex: EWIF string in hexadecimal format
+        :param password: Password of the encrypted seed
+        """
         ewif_bytes = Base58Encoder.decode(ewif_hex)
         if len(ewif_bytes) != 39:
             raise Exception("Error: the size of EWIF is invalid")
