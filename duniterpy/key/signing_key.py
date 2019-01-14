@@ -188,6 +188,9 @@ sec: {signkey}""".format(version=version, pubkey=base58_public_key, signkey=base
             return SigningKey.from_wif_hex(wif_hex)
         elif fi == b"\x02":
             return SigningKey.from_ewif_hex(wif_hex, password)
+        else:
+            raise Exception("Error: Bad format: not WIF nor EWIF")
+
 
     def from_wif_file(path: str) -> SigningKeyType:
         """
