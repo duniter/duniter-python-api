@@ -155,7 +155,7 @@ sec: {signkey}""".format(version=version, pubkey=base58_public_key, signkey=base
             )
 
     @staticmethod
-    def from_wif_or_ewif_file(path: str, password: str = None) -> SigningKeyType:
+    def from_wif_or_ewif_file(path: str, password: Optional[str] = None) -> SigningKeyType:
         """
         Return SigningKey instance from Duniter WIF or EWIF file
 
@@ -176,7 +176,7 @@ sec: {signkey}""".format(version=version, pubkey=base58_public_key, signkey=base
         return SigningKey.from_wif_or_ewif_hex(wif_hex, password)
 
     @staticmethod
-    def from_wif_or_ewif_hex(wif_hex: str, password: str = None) -> SigningKeyType:
+    def from_wif_or_ewif_hex(wif_hex: str, password: Optional[str] = None) -> SigningKeyType:
         """
         Return SigningKey instance from Duniter WIF or EWIF in hexadecimal format
 
@@ -189,7 +189,7 @@ sec: {signkey}""".format(version=version, pubkey=base58_public_key, signkey=base
 
         if fi == b"\x01":
             return SigningKey.from_wif_hex(wif_hex)
-        elif fi == b"\x02":
+        elif fi == b"\x02" and password is not None:
             return SigningKey.from_ewif_hex(wif_hex, password)
         else:
             raise Exception("Error: Bad format: not WIF nor EWIF")
