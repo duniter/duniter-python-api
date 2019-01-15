@@ -154,11 +154,13 @@ pub: {pubkey}
 sec: {signkey}""".format(version=version, pubkey=base58_public_key, signkey=base58_signing_key)
             )
 
-    def from_wif_or_ewif_file(path: str, password: str=None) -> SigningKeyType:
+    @staticmethod
+    def from_wif_or_ewif_file(path: str, password: str = None) -> SigningKeyType:
         """
         Return SigningKey instance from Duniter WIF or EWIF file
 
         :param path: Path to WIF of EWIF file
+        :param password: Password needed for EWIF file
         """
         with open(path, 'r') as fh:
             wif_content = fh.read()
@@ -173,7 +175,8 @@ sec: {signkey}""".format(version=version, pubkey=base58_public_key, signkey=base
         wif_hex = match.groups()[0]
         return SigningKey.from_wif_or_ewif_hex(wif_hex, password)
 
-    def from_wif_or_ewif_hex(wif_hex: str, password: str=None) -> SigningKeyType:
+    @staticmethod
+    def from_wif_or_ewif_hex(wif_hex: str, password: str = None) -> SigningKeyType:
         """
         Return SigningKey instance from Duniter WIF or EWIF in hexadecimal format
 
@@ -191,7 +194,7 @@ sec: {signkey}""".format(version=version, pubkey=base58_public_key, signkey=base
         else:
             raise Exception("Error: Bad format: not WIF nor EWIF")
 
-
+    @staticmethod
     def from_wif_file(path: str) -> SigningKeyType:
         """
         Return SigningKey instance from Duniter WIF file
@@ -266,6 +269,7 @@ Version: {version}
 Data: {data}""".format(version=version, data=wif_key)
             )
 
+    @staticmethod
     def from_ewif_file(path: str, password: str) -> SigningKeyType:
         """
         Return SigningKey instance from Duniter EWIF file
