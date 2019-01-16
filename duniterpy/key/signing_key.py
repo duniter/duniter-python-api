@@ -166,8 +166,8 @@ class SigningKey(libnacl.sign.Signer):
             pubsec_content = fh.read()
 
         # line patterns
-        regex_pubkey = compile("pub: ([1-9A-HJ-NP-Za-km-z]+)", MULTILINE)
-        regex_signkey = compile("sec: ([1-9A-HJ-NP-Za-km-z]+)", MULTILINE)
+        regex_pubkey = compile("pub: ([1-9A-HJ-NP-Za-km-z]{43,44})", MULTILINE)
+        regex_signkey = compile("sec: ([1-9A-HJ-NP-Za-km-z]{88,90})", MULTILINE)
 
         # check public key field
         match = search(regex_pubkey, pubsec_content)
