@@ -12,7 +12,7 @@ from libnacl.utils import load_key
 from pylibscrypt import scrypt
 
 from .base58 import Base58Encoder
-from ..helpers import ensure_bytes, xor_bytes
+from ..helpers import ensure_bytes, xor_bytes, convert_seedhex_to_seed, convert_seed_to_seedhex
 
 SEED_LENGTH = 32  # Length of the key
 crypto_sign_BYTES = 64
@@ -66,6 +66,61 @@ class SigningKey(libnacl.sign.Signer):
                       scrypt_params.N, scrypt_params.r, scrypt_params.p,
                       SEED_LENGTH)
 
+        return cls(seed)
+
+    def save_seedhex_file_from_seed(self, path: str) -> None:
+        """
+        Save hexadecimal seed file from seed
+
+        :param path: Authentication file path
+        """
+        seedhex = convert_seed_to_seedhex(self.seed)
+        SigningKey.save_seedhex_file(seedhex, path)
+
+    @staticmethod
+    def save_seedhex_file(seedhex: str, path: str) -> None:
+        """
+        Save hexadecimal seed file
+
+        :param seedhex: Hexadecimal seed string
+        :param path: Authentication file path
+        """
+        with open(path, 'w') as fh:
+            fh.write(seedhex)
+
+    @staticmethod
+    def from_seedhex_file(path: str) -> SigningKeyType:
+        """
+        Return SigningKey instance from Seedhex file
+
+        :param str path: Hexadecimal seed file path
+        """
+        with open(path, 'r') as fh:
+            seedhex = fh.read()
+        return SigningKey.from_seedhex(seedhex)
+
+    @staticmethod
+    def from_seedhex(seedhex: str) -> SigningKeyType:
+        """
+        Return SigningKey instance from Seedhex
+
+        :param str seedhex: Hexadecimal seed string
+        """
+        regex_seedhex = compile("([0-9a-fA-F]{64})")
+        match = search(regex_seedhex, seedhex)
+        if not match:
+            raise Exception('Error: Bad seed hexadecimal format')
+        seedhex = match.groups()[0]
+        seed = convert_seedhex_to_seed(seedhex)
+        return SigningKey.from_seed(seed)
+
+    @classmethod
+    def from_seed(cls: Type[SigningKeyType], seed: bytes) -> SigningKeyType:
+        """
+        Return SigningKey instance from Seed
+
+        :param str seed: seed string
+        """
         return cls(seed)
 
     def save_private_key(self, path: str) -> None:
