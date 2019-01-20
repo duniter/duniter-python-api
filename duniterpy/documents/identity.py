@@ -75,9 +75,7 @@ class Identity(Document):
     def from_signed_raw(cls: Type[IdentityType], signed_raw: str) -> IdentityType:
         """
         Return Identity instance from a signed_raw string
-        :param # required to type hint cls in classmethod
-IdentityType = TypeVar('IdentityType', bound='Identity')
-signed_raw: Signed raw document
+        :param signed_raw: Signed raw document
         :return:
         """
         n = 0
