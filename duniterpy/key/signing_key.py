@@ -68,23 +68,13 @@ class SigningKey(libnacl.sign.Signer):
 
         return cls(seed)
 
-    def save_seedhex_file_from_seed(self, path: str) -> None:
+    def save_seedhex_file(self, path: str) -> None:
         """
         Save hexadecimal seed file from seed
 
         :param path: Authentication file path
         """
         seedhex = convert_seed_to_seedhex(self.seed)
-        SigningKey.save_seedhex_file(seedhex, path)
-
-    @staticmethod
-    def save_seedhex_file(seedhex: str, path: str) -> None:
-        """
-        Save hexadecimal seed file
-
-        :param seedhex: Hexadecimal seed string
-        :param path: Authentication file path
-        """
         with open(path, 'w') as fh:
             fh.write(seedhex)
 
@@ -99,8 +89,8 @@ class SigningKey(libnacl.sign.Signer):
             seedhex = fh.read()
         return SigningKey.from_seedhex(seedhex)
 
-    @staticmethod
-    def from_seedhex(seedhex: str) -> SigningKeyType:
+    @classmethod
+    def from_seedhex(cls: Type[SigningKeyType], seedhex: str) -> SigningKeyType:
         """
         Return SigningKey instance from Seedhex
 
@@ -112,15 +102,6 @@ class SigningKey(libnacl.sign.Signer):
             raise Exception('Error: Bad seed hexadecimal format')
         seedhex = match.groups()[0]
         seed = convert_seedhex_to_seed(seedhex)
-        return SigningKey.from_seed(seed)
-
-    @classmethod
-    def from_seed(cls: Type[SigningKeyType], seed: bytes) -> SigningKeyType:
-        """
-        Return SigningKey instance from Seed
-
-        :param str seed: seed string
-        """
         return cls(seed)
 
     def save_private_key(self, path: str) -> None:
