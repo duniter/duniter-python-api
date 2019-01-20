@@ -12,7 +12,7 @@ from libnacl.utils import load_key
 from pylibscrypt import scrypt
 
 from .base58 import Base58Encoder
-from ..helpers import ensure_bytes, xor_bytes
+from ..helpers import ensure_bytes, xor_bytes, convert_seedhex_to_seed, convert_seed_to_seedhex
 
 SEED_LENGTH = 32  # Length of the key
 crypto_sign_BYTES = 64
@@ -68,6 +68,42 @@ class SigningKey(libnacl.sign.Signer):
 
         return cls(seed)
 
+    def save_seedhex_file(self, path: str) -> None:
+        """
+        Save hexadecimal seed file from seed
+
+        :param path: Authentication file path
+        """
+        seedhex = convert_seed_to_seedhex(self.seed)
+        with open(path, 'w') as fh:
+            fh.write(seedhex)
+
+    @staticmethod
+    def from_seedhex_file(path: str) -> SigningKeyType:
+        """
+        Return SigningKey instance from Seedhex file
+
+        :param str path: Hexadecimal seed file path
+        """
+        with open(path, 'r') as fh:
+            seedhex = fh.read()
+        return SigningKey.from_seedhex(seedhex)
+
+    @classmethod
+    def from_seedhex(cls: Type[SigningKeyType], seedhex: str) -> SigningKeyType:
+        """
+        Return SigningKey instance from Seedhex
+
+        :param str seedhex: Hexadecimal seed string
+        """
+        regex_seedhex = compile("([0-9a-fA-F]{64})")
+        match = search(regex_seedhex, seedhex)
+        if not match:
+            raise Exception('Error: Bad seed hexadecimal format')
+        seedhex = match.groups()[0]
+        seed = convert_seedhex_to_seed(seedhex)
+        return cls(seed)
+
     def save_private_key(self, path: str) -> None:
         """
         Save authentication file
@@ -111,8 +147,8 @@ class SigningKey(libnacl.sign.Signer):
             pubsec_content = fh.read()
 
         # line patterns
-        regex_pubkey = compile("pub: ([1-9A-HJ-NP-Za-km-z]+)", MULTILINE)
-        regex_signkey = compile("sec: ([1-9A-HJ-NP-Za-km-z]+)", MULTILINE)
+        regex_pubkey = compile("pub: ([1-9A-HJ-NP-Za-km-z]{43,44})", MULTILINE)
+        regex_signkey = compile("sec: ([1-9A-HJ-NP-Za-km-z]{88,90})", MULTILINE)
 
         # check public key field
         match = search(regex_pubkey, pubsec_content)
