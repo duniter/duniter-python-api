@@ -1,18 +1,50 @@
 import base64
 import libnacl
-from typing import Optional, List
+from re import compile
+from typing import Optional, List, Dict
 
-from duniterpy.key import SigningKey, PublicKey, SCRYPT_PARAMS, SEED_LENGTH
+from duniterpy.key import SigningKey, PublicKey, VerifyingKey, SCRYPT_PARAMS, SEED_LENGTH
 
 # Headers constants
 BEGIN_MESSAGE_HEADER = "-----BEGIN DUNITER MESSAGE-----"
 END_MESSAGE_HEADER = "-----END DUNITER MESSAGE-----"
 BEGIN_SIGNATURE_HEADER = "-----BEGIN DUNITER SIGNATURE-----"
 END_SIGNATURE_HEADER = "-----END DUNITER SIGNATURE-----"
+HEADER_PREFIX = "-----"
 
 # Version field values
 AA_MESSAGE_VERSION = "Python Libnacl " + libnacl.__version__
 AA_SIGNATURE_VERSION = "Python Libnacl " + libnacl.__version__
+
+# PARSER CURSOR STATUS
+ON_MESSAGE_FIELDS = 1
+ON_MESSAGE_CONTENT = 2
+AFTER_MESSAGE_CONTENT = 3
+ON_SIGNATURE_FIELDS = 4
+ON_SIGNATURE_CONTENT = 5
+ON_MESSAGE_END = 6
+
+
+# Custom exceptions
+class MissingSigningKeyException(Exception):
+    """
+    Raise when the message is encrypted but no SigningKey instance is provided
+    """
+    pass
+
+
+# Custom exceptions
+class MissingPublicKeysException(Exception):
+    """
+    Raise when there is at least one signature but no public keys are provided
+    """
+    pass
+
+
+# Exception messages listed here
+MISSING_SIGNING_KEY_EXCEPTION = MissingSigningKeyException('The message is encrypted but no SigningKey instance is '
+                                                           'provided')
+MISSING_PUBLIC_KEYS_EXCEPTION = MissingPublicKeysException('At least one signature but no public keys are provided')
 
 
 class AsciiArmor:
@@ -121,3 +153,155 @@ Scrypt: {script_params}
             block += END_SIGNATURE_HEADER
 
         return block
+
+    @staticmethod
+    def parse(ascii_armor_block: str, signing_key: Optional[SigningKey] = None,
+              sender_pubkeys: Optional[List[str]] = None) -> dict:
+        """
+        Return a dict with parsed content
+
+        :param ascii_armor_block: The Ascii Armor Message Block including BEGIN and END headers
+        :param signing_key: Optional Libnacl SigningKey instance to decrypt message
+        :param sender_pubkeys: Optional sender's public keys list to verify signatures
+        :exception libnacl.CryptError: Raise an exception if keypair fail to decrypt the message
+        :exception MissingSigningKeyException: Raise an exception if no keypair given for encrypted message
+
+        :return:
+        """
+        regex_begin_message = compile(BEGIN_MESSAGE_HEADER)
+        regex_end_message = compile(END_MESSAGE_HEADER)
+        regex_begin_signature = compile(BEGIN_SIGNATURE_HEADER)
+        regex_end_signature = compile(END_SIGNATURE_HEADER)
+        regex_fields = compile("^(Version|Scrypt|Comment): (.+)$")
+
+        # trim message to get rid of empty lines
+        ascii_armor_block.strip(" \t\n\r")
+
+        parsed_result = {
+            'message':
+                {
+                    'fields': {},
+                    'content': '',
+                 },
+            'signatures': []
+        }
+        cursor_status = 0
+        message = ''
+        signatures_index = 0
+        for line in ascii_armor_block.splitlines():
+
+            # if begin message header detected...
+            if regex_begin_message.match(line):
+                cursor_status = ON_MESSAGE_FIELDS
+                continue
+
+            # if we are on the fields lines...
+            if cursor_status == ON_MESSAGE_FIELDS:
+                # parse field
+                m = regex_fields.match(line.strip())
+                if m:
+                    # capture field
+                    parsed_result['message']['fields'][m.groups()[0]] = m.groups()[1]
+                    continue
+
+                # if blank line...
+                if line.strip("\n\t\r ") == '':
+                    cursor_status = ON_MESSAGE_CONTENT
+                    continue
+
+            # if we are on the message content lines...
+            if cursor_status == ON_MESSAGE_CONTENT:
+
+                # if a header is detected...
+                if line.startswith(HEADER_PREFIX):
+
+                    # if field Version is present...
+                    if 'Version' in parsed_result['message']['fields']:
+                        # If keypair instance not given...
+                        if signing_key is None:
+                            # SigningKey keypair is mandatory to decrypt the message...
+                            raise MISSING_SIGNING_KEY_EXCEPTION
+
+                        # decrypt message with secret key from keypair
+                        message = AsciiArmor.decrypt(message, signing_key)
+
+                    # save message content in result
+                    parsed_result['message']['content'] = message
+
+                    # if message end header...
+                    if regex_end_message.match(line):
+                        # stop parsing
+                        break
+
+                    # if signature begin header...
+                    if regex_begin_signature.match(line):
+                        fields = {}  # type: Dict[str,str]
+                        # add signature dict in list
+                        parsed_result['signatures'].append({
+                            'fields': fields
+                        })
+                        cursor_status = ON_SIGNATURE_FIELDS
+                        continue
+                else:
+                    # concatenate line to message content
+                    message += line
+
+            # if we are on a signature fields zone...
+            if cursor_status == ON_SIGNATURE_FIELDS:
+                # parse field
+                m = regex_fields.match(line.strip())
+                if m:
+                    # capture field
+                    field_name = str(m.groups()[0])  # type: str
+                    field_value = str(m.groups()[1])  # type: str
+                    parsed_result['signatures'][signatures_index]['fields'][field_name] = field_value
+                    continue
+
+                # if blank line...
+                if line.strip("\n\t\r ") == '':
+                    cursor_status = ON_SIGNATURE_CONTENT
+                    continue
+
+            # if we are on the signature content...
+            if cursor_status == ON_SIGNATURE_CONTENT:
+
+                # if no public keys provided...
+                if sender_pubkeys is None:
+                    # raise exception
+                    raise MISSING_PUBLIC_KEYS_EXCEPTION
+
+                # if end signature header detected...
+                if regex_end_signature.match(line):
+                    # end of parsing
+                    break
+
+                # if begin signature header detected...
+                if regex_begin_signature.match(line):
+                    signatures_index += 1
+                    cursor_status = ON_SIGNATURE_FIELDS
+                    continue
+
+                for pubkey in sender_pubkeys:
+                    verifier = VerifyingKey(pubkey)
+                    signature = base64.b64decode(line)
+                    parsed_result['signatures'][signatures_index]['pubkey'] = pubkey
+                    try:
+                        libnacl.crypto_sign_verify_detached(signature, message, verifier.vk)
+                        parsed_result['signatures'][signatures_index]['valid'] = True
+                    except ValueError:
+                        parsed_result['signatures'][signatures_index]['valid'] = False
+
+        return parsed_result
+
+    @staticmethod
+    def decrypt(ascii_armor_message: str, signing_key: SigningKey) -> str:
+        """
+        Decrypt a message from ascii armor format
+
+        :param ascii_armor_message: Utf-8 message
+        :param signing_key: SigningKey instance created from credentials
+        :return:
+        """
+        message = signing_key.decrypt_seal(base64.b64decode(ascii_armor_message))
+
+        return message
