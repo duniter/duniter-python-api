@@ -13,21 +13,26 @@ BEGIN_SIGNATURE_HEADER = "-----BEGIN DUNITER SIGNATURE-----"
 END_SIGNATURE_HEADER = "-----END DUNITER SIGNATURE-----"
 HEADER_PREFIX = "-----"
 
-# Version field values
-AA_MESSAGE_VERSION = "Python Libnacl " + libnacl.__version__
-AA_SIGNATURE_VERSION = "Python Libnacl " + libnacl.__version__
+# Version field value
+VERSION_FIELD_VALUE = "Python Libnacl " + libnacl.__version__
 
-# PARSER CURSOR STATUS
+# Parser cursor status
 ON_MESSAGE_FIELDS = 1
 ON_MESSAGE_CONTENT = 2
-AFTER_MESSAGE_CONTENT = 3
-ON_SIGNATURE_FIELDS = 4
-ON_SIGNATURE_CONTENT = 5
-ON_MESSAGE_END = 6
+ON_SIGNATURE_FIELDS = 3
+ON_SIGNATURE_CONTENT = 4
 
 
 # Custom exceptions
-class MissingSigningKeyException(Exception):
+class MissingPublickeyAndSigningKeyException(Exception):
+    """
+    Raise when the message created is not encrypted and not signed...
+    """
+    pass
+
+
+# Custom exceptions
+class ParserMissingSigningKeyException(Exception):
     """
     Raise when the message is encrypted but no SigningKey instance is provided
     """
@@ -35,7 +40,7 @@ class MissingSigningKeyException(Exception):
 
 
 # Custom exceptions
-class MissingPublicKeysException(Exception):
+class ParserMissingPublicKeysException(Exception):
     """
     Raise when there is at least one signature but no public keys are provided
     """
@@ -43,19 +48,24 @@ class MissingPublicKeysException(Exception):
 
 
 # Exception messages listed here
-MISSING_SIGNING_KEY_EXCEPTION = MissingSigningKeyException('The message is encrypted but no SigningKey instance is '
-                                                           'provided')
-MISSING_PUBLIC_KEYS_EXCEPTION = MissingPublicKeysException('At least one signature but no public keys are provided')
+PARSER_MISSING_SIGNING_KEY_EXCEPTION = ParserMissingSigningKeyException('The message is encrypted but no SigningKey '
+                                                                        'instance is provided')
+PARSER_MISSING_PUBLIC_KEYS_EXCEPTION = ParserMissingPublicKeysException('At least one signature but no public keys '
+                                                                        'are provided')
+
+MISSING_PUBLIC_KEY_AND_SIGNING_KEY_EXCEPTION = MissingPublickeyAndSigningKeyException('Ascii Armor Message needs a '
+                                                                                      'public key or a SigningKey but '
+                                                                                      'none are provided')
 
 
 class AsciiArmor:
     """
-    Class to handle writing and reading of ascii armor messages
+    Class to handle writing and parsing of ascii armor messages
     """
 
     @staticmethod
-    def encrypt(message: str, pubkey: str, signing_keys: Optional[List[SigningKey]] = None,
-                message_comment: Optional[str] = None, signatures_comment: Optional[str] = None) -> str:
+    def create(message: str, pubkey: Optional[str] = None, signing_keys: Optional[List[SigningKey]] = None,
+               message_comment: Optional[str] = None, signatures_comment: Optional[str] = None) -> str:
         """
         Encrypt a message in ascii armor format, optionally signing it
 
@@ -66,43 +76,69 @@ class AsciiArmor:
         :param signatures_comment: Optional signatures comment field
         :return:
         """
-        pubkey_instance = PublicKey(pubkey)
-        base64_encrypted_message = base64.b64encode(pubkey_instance.encrypt_seal(message))  # type: bytes
-        script_field = AsciiArmor._get_scrypt_field()
+        # if no public key and no signing key...
+        if not pubkey and not signing_keys:
+            # We can not create an Ascii Armor Message
+            raise MISSING_PUBLIC_KEY_AND_SIGNING_KEY_EXCEPTION
+
+        # remove last newline of the message if any
+        message = message.strip("\n\r")
 
         # create block with headers
-        ascii_armor_msg = """
+        ascii_armor_block = """
 {begin_message_header}
-Version: {version}
+""".format(begin_message_header=BEGIN_MESSAGE_HEADER)
+
+        # if encrypted message...
+        if pubkey:
+            # add encrypted message fields, todo: pass scrypt params as arguments
+            ascii_armor_block += """{version_field}
 {script_field}
-""".format(begin_message_header=BEGIN_MESSAGE_HEADER, version=AA_MESSAGE_VERSION,
-           script_field=script_field)
+""".format(version_field=AsciiArmor._get_version_field(), script_field=AsciiArmor._get_scrypt_field())
 
         # add message comment if specified
         if message_comment:
-            ascii_armor_msg += AsciiArmor._get_comment_field(message_comment)
+            ascii_armor_block += """{comment_field}
+""".format(comment_field=AsciiArmor._get_comment_field(message_comment))
 
-        # add encrypted message
-        ascii_armor_msg += """
-{base64_encrypted_message}
+        # blank line separator
+        ascii_armor_block += '\n'
+
+        if pubkey:
+            # add encrypted message
+            pubkey_instance = PublicKey(pubkey)
+            base64_encrypted_message = base64.b64encode(pubkey_instance.encrypt_seal(message))  # type: bytes
+            ascii_armor_block += """{base64_encrypted_message}
 """.format(base64_encrypted_message=base64_encrypted_message.decode('utf-8'))
+        else:
+            # clear text message
+            ascii_armor_block += message + "\n"
 
         # if no signature...
         if signing_keys is None:
             # add message tail
-            ascii_armor_msg += END_MESSAGE_HEADER
+            ascii_armor_block += END_MESSAGE_HEADER
         else:
             # add signature blocks and close block on last signature
             count = 1
             for signing_key in signing_keys:
-                ascii_armor_msg += AsciiArmor._get_signature_block(message, signing_key, count == len(signing_keys),
-                                                                   signatures_comment)
+                ascii_armor_block += AsciiArmor._get_signature_block(message, signing_key, count == len(signing_keys),
+                                                                     signatures_comment)
                 count += 1
 
-        return ascii_armor_msg
+        return ascii_armor_block
 
     @staticmethod
-    def _get_scrypt_field():
+    def _get_version_field() -> str:
+        """
+        Return the Version field
+
+        :return:
+        """
+        return "Version: {version}".format(version=VERSION_FIELD_VALUE)
+
+    @staticmethod
+    def _get_scrypt_field() -> str:
         """
         Return the Scrypt field
 
@@ -119,7 +155,7 @@ Version: {version}
         :param comment: Comment text
         :return:
         """
-        return "Comment: {comment}\n".format(comment=comment)
+        return "Comment: {comment}".format(comment=comment)
 
     @staticmethod
     def _get_signature_block(message: str, signing_key: SigningKey, close_block: bool = True,
@@ -133,21 +169,23 @@ Version: {version}
         :param comment: Optional comment field content
         :return:
         """
-        script_param_field = AsciiArmor._get_scrypt_field()
         base64_signature = base64.b64encode(signing_key.signature(message))
 
         block = """{begin_signature_header}
-Version: {version}
-Scrypt: {script_params}
-""".format(begin_signature_header=BEGIN_SIGNATURE_HEADER, version=AA_SIGNATURE_VERSION,
-            script_params=script_param_field)
+{version_field}
+{script_field}
+""".format(begin_signature_header=BEGIN_SIGNATURE_HEADER, version_field=AsciiArmor._get_version_field(),
+            script_field=AsciiArmor._get_scrypt_field())
 
         # add message comment if specified
         if comment:
-            block += AsciiArmor._get_comment_field(comment)
+            block += """{comment_field}
+""".format(comment_field=AsciiArmor._get_comment_field(comment))
 
-        block += """
-{base64_signature}
+        # blank line separator
+        block += '\n'
+
+        block += """{base64_signature}
 """.format(base64_signature=base64_signature.decode('utf-8'))
 
         if close_block:
@@ -233,10 +271,10 @@ Scrypt: {script_params}
                         # If keypair instance not given...
                         if signing_key is None:
                             # SigningKey keypair is mandatory to decrypt the message...
-                            raise MISSING_SIGNING_KEY_EXCEPTION
+                            raise PARSER_MISSING_SIGNING_KEY_EXCEPTION
 
                         # decrypt message with secret key from keypair
-                        message = AsciiArmor.decrypt(message, signing_key)
+                        message = AsciiArmor._decrypt(message, signing_key)
 
                     # save message content in result
                     parsed_result['message']['content'] = message
@@ -280,7 +318,7 @@ Scrypt: {script_params}
                 # if no public keys provided...
                 if sender_pubkeys is None:
                     # raise exception
-                    raise MISSING_PUBLIC_KEYS_EXCEPTION
+                    raise PARSER_MISSING_PUBLIC_KEYS_EXCEPTION
 
                 # if end signature header detected...
                 if regex_end_signature.match(line):
@@ -306,7 +344,7 @@ Scrypt: {script_params}
         return parsed_result
 
     @staticmethod
-    def decrypt(ascii_armor_message: str, signing_key: SigningKey) -> str:
+    def _decrypt(ascii_armor_message: str, signing_key: SigningKey) -> str:
         """
         Decrypt a message from ascii armor format
 

@@ -9,7 +9,7 @@ AA_ENCRYPTED_MESSAGE_FILENAME = 'duniter_aa_encrypted_message.txt'
 
 if __name__ == '__main__':
     # Ask public key of the recipient
-    pubkeyBase58 = input("Enter public key of the message recipient: ")
+    pubkeyBase58 = input("Enter public key of the message issuer: ")
 
     # prompt hidden user entry
     salt = getpass.getpass("Enter your passphrase (salt): ")
