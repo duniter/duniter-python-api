@@ -3,14 +3,14 @@ duniter public and private keys
 
 @author: inso
 """
-from typing import Union
+from typing import Union, Optional
 
 import libnacl.public
 from pylibscrypt import scrypt
 
+from .scrypt_params import ScryptParams
 from .base58 import Base58Encoder
 from ..helpers import ensure_bytes
-from .constants import SEED_LENGTH, SCRYPT_PARAMS
 
 
 class SecretKey(libnacl.public.SecretKey):
@@ -18,18 +18,21 @@ class SecretKey(libnacl.public.SecretKey):
     Raw Public Key Encryption Class
     """
 
-    def __init__(self, salt: Union[str, bytes], password: Union[str, bytes]) -> None:
+    def __init__(self, salt: Union[str, bytes], password: Union[str, bytes],
+                 scrypt_params: Optional[ScryptParams] = None) -> None:
         """
         Create SecretKey key pair instance from salt and password credentials
 
         :param salt: Salt credential
         :param password: Password credential
+        :param scrypt_params: Optional ScriptParams instance
         """
+        if scrypt_params is None:
+            scrypt_params = ScryptParams()
+
         salt = ensure_bytes(salt)
         password = ensure_bytes(password)
-        seed = scrypt(password, salt,
-                      SCRYPT_PARAMS['N'], SCRYPT_PARAMS['r'], SCRYPT_PARAMS['p'],
-                      SEED_LENGTH)
+        seed = scrypt(password, salt, scrypt_params.N, scrypt_params.r, scrypt_params.p, scrypt_params.seed_length)
 
         super().__init__(seed)
         self.public_key = PublicKey(Base58Encoder.encode(self.pk))

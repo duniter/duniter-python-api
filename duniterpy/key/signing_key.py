@@ -4,31 +4,16 @@ duniter public and private keys
 @author: inso
 """
 from re import compile, MULTILINE, search
-from typing import Optional, Union, TypeVar, Type, Dict
+from typing import Optional, Union, TypeVar, Type
 
 import libnacl.sign
 import pyaes
 from libnacl.utils import load_key
 from pylibscrypt import scrypt
 
-from duniterpy.key.constants import SEED_LENGTH, SCRYPT_PARAMS
+from .scrypt_params import ScryptParams
 from .base58 import Base58Encoder
 from ..helpers import ensure_bytes, xor_bytes, convert_seedhex_to_seed, convert_seed_to_seedhex
-
-
-class ScryptParams:
-    def __init__(self, n: int, r: int, p: int) -> None:
-        """
-        Init a ScryptParams instance with crypto parameters
-
-        :param n: scrypt param N
-        :param r: scrypt param r
-        :param p: scrypt param p
-        """
-        self.N = n
-        self.r = r
-        self.p = p
-
 
 # required to type hint cls in classmethod
 SigningKeyType = TypeVar('SigningKeyType', bound='SigningKey')
@@ -47,7 +32,7 @@ class SigningKey(libnacl.sign.Signer):
 
     @classmethod
     def from_credentials(cls: Type[SigningKeyType], salt: Union[str, bytes], password: Union[str, bytes],
-                         scrypt_params: Optional[Dict[str, int]] = None) -> SigningKeyType:
+                         scrypt_params: Optional[ScryptParams] = None) -> SigningKeyType:
         """
         Create a SigningKey object from credentials
 
@@ -56,13 +41,11 @@ class SigningKey(libnacl.sign.Signer):
         :param scrypt_params: ScryptParams instance
         """
         if scrypt_params is None:
-            scrypt_params = SCRYPT_PARAMS
+            scrypt_params = ScryptParams()
 
         salt = ensure_bytes(salt)
         password = ensure_bytes(password)
-        seed = scrypt(password, salt,
-                      scrypt_params['N'], scrypt_params['r'], scrypt_params['p'],
-                      SEED_LENGTH)
+        seed = scrypt(password, salt, scrypt_params.N, scrypt_params.r, scrypt_params.p, scrypt_params.seed_length)
 
         return cls(seed)
 

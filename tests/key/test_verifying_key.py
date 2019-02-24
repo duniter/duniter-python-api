@@ -1,5 +1,5 @@
 from duniterpy.key import VerifyingKey, SigningKey
-from duniterpy.key.constants import SCRYPT_PARAMS
+from duniterpy.key.scrypt_params import ScryptParams
 from duniterpy.documents.peer import Peer
 from duniterpy.documents.ws2p.heads import *
 import unittest
@@ -7,7 +7,7 @@ import unittest
 
 class TestVerifyingKey(unittest.TestCase):
     def test_from_sign_to_verify(self):
-        sign_key = SigningKey.from_credentials("saltsalt", "passwordpassword", SCRYPT_PARAMS)
+        sign_key = SigningKey.from_credentials("saltsalt", "passwordpassword", ScryptParams())
         verify_key = VerifyingKey(sign_key.pubkey)
         self.assertEqual(verify_key.vk, sign_key.vk)
 

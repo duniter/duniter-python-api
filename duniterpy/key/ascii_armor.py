@@ -4,7 +4,7 @@ from re import compile
 from typing import Optional, List, Dict, Any
 
 from duniterpy.key import SigningKey, PublicKey, VerifyingKey
-from .constants import SCRYPT_PARAMS, SEED_LENGTH
+from duniterpy.key.scrypt_params import ScryptParams
 
 # Headers constants
 BEGIN_MESSAGE_HEADER = "-----BEGIN DUNITER MESSAGE-----"
@@ -62,10 +62,10 @@ class AsciiArmor:
     """
     Class to handle writing and parsing of ascii armor messages
     """
-
     @staticmethod
     def create(message: str, pubkey: Optional[str] = None, signing_keys: Optional[List[SigningKey]] = None,
-               message_comment: Optional[str] = None, signatures_comment: Optional[str] = None) -> str:
+               message_comment: Optional[str] = None, signatures_comment: Optional[str] = None,
+               scrypt_params: Optional[ScryptParams] = None) -> str:
         """
         Encrypt a message in ascii armor format, optionally signing it
 
@@ -74,6 +74,8 @@ class AsciiArmor:
         :param signing_keys: Optional list of SigningKey instances
         :param message_comment: Optional message comment field
         :param signatures_comment: Optional signatures comment field
+        :param scrypt_params: Optional ScryptParams instance
+
         :return:
         """
         # if no public key and no signing key...
@@ -81,6 +83,10 @@ class AsciiArmor:
             # We can not create an Ascii Armor Message
             raise MISSING_PUBLIC_KEY_AND_SIGNING_KEY_EXCEPTION
 
+        if scrypt_params is None:
+            scrypt_params = ScryptParams()
+
+        # TODO: improve cleaning of spaces and tab at end of lines
         # remove last newline of the message if any
         message = message.strip("\n\r")
 
@@ -91,10 +97,10 @@ class AsciiArmor:
 
         # if encrypted message...
         if pubkey:
-            # add encrypted message fields, todo: pass scrypt params as arguments
+            # add encrypted message fields
             ascii_armor_block += """{version_field}
 {script_field}
-""".format(version_field=AsciiArmor._get_version_field(), script_field=AsciiArmor._get_scrypt_field())
+""".format(version_field=AsciiArmor._get_version_field(), script_field=AsciiArmor._get_scrypt_field(scrypt_params))
 
         # add message comment if specified
         if message_comment:
@@ -111,6 +117,7 @@ class AsciiArmor:
             ascii_armor_block += """{base64_encrypted_message}
 """.format(base64_encrypted_message=base64_encrypted_message.decode('utf-8'))
         else:
+            # TODO: Dash escape cleartext
             # clear text message
             ascii_armor_block += message + "\n"
 
@@ -123,7 +130,7 @@ class AsciiArmor:
             count = 1
             for signing_key in signing_keys:
                 ascii_armor_block += AsciiArmor._get_signature_block(message, signing_key, count == len(signing_keys),
-                                                                     signatures_comment)
+                                                                     signatures_comment, scrypt_params)
                 count += 1
 
         return ascii_armor_block
@@ -138,14 +145,18 @@ class AsciiArmor:
         return "Version: {version}".format(version=VERSION_FIELD_VALUE)
 
     @staticmethod
-    def _get_scrypt_field() -> str:
+    def _get_scrypt_field(scrypt_params: Optional[ScryptParams] = None) -> str:
         """
         Return the Scrypt field
 
+        :param scrypt_params: Optional ScryptParams instance
         :return:
         """
-        return "Scrypt: N={0};r={1};p={2};len={3}".format(SCRYPT_PARAMS['N'], SCRYPT_PARAMS['r'], SCRYPT_PARAMS['p'],
-                                                          SEED_LENGTH)
+        if scrypt_params is None:
+            scrypt_params = ScryptParams()
+
+        return "Scrypt: N={0};r={1};p={2};len={3}".format(scrypt_params.N, scrypt_params.r, scrypt_params.p,
+                                                          scrypt_params.seed_length)
 
     @staticmethod
     def _get_comment_field(comment: str) -> str:
@@ -159,7 +170,8 @@ class AsciiArmor:
 
     @staticmethod
     def _get_signature_block(message: str, signing_key: SigningKey, close_block: bool = True,
-                             comment: Optional[str] = None) -> str:
+                             comment: Optional[str] = None,
+                             scrypt_params: Optional[ScryptParams] = None) -> str:
         """
         Return a signature block
 
@@ -167,15 +179,20 @@ class AsciiArmor:
         :param signing_key: The libnacl SigningKey instance of the keypair
         :param close_block: Optional flag to close the signature block with the signature tail header
         :param comment: Optional comment field content
+        :param scrypt_params: Optional ScriptParams instance
+
         :return:
         """
+        if scrypt_params is None:
+            scrypt_params = ScryptParams()
+
         base64_signature = base64.b64encode(signing_key.signature(message))
 
         block = """{begin_signature_header}
 {version_field}
 {script_field}
 """.format(begin_signature_header=BEGIN_SIGNATURE_HEADER, version_field=AsciiArmor._get_version_field(),
-            script_field=AsciiArmor._get_scrypt_field())
+           script_field=AsciiArmor._get_scrypt_field(scrypt_params))
 
         # add message comment if specified
         if comment:
@@ -192,6 +209,8 @@ class AsciiArmor:
             block += END_SIGNATURE_HEADER
 
         return block
+
+    # TODO: add parse from credentials to use scrypt field creating SigningKey
 
     @staticmethod
     def parse(ascii_armor_block: str, signing_key: Optional[SigningKey] = None,
@@ -298,6 +317,9 @@ class AsciiArmor:
 
             # if we are on a signature fields zone...
             if cursor_status == ON_SIGNATURE_FIELDS:
+
+                # TODO: Handle Dash escaped cleartext
+
                 # parse field
                 m = regex_fields.match(line.strip())
                 if m:
