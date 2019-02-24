@@ -1,7 +1,7 @@
 import base64
 import libnacl
 from re import compile
-from typing import Optional, List, Dict
+from typing import Optional, List, Dict, Any
 
 from duniterpy.key import SigningKey, PublicKey, VerifyingKey, SCRYPT_PARAMS, SEED_LENGTH
 
@@ -176,7 +176,6 @@ Scrypt: {script_params}
 
         # trim message to get rid of empty lines
         ascii_armor_block.strip(" \t\n\r")
-
         parsed_result = {
             'message':
                 {
@@ -184,7 +183,7 @@ Scrypt: {script_params}
                     'content': '',
                  },
             'signatures': []
-        }
+        }  # type: Dict[str, Any]
         cursor_status = 0
         message = ''
         signatures_index = 0
@@ -201,7 +200,9 @@ Scrypt: {script_params}
                 m = regex_fields.match(line.strip())
                 if m:
                     # capture field
-                    parsed_result['message']['fields'][m.groups()[0]] = m.groups()[1]
+                    msg_field_name = m.groups()[0]
+                    msg_field_value = m.groups()[1]
+                    parsed_result['message']['fields'][msg_field_name] = msg_field_value
                     continue
 
                 # if blank line...
@@ -235,10 +236,9 @@ Scrypt: {script_params}
 
                     # if signature begin header...
                     if regex_begin_signature.match(line):
-                        fields = {}  # type: Dict[str,str]
                         # add signature dict in list
                         parsed_result['signatures'].append({
-                            'fields': fields
+                            'fields': {}
                         })
                         cursor_status = ON_SIGNATURE_FIELDS
                         continue
@@ -252,9 +252,9 @@ Scrypt: {script_params}
                 m = regex_fields.match(line.strip())
                 if m:
                     # capture field
-                    field_name = str(m.groups()[0])  # type: str
-                    field_value = str(m.groups()[1])  # type: str
-                    parsed_result['signatures'][signatures_index]['fields'][field_name] = field_value
+                    sig_field_name = m.groups()[0]
+                    sig_field_value = m.groups()[1]
+                    parsed_result['signatures'][signatures_index]['fields'][sig_field_name] = sig_field_value
                     continue
 
                 # if blank line...
