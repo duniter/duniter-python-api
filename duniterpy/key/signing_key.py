@@ -4,18 +4,16 @@ duniter public and private keys
 @author: inso
 """
 from re import compile, MULTILINE, search
-from typing import Optional, Union, TypeVar, Type
+from typing import Optional, Union, TypeVar, Type, Dict
 
 import libnacl.sign
 import pyaes
 from libnacl.utils import load_key
 from pylibscrypt import scrypt
 
+from duniterpy.key.constants import SEED_LENGTH, SCRYPT_PARAMS
 from .base58 import Base58Encoder
 from ..helpers import ensure_bytes, xor_bytes, convert_seedhex_to_seed, convert_seed_to_seedhex
-
-SEED_LENGTH = 32  # Length of the key
-crypto_sign_BYTES = 64
 
 
 class ScryptParams:
@@ -49,7 +47,7 @@ class SigningKey(libnacl.sign.Signer):
 
     @classmethod
     def from_credentials(cls: Type[SigningKeyType], salt: Union[str, bytes], password: Union[str, bytes],
-                         scrypt_params: Optional[ScryptParams] = None) -> SigningKeyType:
+                         scrypt_params: Optional[Dict[str, int]] = None) -> SigningKeyType:
         """
         Create a SigningKey object from credentials
 
@@ -58,12 +56,12 @@ class SigningKey(libnacl.sign.Signer):
         :param scrypt_params: ScryptParams instance
         """
         if scrypt_params is None:
-            scrypt_params = ScryptParams(4096, 16, 1)
+            scrypt_params = SCRYPT_PARAMS
 
         salt = ensure_bytes(salt)
         password = ensure_bytes(password)
         seed = scrypt(password, salt,
-                      scrypt_params.N, scrypt_params.r, scrypt_params.p,
+                      scrypt_params['N'], scrypt_params['r'], scrypt_params['p'],
                       SEED_LENGTH)
 
         return cls(seed)

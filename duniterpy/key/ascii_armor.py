@@ -3,7 +3,8 @@ import libnacl
 from re import compile
 from typing import Optional, List, Dict, Any
 
-from duniterpy.key import SigningKey, PublicKey, VerifyingKey, SCRYPT_PARAMS, SEED_LENGTH
+from duniterpy.key import SigningKey, PublicKey, VerifyingKey
+from .constants import SCRYPT_PARAMS, SEED_LENGTH
 
 # Headers constants
 BEGIN_MESSAGE_HEADER = "-----BEGIN DUNITER MESSAGE-----"
@@ -158,7 +159,18 @@ Scrypt: {script_params}
     def parse(ascii_armor_block: str, signing_key: Optional[SigningKey] = None,
               sender_pubkeys: Optional[List[str]] = None) -> dict:
         """
-        Return a dict with parsed content
+        Return a dict with parsed content (decrypted message, signature validation)
+
+        {
+            'message':
+                {
+                    'fields': {},
+                    'content': str,
+                 },
+            'signatures': [
+                {'pubkey': str, 'valid': bool, fields: {}}
+            ]
+        }
 
         :param ascii_armor_block: The Ascii Armor Message Block including BEGIN and END headers
         :param signing_key: Optional Libnacl SigningKey instance to decrypt message

@@ -10,13 +10,7 @@ from pylibscrypt import scrypt
 
 from .base58 import Base58Encoder
 from ..helpers import ensure_bytes
-
-SEED_LENGTH = 32  # Length of the key
-crypto_sign_BYTES = 64
-SCRYPT_PARAMS = {'N': 4096,
-                 'r': 16,
-                 'p': 1
-                 }
+from .constants import SEED_LENGTH, SCRYPT_PARAMS
 
 
 class SecretKey(libnacl.public.SecretKey):
