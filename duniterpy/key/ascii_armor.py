@@ -12,6 +12,7 @@ END_MESSAGE_HEADER = "-----END DUNITER MESSAGE-----"
 BEGIN_SIGNATURE_HEADER = "-----BEGIN DUNITER SIGNATURE-----"
 END_SIGNATURE_HEADER = "-----END DUNITER SIGNATURE-----"
 HEADER_PREFIX = "-----"
+DASH_ESCAPE_PREFIX = "\x2D\x20"
 
 # Version field value
 VERSION_FIELD_VALUE = "Python Libnacl " + libnacl.__version__
@@ -86,7 +87,6 @@ class AsciiArmor:
         if scrypt_params is None:
             scrypt_params = ScryptParams()
 
-        # TODO: improve cleaning of spaces and tab at end of lines
         # remove last newline of the message if any
         message = message.strip("\n\r")
 
@@ -117,8 +117,10 @@ class AsciiArmor:
             ascii_armor_block += """{base64_encrypted_message}
 """.format(base64_encrypted_message=base64_encrypted_message.decode('utf-8'))
         else:
-            # TODO: Dash escape cleartext
-            # clear text message
+            # remove trailing spaces
+            message = AsciiArmor._remove_trailing_spaces(message)
+            # dash escape the message
+            message = AsciiArmor._dash_escape_text(message)
             ascii_armor_block += message + "\n"
 
         # if no signature...
@@ -134,6 +136,37 @@ class AsciiArmor:
                 count += 1
 
         return ascii_armor_block
+
+    @staticmethod
+    def _remove_trailing_spaces(text: str) -> str:
+        clean_text = str()
+
+        for line in text.splitlines():
+            # remove trailing spaces (0x20) and tabs (0x09)
+            clean_text += line.rstrip("\x09\x20")
+
+        return clean_text
+
+    @staticmethod
+    def _dash_escape_text(text: str) -> str:
+        dash_escaped_text = str()
+
+        for line in text.splitlines():
+            # add dash '-' (0x2D) and space ' ' (0x20) as prefix
+            dash_escaped_text += DASH_ESCAPE_PREFIX
+
+        return dash_escaped_text
+
+    @staticmethod
+    def _parse_dash_escaped_line(dash_escaped_line: str) -> str:
+        text = str()
+        regex_dash_escape_prefix = compile('^' + DASH_ESCAPE_PREFIX)
+        # if prefixed by a dash escape prefix...
+        if regex_dash_escape_prefix.match(dash_escaped_line):
+            # remove dash '-' (0x2D) and space ' ' (0x20) prefix
+            text += dash_escaped_line[2:]
+
+        return text
 
     @staticmethod
     def _get_version_field() -> str:
@@ -312,13 +345,11 @@ class AsciiArmor:
                         cursor_status = ON_SIGNATURE_FIELDS
                         continue
                 else:
-                    # concatenate line to message content
-                    message += line
+                    # concatenate striped dash escaped line to message content
+                    message += AsciiArmor._parse_dash_escaped_line(line)
 
             # if we are on a signature fields zone...
             if cursor_status == ON_SIGNATURE_FIELDS:
-
-                # TODO: Handle Dash escaped cleartext
 
                 # parse field
                 m = regex_fields.match(line.strip())
