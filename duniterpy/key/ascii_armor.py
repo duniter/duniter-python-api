@@ -63,6 +63,7 @@ class AsciiArmor:
     """
     Class to handle writing and parsing of ascii armor messages
     """
+
     @staticmethod
     def create(message: str, pubkey: Optional[str] = None, signing_keys: Optional[List[SigningKey]] = None,
                message_comment: Optional[str] = None, signatures_comment: Optional[str] = None,
@@ -87,8 +88,8 @@ class AsciiArmor:
         if scrypt_params is None:
             scrypt_params = ScryptParams()
 
-        # remove last newline of the message if any
-        message = message.strip("\n\r")
+        # keep only one newline at the end of the message
+        message = message.rstrip("\n\r") + "\n"
 
         # create block with headers
         ascii_armor_block = """
@@ -119,9 +120,9 @@ class AsciiArmor:
         else:
             # remove trailing spaces
             message = AsciiArmor._remove_trailing_spaces(message)
-            # dash escape the message
-            message = AsciiArmor._dash_escape_text(message)
-            ascii_armor_block += message + "\n"
+
+            # add dash escaped message to ascii armor content
+            ascii_armor_block += AsciiArmor._dash_escape_text(message)
 
         # if no signature...
         if signing_keys is None:
@@ -141,7 +142,7 @@ class AsciiArmor:
     def _remove_trailing_spaces(text: str) -> str:
         clean_text = str()
 
-        for line in text.splitlines():
+        for line in text.splitlines(True):
             # remove trailing spaces (0x20) and tabs (0x09)
             clean_text += line.rstrip("\x09\x20")
 
@@ -151,9 +152,9 @@ class AsciiArmor:
     def _dash_escape_text(text: str) -> str:
         dash_escaped_text = str()
 
-        for line in text.splitlines():
+        for line in text.splitlines(True):
             # add dash '-' (0x2D) and space ' ' (0x20) as prefix
-            dash_escaped_text += DASH_ESCAPE_PREFIX
+            dash_escaped_text += DASH_ESCAPE_PREFIX + line
 
         return dash_escaped_text
 
@@ -283,13 +284,13 @@ class AsciiArmor:
                 {
                     'fields': {},
                     'content': '',
-                 },
+                },
             'signatures': []
         }  # type: Dict[str, Any]
         cursor_status = 0
         message = ''
         signatures_index = 0
-        for line in ascii_armor_block.splitlines():
+        for line in ascii_armor_block.splitlines(True):
 
             # if begin message header detected...
             if regex_begin_message.match(line):
