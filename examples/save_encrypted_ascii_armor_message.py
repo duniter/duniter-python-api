@@ -36,4 +36,4 @@ if __name__ == '__main__':
     with open(ENCRYPTED_AA_MESSAGE_PATH, 'w') as file_handler:
         file_handler.write(encrypted_message)
 
-    print("Encrypted Ascii Armor Message saved in file ./{0}".format(ENCRYPTED_AA_MESSAGE_PATH))
+    print("Encrypted Ascii Armor Message saved in file {0}".format(ENCRYPTED_AA_MESSAGE_PATH))

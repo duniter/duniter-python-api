@@ -92,8 +92,7 @@ class AsciiArmor:
         message = message.rstrip("\n\r") + "\n"
 
         # create block with headers
-        ascii_armor_block = """
-{begin_message_header}
+        ascii_armor_block = """{begin_message_header}
 """.format(begin_message_header=BEGIN_MESSAGE_HEADER)
 
         # if encrypted message...
@@ -247,7 +246,7 @@ class AsciiArmor:
     # TODO: add parse from credentials to use scrypt field creating SigningKey
 
     @staticmethod
-    def parse(ascii_armor_block: str, signing_key: Optional[SigningKey] = None,
+    def parse(ascii_armor_message: str, signing_key: Optional[SigningKey] = None,
               sender_pubkeys: Optional[List[str]] = None) -> dict:
         """
         Return a dict with parsed content (decrypted message, signature validation)
@@ -263,7 +262,7 @@ class AsciiArmor:
             ]
         }
 
-        :param ascii_armor_block: The Ascii Armor Message Block including BEGIN and END headers
+        :param ascii_armor_message: The Ascii Armor Message Block including BEGIN and END headers
         :param signing_key: Optional Libnacl SigningKey instance to decrypt message
         :param sender_pubkeys: Optional sender's public keys list to verify signatures
         :exception libnacl.CryptError: Raise an exception if keypair fail to decrypt the message
@@ -271,6 +270,7 @@ class AsciiArmor:
 
         :return:
         """
+        # regex patterns
         regex_begin_message = compile(BEGIN_MESSAGE_HEADER)
         regex_end_message = compile(END_MESSAGE_HEADER)
         regex_begin_signature = compile(BEGIN_SIGNATURE_HEADER)
@@ -278,7 +278,9 @@ class AsciiArmor:
         regex_fields = compile("^(Version|Scrypt|Comment): (.+)$")
 
         # trim message to get rid of empty lines
-        ascii_armor_block.strip(" \t\n\r")
+        ascii_armor_message = ascii_armor_message.strip(" \t\n\r")
+
+        # init vars
         parsed_result = {
             'message':
                 {
@@ -290,7 +292,9 @@ class AsciiArmor:
         cursor_status = 0
         message = ''
         signatures_index = 0
-        for line in ascii_armor_block.splitlines(True):
+
+        # parse each line...
+        for line in ascii_armor_message.splitlines(True):
 
             # if begin message header detected...
             if regex_begin_message.match(line):
@@ -316,12 +320,13 @@ class AsciiArmor:
             # if we are on the message content lines...
             if cursor_status == ON_MESSAGE_CONTENT:
 
-                # if a header is detected...
+                # if a header is detected, end of message content...
                 if line.startswith(HEADER_PREFIX):
 
-                    # if field Version is present...
+                    # if field Version is present, the message is encrypted...
                     if 'Version' in parsed_result['message']['fields']:
-                        # If keypair instance not given...
+
+                        # If keypair instance to decrypt not given...
                         if signing_key is None:
                             # SigningKey keypair is mandatory to decrypt the message...
                             raise PARSER_MISSING_SIGNING_KEY_EXCEPTION
@@ -346,8 +351,13 @@ class AsciiArmor:
                         cursor_status = ON_SIGNATURE_FIELDS
                         continue
                 else:
-                    # concatenate striped dash escaped line to message content
-                    message += AsciiArmor._parse_dash_escaped_line(line)
+                    # if field Version is present, the message is encrypted...
+                    if 'Version' in parsed_result['message']['fields']:
+                        # concatenate encrypted line to message content
+                        message += line
+                    else:
+                        # concatenate cleartext striped dash escaped line to message content
+                        message += AsciiArmor._parse_dash_escaped_line(line)
 
             # if we are on a signature fields zone...
             if cursor_status == ON_SIGNATURE_FIELDS:
