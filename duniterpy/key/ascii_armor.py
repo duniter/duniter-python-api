@@ -131,6 +131,12 @@ class AsciiArmor:
 
     @staticmethod
     def _remove_trailing_spaces(text: str) -> str:
+        """
+        Remove trailing spaces and tabs
+
+        :param text: Text to clean up
+        :return:
+        """
         clean_text = str()
 
         for line in text.splitlines(True):
@@ -141,6 +147,12 @@ class AsciiArmor:
 
     @staticmethod
     def _dash_escape_text(text: str) -> str:
+        """
+        Add dash '-' (0x2D) and space ' ' (0x20) as prefix on each line
+
+        :param text: Text to dash-escape
+        :return:
+        """
         dash_escaped_text = str()
 
         for line in text.splitlines(True):
@@ -151,6 +163,12 @@ class AsciiArmor:
 
     @staticmethod
     def _parse_dash_escaped_line(dash_escaped_line: str) -> str:
+        """
+        Parse a dash-escaped text line
+
+        :param dash_escaped_line: Dash escaped text line
+        :return:
+        """
         text = str()
         regex_dash_escape_prefix = compile('^' + DASH_ESCAPE_PREFIX)
         # if prefixed by a dash escape prefix...
@@ -219,16 +237,20 @@ class AsciiArmor:
         """
         Return a dict with parsed content (decrypted message, signature validation)
 
-        {
-            'message':
-                {
-                    'fields': {},
-                    'content': str,
-                 },
-            'signatures': [
-                {'pubkey': str, 'valid': bool, fields: {}}
-            ]
-        }
+            {
+                'message':
+                    {
+                        'fields': {},
+                        'content': str,
+
+                     },
+
+                'signatures': [
+                    {'pubkey': str, 'valid': bool, fields: {}}
+
+                ]
+
+            }
 
         :param ascii_armor_message: The Ascii Armor Message Block including BEGIN and END headers
         :param signing_key: Optional Libnacl SigningKey instance to decrypt message
