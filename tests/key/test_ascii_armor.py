@@ -30,15 +30,13 @@ This is a utf-8 message...
         # check before message
         self.assertEqual(aa_message_lines[0], BEGIN_MESSAGE_HEADER)
         self.assertTrue(aa_message_lines[1].startswith("Version:"))
-        self.assertTrue(aa_message_lines[2].startswith("Scrypt:"))
-        self.assertEqual("", aa_message_lines[3].strip())
+        self.assertEqual("", aa_message_lines[2].strip())
 
         # check after message
-        self.assertEqual(aa_message_lines[5], BEGIN_SIGNATURE_HEADER)
-        self.assertTrue(aa_message_lines[6].startswith("Version:"))
-        self.assertTrue(aa_message_lines[7].startswith("Scrypt:"))
-        self.assertEqual("", aa_message_lines[8].strip())
-        self.assertEqual(aa_message_lines[10], END_SIGNATURE_HEADER)
+        self.assertEqual(aa_message_lines[4], BEGIN_SIGNATURE_HEADER)
+        self.assertTrue(aa_message_lines[5].startswith("Version:"))
+        self.assertEqual("", aa_message_lines[6].strip())
+        self.assertEqual(aa_message_lines[8], END_SIGNATURE_HEADER)
 
         # parse ascii armor message
         result = AsciiArmor.parse(encrypted_and_signed_aa_message, alice_signing_key, [bob_signing_key.pubkey])
@@ -69,11 +67,10 @@ This is a utf-8 message...
         # check before message
         self.assertEqual(aa_message_lines[0], BEGIN_MESSAGE_HEADER)
         self.assertTrue(aa_message_lines[1].startswith("Version:"))
-        self.assertTrue(aa_message_lines[2].startswith("Scrypt:"))
-        self.assertEqual("", aa_message_lines[3].strip())
+        self.assertEqual("", aa_message_lines[2].strip())
 
         # check after message
-        self.assertEqual(aa_message_lines[5], END_MESSAGE_HEADER)
+        self.assertEqual(aa_message_lines[4], END_MESSAGE_HEADER)
 
         # parse ascii armor message
         result = AsciiArmor.parse(encrypted_aa_message, alice_signing_key)
@@ -107,9 +104,8 @@ This is a utf-8 message...
         # check after message
         self.assertEqual(aa_message_lines[10], BEGIN_SIGNATURE_HEADER)
         self.assertTrue(aa_message_lines[11].startswith("Version:"))
-        self.assertTrue(aa_message_lines[12].startswith("Scrypt:"))
-        self.assertEqual("", aa_message_lines[13].strip())
-        self.assertEqual(aa_message_lines[15], END_SIGNATURE_HEADER)
+        self.assertEqual("", aa_message_lines[12].strip())
+        self.assertEqual(aa_message_lines[14], END_SIGNATURE_HEADER)
 
         # parse ascii armor message
         result = AsciiArmor.parse(signed_cleartext_aa_message, None, [bob_signing_key.pubkey])
