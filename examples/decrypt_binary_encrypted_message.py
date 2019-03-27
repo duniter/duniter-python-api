@@ -29,7 +29,7 @@ if __name__ == '__main__':
 
     # Decrypt the message!
     try:
-        message = signing_key_instance.decrypt_seal(encrypted_message)
+        message = signing_key_instance.decrypt_seal(encrypted_message).decode('utf-8')
         print("Decrypted message:")
     except ValueError as error:
         message = str(error)

@@ -384,6 +384,6 @@ class AsciiArmor:
         :param signing_key: SigningKey instance created from credentials
         :return:
         """
-        message = signing_key.decrypt_seal(base64.b64decode(ascii_armor_message))
+        data = signing_key.decrypt_seal(base64.b64decode(ascii_armor_message))
 
-        return message
+        return data.decode('utf-8')

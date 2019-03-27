@@ -105,17 +105,17 @@ class SigningKey(libnacl.sign.Signer):
         key.pubkey = Base58Encoder.encode(key.vk)
         return key
 
-    def decrypt_seal(self, message: bytes) -> str:
+    def decrypt_seal(self, data: bytes) -> bytes:
         """
-        Decrypt message with a curve25519 version of the ed25519 key pair
+        Decrypt bytes data with a curve25519 version of the ed25519 key pair
 
-        :param message: Encrypted message
+        :param data: Encrypted data
 
         :return:
         """
         curve25519_public_key = libnacl.crypto_sign_ed25519_pk_to_curve25519(self.vk)
         curve25519_secret_key = libnacl.crypto_sign_ed25519_sk_to_curve25519(self.sk)
-        return libnacl.crypto_box_seal_open(message, curve25519_public_key, curve25519_secret_key).decode('utf-8')
+        return libnacl.crypto_box_seal_open(data, curve25519_public_key, curve25519_secret_key)
 
     @classmethod
     def from_pubsec_file(cls: Type[SigningKeyType], path: str) -> SigningKeyType:
