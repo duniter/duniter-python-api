@@ -235,22 +235,18 @@ class AsciiArmor:
     def parse(ascii_armor_message: str, signing_key: Optional[SigningKey] = None,
               sender_pubkeys: Optional[List[str]] = None) -> dict:
         """
-        Return a dict with parsed content (decrypted message, signature validation)
+        Return a dict with parsed content (decrypted message, signature validation) ::
 
             {
-                'message':
-                    {
-                        'fields': {},
-                        'content': str,
-
-                     },
-
-                'signatures': [
-                    {'pubkey': str, 'valid': bool, fields: {}}
-
-                ]
-
-            }
+               'message':
+                   {
+                       'fields': {},
+                       'content': str,
+                    },
+               'signatures': [
+                   {'pubkey': str, 'valid': bool, fields: {}}
+               ]
+           }
 
         :param ascii_armor_message: The Ascii Armor Message Block including BEGIN and END headers
         :param signing_key: Optional Libnacl SigningKey instance to decrypt message

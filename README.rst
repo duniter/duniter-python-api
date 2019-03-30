@@ -65,7 +65,7 @@ Development
 
     make check
 
-* Run all unit tests with::
+* Run all unit tests (builtin module unittest) with::
 
     make tests
 
@@ -76,6 +76,8 @@ Development
 Documentation
 -------------
 
+When writing docstrings, use the rst format recommended by https://www.python.org/dev/peps/pep-0287/#docstring-significant-features
+
 * Install Sphinx::
 
     pip install -r requirements_dev.txt
@@ -85,7 +87,7 @@ Documentation
     make docs
 
 * HTML Documentation is generated in docs/_build/html folder.
-* `Examples <https://git.duniter.org/clients/python/duniterpy/tree/master/examples>`_
+* `Examples are more fun than a TLTR doc <https://git.duniter.org/clients/python/duniterpy/tree/master/examples>`_
 
 Packaging and deploy
 --------------------
