@@ -7,9 +7,22 @@ import unittest
 
 class TestVerifyingKey(unittest.TestCase):
     def test_from_sign_to_verify(self):
-        sign_key = SigningKey.from_credentials("saltsalt", "passwordpassword", ScryptParams())
+        sign_key = SigningKey.from_credentials("alice", "password", ScryptParams())
         verify_key = VerifyingKey(sign_key.pubkey)
         self.assertEqual(verify_key.vk, sign_key.vk)
+
+    def test_get_verified_data(self):
+        sign_key = SigningKey.from_credentials("alice", "password", ScryptParams())
+
+        message = "Hello world with utf-8 chars like éàè !"
+        # Sign the message, the signed string is the message itself plus the
+        # signature
+        signed_message = sign_key.sign(bytes(message, 'utf-8'))  # type: bytes
+
+        # Verify the message!
+        verifier = VerifyingKey(sign_key.pubkey)
+        verified_message = verifier.get_verified_data(signed_message)
+        self.assertEqual(message, verified_message.decode('utf-8'))
 
     def test_peer_signature(self):
         signed_raw = """Version: 2
