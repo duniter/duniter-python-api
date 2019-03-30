@@ -58,13 +58,13 @@ class VerifyingKey(libnacl.sign.Verifier):
         except ValueError:
             return False
 
-    def verify_message(self, message: bytes) -> str:
+    def get_verified_data(self, data: bytes) -> bytes:
         """
-        Check specified signed message signature and return message
+        Check specified signed data signature and return data
 
-        Return error message if signature is invalid
+        Raise exception if signature is not valid
 
-        :param bytes message: Message + signature
-        :return str:
+        :param data: Data + signature
+        :return:
         """
-        return self.verify(message).decode('utf-8')
+        return self.verify(data)

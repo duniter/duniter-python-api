@@ -23,7 +23,7 @@ if __name__ == '__main__':
     # Verify the message!
     verifier = VerifyingKey(pubkeyBase58)
     try:
-        message = verifier.verify_message(signed_message)
+        message = verifier.get_verified_data(signed_message).decode('utf-8')
         print("Signature valid for this message:")
     except ValueError as error:
         message = str(error)
