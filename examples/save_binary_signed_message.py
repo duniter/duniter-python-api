@@ -1,10 +1,14 @@
 import getpass
-from duniterpy.key import SigningKey
+
 import libnacl.sign
 
-################################################
+from duniterpy.key import SigningKey
 
-SIGNED_MESSAGE_FILENAME = 'duniter_signed_message.bin'
+# CONFIG #######################################
+
+SIGNED_MESSAGE_FILENAME = '/tmp/duniter_signed_message.bin'
+
+################################################
 
 if __name__ == '__main__':
     # prompt hidden user entry

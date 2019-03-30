@@ -1,8 +1,10 @@
 from duniterpy.key import PublicKey
 
-################################################
+# CONFIG #######################################
 
-ENCRYPTED_MESSAGE_FILENAME = 'duniter_encrypted_message.bin'
+ENCRYPTED_MESSAGE_FILENAME = '/tmp/duniter_encrypted_message.bin'
+
+################################################
 
 if __name__ == '__main__':
     # Ask public key of the recipient
