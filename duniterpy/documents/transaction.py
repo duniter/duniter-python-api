@@ -171,6 +171,22 @@ class OutputSource:
         self.base = base
         self.condition = self.condition_from_text(condition)
 
+
+    def __eq__(self, other: Any) -> bool:
+        """
+        Check OutputSource instances equality
+        """
+        if not isinstance(other, OutputSource):
+            return NotImplemented
+        return self.amount == other.amount and\
+        self.base == other.base and\
+        self.condition == other.condition
+
+
+    def __hash__(self) -> int:
+        return hash((self.amount, self.base, self.condition))
+
+
     @classmethod
     def from_inline(cls: Type[OutputSourceType], inline: str) -> OutputSourceType:
         """
