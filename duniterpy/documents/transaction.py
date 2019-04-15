@@ -1,5 +1,5 @@
 import re
-from typing import TypeVar, List, Type, Optional, Dict, Union
+from typing import TypeVar, List, Any, Type, Optional, Dict, Union
 
 import pypeg2
 
@@ -77,6 +77,24 @@ class InputSource:
         self.source = source
         self.origin_id = origin_id
         self.index = index
+
+
+    def __eq__(self, other: Any) -> bool:
+        """
+        Check InputSource instances equality
+        """
+        if not isinstance(other, InputSource):
+            return NotImplemented
+        return self.amount == other.amount and\
+        self.base == other.base and\
+        self.source == other.source and\
+        self.origin_id == other.origin_id and\
+        self.index == other.index
+
+
+    def __hash__(self) -> int:
+        return hash((self.amount, self.base, self.source, self.origin_id, self.index))
+
 
     @classmethod
     def from_inline(cls: Type[InputSourceType], tx_version: int, inline: str) -> InputSourceType:
