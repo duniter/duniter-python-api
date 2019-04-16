@@ -108,10 +108,9 @@ class UnknownEndpoint(Endpoint):
         return "{0} {1}".format(self.api, ' '.join(["{0}".format(p) for p in self.properties]))
 
     def __eq__(self, other: Any) -> bool:
-        if isinstance(other, UnknownEndpoint):
-            return self.api == other.api and self.properties == other.properties
-        else:
-            return False
+        if not isinstance(other, UnknownEndpoint):
+            return NotImplemented
+        return self.api == other.api and self.properties == other.properties
 
     def __hash__(self) -> int:
         return hash((self.api, self.properties))
@@ -204,11 +203,10 @@ class BMAEndpoint(Endpoint):
         return self.inline()
 
     def __eq__(self, other: Any) -> bool:
-        if isinstance(other, BMAEndpoint):
-            return self.server == other.server and self.ipv4 == other.ipv4 \
+        if not isinstance(other, BMAEndpoint):
+            return NotImplemented
+        return self.server == other.server and self.ipv4 == other.ipv4 \
                    and self.ipv6 == other.ipv6 and self.port == other.port
-        else:
-            return False
 
     def __hash__(self) -> int:
         return hash((self.server, self.ipv4, self.ipv6, self.port))
@@ -347,11 +345,10 @@ class WS2PEndpoint(Endpoint):
         return self.inline()
 
     def __eq__(self, other: Any) -> bool:
-        if isinstance(other, WS2PEndpoint):
-            return self.server == other.server and self.ws2pid == other.ws2pid \
+        if not isinstance(other, WS2PEndpoint):
+            return NotImplemented
+        return self.server == other.server and self.ws2pid == other.ws2pid \
                    and self.port == other.port and self.path == other.path
-        else:
-            return False
 
     def __hash__(self) -> int:
         return hash((self.ws2pid, self.server, self.port, self.path))
@@ -409,10 +406,9 @@ class ESCoreEndpoint(Endpoint):
         return self.inline()
 
     def __eq__(self, other: Any) -> bool:
-        if isinstance(other, ESCoreEndpoint):
-            return self.server == other.server and self.port == other.port
-        else:
-            return False
+        if not isinstance(other, ESCoreEndpoint):
+            return NotImplemented
+        return self.server == other.server and self.port == other.port
 
     def __hash__(self) -> int:
         return hash((self.server, self.port))
@@ -470,10 +466,9 @@ class ESUserEndpoint(Endpoint):
         return self.inline()
 
     def __eq__(self, other: Any) -> bool:
-        if isinstance(other, ESUserEndpoint):
-            return self.server == other.server and self.port == other.port
-        else:
-            return False
+        if not isinstance(other, ESUserEndpoint):
+            return NotImplemented
+        return self.server == other.server and self.port == other.port
 
     def __hash__(self) -> int:
         return hash((self.server, self.port))
@@ -531,10 +526,9 @@ class ESSubscribtionEndpoint(Endpoint):
         return self.inline()
 
     def __eq__(self, other: Any) -> bool:
-        if isinstance(other, ESSubscribtionEndpoint):
-            return self.server == other.server and self.port == other.port
-        else:
-            return False
+        if not isinstance(other, ESSubscribtionEndpoint):
+            return NotImplemented
+        return self.server == other.server and self.port == other.port
 
     def __hash__(self) -> int:
         return hash((ESSubscribtionEndpoint.API, self.server, self.port))

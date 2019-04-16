@@ -501,7 +501,7 @@ Nonce: {nonce}
 
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, Block):
-            return False
+            return NotImplemented
         return self.blockUID == other.blockUID
 
     def __lt__(self, other: object) -> bool:

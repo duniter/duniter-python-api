@@ -51,7 +51,7 @@ class BlockUID:
 
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, BlockUID):
-            return False
+            return NotImplemented
         return self.number == other.number and self.sha_hash == other.sha_hash
 
     def __lt__(self, other: object) -> bool:
