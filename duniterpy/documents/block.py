@@ -70,14 +70,14 @@ The class Block handles Block documents.
     re_unitbase = re.compile("UnitBase: ([0-9]+)\n")
     re_issuer = re.compile("Issuer: ({pubkey_regex})\n".format(pubkey_regex=PUBKEY_REGEX))
     re_issuers_frame = re.compile("IssuersFrame: ([0-9]+)\n")
-    re_issuers_frame_var = re.compile("IssuersFrameVar: (0|-?[1-9]\d{0,18})\n")
+    re_issuers_frame_var = re.compile("IssuersFrameVar: (0|-?[1-9]\\d{0,18})\n")
     re_different_issuers_count = re.compile("DifferentIssuersCount: ([0-9]+)\n")
     re_previoushash = re.compile("PreviousHash: ({block_hash_regex})\n".format(block_hash_regex=BLOCK_HASH_REGEX))
     re_previousissuer = re.compile("PreviousIssuer: ({pubkey_regex})\n".format(pubkey_regex=PUBKEY_REGEX))
-    re_parameters = re.compile("Parameters: ([0-9]+\.[0-9]+):([0-9]+):([0-9]+):([0-9]+):([0-9]+):([0-9]+):\
-([0-9]+):([0-9]+):([0-9]+\.[0-9]+):([0-9]+):([0-9]+):([0-9]+):([0-9]+):([0-9]+):([0-9]+):([0-9]+\.[0-9]+)\n")
-    re_parameters_v10 = re.compile("Parameters: ([0-9]+\.[0-9]+):([0-9]+):([0-9]+):([0-9]+):([0-9]+):([0-9]+):\
-([0-9]+):([0-9]+):([0-9]+):([0-9]+):([0-9]+\.[0-9]+):([0-9]+):([0-9]+):([0-9]+):([0-9]+):([0-9]+):([0-9]+\.[0-9]+):\
+    re_parameters = re.compile("Parameters: ([0-9]+\\.[0-9]+):([0-9]+):([0-9]+):([0-9]+):([0-9]+):([0-9]+):\
+([0-9]+):([0-9]+):([0-9]+\\.[0-9]+):([0-9]+):([0-9]+):([0-9]+):([0-9]+):([0-9]+):([0-9]+):([0-9]+\\.[0-9]+)\n")
+    re_parameters_v10 = re.compile("Parameters: ([0-9]+\\.[0-9]+):([0-9]+):([0-9]+):([0-9]+):([0-9]+):([0-9]+):\
+([0-9]+):([0-9]+):([0-9]+):([0-9]+):([0-9]+\\.[0-9]+):([0-9]+):([0-9]+):([0-9]+):([0-9]+):([0-9]+):([0-9]+\\.[0-9]+):\
 ([0-9]+):([0-9]+):([0-9]+)\n")
     re_memberscount = re.compile("MembersCount: ([0-9]+)\n")
     re_identities = re.compile("Identities:\n")
@@ -501,7 +501,7 @@ Nonce: {nonce}
 
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, Block):
-            return False
+            return NotImplemented
         return self.blockUID == other.blockUID
 
     def __lt__(self, other: object) -> bool:
