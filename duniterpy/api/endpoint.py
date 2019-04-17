@@ -206,7 +206,7 @@ class BMAEndpoint(Endpoint):
         if not isinstance(other, BMAEndpoint):
             return NotImplemented
         return self.server == other.server and self.ipv4 == other.ipv4 \
-                   and self.ipv6 == other.ipv6 and self.port == other.port
+            and self.ipv6 == other.ipv6 and self.port == other.port
 
     def __hash__(self) -> int:
         return hash((self.server, self.ipv4, self.ipv6, self.port))
@@ -348,7 +348,7 @@ class WS2PEndpoint(Endpoint):
         if not isinstance(other, WS2PEndpoint):
             return NotImplemented
         return self.server == other.server and self.ws2pid == other.ws2pid \
-                   and self.port == other.port and self.path == other.path
+            and self.port == other.port and self.path == other.path
 
     def __hash__(self) -> int:
         return hash((self.ws2pid, self.server, self.port, self.path))

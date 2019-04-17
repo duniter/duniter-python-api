@@ -78,23 +78,20 @@ class InputSource:
         self.origin_id = origin_id
         self.index = index
 
-
     def __eq__(self, other: Any) -> bool:
         """
         Check InputSource instances equality
         """
         if not isinstance(other, InputSource):
             return NotImplemented
-        return self.amount == other.amount and\
-        self.base == other.base and\
-        self.source == other.source and\
-        self.origin_id == other.origin_id and\
-        self.index == other.index
-
+        return self.amount == other.amount and \
+            self.base == other.base and \
+            self.source == other.source and \
+            self.origin_id == other.origin_id and \
+            self.index == other.index
 
     def __hash__(self) -> int:
         return hash((self.amount, self.base, self.source, self.origin_id, self.index))
-
 
     @classmethod
     def from_inline(cls: Type[InputSourceType], tx_version: int, inline: str) -> InputSourceType:
@@ -171,21 +168,18 @@ class OutputSource:
         self.base = base
         self.condition = self.condition_from_text(condition)
 
-
     def __eq__(self, other: Any) -> bool:
         """
         Check OutputSource instances equality
         """
         if not isinstance(other, OutputSource):
             return NotImplemented
-        return self.amount == other.amount and\
-        self.base == other.base and\
-        self.condition == other.condition
-
+        return self.amount == other.amount and \
+            self.base == other.base and \
+            self.condition == other.condition
 
     def __hash__(self) -> int:
         return hash((self.amount, self.base, self.condition))
-
 
     @classmethod
     def from_inline(cls: Type[OutputSourceType], inline: str) -> OutputSourceType:
@@ -238,7 +232,7 @@ class SIGParameter:
     """
     A Transaction UNLOCK SIG parameter
     """
-    re_sig = re.compile("SIG\(([0-9]+)\)")
+    re_sig = re.compile("SIG\\(([0-9]+)\\)")
 
     def __init__(self, index: int) -> None:
         """
@@ -280,7 +274,7 @@ class XHXParameter:
     """
     A Transaction UNLOCK XHX parameter
     """
-    re_xhx = re.compile("XHX\(([0-9]+)\)")
+    re_xhx = re.compile("XHX\\(([0-9]+)\\)")
 
     def __init__(self, integer: int) -> None:
         """
@@ -354,7 +348,7 @@ class Unlock:
     """
     A Transaction UNLOCK
     """
-    re_inline = re.compile("([0-9]+):((?:SIG\([0-9]+\)|XHX\([0-9]+\)|\s)+)\n")
+    re_inline = re.compile("([0-9]+):((?:SIG\\([0-9]+\\)|XHX\\([0-9]+\\)|\\s)+)\n")
 
     def __init__(self, index: int, parameters: List[Union[SIGParameter, XHXParameter]]) -> None:
         """
