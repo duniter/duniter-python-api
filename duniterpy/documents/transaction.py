@@ -154,7 +154,7 @@ class OutputSource:
     """
     A Transaction OUTPUT
     """
-    re_inline = re.compile("([0-9]+):([0-9]+):(.*)\n")
+    re_inline = re.compile("([0-9]+):([0-9]):(.*)")
 
     def __init__(self, amount: int, base: int, condition: str) -> None:
         """
