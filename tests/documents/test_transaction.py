@@ -492,3 +492,9 @@ class TestTransaction(unittest.TestCase):
         output_source_str = "460:0:SIG(8kXygUHh1vLjmcRzXVM86t38EL8dfFJgfBeHmkaWLamu)"
         o = OutputSource.from_inline(output_source_str)
         self.assertEqual(o.inline(), output_source_str)
+
+
+    def test_outputsource_inline_condition(self):
+        output_source_str = "460:0:SIG(8kXygUHh1vLjmcRzXVM86t38EL8dfFJgfBeHmkaWLamu)"
+        o = OutputSource.from_inline(output_source_str)
+        self.assertEqual(o.inline_condition(), output_source_str.split(":")[2])

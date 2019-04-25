@@ -200,12 +200,20 @@ class OutputSource:
 
     def inline(self) -> str:
         """
-        Return an inline string format of the document
+        Return an inline string format of the output source
 
         :return:
         """
         return "{0}:{1}:{2}".format(self.amount, self.base,
                                     pypeg2.compose(self.condition, output.Condition))
+
+    def inline_condition(self) -> str:
+        """
+        Return an inline string format of the output source’s condition
+
+        :return:
+        """
+        return pypeg2.compose(self.condition, output.Condition)
 
     @staticmethod
     def condition_from_text(text) -> Condition:
