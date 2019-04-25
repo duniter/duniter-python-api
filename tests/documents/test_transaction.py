@@ -6,7 +6,7 @@ Created on 12 déc. 2014
 import unittest
 import pypeg2
 from duniterpy.grammars import output
-from duniterpy.documents.transaction import Transaction, reduce_base, SimpleTransaction
+from duniterpy.documents.transaction import Transaction, reduce_base, SimpleTransaction, InputSource
 
 compact_change = """TX:10:1:1:1:1:1:0
 13410-000041DF0CCA173F09B5FBA48F619D4BC934F12ADF1D0B798639EB2149C4A8CC
@@ -480,3 +480,9 @@ class TestTransaction(unittest.TestCase):
 
         tx = Transaction.from_compact("zeta_brousouf", tx_compact)
         self.assertFalse(SimpleTransaction.is_simple(tx))
+
+
+    def test_inputsource_from_inline(self):
+        input_source_str = "30:0:T:6991C993631BED4733972ED7538E41CCC33660F554E3C51963E2A0AC4D6453D3:2"
+        i = InputSource.from_inline(10, input_source_str)
+        self.assertEqual(i.inline(10), input_source_str)

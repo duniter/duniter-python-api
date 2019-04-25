@@ -55,8 +55,8 @@ class InputSource:
                 block_id_regex=BLOCK_ID_REGEX,
                 transaction_hash_regex=TRANSACTION_HASH_REGEX))
     re_inline_v3 = re.compile(
-        "([0-9]+):([0-9]+):(?:(?:(D):({pubkey_regex}):({block_id_regex}))|(?:(T):({transaction_hash_regex}):\
-([0-9]+)))\n"
+        "([0-9]+):([0-9]):(?:(?:(D):({pubkey_regex}):({block_id_regex}))|(?:(T):({transaction_hash_regex}):\
+([0-9]+)))"
         .format(pubkey_regex=PUBKEY_REGEX,
                 block_id_regex=BLOCK_ID_REGEX,
                 transaction_hash_regex=TRANSACTION_HASH_REGEX))
