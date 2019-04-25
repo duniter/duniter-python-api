@@ -174,38 +174,6 @@ class TestTransaction(unittest.TestCase):
         self.assertEqual(tx.signatures[2],
                          "2XiBDpuUdu6zCPWGzHXXy8c4ATSscfFQG9DjmqMZUxDZVt1Dp4m2N5oHYVUfoPdrU9SLk4qxi65RNrfCVnvQtQJk")
 
-    def test_fromcompact2(self):
-        tx = Transaction.from_compact("zeta_brousouf", tx_compact_2)
-        self.assertEqual(tx.version, 2)
-        self.assertEqual(tx.currency, "zeta_brousouf")
-        self.assertEqual(len(tx.issuers), 1)
-        self.assertEqual(len(tx.inputs), 1)
-        self.assertEqual(len(tx.unlocks), 1)
-        self.assertEqual(len(tx.outputs), 2)
-
-        self.assertEqual(tx.issuers[0], "GNPdPNwSJAYw7ixkDeibo3YpdELgLmrZ2Q86HF4cyg92")
-
-        self.assertEqual(tx.inputs[0].source, 'D')
-        self.assertEqual(tx.inputs[0].origin_id, "GNPdPNwSJAYw7ixkDeibo3YpdELgLmrZ2Q86HF4cyg92")
-        self.assertEqual(tx.inputs[0].index, 471)
-
-        self.assertEqual(tx.unlocks[0].index, 0)
-        self.assertEqual(str(tx.unlocks[0].parameters[0]), "SIG(0)")
-
-        self.assertEqual(tx.outputs[0].amount, 90)
-        self.assertEqual(tx.outputs[0].base, 0)
-        self.assertEqual(pypeg2.compose(tx.outputs[0].condition, output.Condition),
-                         "SIG(5zDvFjJB1PGDQNiExpfzL9c1tQGs6xPA8mf1phr3VoVi)")
-        self.assertEqual(type(tx.outputs[0].condition.left), output.SIG)
-        self.assertEqual(tx.outputs[1].amount, 10)
-        self.assertEqual(tx.outputs[1].base, 0)
-        self.assertEqual(pypeg2.compose(tx.outputs[1].condition, output.Condition),
-                         "SIG(GNPdPNwSJAYw7ixkDeibo3YpdELgLmrZ2Q86HF4cyg92)")
-        self.assertEqual(type(tx.outputs[1].condition.left), output.SIG)
-        self.assertEqual(tx.signatures[0],
-                         "XDQeEMcJDd+XVGaFIZc8d4kKRJgsPuWAPVNG5UKNk8mDZx2oE1kTP/hbxiFx6yDouBELCswuf/X6POK9ES7JCA==")
-
-
     def test_fromraw_toraw(self):
         tx = Transaction.from_signed_raw(tx_raw)
         rendered_tx = tx.signed_raw()
