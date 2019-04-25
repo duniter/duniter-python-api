@@ -44,8 +44,6 @@ class Document:
         :param currency: Name of the currency
         :param signatures: List of signatures
         """
-        if version < 2:
-            raise MalformedDocumentError("Version 1 documents are not handled by duniterpy>0.2")
         self.version = version
         self.currency = currency
         if signatures:
