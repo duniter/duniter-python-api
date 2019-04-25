@@ -69,7 +69,7 @@ D:GNPdPNwSJAYw7ixkDeibo3YpdELgLmrZ2Q86HF4cyg92:471
 XDQeEMcJDd+XVGaFIZc8d4kKRJgsPuWAPVNG5UKNk8mDZx2oE1kTP/hbxiFx6yDouBELCswuf/X6POK9ES7JCA==
 """
 
-tx_raw_v3 = """Version: 3
+tx_raw = """Version: 10
 Type: Transaction
 Currency: beta_brousouf
 Blockstamp: 32-DB30D958EE5CB75186972286ED3F4686B8A1C2CD
@@ -206,12 +206,12 @@ class TestTransaction(unittest.TestCase):
                          "XDQeEMcJDd+XVGaFIZc8d4kKRJgsPuWAPVNG5UKNk8mDZx2oE1kTP/hbxiFx6yDouBELCswuf/X6POK9ES7JCA==")
 
 
-    def test_fromraw_toraw_v3(self):
-        tx = Transaction.from_signed_raw(tx_raw_v3)
+    def test_fromraw_toraw(self):
+        tx = Transaction.from_signed_raw(tx_raw)
         rendered_tx = tx.signed_raw()
         from_rendered_tx = Transaction.from_signed_raw(rendered_tx)
 
-        self.assertEqual(tx.version, 3)
+        self.assertEqual(tx.version, 10)
         self.assertEqual(tx.currency, "beta_brousouf")
         self.assertEqual(tx.blockstamp.number, 32)
         self.assertEqual(tx.blockstamp.sha_hash, "DB30D958EE5CB75186972286ED3F4686B8A1C2CD")
