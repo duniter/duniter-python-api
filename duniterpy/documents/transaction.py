@@ -565,10 +565,8 @@ Comment: {comment}
         locktime = int(header_data.group(7))
         n += 1
 
-        blockstamp = None  # type: Optional[BlockUID]
-        if version >= 3:
-            blockstamp = BlockUID.from_str(Transaction.parse_field("CompactBlockstamp", lines[n]))
-            n += 1
+        blockstamp = BlockUID.from_str(Transaction.parse_field("CompactBlockstamp", lines[n]))
+        n += 1
 
         issuers = []
         inputs = []
