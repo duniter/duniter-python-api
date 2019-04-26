@@ -113,19 +113,13 @@ class InputSource:
 
         return cls(amount, base, source, origin_id, index)
 
-    def inline(self, tx_version: int) -> str:
+    def inline(self) -> str:
         """
         Return an inline string format of the document
 
-        :param tx_version: Version number of the document
         :return:
         """
-        if tx_version == 2:
-            return "{0}:{1}:{2}".format(self.source,
-                                        self.origin_id,
-                                        self.index)
-        else:
-            return "{0}:{1}:{2}:{3}:{4}".format(self.amount,
+        return "{0}:{1}:{2}:{3}:{4}".format(self.amount,
                                                 self.base,
                                                 self.source,
                                                 self.origin_id,
@@ -696,7 +690,7 @@ Currency: {1}
 
         doc += "Inputs:\n"
         for i in self.inputs:
-            doc += "{0}\n".format(i.inline(self.version))
+            doc += "{0}\n".format(i.inline())
 
         doc += "Unlocks:\n"
         for u in self.unlocks:
@@ -739,7 +733,7 @@ COMMENT
         for pubkey in self.issuers:
             doc += "{0}\n".format(pubkey)
         for i in self.inputs:
-            doc += "{0}\n".format(i.inline(self.version))
+            doc += "{0}\n".format(i.inline())
         for u in self.unlocks:
             doc += "{0}\n".format(u.inline())
         for o in self.outputs:
