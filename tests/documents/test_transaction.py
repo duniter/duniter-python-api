@@ -60,9 +60,10 @@ D:9WYHTavL1pmhunFCzUwiiq4pXwvgGG5ysjZnjz9H8yB:46
 2XiBDpuUdu6zCPWGzHXXy8c4ATSscfFQG9DjmqMZUxDZVt1Dp4m2N5oHYVUfoPdrU9SLk4qxi65RNrfCVnvQtQJk
 """
 
-tx_compact_2 = """TX:2:1:1:1:2:0:0
+simple_tx_compact = """TX:10:1:1:1:2:0:0
+13410-000041DF0CCA173F09B5FBA48F619D4BC934F12ADF1D0B798639EB2149C4A8CC
 GNPdPNwSJAYw7ixkDeibo3YpdELgLmrZ2Q86HF4cyg92
-D:GNPdPNwSJAYw7ixkDeibo3YpdELgLmrZ2Q86HF4cyg92:471
+100:0:D:GNPdPNwSJAYw7ixkDeibo3YpdELgLmrZ2Q86HF4cyg92:471
 0:SIG(0)
 90:0:SIG(5zDvFjJB1PGDQNiExpfzL9c1tQGs6xPA8mf1phr3VoVi)
 10:0:SIG(GNPdPNwSJAYw7ixkDeibo3YpdELgLmrZ2Q86HF4cyg92)
@@ -269,7 +270,7 @@ class TestTransaction(unittest.TestCase):
         self.assertEqual(computed[1], 5)
 
     def test_is_simple(self):
-        tx = Transaction.from_compact("zeta_brousouf", tx_compact_2)
+        tx = Transaction.from_compact("zeta_brousouf", simple_tx_compact)
         self.assertTrue(SimpleTransaction.is_simple(tx))
 
         tx = Transaction.from_compact("zeta_brousouf", tx_compact)
