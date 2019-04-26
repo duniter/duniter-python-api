@@ -292,7 +292,7 @@ class TestTransaction(unittest.TestCase):
 
     def test_inputsource_from_inline(self):
         input_source_str = "30:0:T:6991C993631BED4733972ED7538E41CCC33660F554E3C51963E2A0AC4D6453D3:2"
-        i = InputSource.from_inline(10, input_source_str)
+        i = InputSource.from_inline(input_source_str)
         self.assertEqual(i.inline(10), input_source_str)
 
 

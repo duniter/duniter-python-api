@@ -50,11 +50,6 @@ class InputSource:
 
     """
     re_inline = re.compile(
-        "(?:(?:(D):({pubkey_regex}):({block_id_regex}))|(?:(T):({transaction_hash_regex}):([0-9]+)))\n"
-        .format(pubkey_regex=PUBKEY_REGEX,
-                block_id_regex=BLOCK_ID_REGEX,
-                transaction_hash_regex=TRANSACTION_HASH_REGEX))
-    re_inline_v3 = re.compile(
         "([0-9]+):([0-9]):(?:(?:(D):({pubkey_regex}):({block_id_regex}))|(?:(T):({transaction_hash_regex}):\
 ([0-9]+)))"
         .format(pubkey_regex=PUBKEY_REGEX,
@@ -94,28 +89,19 @@ class InputSource:
         return hash((self.amount, self.base, self.source, self.origin_id, self.index))
 
     @classmethod
-    def from_inline(cls: Type[InputSourceType], tx_version: int, inline: str) -> InputSourceType:
+    def from_inline(cls: Type[InputSourceType], inline: str) -> InputSourceType:
         """
         Return Transaction instance from inline string format
 
-        :param tx_version: Version number of the document
         :param inline: Inline string format
         :return:
         """
-        if tx_version == 2:
-            data = InputSource.re_inline.match(inline)
-            if data is None:
-                raise MalformedDocumentError("Inline input")
-            source_offset = 0
-            amount = 0
-            base = 0
-        else:
-            data = InputSource.re_inline_v3.match(inline)
-            if data is None:
-                raise MalformedDocumentError("Inline input")
-            source_offset = 2
-            amount = int(data.group(1))
-            base = int(data.group(2))
+        data = InputSource.re_inline.match(inline)
+        if data is None:
+            raise MalformedDocumentError("Inline input")
+        source_offset = 2
+        amount = int(data.group(1))
+        base = int(data.group(2))
         if data.group(1 + source_offset):
             source = data.group(1 + source_offset)
             origin_id = data.group(2 + source_offset)
@@ -579,7 +565,7 @@ Comment: {comment}
             n += 1
 
         for i in range(0, inputs_num):
-            input_source = InputSource.from_inline(version, lines[n])
+            input_source = InputSource.from_inline(lines[n])
             inputs.append(input_source)
             n += 1
 
@@ -657,7 +643,7 @@ Comment: {comment}
         if Transaction.re_inputs.match(lines[n]):
             n += 1
             while Transaction.re_unlocks.match(lines[n]) is None:
-                input_source = InputSource.from_inline(version, lines[n])
+                input_source = InputSource.from_inline(lines[n])
                 inputs.append(input_source)
                 n += 1
 
