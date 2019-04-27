@@ -37,8 +37,21 @@ push_to_github:
     - eval "$(pyenv init -)"
     - pyenv shell $PYENV_PYTHON_VERSION
 
+.changes: &changes
+  except:
+    changes:
+      - CHANGELOG.md
+      - ci/*
+      - config
+      - docs
+      - LICENSE*
+      - Makefile
+      - README*
+      - release.sh
+
 build: &build
   <<: *pyenv
+  <<: *changes
   stage: build
   script:
     - pip install -r requirements.txt
@@ -47,6 +60,7 @@ build: &build
 
 test:
   <<: *pyenv
+  <<: *changes
   stage: test
   script:
     - pip install coveralls
@@ -55,6 +69,7 @@ test:
 
 mypy:
   <<: *pyenv
+  <<: *changes
   stage: test
   script:
     - pip install -r requirements_dev.txt
