@@ -6,8 +6,8 @@ docs:
 
 # run tests
 tests:
-	python -m unittest ${test_filter}
+	python3 -m unittest
 
 # check static typing
 check:
-	mypy duniterpy --ignore-missing-imports
+	python3 -m mypy duniterpy --ignore-missing-imports
