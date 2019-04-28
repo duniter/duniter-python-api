@@ -32,7 +32,7 @@ SIGType = TypeVar('SIGType', bound='SIG')
 
 class SIG:
     """
-    Signature function in transaction output condition
+    SIGnature function in transaction output condition
     """
     grammar = "SIG(", attr('pubkey', Pubkey), ")"
 
@@ -60,7 +60,7 @@ class SIG:
         sig.pubkey = pubkey
         return sig
 
-    def compose(self, parser: Any, grammar: Any = None, attr_of: Any = None) -> str:
+    def compose(self, parser: Any = None, grammar: Any = None, attr_of: Any = None) -> str:
         """
         Return the SIG(pubkey) expression as string format
 
@@ -106,7 +106,7 @@ class CSV:
         csv.time = str(time)
         return csv
 
-    def compose(self, parser: Any, grammar: Any = None, attr_of: str = None):
+    def compose(self, parser: Any = None, grammar: Any = None, attr_of: str = None):
         """
         Return the CSV(time) expression as string format
 
@@ -151,7 +151,7 @@ class CLTV:
         cltv.timestamp = str(timestamp)
         return cltv
 
-    def compose(self, parser: Any, grammar: Any = None, attr_of: str = None):
+    def compose(self, parser: Any = None, grammar: Any = None, attr_of: str = None):
         """
         Return the CLTV(timestamp) expression as string format
 
@@ -196,7 +196,7 @@ class XHX:
         xhx.sha_hash = sha_hash
         return xhx
 
-    def compose(self, parser: Any, grammar: Any = None, attr_of: str = None) -> str:
+    def compose(self, parser: Any = None, grammar: Any = None, attr_of: str = None) -> str:
         """
         Return the XHX(sha_hash) expression as string format
 
@@ -229,7 +229,7 @@ class Operator(Keyword):
         op = cls(keyword)
         return op
 
-    def compose(self, parser: Any, grammar: Any = None, attr_of: str = None) -> str:
+    def compose(self, parser: Any = None, grammar: Any = None, attr_of: str = None) -> str:
         """
         Return the Operator keyword as string format
 
