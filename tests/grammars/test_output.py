@@ -4,6 +4,7 @@ import pypeg2
 
 from duniterpy.grammars.output import SIG, CLTV, CSV, XHX, Operator, Condition
 
+pubkey = "DNann1Lh55eZMEDXeYt59bzHbA3NJR46DeQYCS2qQdLV"
 
 class TestOutputgrammar(unittest.TestCase):
     def test_sig(self):
@@ -91,3 +92,19 @@ class TestOutputgrammar(unittest.TestCase):
         self.assertEqual(inst.left.right.op.name, "&&")
         self.assertEqual(inst.left.right.right.sha_hash, "309BC5E644F797F53E5A2065EAF38A173437F2E6")
         self.assertEqual(pypeg2.compose(inst, Condition), condition)
+
+
+    def test_SIG_token_and_compose(self):
+        self.assertEqual(SIG.token(pubkey).compose(), "SIG(" + pubkey + ")")
+
+
+    def test_CSV_token_and_compose(self):
+        self.assertEqual(CSV.token(pubkey).compose(), "CSV(" + pubkey + ")")
+
+
+    def test_CLTV_token_and_compose(self):
+        self.assertEqual(CLTV.token(pubkey).compose(), "CLTV(" + pubkey + ")")
+
+
+    def test_HXH_token_and_compose(self):
+        self.assertEqual(XHX.token(pubkey).compose(), "XHX(" + pubkey + ")")
