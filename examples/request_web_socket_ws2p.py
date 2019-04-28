@@ -4,7 +4,7 @@ from _socket import gaierror
 import aiohttp
 import jsonschema
 
-from duniterpy.api import bma
+from duniterpy.api import ws2p
 from duniterpy.api.client import Client, parse_text
 
 # CONFIG #######################################
@@ -12,7 +12,7 @@ from duniterpy.api.client import Client, parse_text
 # You can either use a complete defined endpoint : [NAME_OF_THE_API] [DOMAIN] [IPv4] [IPv6] [PORT]
 # or the simple definition : [NAME_OF_THE_API] [DOMAIN] [PORT]
 # Here we use the WS2P API (WS2P)
-WS2P_ENDPOINT = "WS2P 2f731dcd 127.0.0.1 35834"
+WS2P_ENDPOINT = "WS2P 2f731dcd 127.0.0.1 20900"
 
 
 ################################################
@@ -27,7 +27,7 @@ async def main():
 
     try:
         # Create Web Socket connection on block path
-        ws_connection = client.connect_ws('')
+        ws_connection = client.connect_ws()
 
         # From the documentation ws_connection should be a ClientWebSocketResponse object...
         #
@@ -39,19 +39,20 @@ async def main():
         # and close the ClientWebSocketResponse in it.
         connect_message = """
         """
-        ws_connection.send(connect_message)
+        #await ws_connection.send(connect_message)
 
         # Mandatory to get the "for msg in ws" to work !
         async with ws_connection as ws:
             print("Connected successfully to web socket block path")
+
             # Iterate on each message received...
             async for msg in ws:
                 # if message type is text...
                 if msg.type == aiohttp.WSMsgType.TEXT:
-                    print("Received a block")
+                    print("Received a message")
                     # Validate jsonschema and return a the json dict
-                    block_data = parse_text(msg.data, bma.ws.WS_BLOCK_SCHEMA)
-                    print(block_data)
+                    data = parse_text(msg.data, ws2p.network.WS2P_CONNECT_MESSAGE_SCHEMA)
+                    print(data)
                 elif msg.type == aiohttp.WSMsgType.CLOSED:
                     # Connection is closed
                     print("Web socket connection closed !")
