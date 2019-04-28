@@ -63,13 +63,16 @@ setup(
     test_suite="tests",
 
     classifiers=[
-        "Programming Language :: Python",
         "Development Status :: 5 - Production/Stable",
         "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
         "Natural Language :: English",
         "Operating System :: OS Independent",
+        "Programming Language :: Python :: 3 :: Only",
+        "Programming Language :: Python :: 3.7",
+        "Programming Language :: Python :: 3.6",
         "Programming Language :: Python :: 3.5",
         "Topic :: Software Development :: Libraries",
+        "Intended Audience :: Developers",
     ],
     install_requires=install_requires,
     dependency_links=dependency_links

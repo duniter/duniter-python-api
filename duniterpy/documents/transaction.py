@@ -50,13 +50,8 @@ class InputSource:
 
     """
     re_inline = re.compile(
-        "(?:(?:(D):({pubkey_regex}):({block_id_regex}))|(?:(T):({transaction_hash_regex}):([0-9]+)))\n"
-        .format(pubkey_regex=PUBKEY_REGEX,
-                block_id_regex=BLOCK_ID_REGEX,
-                transaction_hash_regex=TRANSACTION_HASH_REGEX))
-    re_inline_v3 = re.compile(
-        "([0-9]+):([0-9]+):(?:(?:(D):({pubkey_regex}):({block_id_regex}))|(?:(T):({transaction_hash_regex}):\
-([0-9]+)))\n"
+        "([0-9]+):([0-9]):(?:(?:(D):({pubkey_regex}):({block_id_regex}))|(?:(T):({transaction_hash_regex}):\
+([0-9]+)))"
         .format(pubkey_regex=PUBKEY_REGEX,
                 block_id_regex=BLOCK_ID_REGEX,
                 transaction_hash_regex=TRANSACTION_HASH_REGEX))
@@ -94,28 +89,19 @@ class InputSource:
         return hash((self.amount, self.base, self.source, self.origin_id, self.index))
 
     @classmethod
-    def from_inline(cls: Type[InputSourceType], tx_version: int, inline: str) -> InputSourceType:
+    def from_inline(cls: Type[InputSourceType], inline: str) -> InputSourceType:
         """
         Return Transaction instance from inline string format
 
-        :param tx_version: Version number of the document
         :param inline: Inline string format
         :return:
         """
-        if tx_version == 2:
-            data = InputSource.re_inline.match(inline)
-            if data is None:
-                raise MalformedDocumentError("Inline input")
-            source_offset = 0
-            amount = 0
-            base = 0
-        else:
-            data = InputSource.re_inline_v3.match(inline)
-            if data is None:
-                raise MalformedDocumentError("Inline input")
-            source_offset = 2
-            amount = int(data.group(1))
-            base = int(data.group(2))
+        data = InputSource.re_inline.match(inline)
+        if data is None:
+            raise MalformedDocumentError("Inline input")
+        source_offset = 2
+        amount = int(data.group(1))
+        base = int(data.group(2))
         if data.group(1 + source_offset):
             source = data.group(1 + source_offset)
             origin_id = data.group(2 + source_offset)
@@ -127,19 +113,13 @@ class InputSource:
 
         return cls(amount, base, source, origin_id, index)
 
-    def inline(self, tx_version: int) -> str:
+    def inline(self) -> str:
         """
         Return an inline string format of the document
 
-        :param tx_version: Version number of the document
         :return:
         """
-        if tx_version == 2:
-            return "{0}:{1}:{2}".format(self.source,
-                                        self.origin_id,
-                                        self.index)
-        else:
-            return "{0}:{1}:{2}:{3}:{4}".format(self.amount,
+        return "{0}:{1}:{2}:{3}:{4}".format(self.amount,
                                                 self.base,
                                                 self.source,
                                                 self.origin_id,
@@ -154,7 +134,7 @@ class OutputSource:
     """
     A Transaction OUTPUT
     """
-    re_inline = re.compile("([0-9]+):([0-9]+):(.*)\n")
+    re_inline = re.compile("([0-9]+):([0-9]):(.*)")
 
     def __init__(self, amount: int, base: int, condition: str) -> None:
         """
@@ -200,12 +180,20 @@ class OutputSource:
 
     def inline(self) -> str:
         """
-        Return an inline string format of the document
+        Return an inline string format of the output source
 
         :return:
         """
         return "{0}:{1}:{2}".format(self.amount, self.base,
                                     pypeg2.compose(self.condition, output.Condition))
+
+    def inline_condition(self) -> str:
+        """
+        Return an inline string format of the output source’s condition
+
+        :return:
+        """
+        return pypeg2.compose(self.condition, output.Condition)
 
     @staticmethod
     def condition_from_text(text) -> Condition:
@@ -557,10 +545,8 @@ Comment: {comment}
         locktime = int(header_data.group(7))
         n += 1
 
-        blockstamp = None  # type: Optional[BlockUID]
-        if version >= 3:
-            blockstamp = BlockUID.from_str(Transaction.parse_field("CompactBlockstamp", lines[n]))
-            n += 1
+        blockstamp = BlockUID.from_str(Transaction.parse_field("CompactBlockstamp", lines[n]))
+        n += 1
 
         issuers = []
         inputs = []
@@ -573,7 +559,7 @@ Comment: {comment}
             n += 1
 
         for i in range(0, inputs_num):
-            input_source = InputSource.from_inline(version, lines[n])
+            input_source = InputSource.from_inline(lines[n])
             inputs.append(input_source)
             n += 1
 
@@ -651,7 +637,7 @@ Comment: {comment}
         if Transaction.re_inputs.match(lines[n]):
             n += 1
             while Transaction.re_unlocks.match(lines[n]) is None:
-                input_source = InputSource.from_inline(version, lines[n])
+                input_source = InputSource.from_inline(lines[n])
                 inputs.append(input_source)
                 n += 1
 
@@ -704,7 +690,7 @@ Currency: {1}
 
         doc += "Inputs:\n"
         for i in self.inputs:
-            doc += "{0}\n".format(i.inline(self.version))
+            doc += "{0}\n".format(i.inline())
 
         doc += "Unlocks:\n"
         for u in self.unlocks:
@@ -747,7 +733,7 @@ COMMENT
         for pubkey in self.issuers:
             doc += "{0}\n".format(pubkey)
         for i in self.inputs:
-            doc += "{0}\n".format(i.inline(self.version))
+            doc += "{0}\n".format(i.inline())
         for u in self.unlocks:
             doc += "{0}\n".format(u.inline())
         for o in self.outputs:

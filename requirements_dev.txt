@@ -1,3 +1,4 @@
+coveralls
 mypy
 sphinx
 sphinx_rtd_theme

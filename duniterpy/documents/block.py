@@ -75,8 +75,6 @@ The class Block handles Block documents.
     re_previoushash = re.compile("PreviousHash: ({block_hash_regex})\n".format(block_hash_regex=BLOCK_HASH_REGEX))
     re_previousissuer = re.compile("PreviousIssuer: ({pubkey_regex})\n".format(pubkey_regex=PUBKEY_REGEX))
     re_parameters = re.compile("Parameters: ([0-9]+\\.[0-9]+):([0-9]+):([0-9]+):([0-9]+):([0-9]+):([0-9]+):\
-([0-9]+):([0-9]+):([0-9]+\\.[0-9]+):([0-9]+):([0-9]+):([0-9]+):([0-9]+):([0-9]+):([0-9]+):([0-9]+\\.[0-9]+)\n")
-    re_parameters_v10 = re.compile("Parameters: ([0-9]+\\.[0-9]+):([0-9]+):([0-9]+):([0-9]+):([0-9]+):([0-9]+):\
 ([0-9]+):([0-9]+):([0-9]+):([0-9]+):([0-9]+\\.[0-9]+):([0-9]+):([0-9]+):([0-9]+):([0-9]+):([0-9]+):([0-9]+\\.[0-9]+):\
 ([0-9]+):([0-9]+):([0-9]+)\n")
     re_memberscount = re.compile("MembersCount: ([0-9]+)\n")
@@ -252,24 +250,18 @@ The class Block handles Block documents.
             ud = int(Block.parse_field("UD", lines[n]))
             n += 1
 
-        if version >= 3 or ud:
-            unit_base = int(Block.parse_field("UnitBase", lines[n]))
-            n += 1
+        unit_base = int(Block.parse_field("UnitBase", lines[n]))
+        n += 1
 
         issuer = Block.parse_field("Issuer", lines[n])
         n += 1
 
-        if version >= 3:
-            issuers_frame = Block.parse_field("IssuersFrame", lines[n])
-            n += 1
-            issuers_frame_var = Block.parse_field("IssuersFrameVar", lines[n])
-            n += 1
-            different_issuers_count = Block.parse_field("DifferentIssuersCount", lines[n])
-            n += 1
-        else:
-            issuers_frame = None
-            issuers_frame_var = None
-            different_issuers_count = None
+        issuers_frame = Block.parse_field("IssuersFrame", lines[n])
+        n += 1
+        issuers_frame_var = Block.parse_field("IssuersFrameVar", lines[n])
+        n += 1
+        different_issuers_count = Block.parse_field("DifferentIssuersCount", lines[n])
+        n += 1
 
         prev_hash = None
         prev_issuer = None
@@ -283,16 +275,10 @@ The class Block handles Block documents.
         parameters = None
         if number == 0:
             try:
-                if version >= 10:
-                    params_match = Block.re_parameters_v10.match(lines[n])
-                    if params_match is None:
-                        raise MalformedDocumentError("Parameters")
-                    parameters = params_match.groups()
-                else:
-                    params_match = Block.re_parameters.match(lines[n])
-                    if params_match is None:
-                        raise MalformedDocumentError("Parameters")
-                    parameters = params_match.groups()
+                params_match = Block.re_parameters.match(lines[n])
+                if params_match is None:
+                    raise MalformedDocumentError("Parameters")
+                parameters = params_match.groups()
                 n += 1
             except AttributeError:
                 raise MalformedDocumentError("Parameters")
@@ -374,12 +360,7 @@ The class Block handles Block documents.
                 unlocks_num = int(header_data.group(4))
                 outputs_num = int(header_data.group(5))
                 has_comment = int(header_data.group(6))
-                if version > 2:
-                    if tx_version <= 2:
-                        raise MalformedDocumentError("TX document is using wrong version")
-                    sup_lines = 2
-                else:
-                    sup_lines = 1
+                sup_lines = 2
                 tx_max = n + sup_lines + issuers_num * 2 + inputs_num + unlocks_num + outputs_num + has_comment
                 for i in range(n, tx_max):
                     tx_lines += lines[n]
@@ -419,13 +400,11 @@ MedianTime: {mediantime}
         if self.ud:
             doc += "UniversalDividend: {0}\n".format(self.ud)
 
-        if self.version >= 3 or self.ud:
-            doc += "UnitBase: {0}\n".format(self.unit_base)
+        doc += "UnitBase: {0}\n".format(self.unit_base)
 
         doc += "Issuer: {0}\n".format(self.issuer)
 
-        if self.version >= 3:
-            doc += """IssuersFrame: {0}
+        doc += """IssuersFrame: {0}
 IssuersFrameVar: {1}
 DifferentIssuersCount: {2}
 """.format(self.issuers_frame, self.issuers_frame_var, self.different_issuers_count)

@@ -8,14 +8,18 @@ import unittest
 from duniterpy.documents.block import Block
 from duniterpy.documents.block_uid import BlockUID, block_uid
 
-raw_block = """Version: 2
+raw_block = """Version: 11
 Type: Block
 Currency: zeta_brouzouf
 Number: 15
 PoWMin: 4
 Time: 1418083330
 MedianTime: 1418080208
+UnitBase: 0
 Issuer: HnFcSms8jzwngtVomTTnzudZx7SHUQY8sVE1y8yBmULk
+IssuersFrame: 1
+IssuersFrameVar: 0
+DifferentIssuersCount: 0
 PreviousHash: 0000E73C340601ACA1AD5AAA5B5E56B03E178EF8
 PreviousIssuer: HnFcSms8jzwngtVomTTnzudZx7SHUQY8sVE1y8yBmULk
 MembersCount: 4
@@ -32,14 +36,18 @@ Nonce: 45079
 42yQm4hGTJYWkPg39hQAUgP6S6EQ4vTfXdJuxKEHL1ih6YHiDL2hcwrFgBHjXLRgxRhj2VNVqqc6b4JayKqTE14r
 """
 
-raw_block_with_tx = """Version: 2
+raw_block_with_tx = """Version: 11
 Type: Block
 Currency: meta_brouzouf
 Number: 34436
 PoWMin: 5
 Time: 1443896211
 MedianTime: 1443881811
+UnitBase: 0
 Issuer: HnFcSms8jzwngtVomTTnzudZx7SHUQY8sVE1y8yBmULk
+IssuersFrame: 1
+IssuersFrameVar: 0
+DifferentIssuersCount: 0
 PreviousHash: 000002B06C990DEBD5C1D947289C2CF4F4396FB2
 PreviousIssuer: HnFcSms8jzwngtVomTTnzudZx7SHUQY8sVE1y8yBmULk
 MembersCount: 19
@@ -54,26 +62,28 @@ Certifications:
 5ocqzyDMMWf1V8bsoNhWb1iNwax1e9M7VTUN6navs8of:ATkjQPa4sn4LBF69jqEPzFtRdHYJs6MJQjvP8JdN7MtN:0:6TuxRcARnpo13l3cXtgPTkjJlv8DZOUvsAzmZJMbjHZbbZfDQ6MJpH9DIuH0eyG3WGc0EX/046mbMGBrKKg9DQ==
 ATkjQPa4sn4LBF69jqEPzFtRdHYJs6MJQjvP8JdN7MtN:2qwGeLWoPG7db72bKXPfJpAtj67FYDnPaJn2JB7tyXxJ:0:LusTbb7CgwrqqacDKjtldw60swwvDBH8wVUIJN4SWRb2pZPJSpDxgqaGyjC5P9i/DendfyQWc7cfzPDqSZmZAg==
 Transactions:
-TX:2:1:3:3:1:0:0
+TX:10:1:3:3:1:0:0
+33363-000021C4B5BE2DA996F953DC09482F4FA2FA68774B1A38FAB03B2AAB4A08EBE0
 HsLShAtzXTVxeUtQd7yi5Z5Zh4zNvbu8sTEZ53nfKcqY
-T:6991C993631BED4733972ED7538E41CCC33660F554E3C51963E2A0AC4D6453D3:0
-T:3A09A20E9014110FD224889F13357BAB4EC78A72F95CA03394D8CCA2936A7435:10
-D:HsLShAtzXTVxeUtQd7yi5Z5Zh4zNvbu8sTEZ53nfKcqY:88
+5200:0:T:6991C993631BED4733972ED7538E41CCC33660F554E3C51963E2A0AC4D6453D3:0
+500:0:T:3A09A20E9014110FD224889F13357BAB4EC78A72F95CA03394D8CCA2936A7435:10
+20:0:D:HsLShAtzXTVxeUtQd7yi5Z5Zh4zNvbu8sTEZ53nfKcqY:88
 0:SIG(0)
 1:SIG(0)
 2:SIG(0)
 30:2:SIG(BYfWYFrsyjpvpFysgu19rGK3VHBkz4MqmQbNyEuVU64g)
 42yQm4hGTJYWkPg39hQAUgP6S6EQ4vTfXdJuxKEHL1ih6YHiDL2hcwrFgBHjXLRgxRhj2VNVqqc6b4JayKqTE14r
-TX:2:3:6:6:3:1:0
+TX:10:3:6:6:3:1:0
+33363-000021C4B5BE2DA996F953DC09482F4FA2FA68774B1A38FAB03B2AAB4A08EBE0
 HsLShAtzXTVxeUtQd7yi5Z5Zh4zNvbu8sTEZ53nfKcqY
 CYYjHsNyg3HMRMpTHqCJAN9McjH5BwFLmDKGV3PmCuKp
 9WYHTavL1pmhunFCzUwiiq4pXwvgGG5ysjZnjz9H8yB
-T:6991C993631BED4733972ED7538E41CCC33660F554E3C51963E2A0AC4D6453D3:2
-T:3A09A20E9014110FD224889F13357BAB4EC78A72F95CA03394D8CCA2936A7435:8
-D:HsLShAtzXTVxeUtQd7yi5Z5Zh4zNvbu8sTEZ53nfKcqY:46
-T:A0D9B4CDC113ECE1145C5525873821398890AE842F4B318BD076095A23E70956:3
-T:67F2045B5318777CC52CD38B424F3E40DDA823FA0364625F124BABE0030E7B5B:5
-D:9WYHTavL1pmhunFCzUwiiq4pXwvgGG5ysjZnjz9H8yB:46
+78900:0:T:6991C993631BED4733972ED7538E41CCC33660F554E3C51963E2A0AC4D6453D3:2
+700:0:T:3A09A20E9014110FD224889F13357BAB4EC78A72F95CA03394D8CCA2936A7435:8
+8900:0:D:HsLShAtzXTVxeUtQd7yi5Z5Zh4zNvbu8sTEZ53nfKcqY:46
+780:0:T:A0D9B4CDC113ECE1145C5525873821398890AE842F4B318BD076095A23E70956:3
+780:0:T:67F2045B5318777CC52CD38B424F3E40DDA823FA0364625F124BABE0030E7B5B:5
+8900:0:D:9WYHTavL1pmhunFCzUwiiq4pXwvgGG5ysjZnjz9H8yB:46
 0:SIG(0)
 1:XHX(7665798292)
 2:SIG(0)
@@ -92,7 +102,7 @@ Nonce: 581
 nY/MsFU2luiohLmSiOOimL1RIqbriOBgc22ua03Z2dhxtSJxKZeGNGDvl1jaXgmEBRnXU87yXbZ7ioOS/AAVCA==
 """
 
-raw_block_zero = """Version: 10
+raw_block_zero = """Version: 11
 Type: Block
 Currency: zeta_brouzouf
 Number: 0
@@ -139,14 +149,18 @@ Nonce: 2125
 42yQm4hGTJYWkPg39hQAUgP6S6EQ4vTfXdJuxKEHL1ih6YHiDL2hcwrFgBHjXLRgxRhj2VNVqqc6b4JayKqTE14r
 """
 
-raw_block_with_leavers = """Version: 2
+raw_block_with_leavers = """Version: 11
 Type: Block
 Currency: meta_brouzouf
 Number: 34895
 PoWMin: 4
 Time: 1444434128
 MedianTime: 1444426438
+UnitBase: 0
 Issuer: HnFcSms8jzwngtVomTTnzudZx7SHUQY8sVE1y8yBmULk
+IssuersFrame: 1
+IssuersFrameVar: 0
+DifferentIssuersCount: 0
 PreviousHash: 0000E88115ADDF79344372C0212928501E21622B
 PreviousIssuer: HnFcSms8jzwngtVomTTnzudZx7SHUQY8sVE1y8yBmULk
 MembersCount: 21
@@ -164,7 +178,7 @@ Nonce: 9906
 5LZCFSnm5FkFihPBTpmsPyILEdvu8MXfJOp6OR4d1s+/e2jVWg4J6YSDfO2KBBPgubASyr2QwQuiBlYD2918Bw==
 """
 
-raw_block_with_excluded = """Version: 3
+raw_block_with_excluded = """Version: 11
 Type: Block
 Currency: test_net
 Number: 33365
@@ -189,7 +203,7 @@ Excluded:
 2VAxjr8QoJtSzhE7APno4AkR2RAQNySpNNvDzMgPotSF
 Certifications:
 Transactions:
-TX:3:1:4:4:12:1:0
+TX:10:1:4:4:12:1:0
 33363-000021C4B5BE2DA996F953DC09482F4FA2FA68774B1A38FAB03B2AAB4A08EBE0
 TENGx7WtzFsTXwnbrPEvb6odX2WnqYcnnrjiiLvp1mS
 5:0:T:D25272F1D778B52798B7A51CF0CE21F7C5812F841374508F4367872D4A47F0F7:0
@@ -219,7 +233,7 @@ Nonce: 137387
 GmgYhWrwCtsK7t2B/omPpxZ8EfJgv9UYzJIFo++Za+A0Mo70xRfZG7kywxbQTTxDk/V7r90P946N89vdVjv1Bg==
 """
 
-negative_issuers_frame_var = """Version: 3
+negative_issuers_frame_var = """Version: 11
 Type: Block
 Currency: test_net
 Number: 34662
@@ -242,7 +256,7 @@ Revoked:
 Excluded:
 Certifications:
 Transactions:
-TX:3:1:4:4:2:1:0
+TX:10:1:4:4:2:1:0
 34660-00001EEB3FDCEB2F9F39F931ED8F6D419C4C64B4D3F7EA52C35FB6B07A085664
 5ocqzyDMMWf1V8bsoNhWb1iNwax1e9M7VTUN6navs8of
 765201:3:T:636150D38D565DA0B9717E93C2AD8D6270FA032BF963360ECFCDD55F44493F08:1
@@ -266,7 +280,7 @@ WnJvw204wccmSBQK9UE2rCFw0EG34zf+b58n2KTLwSIhTpgmGsnr5ohkSyYZYcLEKjisLXKNCmMl7D1Q
 class TestBlock(unittest.TestCase):
     def test_fromraw(self):
         block = Block.from_signed_raw(raw_block)
-        self.assertEqual(block.version, 2)
+        self.assertEqual(block.version, 11)
         self.assertEqual(block.currency, "zeta_brouzouf")
         self.assertEqual(block.noonce, 45079)
         self.assertEqual(block.number, 15)
@@ -287,7 +301,7 @@ class TestBlock(unittest.TestCase):
 
     def test_from_signed_raw_block_zero(self):
         block = Block.from_signed_raw(raw_block_zero)
-        self.assertEqual(block.version, 10)
+        self.assertEqual(block.version, 11)
         self.assertEqual(block.currency, "zeta_brouzouf")
         self.assertEqual(block.noonce, 2125)
         self.assertEqual(block.number, 0)
@@ -315,7 +329,7 @@ class TestBlock(unittest.TestCase):
         rendered_raw = block.signed_raw()
         from_rendered_raw = Block.from_signed_raw(rendered_raw)
 
-        self.assertEqual(from_rendered_raw.version, 2)
+        self.assertEqual(from_rendered_raw.version, 11)
         self.assertEqual(from_rendered_raw.currency, "zeta_brouzouf")
         self.assertEqual(from_rendered_raw.noonce, 45079)
         self.assertEqual(from_rendered_raw.number, 15)
@@ -341,7 +355,7 @@ class TestBlock(unittest.TestCase):
         rendered_raw = block.signed_raw()
         from_rendered_raw = block.from_signed_raw(rendered_raw)
 
-        self.assertEqual(from_rendered_raw.version, 10)
+        self.assertEqual(from_rendered_raw.version, 11)
         self.assertEqual(from_rendered_raw.currency, "zeta_brouzouf")
         self.assertEqual(from_rendered_raw.noonce, 2125)
         self.assertEqual(from_rendered_raw.number, 0)
@@ -365,7 +379,7 @@ class TestBlock(unittest.TestCase):
         rendered_raw = block.signed_raw()
         from_rendered_raw = block.from_signed_raw(rendered_raw)
 
-        self.assertEqual(from_rendered_raw.version, 2)
+        self.assertEqual(from_rendered_raw.version, 11)
         self.assertEqual(from_rendered_raw.currency, "meta_brouzouf")
         self.assertEqual(from_rendered_raw.noonce, 581)
         self.assertEqual(from_rendered_raw.number, 34436)
@@ -389,7 +403,7 @@ class TestBlock(unittest.TestCase):
         block = Block.from_signed_raw(raw_block_with_leavers)
         rendered_raw = block.signed_raw()
         from_rendered_raw = block.from_signed_raw(rendered_raw)
-        self.assertEqual(from_rendered_raw.version, 2)
+        self.assertEqual(from_rendered_raw.version, 11)
         self.assertEqual(from_rendered_raw.currency, "meta_brouzouf")
         self.assertEqual(from_rendered_raw.noonce, 9906)
         self.assertEqual(from_rendered_raw.number, 34895)
@@ -452,7 +466,7 @@ class TestBlock(unittest.TestCase):
             self.fail("Empty blockuid __nonzero__ comparison failed")
 
     def test_proof_of_work(self):
-        block = """Version: 5
+        block = """Version: 11
 Type: Block
 Currency: test_net
 Number: 60803
