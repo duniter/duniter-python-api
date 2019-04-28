@@ -69,9 +69,9 @@ Development
 
     make tests
 
-* Run only some unit tests with::
+* Run only some unit tests by passing a special ENV variable::
 
-    make tests test_filter=tests.documents.test_block.TestBlock.test_fromraw
+    make tests TESTS_FILTER=tests.documents.test_block.TestBlock.test_fromraw
 
 Documentation
 -------------

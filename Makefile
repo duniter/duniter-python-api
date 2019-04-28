@@ -6,7 +6,7 @@ docs:
 
 # run tests
 tests:
-	python3 -m unittest
+	python3 -m unittest ${TESTS_FILTER}
 
 # check static typing
 check:
