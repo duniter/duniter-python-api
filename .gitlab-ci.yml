@@ -38,16 +38,14 @@ push_to_github:
     - pyenv shell $PYENV_PYTHON_VERSION
 
 .changes: &changes
-  except:
+  only:
     changes:
-      - CHANGELOG.md
-      - ci/*
-      - config
-      - docs
-      - LICENSE*
-      - Makefile
-      - README*
-      - release.sh
+      - duniterpy/**/*.py
+      - .gitlab-ci.yml
+      - requirements_dev.txt
+      - requirements.txt
+      - setup.py
+      - tests/**/*.py
 
 build: &build
   <<: *pyenv
