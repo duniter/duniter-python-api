@@ -69,7 +69,8 @@ WS2P_CONNECT_MESSAGE_SCHEMA = {
     "type": "object",
     "properties": {
         "auth": {
-            "type": "string"
+            "type": "string",
+            "pattern": "^CONNECT$"
         },
         "challenge": {
             "type": "string",
@@ -83,5 +84,37 @@ WS2P_CONNECT_MESSAGE_SCHEMA = {
         "sig": {
             "type": "string",
         },
-    }
+    },
+    "required": ["auth", "challenge", "currency", "pub", "sig"]
+}
+
+WS2P_ACK_MESSAGE_SCHEMA = {
+    "type": "object",
+    "properties": {
+        "auth": {
+            "type": "string",
+            "pattern": "^ACK$"
+        },
+        "pub": {
+            "type": "string",
+        },
+        "sig": {
+            "type": "string",
+        }
+    },
+    "required": ["auth", "pub", "sig"]
+}
+
+WS2P_OK_MESSAGE_SCHEMA = {
+    "type": "object",
+    "properties": {
+        "auth": {
+            "type": "string",
+            "pattern": "^OK$"
+        },
+        "sig": {
+            "type": "string",
+        }
+    },
+    "required": ["auth", "sig"]
 }
