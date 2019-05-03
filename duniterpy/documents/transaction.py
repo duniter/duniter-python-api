@@ -486,8 +486,7 @@ class Transaction(Document):
         tx_data["currency"] = currency
         for data_list in ('issuers', 'outputs', 'inputs', 'unlocks', 'signatures'):
             tx_data['multiline_{0}'.format(data_list)] = '\n'.join(tx_data[data_list])
-        if tx_data["version"] >= 3:
-            signed_raw = """Version: {version}
+        return cls.from_signed_raw("""Version: {version}
 Type: Transaction
 Currency: {currency}
 Blockstamp: {blockstamp}
@@ -502,24 +501,7 @@ Outputs:
 {multiline_outputs}
 Comment: {comment}
 {multiline_signatures}
-""".format(**tx_data)
-        else:
-            signed_raw = """Version: {version}
-Type: Transaction
-Currency: {currency}
-Locktime: {locktime}
-Issuers:
-{multiline_issuers}
-Inputs:
-{multiline_inputs}
-Unlocks:
-{multiline_unlocks}
-Outputs:
-{multiline_outputs}
-Comment: {comment}
-{multiline_signatures}
-""".format(**tx_data)
-        return cls.from_signed_raw(signed_raw)
+""".format(**tx_data))
 
     @classmethod
     def from_compact(cls: Type[TransactionType], currency: str, compact: str) -> TransactionType:
@@ -613,10 +595,8 @@ Comment: {comment}
         currency = Transaction.parse_field("Currency", lines[n])
         n += 1
 
-        blockstamp = None  # type: Optional[BlockUID]
-        if version >= 3:
-            blockstamp = BlockUID.from_str(Transaction.parse_field("Blockstamp", lines[n]))
-            n += 1
+        blockstamp = BlockUID.from_str(Transaction.parse_field("Blockstamp", lines[n]))
+        n += 1
 
         locktime = Transaction.parse_field("Locktime", lines[n])
         n += 1
@@ -679,8 +659,7 @@ Currency: {1}
 """.format(self.version,
            self.currency)
 
-        if self.version >= 3:
-            doc += "Blockstamp: {0}\n".format(self.blockstamp)
+        doc += "Blockstamp: {0}\n".format(self.blockstamp)
 
         doc += "Locktime: {0}\n".format(self.locktime)
 
@@ -727,8 +706,7 @@ COMMENT
                                                         len(self.outputs),
                                                         '1' if self.comment != "" else '0',
                                                         self.locktime)
-        if self.version >= 3:
-            doc += "{0}\n".format(self.blockstamp)
+        doc += "{0}\n".format(self.blockstamp)
 
         for pubkey in self.issuers:
             doc += "{0}\n".format(pubkey)
