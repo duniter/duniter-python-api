@@ -1,4 +1,4 @@
-## v0.54.0 (XX April 2019)
+## v0.54.0 (5th May 2019)
 
 ### Code/tests
 - Fix OutputSource and InputSource from_inline() regex matching
@@ -6,6 +6,8 @@
 - Block document: code: drop vensions 2 and 3 management
 - Block document: Upgrade blocks to v11 and TX to v10
 - Add OutputSource.inline_condition() method
+- output conditions: fix 'parser' variables default definition
+- output conditions: add token() and compose() tests
 
 ### Other
 - CI: Do not trigger build, tests, type check on modification of non-relevant files
