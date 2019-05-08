@@ -306,3 +306,29 @@ class TestTransaction(unittest.TestCase):
     def test_outputsource_inline_condition(self):
         o = OutputSource.from_inline(output_source_str)
         self.assertEqual(o.inline_condition(), output_source_str.split(":")[2])
+
+
+    def test_transaction_equality(self):
+        t1 = Transaction.from_signed_raw(tx_raw)
+        t2 = Transaction.from_signed_raw(tx_raw)
+
+        self.assertTrue(t1 == t2)
+
+        t2.signatures = ["NSTN"]
+        self.assertFalse(t1 == t2)
+
+        t2 = Transaction.from_signed_raw(tx_raw)
+        t2.issuers = ["NSTRNRST"]
+        self.assertFalse(t1 == t2)
+
+        t2 = Transaction.from_signed_raw(tx_raw)
+        t2.time = 123
+        self.assertFalse(t1 == t2)
+
+        t2 = Transaction.from_signed_raw(tx_raw)
+        t2.inputs = InputSource.from_inline(input_source_str)
+        self.assertFalse(t1 == t2)
+
+        t2 = Transaction.from_signed_raw(tx_raw)
+        t2.outputs = OutputSource.from_inline(output_source_str)
+        self.assertFalse(t1 == t2)
