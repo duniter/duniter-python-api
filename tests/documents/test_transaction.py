@@ -104,6 +104,9 @@ Comment: -----@@@----- (why not this comment?)
 2XiBDpuUdu6zCPWGzHXXy8c4ATSscfFQG9DjmqMZUxDZVt1Dp4m2N5oHYVUfoPdrU9SLk4qxi65RNrfCVnvQtQJk
 """
 
+input_source_str = "30:0:T:6991C993631BED4733972ED7538E41CCC33660F554E3C51963E2A0AC4D6453D3:2"
+
+output_source_str = "460:0:SIG(8kXygUHh1vLjmcRzXVM86t38EL8dfFJgfBeHmkaWLamu)"
 
 class TestTransaction(unittest.TestCase):
     def test_fromcompact(self):
@@ -291,18 +294,15 @@ class TestTransaction(unittest.TestCase):
 
 
     def test_inputsource_from_inline(self):
-        input_source_str = "30:0:T:6991C993631BED4733972ED7538E41CCC33660F554E3C51963E2A0AC4D6453D3:2"
         i = InputSource.from_inline(input_source_str)
         self.assertEqual(i.inline(), input_source_str)
 
 
     def test_outputsource_from_inline(self):
-        output_source_str = "460:0:SIG(8kXygUHh1vLjmcRzXVM86t38EL8dfFJgfBeHmkaWLamu)"
         o = OutputSource.from_inline(output_source_str)
         self.assertEqual(o.inline(), output_source_str)
 
 
     def test_outputsource_inline_condition(self):
-        output_source_str = "460:0:SIG(8kXygUHh1vLjmcRzXVM86t38EL8dfFJgfBeHmkaWLamu)"
         o = OutputSource.from_inline(output_source_str)
         self.assertEqual(o.inline_condition(), output_source_str.split(":")[2])
