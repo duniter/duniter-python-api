@@ -230,6 +230,19 @@ class SIGParameter:
         """
         self.index = index
 
+
+    def __eq__(self, other: Any) -> bool:
+        """
+        Check SIGParameter instances equality
+        """
+        if not isinstance(other, SIGParameter):
+            return NotImplemented
+        return self.index == other.index
+
+    def __hash__(self) -> int:
+        return hash((self.index))
+
+
     @classmethod
     def from_parameter(cls: Type[SIGParameterType], parameter: str) -> Optional[SIGParameterType]:
         """
@@ -271,6 +284,19 @@ class XHXParameter:
         :param integer: XHX number
         """
         self.integer = integer
+
+
+    def __eq__(self, other: Any) -> bool:
+        """
+        Check XHXParameter instances equality
+        """
+        if not isinstance(other, XHXParameter):
+            return NotImplemented
+        return self.integer == other.integer
+
+    def __hash__(self) -> int:
+        return hash((self.integer))
+
 
     @classmethod
     def from_parameter(cls: Type[XHXParameterType], parameter: str) -> Optional[XHXParameterType]:
@@ -347,6 +373,24 @@ class Unlock:
         """
         self.index = index
         self.parameters = parameters
+
+
+    def __eq__(self, other: Any) -> bool:
+        """
+        Check Unlock instances equality
+        """
+        if not isinstance(other, Unlock):
+            return NotImplemented
+
+        params_equals = True
+        for spar, opar in zip(self.parameters, other.parameters):
+            if spar != opar:
+                params_equals = False
+        return self.index == other.index and params_equals
+
+    def __hash__(self) -> int:
+        return hash((self.index, self.parameters))
+
 
     @classmethod
     def from_inline(cls: Type[UnlockType], inline: str) -> UnlockType:
