@@ -448,7 +448,7 @@ class Transaction(Document):
 
     def __init__(self, version: int, currency: str, blockstamp: Optional[BlockUID], locktime: int, issuers: List[str],
                  inputs: List[InputSource], unlocks: List[Unlock], outputs: List[OutputSource],
-                 comment: str, signatures: List[str]) -> None:
+                 comment: str, time: int, signatures: List[str]) -> None:
         """
         Init Transaction instance
 
@@ -461,6 +461,7 @@ class Transaction(Document):
         :param unlocks: List of Unlock instances
         :param outputs: List of OutputSource instances
         :param comment: Comment field
+        :param time: time when the transaction enters the blockchain
         :param signatures: List of signatures
         """
         super().__init__(version, currency, signatures)
@@ -471,6 +472,8 @@ class Transaction(Document):
         self.unlocks = unlocks
         self.outputs = outputs
         self.comment = comment
+        self.time = time
+
 
     @classmethod
     def from_bma_history(cls: Type[TransactionType], currency: str, tx_data: Dict) -> TransactionType:
@@ -501,7 +504,7 @@ Outputs:
 {multiline_outputs}
 Comment: {comment}
 {multiline_signatures}
-""".format(**tx_data))
+""".format(**tx_data), tx_data["time"])
 
     @classmethod
     def from_compact(cls: Type[TransactionType], currency: str, compact: str) -> TransactionType:
@@ -572,10 +575,10 @@ Comment: {comment}
             else:
                 raise MalformedDocumentError("Compact TX Signatures")
 
-        return cls(version, currency, blockstamp, locktime, issuers, inputs, unlocks, outputs, comment, signatures)
+        return cls(version, currency, blockstamp, locktime, issuers, inputs, unlocks, outputs, comment, 0, signatures)
 
     @classmethod
-    def from_signed_raw(cls: Type[TransactionType], raw: str) -> TransactionType:
+    def from_signed_raw(cls: Type[TransactionType], raw: str, time: int = 0) -> TransactionType:
         """
         Return a Transaction instance from a raw string format
 
@@ -645,7 +648,7 @@ Comment: {comment}
                 n += 1
 
         return cls(version, currency, blockstamp, locktime, issuers, inputs, unlocks, outputs,
-                   comment, signatures)
+                   comment, time, signatures)
 
     def raw(self) -> str:
         """
@@ -732,7 +735,7 @@ class SimpleTransaction(Transaction):
 
     def __init__(self, version: int, currency: str, blockstamp: BlockUID, locktime: int, issuer: str,
                  single_input: InputSource, unlocks: List[Unlock], outputs: List[OutputSource], comment: str,
-                 signature: str) -> None:
+                 time: int, signature: str) -> None:
         """
         Init instance
 
@@ -745,10 +748,11 @@ class SimpleTransaction(Transaction):
         :param unlocks: List of Unlock instances
         :param outputs: List of OutputSource instances
         :param comment: Comment field
+        :param time: time when the transaction enters the blockchain
         :param signature: Signature
         """
         super().__init__(version, currency, blockstamp, locktime, [issuer], [single_input], unlocks,
-                         outputs, comment, [signature])
+                         outputs, comment, time ,[signature])
 
     @staticmethod
     def is_simple(tx: Transaction) -> bool:
