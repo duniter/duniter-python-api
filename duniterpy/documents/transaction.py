@@ -519,6 +519,29 @@ class Transaction(Document):
         self.time = time
 
 
+    def __eq__(self, other: Any) -> bool:
+        """
+        Check Transaction instances equality
+        """
+        if not isinstance(other, Transaction):
+            return NotImplemented
+        return self.version == other.version and \
+            self.currency == other.currency and \
+            self.signatures == other.signatures and \
+            self.blockstamp == other.blockstamp and \
+            self.locktime == other.locktime and \
+            self.issuers == other.issuers and \
+            self.inputs == other.inputs and \
+            self.unlocks == other.unlocks and \
+            self.outputs == other.outputs and \
+            self.comment == other.comment and \
+            self.time == other.time
+
+
+    def __hash__(self) -> int:
+        return hash((self.version, self.currency, self.signatures, self.blockstamp, self.locktime, self.issuers, self.inputs, self.unlocks, self.outputs, self.comment, self.time))
+
+
     @classmethod
     def from_bma_history(cls: Type[TransactionType], currency: str, tx_data: Dict) -> TransactionType:
         """
