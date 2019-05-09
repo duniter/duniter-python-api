@@ -650,6 +650,7 @@ Comment: {comment}
         Return a Transaction instance from a raw string format
 
         :param raw: Raw string format
+        :param time: time when the transaction enters the blockchain
 
         :return:
         """
