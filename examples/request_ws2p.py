@@ -4,8 +4,10 @@ from _socket import gaierror
 
 import aiohttp
 import jsonschema
+from jsonschema import ValidationError
 
 from duniterpy.api import ws2p
+from duniterpy.api.ws2p import requests
 from duniterpy.documents.ws2p.messages import Connect, Ack, Ok
 from duniterpy.api.client import Client, parse_text
 
@@ -107,7 +109,8 @@ async def main():
 
                                 Ok(CURRENCY, remote_connect_document.pubkey, connect_document.challenge, data["sig"])
                                 print("Received OK message signature is valid")
-
+                                # do not wait for messages anymore
+                                break
                             except jsonschema.exceptions.ValidationError:
                                 pass
 
@@ -117,6 +120,27 @@ async def main():
                 elif msg.type == aiohttp.WSMsgType.ERROR:
                     # Connection error
                     print("Web socket connection error !")
+
+            # send ws2p request
+            print("Send getCurrent() request")
+            await ws.send_str(requests.get_current())
+            # receive response as string
+            response = await ws.receive_str()
+            try:
+                # check response format
+                parse_text(response, requests.GET_CURRENT_RESPONSE_SCHEMA)
+                # if valid display response
+                print("Response: " + response)
+            except ValidationError as exception:
+                # if invalid response...
+                try:
+                    # check error response format
+                    parse_text(response, requests.ERROR_RESPONSE_SCHEMA)
+                    # if valid, display error response
+                    print("Error response: " + response)
+                except ValidationError as e:
+                    # if invalid, display exception on response validation
+                    print(exception)
 
             # Close session
             await client.close()
