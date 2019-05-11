@@ -1,9 +1,10 @@
 import json
-import uuid
+
 from typing import Optional
 
 from duniterpy.documents import Document
 from duniterpy.key import VerifyingKey, SigningKey
+from duniterpy.helpers import get_ws2p_challenge
 
 
 class Connect(Document):
@@ -25,7 +26,7 @@ class Connect(Document):
         self.pubkey = pubkey
         if challenge is None:
             # create challenge
-            self.challenge = uuid.uuid4().hex + uuid.uuid4().hex
+            self.challenge = get_ws2p_challenge()
         else:
             self.challenge = challenge
         # add and verify signature
@@ -71,7 +72,7 @@ class Ack(Document):
     def __init__(self, currency: str, pubkey: str, challenge: str,
                  signature: Optional[str] = None) -> None:
         """
-        Init Connect message document
+        Init Ack message document
 
         :param currency: Name of currency
         :param pubkey: Public key of node
@@ -124,7 +125,7 @@ class Ok(Document):
     def __init__(self, currency: str, pubkey: str, challenge: str,
                  signature: Optional[str] = None) -> None:
         """
-        Init Connect message document
+        Init Ok message document
 
         :param currency: Name of currency
         :param pubkey: Public key of node

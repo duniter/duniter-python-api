@@ -1,3 +1,4 @@
+import uuid
 from typing import Union
 from libnacl.encode import hex_decode, hex_encode
 
@@ -60,3 +61,12 @@ def convert_seed_to_seedhex(seed: bytes) -> str:
     :rtype str:
     """
     return hex_encode(seed).decode("utf-8")
+
+
+def get_ws2p_challenge() -> str:
+    """
+    Return two uuid v4 concatened as ws2p challenge
+
+    :rtype str:
+    """
+    return str(uuid.uuid4()) + str(uuid.uuid4())
