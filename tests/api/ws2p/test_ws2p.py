@@ -5,7 +5,8 @@ import jsonschema
 from duniterpy.api.client import Client, parse_text
 from duniterpy.api.endpoint import BMAEndpoint
 from duniterpy.api.ws2p.network import heads, WS2P_HEADS_SCHEMA
-from duniterpy.api.ws2p.requests import BLOCK_RESPONSE_SCHEMA, ERROR_RESPONSE_SCHEMA, BLOCKS_RESPONSE_SCHEMA
+from duniterpy.api.ws2p.requests import BLOCK_RESPONSE_SCHEMA, ERROR_RESPONSE_SCHEMA, BLOCKS_RESPONSE_SCHEMA, \
+    REQUIREMENTS_RESPONSE_SCHEMA
 from tests.api.webserver import WebFunctionalSetupMixin, web
 
 
@@ -111,3 +112,67 @@ class TestWs2pHeads(WebFunctionalSetupMixin, unittest.TestCase):
         response = parse_text(response_string, BLOCKS_RESPONSE_SCHEMA)
         self.assertIsInstance(response, dict)
 
+    def test_requirements_pending(self):
+        response_string = """{"resId":"1986997e","body":{"identities":[
+        {"pubkey":"36UhAqrkDx11ifN7WaBM6Q5bMUJxhKb1wJnnPFnkLkCF","uid":"cgeek-2",
+        "sig":"Xjuey5pegW8fmS+L8ubOlT3CJVomaNuEA4cn+cwuyiLoKDgnbqpeOQJ213T0fLq4dU16IRFHiffeAVWONtl4Dg==",
+        "meta":{"timestamp":"287698-0000297DEC5E92F2D14CBE4E6EFA951E1E79D57E3552D1AD7A98778142EF7E7E"},
+        "revocation_sig":"","revoked":false,"revoked_on":0,"expired":false,"outdistanced":false,"isSentry":false,
+        "wasMember":true,"certifications":[{"from":"3dnbnYY9i2bHMQUGyFp5GVvJ2wBkVpus31cDJA5cfRpj",
+        "to":"36UhAqrkDx11ifN7WaBM6Q5bMUJxhKb1wJnnPFnkLkCF",
+        "sig":"p7sYhYvI2QFu6K4veanTrJGl3ytew0b6FH+NW8ojLKzWgXSX6/GPSf5zYMunYdjtEUG79tNXMqmOIQJPcv/3Cw==",
+        "timestamp":1553634062,"expiresIn":8902081},{"from":"5B8iMAzq1dNmFe3ZxFTBQkqhq4fsztg1gZvxHXCk1XYH",
+        "to":"36UhAqrkDx11ifN7WaBM6Q5bMUJxhKb1wJnnPFnkLkCF",
+        "sig":"Qi9TiAWYcWTxDHJL/DLjBoZ7ReAeYuTYcy1GWrVFE8/wh1TAJgNr9Cc68TUEB+QG6qrqrSEDshPZpCyv8ZeFDw==",
+        "timestamp":1554842558,"expiresIn":10110577},{"from":"7BGpV28HzE6fyZtteuPmwHf6fHwHkQ9Ssww3Cxq82NnT",
+        "to":"36UhAqrkDx11ifN7WaBM6Q5bMUJxhKb1wJnnPFnkLkCF",
+        "sig":"eCqKphYiVWl8t4HYMail1AfTD+xYZg/QMFIAn8RPfj8Rc68gDnDvwulAylq09KLkNofhW9SSfWtpNF8t0X5cBg==",
+        "timestamp":1557072594,"expiresIn":12340613},{"from":"81jPYhcyruwKJ9Dy4Vz7MtmxiSdeESuJcvjPotxbCTgS",
+        "to":"36UhAqrkDx11ifN7WaBM6Q5bMUJxhKb1wJnnPFnkLkCF",
+        "sig":"wxtUU0DtooWxp26F2CyOtVY5WEAXkM0UXildWkXgafgpc03RrtW8FsAql1D8gmz9F3q4h/k86Qqoi25EDrC/Dg==",
+        "timestamp":1557070855,"expiresIn":12338874}],"pendingCerts":[{
+        "from":"81jPYhcyruwKJ9Dy4Vz7MtmxiSdeESuJcvjPotxbCTgS","to":"36UhAqrkDx11ifN7WaBM6Q5bMUJxhKb1wJnnPFnkLkCF",
+        "target":"F617EF4F79317BE9A7767FB17B95C859EB33075CD257635AEBA3C12B5C732E84",
+        "sig":"wxtUU0DtooWxp26F2CyOtVY5WEAXkM0UXildWkXgafgpc03RrtW8FsAql1D8gmz9F3q4h/k86Qqoi25EDrC/Dg==",
+        "block_number":365809,"block_hash":"00002ABB8E538CE9803B03F62099F18E23CAFF661EE82908D1E65C0B5131D5A5",
+        "block":365809,"linked":false,"written":false,"written_block":null,"written_hash":null,
+        "expires_on":1558122775,"expired":0,
+        "blockstamp":"365809-00002ABB8E538CE9803B03F62099F18E23CAFF661EE82908D1E65C0B5131D5A5"},
+        {"from":"7BGpV28HzE6fyZtteuPmwHf6fHwHkQ9Ssww3Cxq82NnT","to":"36UhAqrkDx11ifN7WaBM6Q5bMUJxhKb1wJnnPFnkLkCF",
+        "target":"F617EF4F79317BE9A7767FB17B95C859EB33075CD257635AEBA3C12B5C732E84",
+        "sig":"eCqKphYiVWl8t4HYMail1AfTD+xYZg/QMFIAn8RPfj8Rc68gDnDvwulAylq09KLkNofhW9SSfWtpNF8t0X5cBg==",
+        "block_number":365824,"block_hash":"00009739A9042E94A1267D1D906D132F53EF7633233FB7C8519D57B1ED5ECE09",
+        "block":365824,"linked":false,"written":false,"written_block":null,"written_hash":null,
+        "expires_on":1558124514,"expired":0,
+        "blockstamp":"365824-00009739A9042E94A1267D1D906D132F53EF7633233FB7C8519D57B1ED5ECE09"}],
+        "pendingMemberships":[],"membershipPendingExpiresIn":0,"membershipExpiresIn":0},
+        {"pubkey":"3dnbnYY9i2bHMQUGyFp5GVvJ2wBkVpus31cDJA5cfRpj","uid":"cgeek",
+        "sig":"mmQW40vZNHVLLzJ9lJKTQpTstQSa54X7SpRi5ORSIERyCjZkYF8KN/M5Wg6pYIlX832phKHVg766DNy0HxwuDg==",
+        "meta":{"timestamp":"0-E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"},
+        "revocation_sig":"","revoked":false,"revoked_on":0,"expired":false,"outdistanced":false,"isSentry":true,
+        "wasMember":true,"certifications":[{"from":"7KL2QXXFULDpsQY4UdSr5oEVx6rFE6oxeagRdkCX35bf",
+        "to":"3dnbnYY9i2bHMQUGyFp5GVvJ2wBkVpus31cDJA5cfRpj",
+        "sig":"EaY5FoPqKSP+N2NRJcSfrMUgTkRKcCchPmIrGC9uutXFvuw2cCmYcocHR9xASN9R3X1hkZw1u/B0qcaFYUuZCg==",
+        "timestamp":1554890320,"expiresIn":10158339},{"from":"5B8iMAzq1dNmFe3ZxFTBQkqhq4fsztg1gZvxHXCk1XYH",
+        "to":"3dnbnYY9i2bHMQUGyFp5GVvJ2wBkVpus31cDJA5cfRpj",
+        "sig":"5Rfo6p76q7cpn+VF2fudvmYL2RBN97h5uIvRSisWbHLZyhcP4o3FYnLbUQVZMW2wnKUnoiHQPlWgSnmA1P5ADQ==",
+        "timestamp":1548880791,"expiresIn":4148810},{"from":"39Fnossy1GrndwCnAXGDw3K5UYXhNXAFQe7yhYZp8ELP",
+        "to":"3dnbnYY9i2bHMQUGyFp5GVvJ2wBkVpus31cDJA5cfRpj",
+        "sig":"U8SF/OD7E7nSGzEIihSxzDYiPKR/xy7xZqkYz64h6mfORITf80QAt/tDkCPDgnLhMdMkCnbvJqib3dMrhx7FBg==",
+        "timestamp":1545522046,"expiresIn":790065},{"from":"JyTqcD4Q9aEAR2CWEpwBUAAyMCjfM6gaE5S2e8GWUuq",
+        "to":"3dnbnYY9i2bHMQUGyFp5GVvJ2wBkVpus31cDJA5cfRpj",
+        "sig":"joPfimXiQdCR41TFU3rGGfZasK0g/NA7kExCFIG/wd5H3ArYSYPT1nla8vXTYxDuaavOxeIxfiB4KaKGlnmwBA==",
+        "timestamp":1557038934,"expiresIn":12306953},{"from":"81jPYhcyruwKJ9Dy4Vz7MtmxiSdeESuJcvjPotxbCTgS",
+        "to":"3dnbnYY9i2bHMQUGyFp5GVvJ2wBkVpus31cDJA5cfRpj",
+        "sig":"4BwyLBjOjM1Js0U/1tV3UmeJ8mR4TskifmAbPxnPKTw2tMvYu8HrBwO4vfhvUIEw7sfwwZcMu+CY1AnEBfegAg==",
+        "timestamp":1553633613,"expiresIn":8901632},{"from":"36UhAqrkDx11ifN7WaBM6Q5bMUJxhKb1wJnnPFnkLkCF",
+        "to":"3dnbnYY9i2bHMQUGyFp5GVvJ2wBkVpus31cDJA5cfRpj",
+        "sig":"eSnqbh9vyIZl5PA3IidK6LGTd2HuztCmHHChF/UbJbcJDS/f/xN4Iuz4gF6JHNtnAXmqmDcxsNFeQlsOLz8aDA==",
+        "timestamp":1553633513,"expiresIn":8901532},{"from":"DVxuMTLKDX8GLBP3mmPBhbn71rXjvQDqSXCszPErYaFM",
+        "to":"3dnbnYY9i2bHMQUGyFp5GVvJ2wBkVpus31cDJA5cfRpj",
+        "sig":"SDscoRGF4OV7+OtT/CA+d8DDd656vxx9zJVdG9qbKMZ5/nmqziroW0YoVA9kH7AOZj6GJXJWuq7E6KX6X9hNAQ==",
+        "timestamp":1555363122,"expiresIn":10631141}],"pendingCerts":[],"pendingMemberships":[],
+        "membershipPendingExpiresIn":0,"membershipExpiresIn":6003091}
+        ]}} """
+        response = parse_text(response_string, REQUIREMENTS_RESPONSE_SCHEMA)
+        self.assertIsInstance(response, dict)

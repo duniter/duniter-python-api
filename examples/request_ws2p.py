@@ -184,6 +184,27 @@ async def main():
                     # if invalid, display exception on response validation
                     print(exception)
 
+            # send ws2p request
+            print("Send getRequirementsPending(3) request")
+            await ws.send_str(requests.get_requirements_pending(3))
+            # receive response as string
+            response = await ws.receive_str()
+            try:
+                # check response format
+                parse_text(response, requests.REQUIREMENTS_RESPONSE_SCHEMA)
+                # if valid display response
+                print("Response: " + response)
+            except ValidationError as exception:
+                # if invalid response...
+                try:
+                    # check error response format
+                    parse_text(response, requests.ERROR_RESPONSE_SCHEMA)
+                    # if valid, display error response
+                    print("Error response: " + response)
+                except ValidationError as e:
+                    # if invalid, display exception on response validation
+                    print(exception)
+
             # Close session
             await client.close()
 
