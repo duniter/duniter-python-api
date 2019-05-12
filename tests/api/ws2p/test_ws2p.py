@@ -5,7 +5,7 @@ import jsonschema
 from duniterpy.api.client import Client, parse_text
 from duniterpy.api.endpoint import BMAEndpoint
 from duniterpy.api.ws2p.network import heads, WS2P_HEADS_SCHEMA
-from duniterpy.api.ws2p.requests import BLOCK_RESPONSE_SCHEMA, ERROR_RESPONSE_SCHEMA
+from duniterpy.api.ws2p.requests import BLOCK_RESPONSE_SCHEMA, ERROR_RESPONSE_SCHEMA, BLOCKS_RESPONSE_SCHEMA
 from tests.api.webserver import WebFunctionalSetupMixin, web
 
 
@@ -63,6 +63,11 @@ class TestWs2pHeads(WebFunctionalSetupMixin, unittest.TestCase):
 
         self.loop.run_until_complete(go())
 
+    def test_error_response_validation(self):
+        error_response_string = """{"resId":"cfe10cc4","err":"Error message"}"""
+        error_response = parse_text(error_response_string, ERROR_RESPONSE_SCHEMA)
+        self.assertIsInstance(error_response, dict)
+
     def test_block_response_validation(self):
         response_string = """{"resId":"cfe10cc4","body":{"wrong":false,"version":11,"number":367572,
         "currency":"g1-test","hash":"000024399D612753E59D44415CFA61F3A663919110CD2EB8D30C93F49C61E07F",
@@ -79,7 +84,30 @@ class TestWs2pHeads(WebFunctionalSetupMixin, unittest.TestCase):
         response = parse_text(response_string, BLOCK_RESPONSE_SCHEMA)
         self.assertIsInstance(response, dict)
 
-    def test_error_response_validation(self):
-        error_response_string = """{"resId":"cfe10cc4","err":"Error message"}"""
-        error_response = parse_text(error_response_string, ERROR_RESPONSE_SCHEMA)
-        self.assertIsInstance(error_response, dict)
+    def test_blocks_response_validation(self):
+        response_string = """{"resId": "f608a5b8", "body": [
+            {"identities": [], "joiners": [], "actives": [], "leavers": [], "revoked": [], "excluded": [],
+             "certifications": [], "transactions": [], "version": 11, "number": 360000, "currency": "g1-test",
+             "hash": "0001826F638E091DEDEC5E6A4D3917BC37772E16B66923818AED44182F9FBA45",
+             "inner_hash": "3BB4636E7EB6159CB4BF58E2D47E7AC92D75E42F72EC10D91645B7B2CFD6E84A",
+             "previousHash": "0000FBE5B2BA1C88984AEA6FFB16F622A870D1A9DBD2DDF040BFF8E27273B0E1",
+             "issuer": "3dnbnYY9i2bHMQUGyFp5GVvJ2wBkVpus31cDJA5cfRpj",
+             "previousIssuer": "JyTqcD4Q9aEAR2CWEpwBUAAyMCjfM6gaE5S2e8GWUuq", "dividend": null, "time": 1556123743,
+             "powMin": 60, "monetaryMass": 128680804, "unitbase": 1, "membersCount": 18, "issuersCount": 6,
+             "issuersFrame": 31, "issuersFrameVar": 0, "medianTime": 1556122058, "fork": false, "parameters": "",
+             "signature": "Mu+FgC5qhU1Wp7Ih2v7JYkKMM7rv6Z+I4qxUvmVTEW+BObKy87zHJ7B0PsZORPWFkETNpiNsm10COqPbnt84BA==",
+             "nonce": 10200000000241},
+            {"identities": [], "joiners": [], "actives": [], "leavers": [], "revoked": [], "excluded": [],
+             "certifications": [], "transactions": [], "version": 11, "number": 360001, "currency": "g1-test",
+             "hash": "00035B7B452FAB7DBBE6E48DDD1060AC9A1A7096B32DD2C7763CC09A024A1597",
+             "inner_hash": "751DCAE2E881B5ABC0A61912033763872ED1D961C63C4A135CCB24E81DE17075",
+             "previousHash": "0001826F638E091DEDEC5E6A4D3917BC37772E16B66923818AED44182F9FBA45",
+             "issuer": "7BGpV28HzE6fyZtteuPmwHf6fHwHkQ9Ssww3Cxq82NnT",
+             "previousIssuer": "3dnbnYY9i2bHMQUGyFp5GVvJ2wBkVpus31cDJA5cfRpj", "dividend": null, "time": 1556123777,
+             "powMin": 60, "monetaryMass": 128680804, "unitbase": 1, "membersCount": 18, "issuersCount": 6,
+             "issuersFrame": 31, "issuersFrameVar": 0, "medianTime": 1556122255, "fork": false, "parameters": "",
+             "signature": "T13jarx2EopBhIDAmDLb5X6V9lvuIzrKvoh0ugWmOrUBZs0fcCqFyFew7d1TCPgkgjii/t3Bg/injOOVFrlPAQ==",
+             "nonce": 10400000000195}]}"""
+        response = parse_text(response_string, BLOCKS_RESPONSE_SCHEMA)
+        self.assertIsInstance(response, dict)
+

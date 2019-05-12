@@ -3,7 +3,7 @@ import re
 from typing import Optional
 
 from duniterpy.helpers import get_ws2p_challenge
-from duniterpy.api.bma.blockchain import BLOCK_SCHEMA
+from duniterpy.api.bma.blockchain import BLOCK_SCHEMA, BLOCKS_SCHEMA
 
 ERROR_RESPONSE_SCHEMA = {
     "type": "object",
@@ -25,6 +25,18 @@ BLOCK_RESPONSE_SCHEMA = {
             "pattern": "^[0-9,a-z,A-Z]{8}$"
         },
         "body": BLOCK_SCHEMA
+    },
+    "required": ["resId", "body"]
+}
+
+BLOCKS_RESPONSE_SCHEMA = {
+    "type": "object",
+    "properties": {
+        "resId": {
+            "type": "string",
+            "pattern": "^[0-9,a-z,A-Z]{8}$"
+        },
+        "body": BLOCKS_SCHEMA
     },
     "required": ["resId", "body"]
 }
@@ -73,3 +85,26 @@ def get_block(block_number: int, request_id: Optional[str] = None) -> str:
         }
     })
 
+
+def get_blocks(from_number: int, count: int, request_id: Optional[str] = None) -> str:
+    """
+    Return ws2p getBlocks(fromNumber, count) request as json string
+
+    :return:
+    """
+
+    if request_id is None:
+        request_id = get_ws2p_challenge()[:8]
+    else:
+        if not re.fullmatch("^[0-9a-zA-Z]{8}$", request_id):
+            raise Exception("Invalid ws2p request unique id")
+    return json.dumps({
+        "reqId": request_id,
+        "body": {
+            "name": "BLOCKS_CHUNK",
+            "params": {
+                "fromNumber": from_number,
+                "count": count
+            }
+        }
+    })
