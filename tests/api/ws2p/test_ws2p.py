@@ -5,7 +5,7 @@ import jsonschema
 from duniterpy.api.client import Client, parse_text
 from duniterpy.api.endpoint import BMAEndpoint
 from duniterpy.api.ws2p.network import heads, WS2P_HEADS_SCHEMA
-from duniterpy.api.ws2p.requests import GET_CURRENT_RESPONSE_SCHEMA, ERROR_RESPONSE_SCHEMA
+from duniterpy.api.ws2p.requests import BLOCK_RESPONSE_SCHEMA, ERROR_RESPONSE_SCHEMA
 from tests.api.webserver import WebFunctionalSetupMixin, web
 
 
@@ -63,7 +63,7 @@ class TestWs2pHeads(WebFunctionalSetupMixin, unittest.TestCase):
 
         self.loop.run_until_complete(go())
 
-    def test_get_current_validation(self):
+    def test_block_response_validation(self):
         response_string = """{"resId":"cfe10cc4","body":{"wrong":false,"version":11,"number":367572,
         "currency":"g1-test","hash":"000024399D612753E59D44415CFA61F3A663919110CD2EB8D30C93F49C61E07F",
         "previousHash":"00007A2931B1B33351151058E8FE5C8368C9A7C6F13F37FEB92AA67B17B7EC46",
@@ -76,8 +76,10 @@ class TestWs2pHeads(WebFunctionalSetupMixin, unittest.TestCase):
         "signature":"Ks0ugrWCZ/jBDyFQ77TnzTIKJrv2lBJKwQqVW64ZEESgD++J4pjPCEP0WDmcbm65VAomKbnkWOJsThdAIgj2DA==",
         "nonce":10400000002073,"monetaryMass":144418724,"writtenOn":367572,
         "written_on":"367572-000024399D612753E59D44415CFA61F3A663919110CD2EB8D30C93F49C61E07F"}} """
-        response = parse_text(response_string, GET_CURRENT_RESPONSE_SCHEMA)
+        response = parse_text(response_string, BLOCK_RESPONSE_SCHEMA)
         self.assertIsInstance(response, dict)
+
+    def test_error_response_validation(self):
         error_response_string = """{"resId":"cfe10cc4","err":"Error message"}"""
         error_response = parse_text(error_response_string, ERROR_RESPONSE_SCHEMA)
         self.assertIsInstance(error_response, dict)

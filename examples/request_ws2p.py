@@ -128,7 +128,28 @@ async def main():
             response = await ws.receive_str()
             try:
                 # check response format
-                parse_text(response, requests.GET_CURRENT_RESPONSE_SCHEMA)
+                parse_text(response, requests.BLOCK_RESPONSE_SCHEMA)
+                # if valid display response
+                print("Response: " + response)
+            except ValidationError as exception:
+                # if invalid response...
+                try:
+                    # check error response format
+                    parse_text(response, requests.ERROR_RESPONSE_SCHEMA)
+                    # if valid, display error response
+                    print("Error response: " + response)
+                except ValidationError as e:
+                    # if invalid, display exception on response validation
+                    print(exception)
+
+            # send ws2p request
+            print("Send getBlock(360000) request")
+            await ws.send_str(requests.get_block(360000))
+            # receive response as string
+            response = await ws.receive_str()
+            try:
+                # check response format
+                parse_text(response, requests.BLOCK_RESPONSE_SCHEMA)
                 # if valid display response
                 print("Response: " + response)
             except ValidationError as exception:

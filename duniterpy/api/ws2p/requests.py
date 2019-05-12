@@ -17,6 +17,18 @@ ERROR_RESPONSE_SCHEMA = {
     "required": ["resId", "err"]
 }
 
+BLOCK_RESPONSE_SCHEMA = {
+    "type": "object",
+    "properties": {
+        "resId": {
+            "type": "string",
+            "pattern": "^[0-9,a-z,A-Z]{8}$"
+        },
+        "body": BLOCK_SCHEMA
+    },
+    "required": ["resId", "body"]
+}
+
 
 def get_current(request_id: Optional[str] = None) -> str:
     """
@@ -39,14 +51,25 @@ def get_current(request_id: Optional[str] = None) -> str:
     })
 
 
-GET_CURRENT_RESPONSE_SCHEMA = {
-    "type": "object",
-    "properties": {
-        "resId": {
-            "type": "string",
-            "pattern": "^[0-9,a-z,A-Z]{8}$"
-        },
-        "body": BLOCK_SCHEMA
-    },
-    "required": ["resId", "body"]
-}
+def get_block(block_number: int, request_id: Optional[str] = None) -> str:
+    """
+    Return ws2p getBlock() request as json string
+
+    :return:
+    """
+
+    if request_id is None:
+        request_id = get_ws2p_challenge()[:8]
+    else:
+        if not re.fullmatch("^[0-9a-zA-Z]{8}$", request_id):
+            raise Exception("Invalid ws2p request unique id")
+    return json.dumps({
+        "reqId": request_id,
+        "body": {
+            "name": "BLOCK_BY_NUMBER",
+            "params": {
+                "number": block_number
+            }
+        }
+    })
+
