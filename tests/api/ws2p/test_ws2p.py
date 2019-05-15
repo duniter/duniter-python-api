@@ -1,3 +1,4 @@
+import json
 import unittest
 
 import jsonschema
@@ -7,6 +8,8 @@ from duniterpy.api.endpoint import BMAEndpoint
 from duniterpy.api.ws2p.network import heads, WS2P_HEADS_SCHEMA
 from duniterpy.api.ws2p.requests import BLOCK_RESPONSE_SCHEMA, ERROR_RESPONSE_SCHEMA, BLOCKS_RESPONSE_SCHEMA, \
     REQUIREMENTS_RESPONSE_SCHEMA
+from duniterpy.documents import Identity, BlockUID
+from duniterpy.documents.ws2p.messages import DocumentMessage
 from tests.api.webserver import WebFunctionalSetupMixin, web
 
 
@@ -176,3 +179,26 @@ class TestWs2pHeads(WebFunctionalSetupMixin, unittest.TestCase):
         ]}} """
         response = parse_text(response_string, REQUIREMENTS_RESPONSE_SCHEMA)
         self.assertIsInstance(response, dict)
+
+    def test_document_message(self):
+        # prepare message
+        document_message = DocumentMessage()
+        # prepare document
+        identity_document = Identity(
+            10, "beta_brousouf", "HgTTJLAQ5sqfknMq7yLPZbehtuLSsKj9CxWN7k8QvYJd", "lolcat",
+            BlockUID(32, "DB30D958EE5CB75186972286ED3F4686B8A1C2CD"),
+            "J3G9oM5AKYZNLAB5Wx499w61NuUoS57JVccTShUbGpCMjCqj9yXXqNq7dyZpDWA6BxipsiaMZhujMeBfCznzyci")
+        # get json string message
+        json_document_message = document_message.get_json(DocumentMessage.IDENTITY_TYPE_ID, identity_document.inline())
+        # convert to dict to verify
+        dict_document_message = json.loads(json_document_message)
+
+        # verify
+        self.assertIn("body", dict_document_message)
+        self.assertIn("name", dict_document_message["body"])
+        self.assertIn("identity", dict_document_message["body"])
+        self.assertEqual(4, dict_document_message["body"]["name"])
+        expected = """HgTTJLAQ5sqfknMq7yLPZbehtuLSsKj9CxWN7k8QvYJd\
+:J3G9oM5AKYZNLAB5Wx499w61NuUoS57JVccTShUbGpCMjCqj9yXXqNq7dyZpDWA6BxipsiaMZhujMeBfCznzyci:32\
+-DB30D958EE5CB75186972286ED3F4686B8A1C2CD:lolcat"""
+        self.assertEqual(expected, dict_document_message["body"]["identity"])

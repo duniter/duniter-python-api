@@ -1,6 +1,6 @@
 import json
 
-from typing import Optional
+from typing import Optional, Any
 
 from duniterpy.documents import Document
 from duniterpy.key import VerifyingKey, SigningKey
@@ -46,7 +46,7 @@ class Connect(Document):
 
     def get_signed_json(self, signing_key: SigningKey) -> str:
         """
-        Return the signed document in json format
+        Return the signed message in json format
 
         :param signing_key: Signing key instance
 
@@ -100,7 +100,7 @@ class Ack(Document):
 
     def get_signed_json(self, signing_key: SigningKey) -> str:
         """
-        Return the signed document in json format
+        Return the signed message in json format
 
         :param signing_key: Signing key instance
 
@@ -153,7 +153,7 @@ class Ok(Document):
 
     def get_signed_json(self, signing_key: SigningKey) -> str:
         """
-        Return the signed document in json format
+        Return the signed message in json format
 
         :param signing_key: Signing key instance
 
@@ -168,3 +168,39 @@ class Ok(Document):
 
     def __str__(self) -> str:
         return self.raw()
+
+
+# fixme: the document format to send is to be determine
+# does raw or inline format works ?
+class DocumentMessage:
+    PEER_TYPE_ID = 0
+    TRANSACTION_TYPE_ID = 1
+    MEMBERSHIP_TYPE_ID = 2
+    CERTIFICATION_TYPE_ID = 3
+    IDENTITY_TYPE_ID = 4
+    BLOCK_TYPE_ID = 5
+
+    DOCUMENT_TYPE_NAMES = {
+        0: "peer",
+        1: "transaction",
+        2: "membership",
+        3: "certification",
+        4: "identity",
+        5: "block"
+    }
+
+    def get_json(self, document_type_id: int, document: Any) -> str:
+        """
+        Return the document message in json format
+
+        :param document_type_id: Id of the document type, use class properties
+        :param document: Document object to send
+        :return:
+        """
+        data = {
+            "body": {
+                "name": document_type_id,
+                self.DOCUMENT_TYPE_NAMES[document_type_id]: document
+            }
+        }
+        return json.dumps(data)
