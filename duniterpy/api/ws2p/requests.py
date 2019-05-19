@@ -183,17 +183,14 @@ REQUIREMENTS_RESPONSE_SCHEMA = {
 }
 
 
-def get_current(request_id: Optional[str] = None) -> str:
+def get_current(request_id: str) -> str:
     """
     Return ws2p getCurrent() request as json string
 
     :return:
     """
-    if request_id is None:
-        request_id = get_ws2p_challenge()[:8]
-    else:
-        if not re.fullmatch("^[0-9a-zA-Z]{8}$", request_id):
-            raise Exception("Invalid ws2p request unique id")
+    if not re.fullmatch("^[0-9a-zA-Z]{8}$", request_id):
+        raise Exception("Invalid ws2p request unique id")
     return json.dumps({
         "reqId": request_id,
         "body": {
@@ -203,17 +200,14 @@ def get_current(request_id: Optional[str] = None) -> str:
     })
 
 
-def get_block(block_number: int, request_id: Optional[str] = None) -> str:
+def get_block(request_id: str, block_number: int) -> str:
     """
     Return ws2p getBlock() request as json string
 
     :return:
     """
-    if request_id is None:
-        request_id = get_ws2p_challenge()[:8]
-    else:
-        if not re.fullmatch("^[0-9a-zA-Z]{8}$", request_id):
-            raise Exception("Invalid ws2p request unique id")
+    if not re.fullmatch("^[0-9a-zA-Z]{8}$", request_id):
+        raise Exception("Invalid ws2p request unique id")
     return json.dumps({
         "reqId": request_id,
         "body": {
@@ -225,17 +219,14 @@ def get_block(block_number: int, request_id: Optional[str] = None) -> str:
     })
 
 
-def get_blocks(from_number: int, count: int, request_id: Optional[str] = None) -> str:
+def get_blocks(request_id: str, from_number: int, count: int) -> str:
     """
     Return ws2p getBlocks(fromNumber, count) request as json string
 
     :return:
     """
-    if request_id is None:
-        request_id = get_ws2p_challenge()[:8]
-    else:
-        if not re.fullmatch("^[0-9a-zA-Z]{8}$", request_id):
-            raise Exception("Invalid ws2p request unique id")
+    if not re.fullmatch("^[0-9a-zA-Z]{8}$", request_id):
+        raise Exception("Invalid ws2p request unique id")
     return json.dumps({
         "reqId": request_id,
         "body": {
@@ -248,17 +239,14 @@ def get_blocks(from_number: int, count: int, request_id: Optional[str] = None) -
     })
 
 
-def get_requirements_pending(min_cert: int, request_id: Optional[str] = None) -> str:
+def get_requirements_pending(request_id: str, min_cert: int) -> str:
     """
     Return ws2p getRequirementsPending(minCert) request as json string
 
     :return:
     """
-    if request_id is None:
-        request_id = get_ws2p_challenge()[:8]
-    else:
-        if not re.fullmatch("^[0-9a-zA-Z]{8}$", request_id):
-            raise Exception("Invalid ws2p request unique id")
+    if not re.fullmatch("^[0-9a-zA-Z]{8}$", request_id):
+        raise Exception("Invalid ws2p request unique id")
     return json.dumps({
         "reqId": request_id,
         "body": {
