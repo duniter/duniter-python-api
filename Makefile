@@ -1,4 +1,4 @@
-.PHONY: docs tests check
+.PHONY: docs tests check mypy pylint
 
 # generate documentation
 docs:
@@ -8,6 +8,13 @@ docs:
 tests:
 	python3 -m unittest ${TESTS_FILTER}
 
+# check
+check: mypy pylint
+
 # check static typing
-check:
+mypy:
 	python3 -m mypy duniterpy --ignore-missing-imports
+
+# check code errors
+pylint:
+	pylint --disable=C --enable=C0121,C0202,C0321 --jobs=0 duniterpy/
