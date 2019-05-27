@@ -1,3 +1,7 @@
+## v0.54.2 (27th May 2019)
+- fix Transaction document generation
+- lock transaction document generation with a test
+
 ## v0.54.1 (9th May 2019)
 - `Transaction`: add __eq__() and __hash__() methods
 - Transaction Unlock parameters: add __eq__() and __hash__() methods
