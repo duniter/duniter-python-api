@@ -25,7 +25,7 @@ class SecretKey(libnacl.public.SecretKey):
 
         :param salt: Salt credential
         :param password: Password credential
-        :param scrypt_params: Optional ScriptParams instance
+        :param scrypt_params: Optional ScryptParams instance
         """
         if scrypt_params is None:
             scrypt_params = ScryptParams()
