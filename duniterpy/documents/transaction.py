@@ -492,7 +492,7 @@ class Transaction(Document):
 
     def __init__(self, version: int, currency: str, blockstamp: Optional[BlockUID], locktime: int, issuers: List[str],
                  inputs: List[InputSource], unlocks: List[Unlock], outputs: List[OutputSource],
-                 comment: str, time: int, signatures: List[str]) -> None:
+                 comment: str, signatures: List[str], time: int = None) -> None:
         """
         Init Transaction instance
 
@@ -642,7 +642,7 @@ Comment: {comment}
             else:
                 raise MalformedDocumentError("Compact TX Signatures")
 
-        return cls(version, currency, blockstamp, locktime, issuers, inputs, unlocks, outputs, comment, 0, signatures)
+        return cls(version, currency, blockstamp, locktime, issuers, inputs, unlocks, outputs, comment, signatures)
 
     @classmethod
     def from_signed_raw(cls: Type[TransactionType], raw: str, time: int = 0) -> TransactionType:
@@ -716,7 +716,7 @@ Comment: {comment}
                 n += 1
 
         return cls(version, currency, blockstamp, locktime, issuers, inputs, unlocks, outputs,
-                   comment, time, signatures)
+                   comment, signatures, time)
 
     def raw(self) -> str:
         """
@@ -803,7 +803,7 @@ class SimpleTransaction(Transaction):
 
     def __init__(self, version: int, currency: str, blockstamp: BlockUID, locktime: int, issuer: str,
                  single_input: InputSource, unlocks: List[Unlock], outputs: List[OutputSource], comment: str,
-                 time: int, signature: str) -> None:
+                 signature: str, time: int) -> None:
         """
         Init instance
 
@@ -820,7 +820,7 @@ class SimpleTransaction(Transaction):
         :param signature: Signature
         """
         super().__init__(version, currency, blockstamp, locktime, [issuer], [single_input], unlocks,
-                         outputs, comment, time ,[signature])
+                         outputs, comment, [signature], time)
 
     @staticmethod
     def is_simple(tx: Transaction) -> bool:
