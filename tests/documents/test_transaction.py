@@ -6,7 +6,8 @@ Created on 12 déc. 2014
 import unittest
 import pypeg2
 from duniterpy.grammars import output
-from duniterpy.documents.transaction import Transaction, reduce_base, SimpleTransaction, InputSource, OutputSource
+from duniterpy.documents import BlockUID
+from duniterpy.documents.transaction import Transaction, reduce_base, SimpleTransaction, InputSource, OutputSource, Unlock, SIGParameter
 
 compact_change = """TX:10:1:1:1:1:1:0
 13410-000041DF0CCA173F09B5FBA48F619D4BC934F12ADF1D0B798639EB2149C4A8CC
@@ -332,3 +333,21 @@ class TestTransaction(unittest.TestCase):
         t2 = Transaction.from_signed_raw(tx_raw)
         t2.outputs = OutputSource.from_inline(output_source_str)
         self.assertFalse(t1 == t2)
+
+
+    def test_transaction_document_generation(self):
+        transaction = Transaction(
+            version=10,
+            currency="gtest",
+            blockstamp=BlockUID(8979, "000041DF0CCA173F09B5FBA48F619D4BC934F12ADF1D0B798639EB2149C4A8CC"),
+            locktime=0,
+            issuers=list("8kXygUHh1vLjmcRzXVM86t38EL8dfFJgfBeHmkaWLamu"),
+            inputs=[InputSource.from_inline(input_source_str)],
+            unlocks=[Unlock(index=0, parameters=[SIGParameter(0)])],
+            outputs=[OutputSource.from_inline(output_source_str)],
+            comment='',
+            signatures=[]
+        )
+        self.assertTrue(transaction.time == None)
+        self.assertTrue(transaction.currency == "gtest")
+        self.assertTrue(transaction.inputs[0].amount == 30)
