@@ -89,10 +89,12 @@ def block_uid(value: Union[str, BlockUID, None]) -> BlockUID:
     :return:
     """
     if isinstance(value, BlockUID):
-        return value
+        result = value
     elif isinstance(value, str):
-        return BlockUID.from_str(value)
+        result = BlockUID.from_str(value)
     elif value is None:
-        return BlockUID.empty()
+        result = BlockUID.empty()
     else:
         raise TypeError("Cannot convert {0} to BlockUID".format(type(value)))
+
+    return result
