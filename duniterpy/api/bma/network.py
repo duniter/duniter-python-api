@@ -155,9 +155,10 @@ async def peers(client: Client, leaves: bool = False, leaf: str = "") -> dict:
     :return:
     """
     if leaves is True:
-        return await client.get(MODULE + '/peering/peers', {"leaves": "true"}, schema=PEERS_SCHEMA)
+        response = await client.get(MODULE + '/peering/peers', {"leaves": "true"}, schema=PEERS_SCHEMA)
     else:
-        return await client.get(MODULE + '/peering/peers', {"leaf": leaf}, schema=PEERS_SCHEMA)
+        response = await client.get(MODULE + '/peering/peers', {"leaf": leaf}, schema=PEERS_SCHEMA)
+    return response
 
 
 async def peer(client: Client, peer_signed_raw: str) -> ClientResponse:
