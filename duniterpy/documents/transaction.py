@@ -492,7 +492,7 @@ class Transaction(Document):
 
     def __init__(self, version: int, currency: str, blockstamp: Optional[BlockUID], locktime: int, issuers: List[str],
                  inputs: List[InputSource], unlocks: List[Unlock], outputs: List[OutputSource],
-                 comment: str, signatures: List[str], time: int = None) -> None:
+                 comment: str, signatures: List[str], time: Optional[int] = None) -> None:
         """
         Init Transaction instance
 
