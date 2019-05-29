@@ -1,3 +1,7 @@
+## v0.54.3 (29th May 2019)
+- Upload again to PyPi as previous release haven’t been uploaded thanks to the tag
+- Transaction: fix `time` type
+
 ## v0.54.2 (27th May 2019)
 - fix Transaction document generation
 - lock transaction document generation with a test
