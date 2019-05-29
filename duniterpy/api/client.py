@@ -236,12 +236,13 @@ class Client:
             await parse_response(response, schema)
 
         # return the chosen type
+        result = response  # type: Any
         if rtype == RESPONSE_TEXT:
-            response = await response.text()
+            result = await response.text()
         elif rtype == RESPONSE_JSON:
-            response = await response.json()
+            result = await response.json()
 
-        return response
+        return result
 
     async def post(self, url_path: str, params: dict = None, rtype: str = RESPONSE_JSON, schema: dict = None) -> Any:
         """
@@ -267,12 +268,13 @@ class Client:
             await parse_response(response, schema)
 
         # return the chosen type
+        result = response  # type: Any
         if rtype == RESPONSE_TEXT:
-            response = await response.text()
+            result = await response.text()
         elif rtype == RESPONSE_JSON:
-            response = await response.json()
+            result = await response.json()
 
-        return response
+        return result
 
     def connect_ws(self, path: str) -> _WSRequestContextManager:
         """

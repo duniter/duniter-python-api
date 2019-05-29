@@ -339,7 +339,7 @@ class UnlockParameter:
         :param parameter: Parameter string
         :return:
         """
-        result = None
+        result = None  # type: Optional[Union[SIGParameter, XHXParameter]]
         sig_param = SIGParameter.from_parameter(parameter)
         if sig_param:
             result = sig_param
