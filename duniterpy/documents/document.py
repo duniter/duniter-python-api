@@ -87,7 +87,7 @@ class Document:
         """
         Returns the raw document in string format
         """
-        raise NotImplementedError()
+        raise NotImplementedError("raw() is not implemented")
 
     def signed_raw(self) -> str:
         """
