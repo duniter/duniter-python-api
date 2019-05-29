@@ -67,7 +67,6 @@ class HeadV0:
                            .format(ws2p_private=WS2P_PRIVATE_PREFIX_REGEX,
                                    ws2p_public=WS2P_PUBLIC_PREFIX_REGEX,
                                    head=WS2P_HEAD_REGEX,
-                                   version="[0-9]+",
                                    pubkey=PUBKEY_REGEX,
                                    blockstamp=BLOCK_UID_REGEX))
 
