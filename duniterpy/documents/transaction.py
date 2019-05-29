@@ -623,7 +623,7 @@ Comment: {comment}
         for index in range(0, outputs_num):
             output_source = OutputSource.from_inline(lines[n + index])
             outputs.append(output_source)
-        n += 1
+        n += outputs_num
 
         comment = ""
         if has_comment == 1:

@@ -362,7 +362,7 @@ The class Block handles Block documents.
                 sup_lines = 2
                 tx_max = n + sup_lines + issuers_num * 2 + inputs_num + unlocks_num + outputs_num + has_comment
                 for index in range(n, tx_max):
-                    tx_lines += lines[n + index]
+                    tx_lines += lines[index]
                 n += (tx_max - n)
                 transaction = Transaction.from_compact(currency, tx_lines)
                 transactions.append(transaction)
