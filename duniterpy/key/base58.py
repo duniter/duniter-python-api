@@ -5,7 +5,7 @@ import base58
 from ..helpers import ensure_str, ensure_bytes
 
 
-class Base58Encoder(object):
+class Base58Encoder:
     @staticmethod
     def encode(data: Union[str, bytes]) -> str:
         """
