@@ -1,5 +1,6 @@
 coveralls
 mypy
 pylint
+black
 sphinx
 sphinx_rtd_theme
