@@ -1,3 +1,22 @@
+## v0.54.3 (29th May 2019)
+- Upload again to PyPi as previous release haven’t been uploaded thanks to the tag
+- Transaction: fix `time` type
+
+## v0.54.2 (27th May 2019)
+- fix Transaction document generation
+- lock transaction document generation with a test
+
+## v0.54.1 (9th May 2019)
+- `Transaction`: add __eq__() and __hash__() methods
+- Transaction Unlock parameters: add __eq__() and __hash__() methods
+- Transaction: add 'time' variable for read and write but not for doc generation
+- output conditions: add __eq__() and __hash__() methods
+- test transaction equality at all levels
+
+---
+
+- Thanks @Moul, @vtexier
+
 ## v0.54.0 (5th May 2019)
 
 ### Code/tests
@@ -15,6 +34,8 @@
 - Add coveralls as dev dependency
 - setup.py: add classifiers: Python versions, Intended Audience
 - Add CHANGELOG.md from v0.53.1
+
+---
 
 - Thanks @Moul, @vtexier
 

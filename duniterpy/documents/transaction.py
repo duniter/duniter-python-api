@@ -230,6 +230,19 @@ class SIGParameter:
         """
         self.index = index
 
+
+    def __eq__(self, other: Any) -> bool:
+        """
+        Check SIGParameter instances equality
+        """
+        if not isinstance(other, SIGParameter):
+            return NotImplemented
+        return self.index == other.index
+
+    def __hash__(self) -> int:
+        return hash((self.index))
+
+
     @classmethod
     def from_parameter(cls: Type[SIGParameterType], parameter: str) -> Optional[SIGParameterType]:
         """
@@ -271,6 +284,19 @@ class XHXParameter:
         :param integer: XHX number
         """
         self.integer = integer
+
+
+    def __eq__(self, other: Any) -> bool:
+        """
+        Check XHXParameter instances equality
+        """
+        if not isinstance(other, XHXParameter):
+            return NotImplemented
+        return self.integer == other.integer
+
+    def __hash__(self) -> int:
+        return hash((self.integer))
+
 
     @classmethod
     def from_parameter(cls: Type[XHXParameterType], parameter: str) -> Optional[XHXParameterType]:
@@ -347,6 +373,24 @@ class Unlock:
         """
         self.index = index
         self.parameters = parameters
+
+
+    def __eq__(self, other: Any) -> bool:
+        """
+        Check Unlock instances equality
+        """
+        if not isinstance(other, Unlock):
+            return NotImplemented
+
+        params_equals = True
+        for spar, opar in zip(self.parameters, other.parameters):
+            if spar != opar:
+                params_equals = False
+        return self.index == other.index and params_equals
+
+    def __hash__(self) -> int:
+        return hash((self.index, self.parameters))
+
 
     @classmethod
     def from_inline(cls: Type[UnlockType], inline: str) -> UnlockType:
@@ -448,7 +492,7 @@ class Transaction(Document):
 
     def __init__(self, version: int, currency: str, blockstamp: Optional[BlockUID], locktime: int, issuers: List[str],
                  inputs: List[InputSource], unlocks: List[Unlock], outputs: List[OutputSource],
-                 comment: str, signatures: List[str]) -> None:
+                 comment: str, signatures: List[str], time: Optional[int] = None) -> None:
         """
         Init Transaction instance
 
@@ -461,6 +505,7 @@ class Transaction(Document):
         :param unlocks: List of Unlock instances
         :param outputs: List of OutputSource instances
         :param comment: Comment field
+        :param time: time when the transaction enters the blockchain
         :param signatures: List of signatures
         """
         super().__init__(version, currency, signatures)
@@ -471,6 +516,31 @@ class Transaction(Document):
         self.unlocks = unlocks
         self.outputs = outputs
         self.comment = comment
+        self.time = time
+
+
+    def __eq__(self, other: Any) -> bool:
+        """
+        Check Transaction instances equality
+        """
+        if not isinstance(other, Transaction):
+            return NotImplemented
+        return self.version == other.version and \
+            self.currency == other.currency and \
+            self.signatures == other.signatures and \
+            self.blockstamp == other.blockstamp and \
+            self.locktime == other.locktime and \
+            self.issuers == other.issuers and \
+            self.inputs == other.inputs and \
+            self.unlocks == other.unlocks and \
+            self.outputs == other.outputs and \
+            self.comment == other.comment and \
+            self.time == other.time
+
+
+    def __hash__(self) -> int:
+        return hash((self.version, self.currency, self.signatures, self.blockstamp, self.locktime, self.issuers, self.inputs, self.unlocks, self.outputs, self.comment, self.time))
+
 
     @classmethod
     def from_bma_history(cls: Type[TransactionType], currency: str, tx_data: Dict) -> TransactionType:
@@ -501,7 +571,7 @@ Outputs:
 {multiline_outputs}
 Comment: {comment}
 {multiline_signatures}
-""".format(**tx_data))
+""".format(**tx_data), tx_data["time"])
 
     @classmethod
     def from_compact(cls: Type[TransactionType], currency: str, compact: str) -> TransactionType:
@@ -575,11 +645,12 @@ Comment: {comment}
         return cls(version, currency, blockstamp, locktime, issuers, inputs, unlocks, outputs, comment, signatures)
 
     @classmethod
-    def from_signed_raw(cls: Type[TransactionType], raw: str) -> TransactionType:
+    def from_signed_raw(cls: Type[TransactionType], raw: str, time: int = 0) -> TransactionType:
         """
         Return a Transaction instance from a raw string format
 
         :param raw: Raw string format
+        :param time: time when the transaction enters the blockchain
 
         :return:
         """
@@ -645,7 +716,7 @@ Comment: {comment}
                 n += 1
 
         return cls(version, currency, blockstamp, locktime, issuers, inputs, unlocks, outputs,
-                   comment, signatures)
+                   comment, signatures, time)
 
     def raw(self) -> str:
         """
@@ -732,7 +803,7 @@ class SimpleTransaction(Transaction):
 
     def __init__(self, version: int, currency: str, blockstamp: BlockUID, locktime: int, issuer: str,
                  single_input: InputSource, unlocks: List[Unlock], outputs: List[OutputSource], comment: str,
-                 signature: str) -> None:
+                 signature: str, time: int) -> None:
         """
         Init instance
 
@@ -745,10 +816,11 @@ class SimpleTransaction(Transaction):
         :param unlocks: List of Unlock instances
         :param outputs: List of OutputSource instances
         :param comment: Comment field
+        :param time: time when the transaction enters the blockchain
         :param signature: Signature
         """
         super().__init__(version, currency, blockstamp, locktime, [issuer], [single_input], unlocks,
-                         outputs, comment, [signature])
+                         outputs, comment, [signature], time)
 
     @staticmethod
     def is_simple(tx: Transaction) -> bool:

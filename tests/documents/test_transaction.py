@@ -6,7 +6,8 @@ Created on 12 déc. 2014
 import unittest
 import pypeg2
 from duniterpy.grammars import output
-from duniterpy.documents.transaction import Transaction, reduce_base, SimpleTransaction, InputSource, OutputSource
+from duniterpy.documents import BlockUID
+from duniterpy.documents.transaction import Transaction, reduce_base, SimpleTransaction, InputSource, OutputSource, Unlock, SIGParameter
 
 compact_change = """TX:10:1:1:1:1:1:0
 13410-000041DF0CCA173F09B5FBA48F619D4BC934F12ADF1D0B798639EB2149C4A8CC
@@ -104,6 +105,9 @@ Comment: -----@@@----- (why not this comment?)
 2XiBDpuUdu6zCPWGzHXXy8c4ATSscfFQG9DjmqMZUxDZVt1Dp4m2N5oHYVUfoPdrU9SLk4qxi65RNrfCVnvQtQJk
 """
 
+input_source_str = "30:0:T:6991C993631BED4733972ED7538E41CCC33660F554E3C51963E2A0AC4D6453D3:2"
+
+output_source_str = "460:0:SIG(8kXygUHh1vLjmcRzXVM86t38EL8dfFJgfBeHmkaWLamu)"
 
 class TestTransaction(unittest.TestCase):
     def test_fromcompact(self):
@@ -291,18 +295,59 @@ class TestTransaction(unittest.TestCase):
 
 
     def test_inputsource_from_inline(self):
-        input_source_str = "30:0:T:6991C993631BED4733972ED7538E41CCC33660F554E3C51963E2A0AC4D6453D3:2"
         i = InputSource.from_inline(input_source_str)
         self.assertEqual(i.inline(), input_source_str)
 
 
     def test_outputsource_from_inline(self):
-        output_source_str = "460:0:SIG(8kXygUHh1vLjmcRzXVM86t38EL8dfFJgfBeHmkaWLamu)"
         o = OutputSource.from_inline(output_source_str)
         self.assertEqual(o.inline(), output_source_str)
 
 
     def test_outputsource_inline_condition(self):
-        output_source_str = "460:0:SIG(8kXygUHh1vLjmcRzXVM86t38EL8dfFJgfBeHmkaWLamu)"
         o = OutputSource.from_inline(output_source_str)
         self.assertEqual(o.inline_condition(), output_source_str.split(":")[2])
+
+
+    def test_transaction_equality(self):
+        t1 = Transaction.from_signed_raw(tx_raw)
+        t2 = Transaction.from_signed_raw(tx_raw)
+
+        self.assertTrue(t1 == t2)
+
+        t2.signatures = ["NSTN"]
+        self.assertFalse(t1 == t2)
+
+        t2 = Transaction.from_signed_raw(tx_raw)
+        t2.issuers = ["NSTRNRST"]
+        self.assertFalse(t1 == t2)
+
+        t2 = Transaction.from_signed_raw(tx_raw)
+        t2.time = 123
+        self.assertFalse(t1 == t2)
+
+        t2 = Transaction.from_signed_raw(tx_raw)
+        t2.inputs = InputSource.from_inline(input_source_str)
+        self.assertFalse(t1 == t2)
+
+        t2 = Transaction.from_signed_raw(tx_raw)
+        t2.outputs = OutputSource.from_inline(output_source_str)
+        self.assertFalse(t1 == t2)
+
+
+    def test_transaction_document_generation(self):
+        transaction = Transaction(
+            version=10,
+            currency="gtest",
+            blockstamp=BlockUID(8979, "000041DF0CCA173F09B5FBA48F619D4BC934F12ADF1D0B798639EB2149C4A8CC"),
+            locktime=0,
+            issuers=list("8kXygUHh1vLjmcRzXVM86t38EL8dfFJgfBeHmkaWLamu"),
+            inputs=[InputSource.from_inline(input_source_str)],
+            unlocks=[Unlock(index=0, parameters=[SIGParameter(0)])],
+            outputs=[OutputSource.from_inline(output_source_str)],
+            comment='',
+            signatures=[]
+        )
+        self.assertTrue(transaction.time == None)
+        self.assertTrue(transaction.currency == "gtest")
+        self.assertTrue(transaction.inputs[0].amount == 30)

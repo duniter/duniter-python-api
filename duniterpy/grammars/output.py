@@ -48,6 +48,19 @@ class SIG:
     def __str__(self) -> str:
         return self.value
 
+    def __eq__(self, other: Any) -> bool:
+        """
+        Check SIG instances equality
+        """
+        if not isinstance(other, SIG):
+            return NotImplemented
+        return self.value == other.value and \
+            self.pubkey == other.pubkey
+
+    def __hash__(self) -> int:
+        return hash((self.value, self.pubkey))
+
+
     @classmethod
     def token(cls: Type[SIGType], pubkey: str) -> SIGType:
         """
@@ -94,6 +107,19 @@ class CSV:
     def __str__(self) -> str:
         return self.value
 
+    def __eq__(self, other: Any) -> bool:
+        """
+        Check CSV instances equality
+        """
+        if not isinstance(other, CSV):
+            return NotImplemented
+        return self.value == other.value and \
+            self.time == other.time
+
+    def __hash__(self) -> int:
+        return hash((self.value, self.time))
+
+
     @classmethod
     def token(cls: Type[CSVType], time: int) -> CSVType:
         """
@@ -139,6 +165,19 @@ class CLTV:
     def __str__(self) -> str:
         return self.value
 
+    def __eq__(self, other: Any) -> bool:
+        """
+        Check CLTV instances equality
+        """
+        if not isinstance(other, CLTV):
+            return NotImplemented
+        return self.value == other.value and \
+            self.timestamp == other.timestamp
+
+    def __hash__(self) -> int:
+        return hash((self.value, self.timestamp))
+
+
     @classmethod
     def token(cls: Type[CLTVType], timestamp: int) -> CLTVType:
         """
@@ -183,6 +222,19 @@ class XHX:
 
     def __str__(self) -> str:
         return self.value
+
+    def __eq__(self, other: Any) -> bool:
+        """
+        Check XHX instances equality
+        """
+        if not isinstance(other, XHX):
+            return NotImplemented
+        return self.value == other.value and \
+            self.sha_hash == other.sha_hash
+
+    def __hash__(self) -> int:
+        return hash((self.value, self.sha_hash))
+
 
     @classmethod
     def token(cls: Type[XHXType], sha_hash: str) -> XHXType:
@@ -261,6 +313,21 @@ class Condition:
         self.left = ''
         self.right = ''
         self.op = ''
+
+
+    def __eq__(self, other: Any) -> bool:
+        """
+        Check Condition instances equality
+        """
+        if not isinstance(other, Condition):
+            return NotImplemented
+        return self.value == other.value and \
+            self.left == other.left and \
+            self.right == other.right and \
+            self.op == other.op
+
+    def __hash__(self) -> int:
+        return hash((self.value, self.left, self.right, self.op))
 
     def __str__(self) -> str:
         return self.value
