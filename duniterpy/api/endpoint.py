@@ -54,7 +54,7 @@ class Endpoint:
         raise NotImplementedError("__str__ is not implemented")
 
     def __eq__(self, other: Any) -> bool:
-        raise NotImplementedError("__eq__ is not implemented")
+        return NotImplemented
 
 
 # required to type hint cls in classmethod
