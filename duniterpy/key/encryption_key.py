@@ -18,8 +18,12 @@ class SecretKey(libnacl.public.SecretKey):
     Raw Public Key Encryption Class
     """
 
-    def __init__(self, salt: Union[str, bytes], password: Union[str, bytes],
-                 scrypt_params: Optional[ScryptParams] = None) -> None:
+    def __init__(
+        self,
+        salt: Union[str, bytes],
+        password: Union[str, bytes],
+        scrypt_params: Optional[ScryptParams] = None,
+    ) -> None:
         """
         Create SecretKey key pair instance from salt and password credentials
 
@@ -32,12 +36,21 @@ class SecretKey(libnacl.public.SecretKey):
 
         salt = ensure_bytes(salt)
         password = ensure_bytes(password)
-        seed = scrypt(password, salt, scrypt_params.N, scrypt_params.r, scrypt_params.p, scrypt_params.seed_length)
+        seed = scrypt(
+            password,
+            salt,
+            scrypt_params.N,
+            scrypt_params.r,
+            scrypt_params.p,
+            scrypt_params.seed_length,
+        )
 
         super().__init__(seed)
         self.public_key = PublicKey(Base58Encoder.encode(self.pk))
 
-    def encrypt(self, pubkey: str, nonce: Union[str, bytes], text: Union[str, bytes]) -> str:
+    def encrypt(
+        self, pubkey: str, nonce: Union[str, bytes], text: Union[str, bytes]
+    ) -> str:
         """
         Encrypt message text with the public key of the recipient and a nonce
 
@@ -54,7 +67,9 @@ class SecretKey(libnacl.public.SecretKey):
         text_bytes = ensure_bytes(text)
         nonce_bytes = ensure_bytes(nonce)
         recipient_pubkey = PublicKey(pubkey)
-        crypt_bytes = libnacl.public.Box(self, recipient_pubkey).encrypt(text_bytes, nonce_bytes)
+        crypt_bytes = libnacl.public.Box(self, recipient_pubkey).encrypt(
+            text_bytes, nonce_bytes
+        )
         return Base58Encoder.encode(crypt_bytes[24:])
 
     def decrypt(self, pubkey: str, nonce: Union[str, bytes], text: str) -> str:
@@ -69,8 +84,10 @@ class SecretKey(libnacl.public.SecretKey):
         sender_pubkey = PublicKey(pubkey)
         nonce_bytes = ensure_bytes(nonce)
         encrypt_bytes = Base58Encoder.decode(text)
-        decrypt_bytes = libnacl.public.Box(self, sender_pubkey).decrypt(encrypt_bytes, nonce_bytes)
-        return decrypt_bytes.decode('utf-8')
+        decrypt_bytes = libnacl.public.Box(self, sender_pubkey).decrypt(
+            encrypt_bytes, nonce_bytes
+        )
+        return decrypt_bytes.decode("utf-8")
 
 
 class PublicKey(libnacl.public.PublicKey):

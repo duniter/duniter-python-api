@@ -13,14 +13,18 @@ from pylibscrypt import scrypt
 
 from .scrypt_params import ScryptParams
 from .base58 import Base58Encoder
-from ..helpers import ensure_bytes, xor_bytes, convert_seedhex_to_seed, convert_seed_to_seedhex
+from ..helpers import (
+    ensure_bytes,
+    xor_bytes,
+    convert_seedhex_to_seed,
+    convert_seed_to_seedhex,
+)
 
 # required to type hint cls in classmethod
-SigningKeyType = TypeVar('SigningKeyType', bound='SigningKey')
+SigningKeyType = TypeVar("SigningKeyType", bound="SigningKey")
 
 
 class SigningKey(libnacl.sign.Signer):
-
     def __init__(self, seed: bytes) -> None:
         """
         Init pubkey property
@@ -31,8 +35,12 @@ class SigningKey(libnacl.sign.Signer):
         self.pubkey = Base58Encoder.encode(self.vk)
 
     @classmethod
-    def from_credentials(cls: Type[SigningKeyType], salt: Union[str, bytes], password: Union[str, bytes],
-                         scrypt_params: Optional[ScryptParams] = None) -> SigningKeyType:
+    def from_credentials(
+        cls: Type[SigningKeyType],
+        salt: Union[str, bytes],
+        password: Union[str, bytes],
+        scrypt_params: Optional[ScryptParams] = None,
+    ) -> SigningKeyType:
         """
         Create a SigningKey object from credentials
 
@@ -45,7 +53,14 @@ class SigningKey(libnacl.sign.Signer):
 
         salt = ensure_bytes(salt)
         password = ensure_bytes(password)
-        seed = scrypt(password, salt, scrypt_params.N, scrypt_params.r, scrypt_params.p, scrypt_params.seed_length)
+        seed = scrypt(
+            password,
+            salt,
+            scrypt_params.N,
+            scrypt_params.r,
+            scrypt_params.p,
+            scrypt_params.seed_length,
+        )
 
         return cls(seed)
 
@@ -56,7 +71,7 @@ class SigningKey(libnacl.sign.Signer):
         :param path: Authentication file path
         """
         seedhex = convert_seed_to_seedhex(self.seed)
-        with open(path, 'w') as fh:
+        with open(path, "w") as fh:
             fh.write(seedhex)
 
     @staticmethod
@@ -66,7 +81,7 @@ class SigningKey(libnacl.sign.Signer):
 
         :param str path: Hexadecimal seed file path
         """
-        with open(path, 'r') as fh:
+        with open(path, "r") as fh:
             seedhex = fh.read()
         return SigningKey.from_seedhex(seedhex)
 
@@ -80,7 +95,7 @@ class SigningKey(libnacl.sign.Signer):
         regex_seedhex = re.compile("([0-9a-fA-F]{64})")
         match = re.search(regex_seedhex, seedhex)
         if not match:
-            raise Exception('Error: Bad seed hexadecimal format')
+            raise Exception("Error: Bad seed hexadecimal format")
         seedhex = match.groups()[0]
         seed = convert_seedhex_to_seed(seedhex)
         return cls(seed)
@@ -115,7 +130,9 @@ class SigningKey(libnacl.sign.Signer):
         """
         curve25519_public_key = libnacl.crypto_sign_ed25519_pk_to_curve25519(self.vk)
         curve25519_secret_key = libnacl.crypto_sign_ed25519_sk_to_curve25519(self.sk)
-        return libnacl.crypto_box_seal_open(data, curve25519_public_key, curve25519_secret_key)
+        return libnacl.crypto_box_seal_open(
+            data, curve25519_public_key, curve25519_secret_key
+        )
 
     @classmethod
     def from_pubsec_file(cls: Type[SigningKeyType], path: str) -> SigningKeyType:
@@ -124,7 +141,7 @@ class SigningKey(libnacl.sign.Signer):
 
         :param path: Path to WIF file
         """
-        with open(path, 'r') as fh:
+        with open(path, "r") as fh:
             pubsec_content = fh.read()
 
         # line patterns
@@ -134,12 +151,12 @@ class SigningKey(libnacl.sign.Signer):
         # check public key field
         match = re.search(regex_pubkey, pubsec_content)
         if not match:
-            raise Exception('Error: Bad format PubSec v1 file, missing public key')
+            raise Exception("Error: Bad format PubSec v1 file, missing public key")
 
         # check signkey field
         match = re.search(regex_signkey, pubsec_content)
         if not match:
-            raise Exception('Error: Bad format PubSec v1 file, missing sec key')
+            raise Exception("Error: Bad format PubSec v1 file, missing sec key")
 
         # capture signkey
         signkey_hex = match.groups()[0]
@@ -163,37 +180,45 @@ class SigningKey(libnacl.sign.Signer):
         base58_public_key = self.pubkey
 
         # save file
-        with open(path, 'w') as fh:
+        with open(path, "w") as fh:
             fh.write(
                 """Type: PubSec
 Version: {version}
 pub: {pubkey}
-sec: {signkey}""".format(version=version, pubkey=base58_public_key, signkey=base58_signing_key)
+sec: {signkey}""".format(
+                    version=version,
+                    pubkey=base58_public_key,
+                    signkey=base58_signing_key,
+                )
             )
 
     @staticmethod
-    def from_wif_or_ewif_file(path: str, password: Optional[str] = None) -> SigningKeyType:
+    def from_wif_or_ewif_file(
+        path: str, password: Optional[str] = None
+    ) -> SigningKeyType:
         """
         Return SigningKey instance from Duniter WIF or EWIF file
 
         :param path: Path to WIF of EWIF file
         :param password: Password needed for EWIF file
         """
-        with open(path, 'r') as fh:
+        with open(path, "r") as fh:
             wif_content = fh.read()
 
         # check data field
-        regex = re.compile('Data: ([1-9A-HJ-NP-Za-km-z]+)', re.MULTILINE)
+        regex = re.compile("Data: ([1-9A-HJ-NP-Za-km-z]+)", re.MULTILINE)
         match = re.search(regex, wif_content)
         if not match:
-            raise Exception('Error: Bad format WIF or EWIF v1 file')
+            raise Exception("Error: Bad format WIF or EWIF v1 file")
 
         # capture hexa wif key
         wif_hex = match.groups()[0]
         return SigningKey.from_wif_or_ewif_hex(wif_hex, password)
 
     @staticmethod
-    def from_wif_or_ewif_hex(wif_hex: str, password: Optional[str] = None) -> SigningKeyType:
+    def from_wif_or_ewif_hex(
+        wif_hex: str, password: Optional[str] = None
+    ) -> SigningKeyType:
         """
         Return SigningKey instance from Duniter WIF or EWIF in hexadecimal format
 
@@ -220,14 +245,14 @@ sec: {signkey}""".format(version=version, pubkey=base58_public_key, signkey=base
 
         :param path: Path to WIF file
         """
-        with open(path, 'r') as fh:
+        with open(path, "r") as fh:
             wif_content = fh.read()
 
         # check data field
-        regex = re.compile('Data: ([1-9A-HJ-NP-Za-km-z]+)', re.MULTILINE)
+        regex = re.compile("Data: ([1-9A-HJ-NP-Za-km-z]+)", re.MULTILINE)
         match = re.search(regex, wif_content)
         if not match:
-            raise Exception('Error: Bad format WIF v1 file')
+            raise Exception("Error: Bad format WIF v1 file")
 
         # capture hexa wif key
         wif_hex = match.groups()[0]
@@ -281,11 +306,13 @@ sec: {signkey}""".format(version=version, pubkey=base58_public_key, signkey=base
         # base58 encode key and checksum
         wif_key = Base58Encoder.encode(seed_fi + checksum)
 
-        with open(path, 'w') as fh:
+        with open(path, "w") as fh:
             fh.write(
                 """Type: WIF
 Version: {version}
-Data: {data}""".format(version=version, data=wif_key)
+Data: {data}""".format(
+                    version=version, data=wif_key
+                )
             )
 
     @staticmethod
@@ -296,21 +323,23 @@ Data: {data}""".format(version=version, data=wif_key)
         :param path: Path to EWIF file
         :param password: Password of the encrypted seed
         """
-        with open(path, 'r') as fh:
+        with open(path, "r") as fh:
             wif_content = fh.read()
 
         # check data field
-        regex = re.compile('Data: ([1-9A-HJ-NP-Za-km-z]+)', re.MULTILINE)
+        regex = re.compile("Data: ([1-9A-HJ-NP-Za-km-z]+)", re.MULTILINE)
         match = re.search(regex, wif_content)
         if not match:
-            raise Exception('Error: Bad format EWIF v1 file')
+            raise Exception("Error: Bad format EWIF v1 file")
 
         # capture ewif key
         ewif_hex = match.groups()[0]
         return SigningKey.from_ewif_hex(ewif_hex, password)
 
     @classmethod
-    def from_ewif_hex(cls: Type[SigningKeyType], ewif_hex: str, password: str) -> SigningKeyType:
+    def from_ewif_hex(
+        cls: Type[SigningKeyType], ewif_hex: str, password: str
+    ) -> SigningKeyType:
         """
         Return SigningKey instance from Duniter EWIF in hexadecimal format
 
@@ -334,7 +363,9 @@ Data: {data}""".format(version=version, data=wif_key)
             raise Exception("Error: bad format version, not EWIF")
 
         # checksum control
-        checksum = libnacl.crypto_hash_sha256(libnacl.crypto_hash_sha256(ewif_no_checksum))[0:2]
+        checksum = libnacl.crypto_hash_sha256(
+            libnacl.crypto_hash_sha256(ewif_no_checksum)
+        )[0:2]
         if checksum_from_ewif != checksum:
             raise Exception("Error: bad checksum of the EWIF")
 
@@ -357,8 +388,8 @@ Data: {data}""".format(version=version, data=wif_key)
         # Password Control
         signer = SigningKey(seed)
         salt_from_seed = libnacl.crypto_hash_sha256(
-            libnacl.crypto_hash_sha256(
-                Base58Encoder.decode(signer.pubkey)))[0:4]
+            libnacl.crypto_hash_sha256(Base58Encoder.decode(signer.pubkey))
+        )[0:4]
         if salt_from_seed != salt:
             raise Exception("Error: bad Password of EWIF address")
 
@@ -376,8 +407,8 @@ Data: {data}""".format(version=version, data=wif_key)
 
         # add version to seed
         salt = libnacl.crypto_hash_sha256(
-            libnacl.crypto_hash_sha256(
-                Base58Encoder.decode(self.pubkey)))[0:4]
+            libnacl.crypto_hash_sha256(Base58Encoder.decode(self.pubkey))
+        )[0:4]
 
         # SCRYPT
         password_bytes = password.encode("utf-8")
@@ -387,7 +418,9 @@ Data: {data}""".format(version=version, data=wif_key)
 
         # XOR
         seed1_xor_derivedhalf1_1 = bytes(xor_bytes(self.seed[0:16], derivedhalf1[0:16]))
-        seed2_xor_derivedhalf1_2 = bytes(xor_bytes(self.seed[16:32], derivedhalf1[16:32]))
+        seed2_xor_derivedhalf1_2 = bytes(
+            xor_bytes(self.seed[16:32], derivedhalf1[16:32])
+        )
 
         # AES
         aes = pyaes.AESModeOfOperationECB(derivedhalf2)
@@ -395,7 +428,7 @@ Data: {data}""".format(version=version, data=wif_key)
         encryptedhalf2 = aes.encrypt(seed2_xor_derivedhalf1_2)
 
         # add format to final seed (1=WIF,2=EWIF)
-        seed_bytes = b'\x02' + salt + encryptedhalf1 + encryptedhalf2
+        seed_bytes = b"\x02" + salt + encryptedhalf1 + encryptedhalf2
 
         # calculate checksum
         sha256_v1 = libnacl.crypto_hash_sha256(seed_bytes)
@@ -406,9 +439,11 @@ Data: {data}""".format(version=version, data=wif_key)
         ewif_key = Base58Encoder.encode(seed_bytes + checksum)
 
         # save file
-        with open(path, 'w') as fh:
+        with open(path, "w") as fh:
             fh.write(
                 """Type: EWIF
 Version: {version}
-Data: {data}""".format(version=version, data=ewif_key)
+Data: {data}""".format(
+                    version=version, data=ewif_key
+                )
             )

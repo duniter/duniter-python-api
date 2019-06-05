@@ -7,7 +7,7 @@ from .block_uid import BlockUID
 from ..constants import BLOCK_HASH_REGEX, PUBKEY_REGEX
 
 # required to type hint cls in classmethod
-PeerType = TypeVar('PeerType', bound='Peer')
+PeerType = TypeVar("PeerType", bound="Peer")
 
 
 class Peer(Document):
@@ -28,19 +28,33 @@ class Peer(Document):
     """
 
     re_type = re.compile("Type: (Peer)")
-    re_pubkey = re.compile("PublicKey: ({pubkey_regex})\n".format(pubkey_regex=PUBKEY_REGEX))
-    re_block = re.compile("Block: ([0-9]+-{block_hash_regex})\n".format(block_hash_regex=BLOCK_HASH_REGEX))
+    re_pubkey = re.compile(
+        "PublicKey: ({pubkey_regex})\n".format(pubkey_regex=PUBKEY_REGEX)
+    )
+    re_block = re.compile(
+        "Block: ([0-9]+-{block_hash_regex})\n".format(block_hash_regex=BLOCK_HASH_REGEX)
+    )
     re_endpoints = re.compile("(Endpoints:)\n")
 
-    fields_parsers = {**Document.fields_parsers, **{
-        "Type": re_type,
-        "Pubkey": re_pubkey,
-        "Block": re_block,
-        "Endpoints": re_endpoints
-    }}
+    fields_parsers = {
+        **Document.fields_parsers,
+        **{
+            "Type": re_type,
+            "Pubkey": re_pubkey,
+            "Block": re_block,
+            "Endpoints": re_endpoints,
+        },
+    }
 
-    def __init__(self, version: int, currency: str, pubkey: str, block_uid: BlockUID,
-                 endpoints: List[Endpoint], signature: str) -> None:
+    def __init__(
+        self,
+        version: int,
+        currency: str,
+        pubkey: str,
+        block_uid: BlockUID,
+        endpoints: List[Endpoint],
+        signature: str,
+    ) -> None:
         """
         Init Peer instance
 
@@ -110,7 +124,9 @@ Currency: {1}
 PublicKey: {2}
 Block: {3}
 Endpoints:
-""".format(self.version, self.currency, self.pubkey, self.blockUID)
+""".format(
+            self.version, self.currency, self.pubkey, self.blockUID
+        )
 
         for _endpoint in self.endpoints:
             doc += "{0}\n".format(_endpoint.inline())

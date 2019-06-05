@@ -23,38 +23,24 @@ from duniterpy.api.client import Client, RESPONSE_AIOHTTP
 
 logger = logging.getLogger("duniter/tx")
 
-MODULE = 'tx'
+MODULE = "tx"
 
 HISTORY_SCHEMA = {
     "type": "object",
     "properties": {
-        "currency": {
-            "type": "string"
-        },
-        "pubkey": {
-            "type": "string"
-        },
+        "currency": {"type": "string"},
+        "pubkey": {"type": "string"},
         "history": {
             "type": "object",
             "properties": {
-                "sent": {
-                    "$ref": "#/definitions/transaction_data"
-                },
-                "received": {
-                    "$ref": "#/definitions/transaction_data"
-                },
-                "sending": {
-                    "$ref": "#/definitions/transactioning_data"
-                },
-                "receiving": {
-                    "$ref": "#/definitions/transactioning_data"
-                },
-                "pending": {
-                    "$ref": "#/definitions/transactioning_data"
-                }
+                "sent": {"$ref": "#/definitions/transaction_data"},
+                "received": {"$ref": "#/definitions/transaction_data"},
+                "sending": {"$ref": "#/definitions/transactioning_data"},
+                "receiving": {"$ref": "#/definitions/transactioning_data"},
+                "pending": {"$ref": "#/definitions/transactioning_data"},
             },
-            "required": ["sent", "received", "sending", "receiving", "pending"]
-        }
+            "required": ["sent", "received", "sending", "receiving", "pending"],
+        },
     },
     "definitions": {
         "transaction_data": {
@@ -62,144 +48,80 @@ HISTORY_SCHEMA = {
             "items": {
                 "type": "object",
                 "properties": {
-                    "version": {
-                        "type": "number"
-                    },
-                    "issuers": {
-                        "type": "array",
-                        "items": {
-                            "type": "string"
-                        }
-                    },
-                    "inputs": {
-                        "type": "array",
-                        "items": {
-                            "type": "string"
-                        }
-                    },
-                    "outputs": {
-                        "type": "array",
-                        "items": {
-                            "type": "string"
-                        }
-                    },
-                    "unlocks": {
-                        "type": "array",
-                        "items": {
-                            "type": "string"
-                        }
-                    },
-                    "comment": {
-                        "type": "string"
-                    },
-                    "signatures": {
-                        "type": "array",
-                        "items": {
-                            "type": "string"
-                        }
-                    },
-                    "hash": {
-                        "type": "string"
-                    },
-                    "block_number": {
-                        "type": "number"
-                    },
-                    "time": {
-                        "type": "number"
-                    }
+                    "version": {"type": "number"},
+                    "issuers": {"type": "array", "items": {"type": "string"}},
+                    "inputs": {"type": "array", "items": {"type": "string"}},
+                    "outputs": {"type": "array", "items": {"type": "string"}},
+                    "unlocks": {"type": "array", "items": {"type": "string"}},
+                    "comment": {"type": "string"},
+                    "signatures": {"type": "array", "items": {"type": "string"}},
+                    "hash": {"type": "string"},
+                    "block_number": {"type": "number"},
+                    "time": {"type": "number"},
                 },
-                "required": ["version", "issuers", "inputs", "outputs",
-                             "comment", "signatures", "hash", "block_number", "time"]
-            }
+                "required": [
+                    "version",
+                    "issuers",
+                    "inputs",
+                    "outputs",
+                    "comment",
+                    "signatures",
+                    "hash",
+                    "block_number",
+                    "time",
+                ],
+            },
         },
         "transactioning_data": {
             "type": "array",
             "items": {
                 "type": "object",
                 "properties": {
-                    "version": {
-                        "type": "number"
-                    },
-                    "issuers": {
-                        "type": "array",
-                        "items": {
-                            "type": "string"
-                        }
-                    },
-                    "inputs": {
-                        "type": "array",
-                        "items": {
-                            "type": "string"
-                        }
-                    },
-                    "outputs": {
-                        "type": "array",
-                        "items": {
-                            "type": "string"
-                        }
-                    },
-                    "unlocks": {
-                        "type": "array",
-                        "items": {
-                            "type": "string"
-                        }
-                    },
-                    "comment": {
-                        "type": "string"
-                    },
-                    "signatures": {
-                        "type": "array",
-                        "items": {
-                            "type": "string"
-                        }
-                    },
-                    "hash": {
-                        "type": "string"
-                    },
+                    "version": {"type": "number"},
+                    "issuers": {"type": "array", "items": {"type": "string"}},
+                    "inputs": {"type": "array", "items": {"type": "string"}},
+                    "outputs": {"type": "array", "items": {"type": "string"}},
+                    "unlocks": {"type": "array", "items": {"type": "string"}},
+                    "comment": {"type": "string"},
+                    "signatures": {"type": "array", "items": {"type": "string"}},
+                    "hash": {"type": "string"},
                 },
-                "required": ["version", "issuers", "inputs", "outputs",
-                             "comment", "signatures", "hash"]
-            }
-        }
+                "required": [
+                    "version",
+                    "issuers",
+                    "inputs",
+                    "outputs",
+                    "comment",
+                    "signatures",
+                    "hash",
+                ],
+            },
+        },
     },
-    "required": ["currency", "pubkey", "history"]
+    "required": ["currency", "pubkey", "history"],
 }
 
 SOURCES_SCHEMA = {
     "type": "object",
     "properties": {
-        "currency": {
-            "type": "string"
-        },
-        "pubkey": {
-            "type": "string"
-        },
+        "currency": {"type": "string"},
+        "pubkey": {"type": "string"},
         "sources": {
             "type": "array",
             "items": {
                 "type": "object",
                 "properties": {
-                    "type": {
-                        "type": "string"
-                    },
-                    "noffset": {
-                        "type": "number"
-                    },
-                    "identifier": {
-                        "type": "string"
-                    },
-                    "amount": {
-                        "type": "number"
-                    },
-                    "base": {
-                        "type": "number"
-                    }
+                    "type": {"type": "string"},
+                    "noffset": {"type": "number"},
+                    "identifier": {"type": "string"},
+                    "amount": {"type": "number"},
+                    "base": {"type": "number"},
                 },
-                "required": ["type", "noffset", "identifier", "amount", "base"]
-            }
-        }
+                "required": ["type", "noffset", "identifier", "amount", "base"],
+            },
+        },
     },
-    "required": ["currency", "pubkey", "sources"]
+    "required": ["currency", "pubkey", "sources"],
 }
 
 
@@ -211,7 +133,7 @@ async def history(client: Client, pubkey: str) -> dict:
     :param pubkey: Public key
     :return:
     """
-    return await client.get(MODULE + '/history/%s' % pubkey, schema=HISTORY_SCHEMA)
+    return await client.get(MODULE + "/history/%s" % pubkey, schema=HISTORY_SCHEMA)
 
 
 async def process(client: Client, transaction_signed_raw: str) -> ClientResponse:
@@ -222,7 +144,11 @@ async def process(client: Client, transaction_signed_raw: str) -> ClientResponse
     :param transaction_signed_raw: Transaction signed raw document
     :return:
     """
-    return await client.post(MODULE + '/process', {'transaction': transaction_signed_raw}, rtype=RESPONSE_AIOHTTP)
+    return await client.post(
+        MODULE + "/process",
+        {"transaction": transaction_signed_raw},
+        rtype=RESPONSE_AIOHTTP,
+    )
 
 
 async def sources(client: Client, pubkey: str) -> dict:
@@ -233,7 +159,7 @@ async def sources(client: Client, pubkey: str) -> dict:
     :param pubkey: Public key
     :return:
     """
-    return await client.get(MODULE + '/sources/%s' % pubkey, schema=SOURCES_SCHEMA)
+    return await client.get(MODULE + "/sources/%s" % pubkey, schema=SOURCES_SCHEMA)
 
 
 async def pending(client: Client, pubkey: str) -> dict:
@@ -244,7 +170,9 @@ async def pending(client: Client, pubkey: str) -> dict:
     :param pubkey: Public key
     :return:
     """
-    return await client.get(MODULE + '/history/%s/pending' % pubkey, schema=HISTORY_SCHEMA)
+    return await client.get(
+        MODULE + "/history/%s/pending" % pubkey, schema=HISTORY_SCHEMA
+    )
 
 
 async def blocks(client: Client, pubkey: str, start: int, end: int) -> dict:
@@ -257,7 +185,10 @@ async def blocks(client: Client, pubkey: str, start: int, end: int) -> dict:
     :param end: End to block number
     :return:
     """
-    return await client.get(MODULE + '/history/%s/blocks/%s/%s' % (pubkey, start, end), schema=HISTORY_SCHEMA)
+    return await client.get(
+        MODULE + "/history/%s/blocks/%s/%s" % (pubkey, start, end),
+        schema=HISTORY_SCHEMA,
+    )
 
 
 async def times(client: Client, pubkey: str, start: int, end: int) -> dict:
@@ -270,4 +201,6 @@ async def times(client: Client, pubkey: str, start: int, end: int) -> dict:
     :param end: End to timestamp
     :return:
     """
-    return await client.get(MODULE + '/history/%s/times/%s/%s' % (pubkey, start, end), schema=HISTORY_SCHEMA)
+    return await client.get(
+        MODULE + "/history/%s/times/%s/%s" % (pubkey, start, end), schema=HISTORY_SCHEMA
+    )

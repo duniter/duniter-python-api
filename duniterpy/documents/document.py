@@ -22,18 +22,20 @@ class MalformedDocumentError(Exception):
 
 
 # required to type hint cls in classmethod
-DocumentType = TypeVar('DocumentType', bound='Document')
+DocumentType = TypeVar("DocumentType", bound="Document")
 
 
 class Document:
     re_version = re.compile("Version: ([0-9]+)\n")
     re_currency = re.compile("Currency: ([^\n]+)\n")
-    re_signature = re.compile("({signature_regex})\n".format(signature_regex=SIGNATURE_REGEX))
+    re_signature = re.compile(
+        "({signature_regex})\n".format(signature_regex=SIGNATURE_REGEX)
+    )
 
     fields_parsers = {
         "Version": re_version,
         "Currency": re_currency,
-        "Signature": re_signature
+        "Signature": re_signature,
     }
 
     def __init__(self, version: int, currency: str, signatures: List[str]) -> None:
@@ -79,7 +81,7 @@ class Document:
         """
         self.signatures = []
         for key in keys:
-            signing = base64.b64encode(key.signature(bytes(self.raw(), 'ascii')))
+            signing = base64.b64encode(key.signature(bytes(self.raw(), "ascii")))
             logging.debug("Signature : \n%s", signing.decode("ascii"))
             self.signatures.append(signing.decode("ascii"))
 

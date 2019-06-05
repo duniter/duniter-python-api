@@ -21,7 +21,7 @@ from duniterpy.api.client import Client
 
 logger = logging.getLogger("duniter/node")
 
-MODULE = 'node'
+MODULE = "node"
 
 SUMMARY_SCHEMA = {
     "type": "object",
@@ -29,33 +29,20 @@ SUMMARY_SCHEMA = {
         "duniter": {
             "type": "object",
             "properties": {
-                "software": {
-                    "type": "string"
-                },
-                "version": {
-                    "type": "string",
-                },
-                "forkWindowSize": {
-                    "type": "number"
-                }
+                "software": {"type": "string"},
+                "version": {"type": "string"},
+                "forkWindowSize": {"type": "number"},
             },
-            "required": ["software", "version"]
-        },
+            "required": ["software", "version"],
+        }
     },
-    "required": ["duniter"]
+    "required": ["duniter"],
 }
 
 SANDBOX_SCHEMA = {
     "type": "object",
-    "properties": {
-        "size": {
-            "type": "number"
-        },
-        "free": {
-            "type": "number"
-        }
-    },
-    "required": ["size", "free"]
+    "properties": {"size": {"type": "number"}, "free": {"type": "number"}},
+    "required": ["size", "free"],
 }
 
 SANDBOXES_SCHEMA = {
@@ -63,9 +50,9 @@ SANDBOXES_SCHEMA = {
     "properties": {
         "identities": SANDBOX_SCHEMA,
         "memberships": SANDBOX_SCHEMA,
-        "transactions": SANDBOX_SCHEMA
+        "transactions": SANDBOX_SCHEMA,
     },
-    "required": ["identities", "memberships", "transactions"]
+    "required": ["identities", "memberships", "transactions"],
 }
 
 
@@ -76,7 +63,7 @@ async def summary(client: Client) -> dict:
     :param client: Client to connect to the api
     :return:
     """
-    return await client.get(MODULE + '/summary', schema=SUMMARY_SCHEMA)
+    return await client.get(MODULE + "/summary", schema=SUMMARY_SCHEMA)
 
 
 async def sandboxes(client: Client) -> dict:
@@ -86,4 +73,4 @@ async def sandboxes(client: Client) -> dict:
     :param client: Client to connect to the api
     :return:
     """
-    return await client.get(MODULE + '/sandboxes', schema=SANDBOXES_SCHEMA)
+    return await client.get(MODULE + "/sandboxes", schema=SANDBOXES_SCHEMA)

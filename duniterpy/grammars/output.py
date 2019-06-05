@@ -9,6 +9,7 @@ class Pubkey(str):
     """
     Pubkey in transaction output condition
     """
+
     regex = re.compile(PUBKEY_REGEX)
 
 
@@ -16,6 +17,7 @@ class Hash(str):
     """
     Hash in transaction output condition
     """
+
     regex = re.compile(HASH_REGEX)
 
 
@@ -23,27 +25,29 @@ class Int(str):
     """
     Integer in transaction output condition
     """
+
     regex = re.compile(r"[0-9]+")
 
 
 # required to type hint cls in classmethod
-SIGType = TypeVar('SIGType', bound='SIG')
+SIGType = TypeVar("SIGType", bound="SIG")
 
 
 class SIG:
     """
     SIGnature function in transaction output condition
     """
-    grammar = "SIG(", attr('pubkey', Pubkey), ")"
 
-    def __init__(self, value: str = '') -> None:
+    grammar = "SIG(", attr("pubkey", Pubkey), ")"
+
+    def __init__(self, value: str = "") -> None:
         """
         Init SIG instance
 
         :param value: Content of the string
         """
         self.value = value
-        self.pubkey = ''
+        self.pubkey = ""
 
     def __str__(self) -> str:
         return self.value
@@ -54,12 +58,10 @@ class SIG:
         """
         if not isinstance(other, SIG):
             return NotImplemented
-        return self.value == other.value and \
-            self.pubkey == other.pubkey
+        return self.value == other.value and self.pubkey == other.pubkey
 
     def __hash__(self) -> int:
         return hash((self.value, self.pubkey))
-
 
     @classmethod
     def token(cls: Type[SIGType], pubkey: str) -> SIGType:
@@ -73,7 +75,9 @@ class SIG:
         sig.pubkey = pubkey
         return sig
 
-    def compose(self, parser: Any = None, grammar: Any = None, attr_of: Any = None) -> str:
+    def compose(
+        self, parser: Any = None, grammar: Any = None, attr_of: Any = None
+    ) -> str:
         """
         Return the SIG(pubkey) expression as string format
 
@@ -86,23 +90,24 @@ class SIG:
 
 
 # required to type hint cls in classmethod
-CSVType = TypeVar('CSVType', bound='CSV')
+CSVType = TypeVar("CSVType", bound="CSV")
 
 
 class CSV:
     """
     CSV function in transaction output condition
     """
-    grammar = "CSV(", attr('time', Int), ")"
 
-    def __init__(self, value: str = '') -> None:
+    grammar = "CSV(", attr("time", Int), ")"
+
+    def __init__(self, value: str = "") -> None:
         """
         Init CSV instance
 
         :param value: Content of the string
         """
         self.value = value
-        self.time = ''
+        self.time = ""
 
     def __str__(self) -> str:
         return self.value
@@ -113,12 +118,10 @@ class CSV:
         """
         if not isinstance(other, CSV):
             return NotImplemented
-        return self.value == other.value and \
-            self.time == other.time
+        return self.value == other.value and self.time == other.time
 
     def __hash__(self) -> int:
         return hash((self.value, self.time))
-
 
     @classmethod
     def token(cls: Type[CSVType], time: int) -> CSVType:
@@ -132,7 +135,9 @@ class CSV:
         csv.time = str(time)
         return csv
 
-    def compose(self, parser: Any = None, grammar: Any = None, attr_of: str = None) -> str:
+    def compose(
+        self, parser: Any = None, grammar: Any = None, attr_of: str = None
+    ) -> str:
         """
         Return the CSV(time) expression as string format
 
@@ -144,23 +149,24 @@ class CSV:
 
 
 # required to type hint cls in classmethod
-CLTVType = TypeVar('CLTVType', bound='CLTV')
+CLTVType = TypeVar("CLTVType", bound="CLTV")
 
 
 class CLTV:
     """
     CLTV function in transaction output condition
     """
-    grammar = "CLTV(", attr('timestamp', Int), ")"
 
-    def __init__(self, value: str = '') -> None:
+    grammar = "CLTV(", attr("timestamp", Int), ")"
+
+    def __init__(self, value: str = "") -> None:
         """
         Init CLTV instance
 
         :param value: Content of the string
         """
         self.value = value
-        self.timestamp = ''
+        self.timestamp = ""
 
     def __str__(self) -> str:
         return self.value
@@ -171,12 +177,10 @@ class CLTV:
         """
         if not isinstance(other, CLTV):
             return NotImplemented
-        return self.value == other.value and \
-            self.timestamp == other.timestamp
+        return self.value == other.value and self.timestamp == other.timestamp
 
     def __hash__(self) -> int:
         return hash((self.value, self.timestamp))
-
 
     @classmethod
     def token(cls: Type[CLTVType], timestamp: int) -> CLTVType:
@@ -190,7 +194,9 @@ class CLTV:
         cltv.timestamp = str(timestamp)
         return cltv
 
-    def compose(self, parser: Any = None, grammar: Any = None, attr_of: str = None) -> str:
+    def compose(
+        self, parser: Any = None, grammar: Any = None, attr_of: str = None
+    ) -> str:
         """
         Return the CLTV(timestamp) expression as string format
 
@@ -202,23 +208,24 @@ class CLTV:
 
 
 # required to type hint cls in classmethod
-XHXType = TypeVar('XHXType', bound='XHX')
+XHXType = TypeVar("XHXType", bound="XHX")
 
 
 class XHX:
     """
     XHX function in transaction output condition
     """
-    grammar = "XHX(", attr('sha_hash', Hash), ")"
 
-    def __init__(self, value: str = '') -> None:
+    grammar = "XHX(", attr("sha_hash", Hash), ")"
+
+    def __init__(self, value: str = "") -> None:
         """
         Init XHX instance
 
         :param value: Content of the string
         """
         self.value = value
-        self.sha_hash = ''
+        self.sha_hash = ""
 
     def __str__(self) -> str:
         return self.value
@@ -229,12 +236,10 @@ class XHX:
         """
         if not isinstance(other, XHX):
             return NotImplemented
-        return self.value == other.value and \
-            self.sha_hash == other.sha_hash
+        return self.value == other.value and self.sha_hash == other.sha_hash
 
     def __hash__(self) -> int:
         return hash((self.value, self.sha_hash))
-
 
     @classmethod
     def token(cls: Type[XHXType], sha_hash: str) -> XHXType:
@@ -248,7 +253,9 @@ class XHX:
         xhx.sha_hash = sha_hash
         return xhx
 
-    def compose(self, parser: Any = None, grammar: Any = None, attr_of: str = None) -> str:
+    def compose(
+        self, parser: Any = None, grammar: Any = None, attr_of: str = None
+    ) -> str:
         """
         Return the XHX(sha_hash) expression as string format
 
@@ -260,13 +267,14 @@ class XHX:
 
 
 # required to type hint cls in classmethod
-OperatorType = TypeVar('OperatorType', bound='Operator')
+OperatorType = TypeVar("OperatorType", bound="Operator")
 
 
 class Operator(Keyword):
     """
     Operator in transaction output condition
     """
+
     grammar = Enum(K("&&"), K("||"), K("AND"), K("OR"))
     regex = re.compile(r"[&&|\|\||\w]+")
 
@@ -281,7 +289,9 @@ class Operator(Keyword):
         op = cls(keyword)
         return op
 
-    def compose(self, parser: Any = None, grammar: Any = None, attr_of: str = None) -> str:
+    def compose(
+        self, parser: Any = None, grammar: Any = None, attr_of: str = None
+    ) -> str:
         """
         Return the Operator keyword as string format
 
@@ -293,7 +303,7 @@ class Operator(Keyword):
 
 
 # required to type hint cls in classmethod
-ConditionType = TypeVar('ConditionType', bound='Condition')
+ConditionType = TypeVar("ConditionType", bound="Condition")
 
 
 class Condition:
@@ -301,19 +311,19 @@ class Condition:
     Condition expression in transaction output
 
     """
+
     grammar = None
 
-    def __init__(self, value: str = '') -> None:
+    def __init__(self, value: str = "") -> None:
         """
         Init Condition instance
 
         :param value: Content of the condition as string
         """
         self.value = value
-        self.left = ''
-        self.right = ''
-        self.op = ''
-
+        self.left = ""
+        self.right = ""
+        self.op = ""
 
     def __eq__(self, other: Any) -> bool:
         """
@@ -321,10 +331,12 @@ class Condition:
         """
         if not isinstance(other, Condition):
             return NotImplemented
-        return self.value == other.value and \
-            self.left == other.left and \
-            self.right == other.right and \
-            self.op == other.op
+        return (
+            self.value == other.value
+            and self.left == other.left
+            and self.right == other.right
+            and self.op == other.op
+        )
 
     def __hash__(self) -> int:
         return hash((self.value, self.left, self.right, self.op))
@@ -333,8 +345,12 @@ class Condition:
         return self.value
 
     @classmethod
-    def token(cls: Type[ConditionType], left: Any, op: Optional[Any] = None,
-              right: Optional[Any] = None) -> ConditionType:
+    def token(
+        cls: Type[ConditionType],
+        left: Any,
+        op: Optional[Any] = None,
+        right: Optional[Any] = None,
+    ) -> ConditionType:
         """
         Return Condition instance from arguments and Operator
 
@@ -360,14 +376,18 @@ class Condition:
         :param attr_of: Attribute of...
         """
         if type(self.left) is Condition:
-            left = "({0})".format(parser.compose(self.left, grammar=grammar, attr_of=attr_of))
+            left = "({0})".format(
+                parser.compose(self.left, grammar=grammar, attr_of=attr_of)
+            )
         else:
             left = parser.compose(self.left, grammar=grammar, attr_of=attr_of)
 
-        if getattr(self, 'op', None):
+        if getattr(self, "op", None):
 
             if type(self.right) is Condition:
-                right = "({0})".format(parser.compose(self.right, grammar=grammar, attr_of=attr_of))
+                right = "({0})".format(
+                    parser.compose(self.right, grammar=grammar, attr_of=attr_of)
+                )
             else:
                 right = parser.compose(self.right, grammar=grammar, attr_of=attr_of)
             op = parser.compose(self.op, grammar=grammar, attr_of=attr_of)
@@ -377,6 +397,12 @@ class Condition:
         return result
 
 
-Condition.grammar = contiguous(attr('left', [SIG, XHX, CSV, CLTV, ('(', Condition, ')')]),
-                               maybe_some(whitespace, attr('op', Operator), whitespace,
-                                          attr('right', [SIG, XHX, CSV, CLTV, ('(', Condition, ')')])))
+Condition.grammar = contiguous(
+    attr("left", [SIG, XHX, CSV, CLTV, ("(", Condition, ")")]),
+    maybe_some(
+        whitespace,
+        attr("op", Operator),
+        whitespace,
+        attr("right", [SIG, XHX, CSV, CLTV, ("(", Condition, ")")]),
+    ),
+)

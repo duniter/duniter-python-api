@@ -18,9 +18,8 @@
 import logging
 from . import network, blockchain, tx, wot, node, ud, ws
 
-__all__ = ['network', 'blockchain', 'tx', 'wot', 'node', 'ud', 'ws']
+__all__ = ["network", "blockchain", "tx", "wot", "node", "ud", "ws"]
 
 PROTOCOL_VERSION = 2
 
 logger = logging.getLogger("duniter")
-

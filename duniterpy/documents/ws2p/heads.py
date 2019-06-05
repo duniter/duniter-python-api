@@ -4,8 +4,15 @@ import attr
 
 from ..block_uid import BlockUID
 from ..document import MalformedDocumentError
-from ...constants import WS2P_PUBLIC_PREFIX_REGEX, WS2P_PRIVATE_PREFIX_REGEX, WS2P_HEAD_REGEX, \
-    PUBKEY_REGEX, SIGNATURE_REGEX, WS2PID_REGEX, BLOCK_UID_REGEX
+from ...constants import (
+    WS2P_PUBLIC_PREFIX_REGEX,
+    WS2P_PRIVATE_PREFIX_REGEX,
+    WS2P_HEAD_REGEX,
+    PUBKEY_REGEX,
+    SIGNATURE_REGEX,
+    WS2PID_REGEX,
+    BLOCK_UID_REGEX,
+)
 
 
 @attr.s()
@@ -13,9 +20,11 @@ class API:
     private = attr.ib(type=str)
     public = attr.ib(type=str)
 
-    re_inline = re.compile("WS2P({ws2p_private})?({ws2p_public})?".format(
-        ws2p_private=WS2P_PRIVATE_PREFIX_REGEX,
-        ws2p_public=WS2P_PUBLIC_PREFIX_REGEX))
+    re_inline = re.compile(
+        "WS2P({ws2p_private})?({ws2p_public})?".format(
+            ws2p_private=WS2P_PRIVATE_PREFIX_REGEX, ws2p_public=WS2P_PUBLIC_PREFIX_REGEX
+        )
+    )
 
     @classmethod
     def from_inline(cls, inline: str):
@@ -42,7 +51,7 @@ class Head:
             data = Head.re_inline.match(inline)
             if data is None:
                 raise MalformedDocumentError("Head")
-            head = data.group(0).split(':')
+            head = data.group(0).split(":")
             version = int(head[1]) if len(head) == 2 else 0
             return cls(version)
         except AttributeError:
@@ -57,18 +66,22 @@ class HeadV0:
     """
     A document describing a self certification.
     """
+
     signature = attr.ib(type=str)
     api = attr.ib(type=API)
     head = attr.ib(type=Head)
     pubkey = attr.ib(type=str)
     blockstamp = attr.ib(type=BlockUID)
 
-    re_inline = re.compile("^(WS2P(?:{ws2p_private})?(?:{ws2p_public})?):({head}):({pubkey}):({blockstamp})(?::)?(.*)"
-                           .format(ws2p_private=WS2P_PRIVATE_PREFIX_REGEX,
-                                   ws2p_public=WS2P_PUBLIC_PREFIX_REGEX,
-                                   head=WS2P_HEAD_REGEX,
-                                   pubkey=PUBKEY_REGEX,
-                                   blockstamp=BLOCK_UID_REGEX))
+    re_inline = re.compile(
+        "^(WS2P(?:{ws2p_private})?(?:{ws2p_public})?):({head}):({pubkey}):({blockstamp})(?::)?(.*)".format(
+            ws2p_private=WS2P_PRIVATE_PREFIX_REGEX,
+            ws2p_public=WS2P_PUBLIC_PREFIX_REGEX,
+            head=WS2P_HEAD_REGEX,
+            pubkey=PUBKEY_REGEX,
+            blockstamp=BLOCK_UID_REGEX,
+        )
+    )
 
     re_signature = re.compile(SIGNATURE_REGEX)
 
@@ -88,8 +101,14 @@ class HeadV0:
             raise MalformedDocumentError("HeadV0")
 
     def inline(self) -> str:
-        values = (str(v) for v in attr.astuple(self, recurse=False,
-                                               filter=attr.filters.exclude(attr.fields(HeadV0).signature)))
+        values = (
+            str(v)
+            for v in attr.astuple(
+                self,
+                recurse=False,
+                filter=attr.filters.exclude(attr.fields(HeadV0).signature),
+            )
+        )
         return ":".join(values)
 
 
@@ -101,11 +120,14 @@ class HeadV1:
     software_version = attr.ib(type=str)
     pow_prefix = attr.ib(type=int)
 
-    re_inline = re.compile("({ws2pid}):({software}):({software_version}):({pow_prefix})(?::)?(.*)".format(
-        ws2pid=WS2PID_REGEX,
-        software="[A-Za-z-_]+",
-        software_version="[0-9]+[.][0-9]+[.][0-9]+",
-        pow_prefix="[0-9]+"))
+    re_inline = re.compile(
+        "({ws2pid}):({software}):({software_version}):({pow_prefix})(?::)?(.*)".format(
+            ws2pid=WS2PID_REGEX,
+            software="[A-Za-z-_]+",
+            software_version="[0-9]+[.][0-9]+[.][0-9]+",
+            pow_prefix="[0-9]+",
+        )
+    )
 
     @classmethod
     def from_inline(cls, inline: str, signature: str):
@@ -124,7 +146,12 @@ class HeadV1:
             raise MalformedDocumentError("HeadV1")
 
     def inline(self) -> str:
-        values = [str(v) for v in attr.astuple(self, True, filter=attr.filters.exclude(attr.fields(HeadV1).v0))]
+        values = [
+            str(v)
+            for v in attr.astuple(
+                self, True, filter=attr.filters.exclude(attr.fields(HeadV1).v0)
+            )
+        ]
         return self.v0.inline() + ":" + ":".join(values)
 
     @property
@@ -146,9 +173,11 @@ class HeadV2:
     free_member_room = attr.ib(type=int)
     free_mirror_room = attr.ib(type=int)
 
-    re_inline = re.compile("({free_member_room}):({free_mirror_room})(?::)?(.*)".format(
-        free_member_room="[0-9]+",
-        free_mirror_room="[0-9]+"))
+    re_inline = re.compile(
+        "({free_member_room}):({free_mirror_room})(?::)?(.*)".format(
+            free_member_room="[0-9]+", free_mirror_room="[0-9]+"
+        )
+    )
 
     @classmethod
     def from_inline(cls, inline: str, signature: str):
@@ -164,7 +193,12 @@ class HeadV2:
             raise MalformedDocumentError("HeadV2")
 
     def inline(self) -> str:
-        values = (str(v) for v in attr.astuple(self, True, filter=attr.filters.exclude(attr.fields(HeadV2).v1)))
+        values = (
+            str(v)
+            for v in attr.astuple(
+                self, True, filter=attr.filters.exclude(attr.fields(HeadV2).v1)
+            )
+        )
         return self.v1.inline() + ":" + ":".join(values)
 
     @property

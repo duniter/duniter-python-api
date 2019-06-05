@@ -23,81 +23,61 @@ from duniterpy.api.client import Client, RESPONSE_AIOHTTP
 
 logger = logging.getLogger("duniter/wot")
 
-MODULE = 'wot'
+MODULE = "wot"
 
 CERTIFICATIONS_SCHEMA = {
     "type": "object",
     "properties": {
-        "pubkey": {
-            "type": "string"
-        },
-        "uid": {
-            "type": "string"
-        },
-        "isMember": {
-            "type": "boolean"
-        },
+        "pubkey": {"type": "string"},
+        "uid": {"type": "string"},
+        "isMember": {"type": "boolean"},
         "certifications": {
             "type": "array",
             "items": {
                 "type": "object",
                 "properties": {
-                    "pubkey": {
-                        "type": "string"
-                    },
-                    "uid": {
-                        "type": "string"
-                    },
+                    "pubkey": {"type": "string"},
+                    "uid": {"type": "string"},
                     "cert_time": {
                         "type": "object",
                         "properties": {
-                            "block": {
-                                "type": "number"
-                            },
-                            "medianTime": {
-                                "type": "number"
-                            }
+                            "block": {"type": "number"},
+                            "medianTime": {"type": "number"},
                         },
-                        "required": ["block", "medianTime"]
+                        "required": ["block", "medianTime"],
                     },
-                    "sigDate": {
-                        "type": "string"
-                    },
+                    "sigDate": {"type": "string"},
                     "written": {
                         "oneOf": [
                             {
                                 "type": "object",
                                 "properties": {
-                                    "number": {
-                                        "type": "number",
-                                    },
-                                    "hash": {
-                                        "type": "string"
-                                    }
+                                    "number": {"type": "number"},
+                                    "hash": {"type": "string"},
                                 },
-                                "required": ["number", "hash"]
+                                "required": ["number", "hash"],
                             },
-                            {
-                                "type": "null"
-                            }
+                            {"type": "null"},
                         ]
                     },
-                    "isMember": {
-                        "type": "boolean"
-                    },
-                    "wasMember": {
-                        "type": "boolean"
-                    },
-                    "signature": {
-                        "type": "string"
-                    }
+                    "isMember": {"type": "boolean"},
+                    "wasMember": {"type": "boolean"},
+                    "signature": {"type": "string"},
                 },
-                "required": ["pubkey", "uid", "cert_time", "sigDate",
-                             "written", "wasMember", "isMember", "signature"]
-            }
-        }
+                "required": [
+                    "pubkey",
+                    "uid",
+                    "cert_time",
+                    "sigDate",
+                    "written",
+                    "wasMember",
+                    "isMember",
+                    "signature",
+                ],
+            },
+        },
     },
-    "required": ["pubkey", "uid", "isMember", "certifications"]
+    "required": ["pubkey", "uid", "isMember", "certifications"],
 }
 
 MEMBERS_SCHEMA = {
@@ -107,16 +87,12 @@ MEMBERS_SCHEMA = {
             "type": "array",
             "items": {
                 "type": "object",
-                "properties": {
-                    "pubkey": {
-                        "type": "string"
-                    }
-                },
-                "required": ["pubkey"]
-            }
+                "properties": {"pubkey": {"type": "string"}},
+                "required": ["pubkey"],
+            },
         }
     },
-    "required": ["results"]
+    "required": ["results"],
 }
 
 REQUIREMENTS_SCHEMA = {
@@ -127,190 +103,130 @@ REQUIREMENTS_SCHEMA = {
             "items": {
                 "type": "object",
                 "properties": {
-                    "pubkey": {
-                        "type": "string"
-                    },
-                    "uid": {
-                        "type": "string"
-                    },
+                    "pubkey": {"type": "string"},
+                    "uid": {"type": "string"},
                     "meta": {
                         "type": "object",
-                        "properties": {
-                            "timestamp": {
-                                "type": "string"
-                            }
-                        },
-                        "required": ["timestamp"]
+                        "properties": {"timestamp": {"type": "string"}},
+                        "required": ["timestamp"],
                     },
-                    "outdistanced": {
-                        "type": "boolean"
-                    },
+                    "outdistanced": {"type": "boolean"},
                     "certifications": {
                         "type": "array",
                         "items": {
                             "type": "object",
                             "properties": {
-                                "from": {
-                                    "type": "string"
-                                },
-                                "to": {
-                                    "type": "string"
-                                },
-                                "expiresIn": {
-                                    "type": "number"
-                                }
+                                "from": {"type": "string"},
+                                "to": {"type": "string"},
+                                "expiresIn": {"type": "number"},
                             },
-                            "required": ["from", "to", "expiresIn"]
-                        }
+                            "required": ["from", "to", "expiresIn"],
+                        },
                     },
-                    "membershipPendingExpiresIn": {
-                        "type": "number"
-                    },
-                    "membershipExpiresIn": {
-                        "type": "number"
-                    },
-                    "wasMember": {
-                        "type": "boolean"
-                    },
-                    "isSentry": {
-                        "type": "boolean"
-                    },
-                    "revoked": {
-                        "type": "boolean"
-                    },
-                    "revokation_sig": {
-                        "type": ["string", "null"]
-                    },
-                    "revoked_on": {
-                        "type": ["number", "null"]
-                    },
+                    "membershipPendingExpiresIn": {"type": "number"},
+                    "membershipExpiresIn": {"type": "number"},
+                    "wasMember": {"type": "boolean"},
+                    "isSentry": {"type": "boolean"},
+                    "revoked": {"type": "boolean"},
+                    "revokation_sig": {"type": ["string", "null"]},
+                    "revoked_on": {"type": ["number", "null"]},
                 },
-                "required": ["pubkey", "uid", "meta", "outdistanced", "certifications", "membershipPendingExpiresIn",
-                             "membershipExpiresIn", "wasMember", "isSentry", "revoked", "revoked_on", "revocation_sig"]
-            }
+                "required": [
+                    "pubkey",
+                    "uid",
+                    "meta",
+                    "outdistanced",
+                    "certifications",
+                    "membershipPendingExpiresIn",
+                    "membershipExpiresIn",
+                    "wasMember",
+                    "isSentry",
+                    "revoked",
+                    "revoked_on",
+                    "revocation_sig",
+                ],
+            },
         }
     },
-    "required": ["identities"]
+    "required": ["identities"],
 }
 
 LOOKUP_SCHEMA = {
     "type": "object",
     "definitions": {
-        "meta_data": {
-            "type": "object",
-            "properties": {
-                "timestamp": {
-                    "type": "string"
-                }
-            }
-        },
+        "meta_data": {"type": "object", "properties": {"timestamp": {"type": "string"}}}
     },
     "properties": {
-        "partial": {
-            "type": "boolean"
-        },
+        "partial": {"type": "boolean"},
         "results": {
             "type": "array",
             "items": {
                 "type": "object",
                 "properties": {
-                    "pubkey": {
-                        "type": "string"
-                    },
+                    "pubkey": {"type": "string"},
                     "uids": {
                         "type": "array",
                         "items": {
                             "type": "object",
                             "properties": {
-                                "uid": {
-                                    "type": "string"
-                                },
-                                "meta": {
-                                    "$ref": "#/definitions/meta_data"
-                                },
-                                "self": {
-                                    "type": "string",
-                                },
-                                "revocation_sig": {
-                                    "type": ["string", "null"]
-                                },
-                                "revoked_on": {
-                                    "type": ["number", "null"]
-                                },
-                                "revoked": {
-                                    "type": "boolean"
-                                },
+                                "uid": {"type": "string"},
+                                "meta": {"$ref": "#/definitions/meta_data"},
+                                "self": {"type": "string"},
+                                "revocation_sig": {"type": ["string", "null"]},
+                                "revoked_on": {"type": ["number", "null"]},
+                                "revoked": {"type": "boolean"},
                                 "others": {
                                     "type": "array",
                                     "items": {
                                         "type": "object",
                                         "properties": {
-                                            "pubkey": {
-                                                "type": "string",
-                                            },
-                                            "meta": {
-                                                "$ref": "#/definitions/meta_data"
-                                            },
-                                            "signature": {
-                                                "type": "string"
-                                            }
-                                        }
-                                    }
-                                }
+                                            "pubkey": {"type": "string"},
+                                            "meta": {"$ref": "#/definitions/meta_data"},
+                                            "signature": {"type": "string"},
+                                        },
+                                    },
+                                },
                             },
-                            "required": ["uid", "meta", "self", "revocation_sig", "revoked", "others"]
-                        }
+                            "required": [
+                                "uid",
+                                "meta",
+                                "self",
+                                "revocation_sig",
+                                "revoked",
+                                "others",
+                            ],
+                        },
                     },
                     "signed": {
                         "type": "array",
                         "items": {
                             "type": "object",
                             "properties": {
-                                "uid": {
-                                    "type": "string"
-                                },
-                                "pubkey": {
-                                    "type": "string"
-                                },
-                                "meta": {
-                                    "$ref": "#/definitions/meta_data"
-                                },
-                                "signature": {
-                                    "type": "string"
-                                },
-                                "revocation_sig": {
-                                    "type": ["string", "null"]
-                                },
-                                "revoked_on": {
-                                    "type": ["number", "null"]
-                                },
-                                "revoked": {
-                                    "type": "boolean"
-                                }
+                                "uid": {"type": "string"},
+                                "pubkey": {"type": "string"},
+                                "meta": {"$ref": "#/definitions/meta_data"},
+                                "signature": {"type": "string"},
+                                "revocation_sig": {"type": ["string", "null"]},
+                                "revoked_on": {"type": ["number", "null"]},
+                                "revoked": {"type": "boolean"},
                             },
-                            "required": ["uid", "pubkey", "meta", "signature"]
-                        }
+                            "required": ["uid", "pubkey", "meta", "signature"],
+                        },
                     },
                 },
-            }
-        }
+            },
+        },
     },
-    "required": ["partial", "results"]
+    "required": ["partial", "results"],
 }
 
 IDENTITY_OF_SCHEMA = {
     "type": "object",
     "properties": {
-        "pubkey": {
-            "type": "string"
-        },
-        "uid": {
-            "type": "string"
-        },
-        "sigDate": {
-            "type": "string"
-        }
-    }
+        "pubkey": {"type": "string"},
+        "uid": {"type": "string"},
+        "sigDate": {"type": "string"},
+    },
 }
 
 
@@ -322,7 +238,9 @@ async def add(client: Client, identity_signed_raw: str) -> ClientResponse:
     :param identity_signed_raw: Identity raw document
     :return:
     """
-    return await client.post(MODULE + '/add', {'identity': identity_signed_raw}, rtype=RESPONSE_AIOHTTP)
+    return await client.post(
+        MODULE + "/add", {"identity": identity_signed_raw}, rtype=RESPONSE_AIOHTTP
+    )
 
 
 async def certify(client: Client, certification_signed_raw: str) -> ClientResponse:
@@ -333,7 +251,9 @@ async def certify(client: Client, certification_signed_raw: str) -> ClientRespon
     :param certification_signed_raw: Certification raw document
     :return:
     """
-    return await client.post(MODULE + '/certify', {'cert': certification_signed_raw}, rtype=RESPONSE_AIOHTTP)
+    return await client.post(
+        MODULE + "/certify", {"cert": certification_signed_raw}, rtype=RESPONSE_AIOHTTP
+    )
 
 
 async def revoke(client: Client, revocation_signed_raw: str) -> ClientResponse:
@@ -344,7 +264,11 @@ async def revoke(client: Client, revocation_signed_raw: str) -> ClientResponse:
     :param revocation_signed_raw: Certification raw document
     :return:
     """
-    return await client.post(MODULE + '/revoke', {'revocation': revocation_signed_raw}, rtype=RESPONSE_AIOHTTP)
+    return await client.post(
+        MODULE + "/revoke",
+        {"revocation": revocation_signed_raw},
+        rtype=RESPONSE_AIOHTTP,
+    )
 
 
 async def lookup(client: Client, search: str) -> dict:
@@ -355,7 +279,7 @@ async def lookup(client: Client, search: str) -> dict:
     :param search: UID or public key
     :return:
     """
-    return await client.get(MODULE + '/lookup/%s' % search, schema=LOOKUP_SCHEMA)
+    return await client.get(MODULE + "/lookup/%s" % search, schema=LOOKUP_SCHEMA)
 
 
 async def certifiers_of(client: Client, search: str) -> dict:
@@ -366,7 +290,9 @@ async def certifiers_of(client: Client, search: str) -> dict:
     :param search: UID or public key
     :return:
     """
-    return await client.get(MODULE + '/certifiers-of/%s' % search, schema=CERTIFICATIONS_SCHEMA)
+    return await client.get(
+        MODULE + "/certifiers-of/%s" % search, schema=CERTIFICATIONS_SCHEMA
+    )
 
 
 async def certified_by(client: Client, search: str) -> dict:
@@ -377,7 +303,9 @@ async def certified_by(client: Client, search: str) -> dict:
     :param search: UID or public key
     :return:
     """
-    return await client.get(MODULE + '/certified-by/%s' % search, schema=CERTIFICATIONS_SCHEMA)
+    return await client.get(
+        MODULE + "/certified-by/%s" % search, schema=CERTIFICATIONS_SCHEMA
+    )
 
 
 async def members(client: Client) -> dict:
@@ -387,7 +315,7 @@ async def members(client: Client) -> dict:
     :param client: Client to connect to the api
     :return:
     """
-    return await client.get(MODULE + '/members', schema=MEMBERS_SCHEMA)
+    return await client.get(MODULE + "/members", schema=MEMBERS_SCHEMA)
 
 
 async def requirements(client: Client, search: str) -> dict:
@@ -398,7 +326,9 @@ async def requirements(client: Client, search: str) -> dict:
     :param search: UID or public key
     :return:
     """
-    return await client.get(MODULE + '/requirements/%s' % search, schema=REQUIREMENTS_SCHEMA)
+    return await client.get(
+        MODULE + "/requirements/%s" % search, schema=REQUIREMENTS_SCHEMA
+    )
 
 
 async def identity_of(client: Client, search: str) -> dict:
@@ -409,4 +339,6 @@ async def identity_of(client: Client, search: str) -> dict:
     :param search: UID or public key
     :return:
     """
-    return await client.get(MODULE + '/identity-of/%s' % search, schema=IDENTITY_OF_SCHEMA)
+    return await client.get(
+        MODULE + "/identity-of/%s" % search, schema=IDENTITY_OF_SCHEMA
+    )

@@ -6,7 +6,7 @@ from ..constants import PUBKEY_REGEX, SIGNATURE_REGEX, BLOCK_UID_REGEX, UID_REGE
 from .document import Document, MalformedDocumentError
 
 # required to type hint cls in classmethod
-IdentityType = TypeVar('IdentityType', bound='Identity')
+IdentityType = TypeVar("IdentityType", bound="Identity")
 
 
 class Identity(Document):
@@ -14,26 +14,45 @@ class Identity(Document):
     A document describing a self certification.
     """
 
-    re_inline = re.compile("({pubkey_regex}):({signature_regex}):({block_uid_regex}):([^\n]+)\n"
-                           .format(pubkey_regex=PUBKEY_REGEX,
-                                   signature_regex=SIGNATURE_REGEX,
-                                   block_uid_regex=BLOCK_UID_REGEX))
+    re_inline = re.compile(
+        "({pubkey_regex}):({signature_regex}):({block_uid_regex}):([^\n]+)\n".format(
+            pubkey_regex=PUBKEY_REGEX,
+            signature_regex=SIGNATURE_REGEX,
+            block_uid_regex=BLOCK_UID_REGEX,
+        )
+    )
     re_type = re.compile("Type: (Identity)")
-    re_issuer = re.compile("Issuer: ({pubkey_regex})\n".format(pubkey_regex=PUBKEY_REGEX))
+    re_issuer = re.compile(
+        "Issuer: ({pubkey_regex})\n".format(pubkey_regex=PUBKEY_REGEX)
+    )
     re_unique_id = re.compile("UniqueID: ({uid_regex})\n".format(uid_regex=UID_REGEX))
     re_uid = re.compile("UID:([^\n]+)\n")
-    re_meta_ts = re.compile("META:TS:({block_uid_regex})\n".format(block_uid_regex=BLOCK_UID_REGEX))
-    re_timestamp = re.compile("Timestamp: ({block_uid_regex})\n".format(block_uid_regex=BLOCK_UID_REGEX))
+    re_meta_ts = re.compile(
+        "META:TS:({block_uid_regex})\n".format(block_uid_regex=BLOCK_UID_REGEX)
+    )
+    re_timestamp = re.compile(
+        "Timestamp: ({block_uid_regex})\n".format(block_uid_regex=BLOCK_UID_REGEX)
+    )
 
-    fields_parsers = {**Document.fields_parsers, **{
-        "Type": re_type,
-        "UniqueID": re_unique_id,
-        "Issuer": re_issuer,
-        "Timestamp": re_timestamp
-    }}
+    fields_parsers = {
+        **Document.fields_parsers,
+        **{
+            "Type": re_type,
+            "UniqueID": re_unique_id,
+            "Issuer": re_issuer,
+            "Timestamp": re_timestamp,
+        },
+    }
 
-    def __init__(self, version: int, currency: str, pubkey: str, uid: str, ts: BlockUID,
-                 signature: Optional[str]) -> None:
+    def __init__(
+        self,
+        version: int,
+        currency: str,
+        pubkey: str,
+        uid: str,
+        ts: BlockUID,
+        signature: Optional[str],
+    ) -> None:
         """
         Create an identity document
 
@@ -53,7 +72,9 @@ class Identity(Document):
         self.uid = uid
 
     @classmethod
-    def from_inline(cls: Type[IdentityType], version: int, currency: str, inline: str) -> IdentityType:
+    def from_inline(
+        cls: Type[IdentityType], version: int, currency: str, inline: str
+    ) -> IdentityType:
         """
         Return Identity instance from inline Identity string
         :param version: Document version number
@@ -114,11 +135,13 @@ Currency: {currency}
 Issuer: {pubkey}
 UniqueID: {uid}
 Timestamp: {timestamp}
-""".format(version=self.version,
-           currency=self.currency,
-           pubkey=self.pubkey,
-           uid=self.uid,
-           timestamp=self.timestamp)
+""".format(
+            version=self.version,
+            currency=self.currency,
+            pubkey=self.pubkey,
+            uid=self.uid,
+            timestamp=self.timestamp,
+        )
 
     def inline(self) -> str:
         """
@@ -129,4 +152,5 @@ Timestamp: {timestamp}
             pubkey=self.pubkey,
             signature=self.signatures[0],
             timestamp=self.timestamp,
-            uid=self.uid)
+            uid=self.uid,
+        )

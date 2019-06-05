@@ -10,7 +10,7 @@ def ensure_bytes(data: Union[str, bytes]) -> bytes:
     :rtype bytes:
     """
     if isinstance(data, str):
-        return bytes(data, 'utf-8')
+        return bytes(data, "utf-8")
 
     return data
 
@@ -23,7 +23,7 @@ def ensure_str(data: Union[str, bytes]) -> str:
     :rtype str:
     """
     if isinstance(data, bytes):
-        return str(data, 'utf-8')
+        return str(data, "utf-8")
 
     return data
 

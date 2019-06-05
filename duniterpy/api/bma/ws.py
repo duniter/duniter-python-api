@@ -25,33 +25,20 @@ from duniterpy.api.client import Client
 
 logger = logging.getLogger("duniter/ws")
 
-MODULE = 'ws'
+MODULE = "ws"
 
 WS_BLOCK_SCHEMA = BLOCK_SCHEMA
 
 WS_PEER_SCHEMA = {
     "type": "object",
     "properties": {
-        "version": {
-            "type": "number"
-        },
-        "currency": {
-            "type": "string"
-        },
-        "pubkey": {
-            "type": "string"
-        },
-        "endpoints": {
-            "type": "array",
-            "items": {
-                "type": "string"
-            }
-        },
-        "signature": {
-            "type": "string"
-        }
+        "version": {"type": "number"},
+        "currency": {"type": "string"},
+        "pubkey": {"type": "string"},
+        "endpoints": {"type": "array", "items": {"type": "string"}},
+        "signature": {"type": "string"},
     },
-    "required": ["version", "currency", "pubkey", "endpoints", "signature"]
+    "required": ["version", "currency", "pubkey", "endpoints", "signature"],
 }
 
 
@@ -62,7 +49,7 @@ def block(client: Client) -> _WSRequestContextManager:
     :param client: Client to connect to the api
     :return:
     """
-    return client.connect_ws(MODULE + '/block')
+    return client.connect_ws(MODULE + "/block")
 
 
 def peer(client: Client) -> _WSRequestContextManager:
@@ -72,4 +59,4 @@ def peer(client: Client) -> _WSRequestContextManager:
     :param client: Client to connect to the api
     :return:
     """
-    return client.connect_ws(MODULE + '/peer')
+    return client.connect_ws(MODULE + "/peer")

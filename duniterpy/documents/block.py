@@ -13,7 +13,7 @@ from ..constants import PUBKEY_REGEX, BLOCK_HASH_REGEX
 
 
 # required to type hint cls in classmethod
-BlockType = TypeVar('BlockType', bound='Block')
+BlockType = TypeVar("BlockType", bound="Block")
 
 
 class Block(Document):
@@ -68,15 +68,23 @@ The class Block handles Block documents.
     re_mediantime = re.compile("MedianTime: ([0-9]+)\n")
     re_universaldividend = re.compile("UniversalDividend: ([0-9]+)\n")
     re_unitbase = re.compile("UnitBase: ([0-9]+)\n")
-    re_issuer = re.compile("Issuer: ({pubkey_regex})\n".format(pubkey_regex=PUBKEY_REGEX))
+    re_issuer = re.compile(
+        "Issuer: ({pubkey_regex})\n".format(pubkey_regex=PUBKEY_REGEX)
+    )
     re_issuers_frame = re.compile("IssuersFrame: ([0-9]+)\n")
     re_issuers_frame_var = re.compile("IssuersFrameVar: (0|-?[1-9]\\d{0,18})\n")
     re_different_issuers_count = re.compile("DifferentIssuersCount: ([0-9]+)\n")
-    re_previoushash = re.compile("PreviousHash: ({block_hash_regex})\n".format(block_hash_regex=BLOCK_HASH_REGEX))
-    re_previousissuer = re.compile("PreviousIssuer: ({pubkey_regex})\n".format(pubkey_regex=PUBKEY_REGEX))
-    re_parameters = re.compile("Parameters: ([0-9]+\\.[0-9]+):([0-9]+):([0-9]+):([0-9]+):([0-9]+):([0-9]+):\
+    re_previoushash = re.compile(
+        "PreviousHash: ({block_hash_regex})\n".format(block_hash_regex=BLOCK_HASH_REGEX)
+    )
+    re_previousissuer = re.compile(
+        "PreviousIssuer: ({pubkey_regex})\n".format(pubkey_regex=PUBKEY_REGEX)
+    )
+    re_parameters = re.compile(
+        "Parameters: ([0-9]+\\.[0-9]+):([0-9]+):([0-9]+):([0-9]+):([0-9]+):([0-9]+):\
 ([0-9]+):([0-9]+):([0-9]+):([0-9]+):([0-9]+\\.[0-9]+):([0-9]+):([0-9]+):([0-9]+):([0-9]+):([0-9]+):([0-9]+\\.[0-9]+):\
-([0-9]+):([0-9]+):([0-9]+)\n")
+([0-9]+):([0-9]+):([0-9]+)\n"
+    )
     re_memberscount = re.compile("MembersCount: ([0-9]+)\n")
     re_identities = re.compile("Identities:\n")
     re_joiners = re.compile("Joiners:\n")
@@ -87,67 +95,72 @@ The class Block handles Block documents.
     re_exclusion = re.compile("({pubkey_regex})\n".format(pubkey_regex=PUBKEY_REGEX))
     re_certifications = re.compile("Certifications:\n")
     re_transactions = re.compile("Transactions:\n")
-    re_hash = re.compile("InnerHash: ({block_hash_regex})\n".format(block_hash_regex=BLOCK_HASH_REGEX))
+    re_hash = re.compile(
+        "InnerHash: ({block_hash_regex})\n".format(block_hash_regex=BLOCK_HASH_REGEX)
+    )
     re_noonce = re.compile("Nonce: ([0-9]+)\n")
 
-    fields_parsers = {**Document.fields_parsers, **{
-        'Type': re_type,
-        'Number': re_number,
-        'PoWMin': re_powmin,
-        'Time': re_time,
-        'MedianTime': re_mediantime,
-        'UD': re_universaldividend,
-        'UnitBase': re_unitbase,
-        'Issuer': re_issuer,
-        'IssuersFrame': re_issuers_frame,
-        'IssuersFrameVar': re_issuers_frame_var,
-        'DifferentIssuersCount': re_different_issuers_count,
-        'PreviousIssuer': re_previousissuer,
-        'PreviousHash': re_previoushash,
-        'Parameters': re_parameters,
-        'MembersCount': re_memberscount,
-        'Identities': re_identities,
-        'Joiners': re_joiners,
-        'Actives': re_actives,
-        'Leavers': re_leavers,
-        'Revoked': re_revoked,
-        'Excluded': re_excluded,
-        'Certifications': re_certifications,
-        'Transactions': re_transactions,
-        'InnerHash': re_hash,
-        'Noonce': re_noonce,
+    fields_parsers = {
+        **Document.fields_parsers,
+        **{
+            "Type": re_type,
+            "Number": re_number,
+            "PoWMin": re_powmin,
+            "Time": re_time,
+            "MedianTime": re_mediantime,
+            "UD": re_universaldividend,
+            "UnitBase": re_unitbase,
+            "Issuer": re_issuer,
+            "IssuersFrame": re_issuers_frame,
+            "IssuersFrameVar": re_issuers_frame_var,
+            "DifferentIssuersCount": re_different_issuers_count,
+            "PreviousIssuer": re_previousissuer,
+            "PreviousHash": re_previoushash,
+            "Parameters": re_parameters,
+            "MembersCount": re_memberscount,
+            "Identities": re_identities,
+            "Joiners": re_joiners,
+            "Actives": re_actives,
+            "Leavers": re_leavers,
+            "Revoked": re_revoked,
+            "Excluded": re_excluded,
+            "Certifications": re_certifications,
+            "Transactions": re_transactions,
+            "InnerHash": re_hash,
+            "Noonce": re_noonce,
+        },
     }
-                      }
 
-    def __init__(self,
-                 version: int,
-                 currency: str,
-                 number: int,
-                 powmin: int,
-                 time: int,
-                 mediantime: int,
-                 ud: Optional[int],
-                 unit_base: int,
-                 issuer: str,
-                 issuers_frame: int,
-                 issuers_frame_var: int,
-                 different_issuers_count: int,
-                 prev_hash: Optional[str],
-                 prev_issuer: Optional[str],
-                 parameters: Optional[Sequence[str]],
-                 members_count: int,
-                 identities: List[Identity],
-                 joiners: List[Membership],
-                 actives: List[Membership],
-                 leavers: List[Membership],
-                 revokations: List[Revocation],
-                 excluded: List[str],
-                 certifications: List[Certification],
-                 transactions: List[Transaction],
-                 inner_hash: str,
-                 noonce: int,
-                 signature: str
-                 ) -> None:
+    def __init__(
+        self,
+        version: int,
+        currency: str,
+        number: int,
+        powmin: int,
+        time: int,
+        mediantime: int,
+        ud: Optional[int],
+        unit_base: int,
+        issuer: str,
+        issuers_frame: int,
+        issuers_frame_var: int,
+        different_issuers_count: int,
+        prev_hash: Optional[str],
+        prev_issuer: Optional[str],
+        parameters: Optional[Sequence[str]],
+        members_count: int,
+        identities: List[Identity],
+        joiners: List[Membership],
+        actives: List[Membership],
+        leavers: List[Membership],
+        revokations: List[Revocation],
+        excluded: List[str],
+        certifications: List[Certification],
+        transactions: List[Transaction],
+        inner_hash: str,
+        noonce: int,
+        signature: str,
+    ) -> None:
         """
         Constructor
 
@@ -180,14 +193,19 @@ The class Block handles Block documents.
         :param signature: the block signature
         """
         super().__init__(version, currency, [signature])
-        documents_versions = max(max([1] + [i.version for i in identities]),
-                                 max([1] + [m.version for m in actives + leavers + joiners]),
-                                 max([1] + [r.version for r in revokations]),
-                                 max([1] + [c.version for c in certifications]),
-                                 max([1] + [t.version for t in transactions]))
+        documents_versions = max(
+            max([1] + [i.version for i in identities]),
+            max([1] + [m.version for m in actives + leavers + joiners]),
+            max([1] + [r.version for r in revokations]),
+            max([1] + [c.version for c in certifications]),
+            max([1] + [t.version for t in transactions]),
+        )
         if self.version < documents_versions:
             raise MalformedDocumentError(
-                "Block version is too low : {0} < {1}".format(self.version, documents_versions))
+                "Block version is too low : {0} < {1}".format(
+                    self.version, documents_versions
+                )
+            )
         self.number = number
         self.powmin = powmin
         self.time = time
@@ -342,8 +360,9 @@ The class Block handles Block documents.
         if Block.re_certifications.match(lines[n]):
             n += 1
             while Block.re_transactions.match(lines[n]) is None:
-                certification = Certification.from_inline(version, currency,
-                                                          prev_hash, lines[n])
+                certification = Certification.from_inline(
+                    version, currency, prev_hash, lines[n]
+                )
                 certifications.append(certification)
                 n += 1
 
@@ -353,17 +372,27 @@ The class Block handles Block documents.
                 tx_lines = ""
                 header_data = Transaction.re_header.match(lines[n])
                 if header_data is None:
-                    raise MalformedDocumentError("Compact transaction ({0})".format(lines[n]))
+                    raise MalformedDocumentError(
+                        "Compact transaction ({0})".format(lines[n])
+                    )
                 issuers_num = int(header_data.group(2))
                 inputs_num = int(header_data.group(3))
                 unlocks_num = int(header_data.group(4))
                 outputs_num = int(header_data.group(5))
                 has_comment = int(header_data.group(6))
                 sup_lines = 2
-                tx_max = n + sup_lines + issuers_num * 2 + inputs_num + unlocks_num + outputs_num + has_comment
+                tx_max = (
+                    n
+                    + sup_lines
+                    + issuers_num * 2
+                    + inputs_num
+                    + unlocks_num
+                    + outputs_num
+                    + has_comment
+                )
                 for index in range(n, tx_max):
                     tx_lines += lines[index]
-                n += (tx_max - n)
+                n += tx_max - n
                 transaction = Transaction.from_compact(currency, tx_lines)
                 transactions.append(transaction)
 
@@ -375,12 +404,35 @@ The class Block handles Block documents.
 
         signature = Block.parse_field("Signature", lines[n])
 
-        return cls(version, currency, number, powmin, time,
-                   mediantime, ud, unit_base, issuer, issuers_frame, issuers_frame_var,
-                   different_issuers_count, prev_hash, prev_issuer,
-                   parameters, members_count, identities, joiners,
-                   actives, leavers, revoked, excluded, certifications,
-                   transactions, inner_hash, noonce, signature)
+        return cls(
+            version,
+            currency,
+            number,
+            powmin,
+            time,
+            mediantime,
+            ud,
+            unit_base,
+            issuer,
+            issuers_frame,
+            issuers_frame_var,
+            different_issuers_count,
+            prev_hash,
+            prev_issuer,
+            parameters,
+            members_count,
+            identities,
+            joiners,
+            actives,
+            leavers,
+            revoked,
+            excluded,
+            certifications,
+            transactions,
+            inner_hash,
+            noonce,
+            signature,
+        )
 
     def raw(self) -> str:
         doc = """Version: {version}
@@ -390,12 +442,14 @@ Number: {number}
 PoWMin: {powmin}
 Time: {time}
 MedianTime: {mediantime}
-""".format(version=self.version,
-           currency=self.currency,
-           number=self.number,
-           powmin=self.powmin,
-           time=self.time,
-           mediantime=self.mediantime)
+""".format(
+            version=self.version,
+            currency=self.currency,
+            number=self.number,
+            powmin=self.powmin,
+            time=self.time,
+            mediantime=self.mediantime,
+        )
         if self.ud:
             doc += "UniversalDividend: {0}\n".format(self.ud)
 
@@ -406,14 +460,18 @@ MedianTime: {mediantime}
         doc += """IssuersFrame: {0}
 IssuersFrameVar: {1}
 DifferentIssuersCount: {2}
-""".format(self.issuers_frame, self.issuers_frame_var, self.different_issuers_count)
+""".format(
+            self.issuers_frame, self.issuers_frame_var, self.different_issuers_count
+        )
 
         if self.number == 0 and self.parameters is not None:
             str_params = ":".join([str(p) for p in self.parameters])
             doc += "Parameters: {0}\n".format(str_params)
         else:
             doc += "PreviousHash: {0}\n\
-PreviousIssuer: {1}\n".format(self.prev_hash, self.prev_issuer)
+PreviousIssuer: {1}\n".format(
+                self.prev_hash, self.prev_issuer
+            )
 
         doc += "MembersCount: {0}\n".format(self.members_count)
 
@@ -459,12 +517,14 @@ PreviousIssuer: {1}\n".format(self.prev_hash, self.prev_issuer)
         doc_str = """InnerHash: {inner_hash}
 Nonce: {nonce}
 {signature}
-""".format(inner_hash=self.inner_hash, nonce=self.noonce, signature=self.signatures[0])
-        return hashlib.sha256(doc_str.encode('ascii')).hexdigest().upper()
+""".format(
+            inner_hash=self.inner_hash, nonce=self.noonce, signature=self.signatures[0]
+        )
+        return hashlib.sha256(doc_str.encode("ascii")).hexdigest().upper()
 
     def computed_inner_hash(self) -> str:
         doc = self.signed_raw()
-        inner_doc = '\n'.join(doc.split('\n')[:-2]) + '\n'
+        inner_doc = "\n".join(doc.split("\n")[:-2]) + "\n"
         return hashlib.sha256(inner_doc.encode("ascii")).hexdigest().upper()
 
     def sign(self, keys):
@@ -474,7 +534,7 @@ Nonce: {nonce}
         """
         key = keys[0]
         signed = self.raw()[-2:]
-        signing = base64.b64encode(key.signature(bytes(signed, 'ascii')))
+        signing = base64.b64encode(key.signature(bytes(signed, "ascii")))
         self.signatures = [signing.decode("ascii")]
 
     def __eq__(self, other: object) -> bool:

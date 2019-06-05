@@ -5,20 +5,26 @@ from .document import MalformedDocumentError
 from ..constants import EMPTY_HASH, BLOCK_ID_REGEX, BLOCK_HASH_REGEX
 
 # required to type hint cls in classmethod
-BlockUIDType = TypeVar('BlockUIDType', bound='BlockUID')
+BlockUIDType = TypeVar("BlockUIDType", bound="BlockUID")
 
 
 class BlockUID:
     """
     A simple block id
     """
-    re_block_uid = re.compile("({block_id_regex})-({block_hash_regex})".format(block_id_regex=BLOCK_ID_REGEX,
-                                                                               block_hash_regex=BLOCK_HASH_REGEX))
-    re_hash = re.compile("({block_hash_regex})".format(block_hash_regex=BLOCK_HASH_REGEX))
+
+    re_block_uid = re.compile(
+        "({block_id_regex})-({block_hash_regex})".format(
+            block_id_regex=BLOCK_ID_REGEX, block_hash_regex=BLOCK_HASH_REGEX
+        )
+    )
+    re_hash = re.compile(
+        "({block_hash_regex})".format(block_hash_regex=BLOCK_HASH_REGEX)
+    )
 
     def __init__(self, number: int, sha_hash: str) -> None:
-        assert (type(number) is int)
-        assert (BlockUID.re_hash.match(sha_hash) is not None)
+        assert type(number) is int
+        assert BlockUID.re_hash.match(sha_hash) is not None
         self.number = number
         self.sha_hash = sha_hash
 

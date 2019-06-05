@@ -21,17 +21,13 @@ from duniterpy.api.client import Client
 
 logger = logging.getLogger("duniter/ud")
 
-MODULE = 'ud'
+MODULE = "ud"
 
 UD_SCHEMA = {
     "type": "object",
     "properties": {
-        "currency": {
-            "type": "string"
-        },
-        "pubkey": {
-            "type": "string"
-        },
+        "currency": {"type": "string"},
+        "pubkey": {"type": "string"},
         "history": {
             "type": "object",
             "properties": {
@@ -40,29 +36,18 @@ UD_SCHEMA = {
                     "items": {
                         "type": "object",
                         "properties": {
-                            "block_number": {
-                                "type": "number"
-                            },
-
-                            "consumed": {
-                                "type": "boolean"
-                            },
-                            "time": {
-                                "type": "number"
-                            },
-                            "amount": {
-                                "type": "number"
-                            },
-                            "base": {
-                                "type": "number"
-                            },
-                        }
-                    }
+                            "block_number": {"type": "number"},
+                            "consumed": {"type": "boolean"},
+                            "time": {"type": "number"},
+                            "amount": {"type": "number"},
+                            "base": {"type": "number"},
+                        },
+                    },
                 }
-            }
-        }
+            },
+        },
     },
-    "required": ["currency", "pubkey", "history"]
+    "required": ["currency", "pubkey", "history"],
 }
 
 
@@ -74,4 +59,4 @@ async def history(client: Client, pubkey: str) -> dict:
     :param pubkey:  Public key of the member
     :return:
     """
-    return await client.get(MODULE + '/history/%s' % pubkey, schema=UD_SCHEMA)
+    return await client.get(MODULE + "/history/%s" % pubkey, schema=UD_SCHEMA)

@@ -34,7 +34,7 @@ class VerifyingKey(libnacl.sign.Verifier):
         :return:
         """
         signature = base64.b64decode(document.signatures[0])
-        prepended = signature + bytes(document.raw(), 'ascii')
+        prepended = signature + bytes(document.raw(), "ascii")
 
         try:
             self.verify(prepended)
@@ -50,7 +50,7 @@ class VerifyingKey(libnacl.sign.Verifier):
         """
         signature = base64.b64decode(head.signature)
         inline = head.inline()
-        prepended = signature + bytes(inline, 'ascii')
+        prepended = signature + bytes(inline, "ascii")
 
         try:
             self.verify(prepended)

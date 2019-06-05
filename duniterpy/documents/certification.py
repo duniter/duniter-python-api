@@ -5,12 +5,18 @@ from typing import Optional, TypeVar, Type, Union
 
 from .identity import Identity
 from .block_uid import BlockUID
-from ..constants import PUBKEY_REGEX, SIGNATURE_REGEX, BLOCK_ID_REGEX, BLOCK_UID_REGEX, UID_REGEX
+from ..constants import (
+    PUBKEY_REGEX,
+    SIGNATURE_REGEX,
+    BLOCK_ID_REGEX,
+    BLOCK_UID_REGEX,
+    UID_REGEX,
+)
 from .document import Document, MalformedDocumentError
 
 
 # required to type hint cls in classmethod
-CertificationType = TypeVar('CertificationType', bound='Certification')
+CertificationType = TypeVar("CertificationType", bound="Certification")
 
 
 class Certification(Document):
@@ -18,33 +24,59 @@ class Certification(Document):
     A document describing a certification.
     """
 
-    re_inline = re.compile("({certifier_regex}):({certified_regex}):({block_id_regex}):({signature_regex})\n".format(
-        certifier_regex=PUBKEY_REGEX,
-        certified_regex=PUBKEY_REGEX,
-        block_id_regex=BLOCK_ID_REGEX,
-        signature_regex=SIGNATURE_REGEX
-    ))
-    re_timestamp = re.compile("META:TS:({block_uid_regex})\n".format(block_uid_regex=BLOCK_UID_REGEX))
+    re_inline = re.compile(
+        "({certifier_regex}):({certified_regex}):({block_id_regex}):({signature_regex})\n".format(
+            certifier_regex=PUBKEY_REGEX,
+            certified_regex=PUBKEY_REGEX,
+            block_id_regex=BLOCK_ID_REGEX,
+            signature_regex=SIGNATURE_REGEX,
+        )
+    )
+    re_timestamp = re.compile(
+        "META:TS:({block_uid_regex})\n".format(block_uid_regex=BLOCK_UID_REGEX)
+    )
     re_type = re.compile("Type: (Certification)")
-    re_issuer = re.compile("Issuer: ({pubkey_regex})\n".format(pubkey_regex=PUBKEY_REGEX))
-    re_idty_issuer = re.compile("IdtyIssuer: ({pubkey_regex})\n".format(pubkey_regex=PUBKEY_REGEX))
-    re_idty_unique_id = re.compile("IdtyUniqueID: ({uid_regex})\n".format(uid_regex=UID_REGEX))
-    re_idty_timestamp = re.compile("IdtyTimestamp: ({block_uid_regex})\n".format(block_uid_regex=BLOCK_UID_REGEX))
-    re_idty_signature = re.compile("IdtySignature: ({signature_regex})\n".format(signature_regex=SIGNATURE_REGEX))
-    re_cert_timestamp = re.compile("CertTimestamp: ({block_uid_regex})\n".format(block_uid_regex=BLOCK_UID_REGEX))
+    re_issuer = re.compile(
+        "Issuer: ({pubkey_regex})\n".format(pubkey_regex=PUBKEY_REGEX)
+    )
+    re_idty_issuer = re.compile(
+        "IdtyIssuer: ({pubkey_regex})\n".format(pubkey_regex=PUBKEY_REGEX)
+    )
+    re_idty_unique_id = re.compile(
+        "IdtyUniqueID: ({uid_regex})\n".format(uid_regex=UID_REGEX)
+    )
+    re_idty_timestamp = re.compile(
+        "IdtyTimestamp: ({block_uid_regex})\n".format(block_uid_regex=BLOCK_UID_REGEX)
+    )
+    re_idty_signature = re.compile(
+        "IdtySignature: ({signature_regex})\n".format(signature_regex=SIGNATURE_REGEX)
+    )
+    re_cert_timestamp = re.compile(
+        "CertTimestamp: ({block_uid_regex})\n".format(block_uid_regex=BLOCK_UID_REGEX)
+    )
 
-    fields_parsers = {**Document.fields_parsers, **{
-        "Type": re_type,
-        "Issuer": re_issuer,
-        "CertTimestamp": re_cert_timestamp,
-        "IdtyIssuer": re_idty_issuer,
-        "IdtyUniqueID": re_idty_unique_id,
-        "IdtySignature": re_idty_signature,
-        "IdtyTimestamp": re_idty_timestamp
-    }}
+    fields_parsers = {
+        **Document.fields_parsers,
+        **{
+            "Type": re_type,
+            "Issuer": re_issuer,
+            "CertTimestamp": re_cert_timestamp,
+            "IdtyIssuer": re_idty_issuer,
+            "IdtyUniqueID": re_idty_unique_id,
+            "IdtySignature": re_idty_signature,
+            "IdtyTimestamp": re_idty_timestamp,
+        },
+    }
 
-    def __init__(self, version: int, currency: str, pubkey_from: str, identity: Union[Identity, str],
-                 timestamp: BlockUID, signature: str) -> None:
+    def __init__(
+        self,
+        version: int,
+        currency: str,
+        pubkey_from: str,
+        identity: Union[Identity, str],
+        timestamp: BlockUID,
+        signature: str,
+    ) -> None:
         """
         Constructor
 
@@ -62,7 +94,9 @@ class Certification(Document):
         self.timestamp = timestamp
 
     @classmethod
-    def from_signed_raw(cls: Type[CertificationType], signed_raw: str) -> CertificationType:
+    def from_signed_raw(
+        cls: Type[CertificationType], signed_raw: str
+    ) -> CertificationType:
         """
         Return Certification instance from signed raw document
 
@@ -90,24 +124,40 @@ class Certification(Document):
         identity_uid = Certification.parse_field("IdtyUniqueID", lines[n])
         n += 1
 
-        identity_timestamp = BlockUID.from_str(Certification.parse_field("IdtyTimestamp", lines[n]))
+        identity_timestamp = BlockUID.from_str(
+            Certification.parse_field("IdtyTimestamp", lines[n])
+        )
         n += 1
 
         identity_signature = Certification.parse_field("IdtySignature", lines[n])
         n += 1
 
-        timestamp = BlockUID.from_str(Certification.parse_field("CertTimestamp", lines[n]))
+        timestamp = BlockUID.from_str(
+            Certification.parse_field("CertTimestamp", lines[n])
+        )
         n += 1
 
         signature = Certification.parse_field("Signature", lines[n])
 
-        identity = Identity(version, currency, identity_pubkey, identity_uid, identity_timestamp, identity_signature)
+        identity = Identity(
+            version,
+            currency,
+            identity_pubkey,
+            identity_uid,
+            identity_timestamp,
+            identity_signature,
+        )
 
         return cls(version, currency, pubkey_from, identity, timestamp, signature)
 
     @classmethod
-    def from_inline(cls: Type[CertificationType], version: int, currency: str, blockhash: Optional[str],
-                    inline: str) -> CertificationType:
+    def from_inline(
+        cls: Type[CertificationType],
+        version: int,
+        currency: str,
+        blockhash: Optional[str],
+        inline: str,
+    ) -> CertificationType:
         """
         Return Certification instance from inline document
 
@@ -139,7 +189,9 @@ class Certification(Document):
         Return a raw document of the certification
         """
         if not isinstance(self.identity, Identity):
-            raise MalformedDocumentError("Can not return full certification document created from inline")
+            raise MalformedDocumentError(
+                "Can not return full certification document created from inline"
+            )
 
         return """Version: {version}
 Type: Certification
@@ -150,14 +202,16 @@ IdtyUniqueID: {certified_uid}
 IdtyTimestamp: {certified_ts}
 IdtySignature: {certified_signature}
 CertTimestamp: {timestamp}
-""".format(version=self.version,
-           currency=self.currency,
-           issuer=self.pubkey_from,
-           certified_pubkey=self.identity.pubkey,
-           certified_uid=self.identity.uid,
-           certified_ts=self.identity.timestamp,
-           certified_signature=self.identity.signatures[0],
-           timestamp=self.timestamp)
+""".format(
+            version=self.version,
+            currency=self.currency,
+            issuer=self.pubkey_from,
+            certified_pubkey=self.identity.pubkey,
+            certified_uid=self.identity.uid,
+            certified_ts=self.identity.timestamp,
+            certified_signature=self.identity.signatures[0],
+            timestamp=self.timestamp,
+        )
 
     def sign(self, keys: list) -> None:
         """
@@ -168,11 +222,13 @@ CertTimestamp: {timestamp}
         :param keys: List of libnacl key instances
         """
         if not isinstance(self.identity, Identity):
-            raise MalformedDocumentError("Can not return full certification document created from inline")
+            raise MalformedDocumentError(
+                "Can not return full certification document created from inline"
+            )
 
         self.signatures = []
         for key in keys:
-            signing = base64.b64encode(key.signature(bytes(self.raw(), 'ascii')))
+            signing = base64.b64encode(key.signature(bytes(self.raw(), "ascii")))
             logging.debug("Signature : \n%s", signing.decode("ascii"))
             self.signatures.append(signing.decode("ascii"))
 
@@ -183,7 +239,9 @@ CertTimestamp: {timestamp}
         :return:
         """
         if not isinstance(self.identity, Identity):
-            raise MalformedDocumentError("Can not return full certification document created from inline")
+            raise MalformedDocumentError(
+                "Can not return full certification document created from inline"
+            )
 
         raw = self.raw()
         signed = "\n".join(self.signatures)
@@ -196,5 +254,6 @@ CertTimestamp: {timestamp}
 
         :return:
         """
-        return "{0}:{1}:{2}:{3}".format(self.pubkey_from, self.pubkey_to,
-                                        self.timestamp.number, self.signatures[0])
+        return "{0}:{1}:{2}:{3}".format(
+            self.pubkey_from, self.pubkey_to, self.timestamp.number, self.signatures[0]
+        )
