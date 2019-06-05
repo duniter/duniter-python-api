@@ -1,17 +1,16 @@
 stages:
-  - github-sync
   - prepare
   - black
   - test
   - build
   - release
+  - github-sync
 
 variables:
     PYENV_PYTHON_VERSION: 3.5.5
 
 image: registry.duniter.org/docker/python3/duniterpy-builder:0.0.4
 
-# todo: remove useless github mirror as only repo is mirrored, not issues
 push_to_github:
   stage: github-sync
   variables:
@@ -87,15 +86,12 @@ build: &build
     - pip install wheel
     - python setup.py sdist bdist_wheel
 
-# todo: use build anchor as build stage is repeated here
 releases:
   <<: *pyenv
+  <<: *build
   stage: release
   when: manual
   script:
-    - pip install -r requirements.txt
-    - pip install wheel
     - pip install twine
-    - python setup.py sdist bdist_wheel
     - twine upload dist/* --username duniter --password $PYPI_PASSWORD
 
