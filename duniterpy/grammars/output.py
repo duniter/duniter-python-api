@@ -132,7 +132,7 @@ class CSV:
         csv.time = str(time)
         return csv
 
-    def compose(self, parser: Any = None, grammar: Any = None, attr_of: str = None):
+    def compose(self, parser: Any = None, grammar: Any = None, attr_of: str = None) -> str:
         """
         Return the CSV(time) expression as string format
 
@@ -190,7 +190,7 @@ class CLTV:
         cltv.timestamp = str(timestamp)
         return cltv
 
-    def compose(self, parser: Any = None, grammar: Any = None, attr_of: str = None):
+    def compose(self, parser: Any = None, grammar: Any = None, attr_of: str = None) -> str:
         """
         Return the CLTV(timestamp) expression as string format
 

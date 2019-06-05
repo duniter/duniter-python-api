@@ -339,16 +339,16 @@ class UnlockParameter:
         :param parameter: Parameter string
         :return:
         """
-
+        result = None  # type: Optional[Union[SIGParameter, XHXParameter]]
         sig_param = SIGParameter.from_parameter(parameter)
         if sig_param:
-            return sig_param
+            result = sig_param
         else:
             xhx_param = XHXParameter.from_parameter(parameter)
             if xhx_param:
-                return xhx_param
+                result = xhx_param
 
-        return None
+        return result
 
     def compute(self):
         pass
@@ -605,25 +605,25 @@ Comment: {comment}
         unlocks = []
         outputs = []
         signatures = []
-        for i in range(0, issuers_num):
-            issuer = Transaction.parse_field("Pubkey", lines[n])
+        for index in range(0, issuers_num):
+            issuer = Transaction.parse_field("Pubkey", lines[n + index])
             issuers.append(issuer)
-            n += 1
+        n += issuers_num
 
-        for i in range(0, inputs_num):
-            input_source = InputSource.from_inline(lines[n])
+        for index in range(0, inputs_num):
+            input_source = InputSource.from_inline(lines[n + index])
             inputs.append(input_source)
-            n += 1
+        n += inputs_num
 
-        for i in range(0, unlocks_num):
-            unlock = Unlock.from_inline(lines[n])
+        for index in range(0, unlocks_num):
+            unlock = Unlock.from_inline(lines[n + index])
             unlocks.append(unlock)
-            n += 1
+        n += unlocks_num
 
-        for i in range(0, outputs_num):
-            output_source = OutputSource.from_inline(lines[n])
+        for index in range(0, outputs_num):
+            output_source = OutputSource.from_inline(lines[n + index])
             outputs.append(output_source)
-            n += 1
+        n += outputs_num
 
         comment = ""
         if has_comment == 1:
@@ -760,15 +760,15 @@ Currency: {1}
         Return a transaction in its compact format from the instance
 
         :return:
-        """
-        """TX:VERSION:NB_ISSUERS:NB_INPUTS:NB_UNLOCKS:NB_OUTPUTS:HAS_COMMENT:LOCKTIME
+
+        "TX:VERSION:NB_ISSUERS:NB_INPUTS:NB_UNLOCKS:NB_OUTPUTS:HAS_COMMENT:LOCKTIME
 PUBLIC_KEY:INDEX
 ...
 INDEX:SOURCE:FINGERPRINT:AMOUNT
 ...
 PUBLIC_KEY:AMOUNT
 ...
-COMMENT
+COMMENT"
 """
         doc = "TX:{0}:{1}:{2}:{3}:{4}:{5}:{6}\n".format(self.version,
                                                         len(self.issuers),

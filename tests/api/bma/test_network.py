@@ -77,3 +77,44 @@ class TestBmaNetwork(WebFunctionalSetupMixin, unittest.TestCase):
             await client.close()
 
         self.loop.run_until_complete(go())
+
+    def test_ws2p_heads(self):
+        json_sample = {
+            "heads": [
+                {
+                    "messageV2": "WS2POCAIC:HEAD:2:238pNfpkNs4TdRgt6NnJ5Q72CDZbgNqm4cJo4nCP3BxC:367572"
+                                 "-000024399D612753E59D44415CFA61F3A663919110CD2EB8D30C93F49C61E07F:96675302:duniter"
+                                 ":1.7.10:1:0:0",
+                    "message": "WS2POCAIC:HEAD:1:238pNfpkNs4TdRgt6NnJ5Q72CDZbgNqm4cJo4nCP3BxC:367572"
+                               "-000024399D612753E59D44415CFA61F3A663919110CD2EB8D30C93F49C61E07F:96675302:duniter:1"
+                               ".7.10:1",
+                    "sigV2": "G1YQd5hgW6+bVGSZJgFzBjZyHgiIqzgUzHOVjcelbHJnwFtxl9XtqZiC5Ul0+Wv8im4IcOwgPypzFe/xUVJMBQ==",
+                    "sig": "frlBj5ntC64H/iqNTqsB+igvEn2C9RD6fF2UOvZHWlzEqyaFy0YSRDyvZIyCTi/kPC+f1Xq2PKUItZvQdqPuAQ==",
+                    "step": 0},
+                {
+                    "messageV2": "WS2POTAIT:HEAD:2:CrznBiyq8G4RVUprH9jHmAw1n1iuzw8y9FdJbrESnaX7:378529"
+                                 "-00028D6F71E384565A1A106C1247E5F4B0392645A84EDB121173AC930540D552:3eaab4c7:duniter"
+                                 ":1.7.18:1:30:30",
+                    "message": "WS2POTAIT:HEAD:1:CrznBiyq8G4RVUprH9jHmAw1n1iuzw8y9FdJbrESnaX7:378529"
+                               "-00028D6F71E384565A1A106C1247E5F4B0392645A84EDB121173AC930540D552:3eaab4c7:duniter:1"
+                               ".7.18:1",
+                    "sigV2": "EIa5P8jJSdKR740/fLgu8u+7VFf6tiDs3xGKHxiM8nTVLjsZR8RoZtRGexqG0XIoPGpCty9rIduOu83knsorAA==",
+                    "sig": "up5LLKm9DEXeiEAcMyPv9hignCx/rKlXSfcHVH1EZUOEMcNBiE4WzR4kSU8AA5cSpBYpZ7Uoo9y4ATmrLj3YDw==",
+                    "step": 2}
+            ]
+        }
+        jsonschema.validate(json_sample, network.WS2P_HEADS_SCHEMA)
+
+    def test_ws2p_heads_bad(self):
+        async def handler(request):
+            await request.read()
+            return web.Response(body=b'{}', content_type='application/json')
+
+        async def go():
+            _, port, url = await self.create_server('GET', '/network/ws2p/heads', handler)
+            with self.assertRaises(jsonschema.ValidationError):
+                client = Client(BMAEndpoint("127.0.0.1", "", "", port))
+                await client(network.ws2p_heads)
+            await client.close()
+
+        self.loop.run_until_complete(go())

@@ -1,6 +1,6 @@
 import base64
 import libnacl
-from re import compile
+import re
 from typing import Optional, List, Dict, Any
 
 from duniterpy.key import SigningKey, PublicKey, VerifyingKey
@@ -28,7 +28,6 @@ class MissingPublickeyAndSigningKeyException(Exception):
     """
     Raise when the message created is not encrypted and not signed...
     """
-    pass
 
 
 # Custom exceptions
@@ -36,7 +35,6 @@ class ParserMissingSigningKeyException(Exception):
     """
     Raise when the message is encrypted but no SigningKey instance is provided
     """
-    pass
 
 
 # Custom exceptions
@@ -44,7 +42,6 @@ class ParserMissingPublicKeysException(Exception):
     """
     Raise when there is at least one signature but no public keys are provided
     """
-    pass
 
 
 # Exception messages listed here
@@ -170,7 +167,7 @@ class AsciiArmor:
         :return:
         """
         text = str()
-        regex_dash_escape_prefix = compile('^' + DASH_ESCAPE_PREFIX)
+        regex_dash_escape_prefix = re.compile('^' + DASH_ESCAPE_PREFIX)
         # if prefixed by a dash escape prefix...
         if regex_dash_escape_prefix.match(dash_escaped_line):
             # remove dash '-' (0x2D) and space ' ' (0x20) prefix
@@ -257,11 +254,11 @@ class AsciiArmor:
         :return:
         """
         # regex patterns
-        regex_begin_message = compile(BEGIN_MESSAGE_HEADER)
-        regex_end_message = compile(END_MESSAGE_HEADER)
-        regex_begin_signature = compile(BEGIN_SIGNATURE_HEADER)
-        regex_end_signature = compile(END_SIGNATURE_HEADER)
-        regex_fields = compile("^(Version|Comment): (.+)$")
+        regex_begin_message = re.compile(BEGIN_MESSAGE_HEADER)
+        regex_end_message = re.compile(END_MESSAGE_HEADER)
+        regex_begin_signature = re.compile(BEGIN_SIGNATURE_HEADER)
+        regex_end_signature = re.compile(END_SIGNATURE_HEADER)
+        regex_fields = re.compile("^(Version|Comment): (.+)$")
 
         # trim message to get rid of empty lines
         ascii_armor_message = ascii_armor_message.strip(" \t\n\r")

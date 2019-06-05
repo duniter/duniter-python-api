@@ -354,7 +354,6 @@ The class Block handles Block documents.
                 header_data = Transaction.re_header.match(lines[n])
                 if header_data is None:
                     raise MalformedDocumentError("Compact transaction ({0})".format(lines[n]))
-                tx_version = int(header_data.group(1))
                 issuers_num = int(header_data.group(2))
                 inputs_num = int(header_data.group(3))
                 unlocks_num = int(header_data.group(4))
@@ -362,9 +361,9 @@ The class Block handles Block documents.
                 has_comment = int(header_data.group(6))
                 sup_lines = 2
                 tx_max = n + sup_lines + issuers_num * 2 + inputs_num + unlocks_num + outputs_num + has_comment
-                for i in range(n, tx_max):
-                    tx_lines += lines[n]
-                    n += 1
+                for index in range(n, tx_max):
+                    tx_lines += lines[index]
+                n += (tx_max - n)
                 transaction = Transaction.from_compact(currency, tx_lines)
                 transactions.append(transaction)
 

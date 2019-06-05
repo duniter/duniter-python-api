@@ -80,14 +80,14 @@ class Document:
         self.signatures = []
         for key in keys:
             signing = base64.b64encode(key.signature(bytes(self.raw(), 'ascii')))
-            logging.debug("Signature : \n{0}".format(signing.decode("ascii")))
+            logging.debug("Signature : \n%s", signing.decode("ascii"))
             self.signatures.append(signing.decode("ascii"))
 
     def raw(self) -> str:
         """
         Returns the raw document in string format
         """
-        raise NotImplementedError()
+        raise NotImplementedError("raw() is not implemented")
 
     def signed_raw(self) -> str:
         """

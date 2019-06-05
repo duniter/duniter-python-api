@@ -103,6 +103,37 @@ PEERS_SCHEMA = schema = {
     ]
 }
 
+WS2P_HEADS_SCHEMA = {
+    "type": "object",
+    "properties": {
+        "heads": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "message": {
+                        "type": "string"
+                    },
+                    "sig": {
+                        "type": "string",
+                    },
+                    "messageV2": {
+                        "type": "string"
+                    },
+                    "sigV2": {
+                        "type": "string",
+                    },
+                    "step": {
+                        "type": "number",
+                    },
+                },
+                "required": ["messageV2", "sigV2", "step"]
+            }
+        }
+    },
+    "required": ["heads"]
+}
+
 
 async def peering(client: Client) -> dict:
     """
@@ -124,9 +155,10 @@ async def peers(client: Client, leaves: bool = False, leaf: str = "") -> dict:
     :return:
     """
     if leaves is True:
-        return await client.get(MODULE + '/peering/peers', {"leaves": "true"}, schema=PEERS_SCHEMA)
+        response = await client.get(MODULE + '/peering/peers', {"leaves": "true"}, schema=PEERS_SCHEMA)
     else:
-        return await client.get(MODULE + '/peering/peers', {"leaf": leaf}, schema=PEERS_SCHEMA)
+        response = await client.get(MODULE + '/peering/peers', {"leaf": leaf}, schema=PEERS_SCHEMA)
+    return response
 
 
 async def peer(client: Client, peer_signed_raw: str) -> ClientResponse:
@@ -138,3 +170,13 @@ async def peer(client: Client, peer_signed_raw: str) -> ClientResponse:
     :return:
     """
     return await client.post(MODULE + '/peering/peers', {'peer': peer_signed_raw}, rtype=RESPONSE_AIOHTTP)
+
+
+async def ws2p_heads(client: Client) -> dict:
+    """
+    GET ws2p heads known by the node
+
+    :param client: Client to connect to the api
+    :rtype: dict
+    """
+    return await client.get(MODULE + '/ws2p/heads', schema=WS2P_HEADS_SCHEMA)

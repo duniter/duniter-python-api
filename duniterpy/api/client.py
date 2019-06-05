@@ -85,7 +85,7 @@ async def parse_response(response: ClientResponse, schema: dict) -> Any:
         raise jsonschema.ValidationError("Could not parse json : {0}".format(str(e)))
 
 
-class API(object):
+class API:
     """
     API is a class used as an abstraction layer over the request library (AIOHTTP).
     """
@@ -131,7 +131,7 @@ class API(object):
         :param path: the request path
         :return:
         """
-        logging.debug("Request : {0}".format(self.reverse_url(self.connection_handler.http_scheme, path)))
+        logging.debug("Request : %s", self.reverse_url(self.connection_handler.http_scheme, path))
         url = self.reverse_url(self.connection_handler.http_scheme, path)
         response = await self.connection_handler.session.get(url, params=kwargs, headers=self.headers,
                                                              proxy=self.connection_handler.proxy,
@@ -155,7 +155,7 @@ class API(object):
         if 'self_' in kwargs:
             kwargs['self'] = kwargs.pop('self_')
 
-        logging.debug("POST : {0}".format(kwargs))
+        logging.debug("POST : %s", kwargs)
         response = await self.connection_handler.session.post(
             self.reverse_url(self.connection_handler.http_scheme, path),
             data=kwargs,
@@ -236,12 +236,13 @@ class Client:
             await parse_response(response, schema)
 
         # return the chosen type
-        if rtype == RESPONSE_AIOHTTP:
-            return response
-        elif rtype == RESPONSE_TEXT:
-            return await response.text()
+        result = response  # type: Any
+        if rtype == RESPONSE_TEXT:
+            result = await response.text()
         elif rtype == RESPONSE_JSON:
-            return await response.json()
+            result = await response.json()
+
+        return result
 
     async def post(self, url_path: str, params: dict = None, rtype: str = RESPONSE_JSON, schema: dict = None) -> Any:
         """
@@ -267,12 +268,13 @@ class Client:
             await parse_response(response, schema)
 
         # return the chosen type
-        if rtype == RESPONSE_AIOHTTP:
-            return response
-        elif rtype == RESPONSE_TEXT:
-            return await response.text()
+        result = response  # type: Any
+        if rtype == RESPONSE_TEXT:
+            result = await response.text()
         elif rtype == RESPONSE_JSON:
-            return await response.json()
+            result = await response.json()
+
+        return result
 
     def connect_ws(self, path: str) -> _WSRequestContextManager:
         """

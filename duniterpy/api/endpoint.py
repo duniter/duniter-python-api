@@ -3,7 +3,7 @@ from typing import Any, Optional, TypeVar, Type, Dict
 
 from aiohttp import ClientSession
 
-from ..constants import *
+import duniterpy.constants as constants
 from ..documents import MalformedDocumentError
 
 
@@ -54,7 +54,7 @@ class Endpoint:
         raise NotImplementedError("__str__ is not implemented")
 
     def __eq__(self, other: Any) -> bool:
-        raise NotImplementedError("__eq__ is not implemented")
+        return NotImplemented
 
 
 # required to type hint cls in classmethod
@@ -137,9 +137,9 @@ class BMAEndpoint(Endpoint):
     API = "BASIC_MERKLED_API"
     re_inline = re.compile(
         '^BASIC_MERKLED_API(?: ({host_regex}))?(?: ({ipv4_regex}))?(?: ({ipv6_regex}))?(?: ([0-9]+))$'.format(
-            host_regex=HOST_REGEX,
-            ipv4_regex=IPV4_REGEX,
-            ipv6_regex=IPV6_REGEX))
+            host_regex=constants.HOST_REGEX,
+            ipv4_regex=constants.IPV4_REGEX,
+            ipv6_regex=constants.IPV6_REGEX))
 
     def __init__(self, server: str, ipv4: str, ipv6: str, port: int) -> None:
         """
@@ -193,11 +193,13 @@ class BMAEndpoint(Endpoint):
         :return:
         """
         if self.server:
-            return ConnectionHandler("http", "ws", self.server, self.port, "", session, proxy)
+            conn_handler = ConnectionHandler("http", "ws", self.server, self.port, "", session, proxy)
         elif self.ipv6:
-            return ConnectionHandler("http", "ws", "[{0}]".format(self.ipv6), self.port, "", session, proxy)
+            conn_handler = ConnectionHandler("http", "ws", "[{0}]".format(self.ipv6), self.port, "", session, proxy)
+        else:
+            conn_handler = ConnectionHandler("http", "ws", self.ipv4, self.port, "", session, proxy)
 
-        return ConnectionHandler("http", "ws", self.ipv4, self.port, "", session, proxy)
+        return conn_handler
 
     def __str__(self) -> str:
         return self.inline()
@@ -206,7 +208,7 @@ class BMAEndpoint(Endpoint):
         if not isinstance(other, BMAEndpoint):
             return NotImplemented
         return self.server == other.server and self.ipv4 == other.ipv4 \
-            and self.ipv6 == other.ipv6 and self.port == other.port
+               and self.ipv6 == other.ipv6 and self.port == other.port
 
     def __hash__(self) -> int:
         return hash((self.server, self.ipv4, self.ipv6, self.port))
@@ -220,10 +222,10 @@ class SecuredBMAEndpoint(BMAEndpoint):
     API = "BMAS"
     re_inline = re.compile(
         '^BMAS(?: ({host_regex}))?(?: ({ipv4_regex}))?(?: ({ipv6_regex}))? ([0-9]+)(?: ({path_regex}))?$'.format(
-            host_regex=HOST_REGEX,
-            ipv4_regex=IPV4_REGEX,
-            ipv6_regex=IPV6_REGEX,
-            path_regex=PATH_REGEX))
+            host_regex=constants.HOST_REGEX,
+            ipv4_regex=constants.IPV4_REGEX,
+            ipv6_regex=constants.IPV6_REGEX,
+            path_regex=constants.PATH_REGEX))
 
     def __init__(self, server: str, ipv4: str, ipv6: str, port: int, path: str) -> None:
         """
@@ -276,11 +278,14 @@ class SecuredBMAEndpoint(BMAEndpoint):
         :return:
         """
         if self.server:
-            return ConnectionHandler("https", "wss", self.server, self.port, self.path, session, proxy)
+            conn_handler = ConnectionHandler("https", "wss", self.server, self.port, self.path, session, proxy)
         elif self.ipv6:
-            return ConnectionHandler("https", "wss", "[{0}]".format(self.ipv6), self.port, self.path, session, proxy)
+            conn_handler = ConnectionHandler("https", "wss", "[{0}]".format(self.ipv6), self.port, self.path, session,
+                                             proxy)
+        else:
+            conn_handler = ConnectionHandler("https", "wss", self.ipv4, self.port, self.path, session, proxy)
 
-        return ConnectionHandler("https", "wss", self.ipv4, self.port, self.path, session, proxy)
+        return conn_handler
 
 
 # required to type hint cls in classmethod
@@ -290,12 +295,15 @@ WS2PEndpointType = TypeVar('WS2PEndpointType', bound='WS2PEndpoint')
 class WS2PEndpoint(Endpoint):
     API = "WS2P"
     re_inline = re.compile(
-        '^WS2P ({ws2pid_regex}) ((?:{host_regex})|(?:{ipv4_regex})) ([0-9]+)?(?: ({path_regex}))?$'.format(
-            ws2pid_regex=WS2PID_REGEX,
-            host_regex=HOST_REGEX,
-            ipv4_regex=IPV4_REGEX,
-            ipv6_regex=IPV6_REGEX,
-            path_regex=PATH_REGEX))
+        '^WS2P ({ws2pid_regex}) ((?:{host_regex})|(?:{ipv4_regex})|(?:{ipv6_regex})) ([0-9]+)?(?: ({path_regex}))?$'
+        .format(
+            ws2pid_regex=constants.WS2PID_REGEX,
+            host_regex=constants.HOST_REGEX,
+            ipv4_regex=constants.IPV4_REGEX,
+            ipv6_regex=constants.IPV6_REGEX,
+            path_regex=constants.PATH_REGEX
+        )
+    )
 
     def __init__(self, ws2pid: str, server: str, port: int, path: str) -> None:
         self.ws2pid = ws2pid
@@ -348,7 +356,7 @@ class WS2PEndpoint(Endpoint):
         if not isinstance(other, WS2PEndpoint):
             return NotImplemented
         return self.server == other.server and self.ws2pid == other.ws2pid \
-            and self.port == other.port and self.path == other.path
+               and self.port == other.port and self.path == other.path
 
     def __hash__(self) -> int:
         return hash((self.ws2pid, self.server, self.port, self.path))
@@ -361,8 +369,8 @@ ESCoreEndpointType = TypeVar('ESCoreEndpointType', bound='ESCoreEndpoint')
 class ESCoreEndpoint(Endpoint):
     API = "ES_CORE_API"
     re_inline = re.compile(
-        '^ES_CORE_API ((?:{host_regex})|(?:{ipv4_regex})) ([0-9]+)$'.format(host_regex=HOST_REGEX,
-                                                                            ipv4_regex=IPV4_REGEX))
+        '^ES_CORE_API ((?:{host_regex})|(?:{ipv4_regex})) ([0-9]+)$'.format(host_regex=constants.HOST_REGEX,
+                                                                            ipv4_regex=constants.IPV4_REGEX))
 
     def __init__(self, server: str, port: int) -> None:
         self.server = server
@@ -421,8 +429,8 @@ ESUserEndpointType = TypeVar('ESUserEndpointType', bound='ESUserEndpoint')
 class ESUserEndpoint(Endpoint):
     API = "ES_USER_API"
     re_inline = re.compile(
-        '^ES_USER_API ((?:{host_regex})|(?:{ipv4_regex})) ([0-9]+)$'.format(host_regex=HOST_REGEX,
-                                                                            ipv4_regex=IPV4_REGEX))
+        '^ES_USER_API ((?:{host_regex})|(?:{ipv4_regex})) ([0-9]+)$'.format(host_regex=constants.HOST_REGEX,
+                                                                            ipv4_regex=constants.IPV4_REGEX))
 
     def __init__(self, server: str, port: int) -> None:
         self.server = server
@@ -481,8 +489,8 @@ ESSubscribtionEndpointType = TypeVar('ESSubscribtionEndpointType', bound='ESSubs
 class ESSubscribtionEndpoint(Endpoint):
     API = "ES_SUBSCRIPTION_API"
     re_inline = re.compile(
-        '^ES_SUBSCRIPTION_API ((?:{host_regex})|(?:{ipv4_regex})) ([0-9]+)$'.format(host_regex=HOST_REGEX,
-                                                                                    ipv4_regex=IPV4_REGEX))
+        '^ES_SUBSCRIPTION_API ((?:{host_regex})|(?:{ipv4_regex})) ([0-9]+)$'.format(host_regex=constants.HOST_REGEX,
+                                                                                    ipv4_regex=constants.IPV4_REGEX))
 
     def __init__(self, server: str, port: int) -> None:
         self.server = server
@@ -551,12 +559,17 @@ def endpoint(value: Any) -> Any:
     :param value: Endpoint string or subclass
     :return:
     """
+    result = UnknownEndpoint.from_inline(value)
+    # if Endpoint instance...
     if issubclass(type(value), Endpoint):
-        return value
+        result = value
+        # if str...
     elif isinstance(value, str):
+        # find Endpoint instance
         for api, cls in MANAGED_API.items():
             if value.startswith(api + " "):
-                return cls.from_inline(value)
-        return UnknownEndpoint.from_inline(value)
+                result = cls.from_inline(value)
     else:
         raise TypeError("Cannot convert {0} to endpoint".format(value))
+
+    return result

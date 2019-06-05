@@ -3,7 +3,7 @@ duniter public and private keys
 
 @author: inso
 """
-from re import compile, MULTILINE, search
+import re
 from typing import Optional, Union, TypeVar, Type
 
 import libnacl.sign
@@ -77,8 +77,8 @@ class SigningKey(libnacl.sign.Signer):
 
         :param str seedhex: Hexadecimal seed string
         """
-        regex_seedhex = compile("([0-9a-fA-F]{64})")
-        match = search(regex_seedhex, seedhex)
+        regex_seedhex = re.compile("([0-9a-fA-F]{64})")
+        match = re.search(regex_seedhex, seedhex)
         if not match:
             raise Exception('Error: Bad seed hexadecimal format')
         seedhex = match.groups()[0]
@@ -128,16 +128,16 @@ class SigningKey(libnacl.sign.Signer):
             pubsec_content = fh.read()
 
         # line patterns
-        regex_pubkey = compile("pub: ([1-9A-HJ-NP-Za-km-z]{43,44})", MULTILINE)
-        regex_signkey = compile("sec: ([1-9A-HJ-NP-Za-km-z]{88,90})", MULTILINE)
+        regex_pubkey = re.compile("pub: ([1-9A-HJ-NP-Za-km-z]{43,44})", re.MULTILINE)
+        regex_signkey = re.compile("sec: ([1-9A-HJ-NP-Za-km-z]{88,90})", re.MULTILINE)
 
         # check public key field
-        match = search(regex_pubkey, pubsec_content)
+        match = re.search(regex_pubkey, pubsec_content)
         if not match:
             raise Exception('Error: Bad format PubSec v1 file, missing public key')
 
         # check signkey field
-        match = search(regex_signkey, pubsec_content)
+        match = re.search(regex_signkey, pubsec_content)
         if not match:
             raise Exception('Error: Bad format PubSec v1 file, missing sec key')
 
@@ -183,8 +183,8 @@ sec: {signkey}""".format(version=version, pubkey=base58_public_key, signkey=base
             wif_content = fh.read()
 
         # check data field
-        regex = compile('Data: ([1-9A-HJ-NP-Za-km-z]+)', MULTILINE)
-        match = search(regex, wif_content)
+        regex = re.compile('Data: ([1-9A-HJ-NP-Za-km-z]+)', re.MULTILINE)
+        match = re.search(regex, wif_content)
         if not match:
             raise Exception('Error: Bad format WIF or EWIF v1 file')
 
@@ -205,11 +205,13 @@ sec: {signkey}""".format(version=version, pubkey=base58_public_key, signkey=base
         fi = wif_bytes[0:1]
 
         if fi == b"\x01":
-            return SigningKey.from_wif_hex(wif_hex)
+            result = SigningKey.from_wif_hex(wif_hex)
         elif fi == b"\x02" and password is not None:
-            return SigningKey.from_ewif_hex(wif_hex, password)
+            result = SigningKey.from_ewif_hex(wif_hex, password)
         else:
             raise Exception("Error: Bad format: not WIF nor EWIF")
+
+        return result
 
     @staticmethod
     def from_wif_file(path: str) -> SigningKeyType:
@@ -222,8 +224,8 @@ sec: {signkey}""".format(version=version, pubkey=base58_public_key, signkey=base
             wif_content = fh.read()
 
         # check data field
-        regex = compile('Data: ([1-9A-HJ-NP-Za-km-z]+)', MULTILINE)
-        match = search(regex, wif_content)
+        regex = re.compile('Data: ([1-9A-HJ-NP-Za-km-z]+)', re.MULTILINE)
+        match = re.search(regex, wif_content)
         if not match:
             raise Exception('Error: Bad format WIF v1 file')
 
@@ -298,8 +300,8 @@ Data: {data}""".format(version=version, data=wif_key)
             wif_content = fh.read()
 
         # check data field
-        regex = compile('Data: ([1-9A-HJ-NP-Za-km-z]+)', MULTILINE)
-        match = search(regex, wif_content)
+        regex = re.compile('Data: ([1-9A-HJ-NP-Za-km-z]+)', re.MULTILINE)
+        match = re.search(regex, wif_content)
         if not match:
             raise Exception('Error: Bad format EWIF v1 file')
 

@@ -327,11 +327,11 @@ class TestTransaction(unittest.TestCase):
         self.assertFalse(t1 == t2)
 
         t2 = Transaction.from_signed_raw(tx_raw)
-        t2.inputs = InputSource.from_inline(input_source_str)
+        t2.inputs = [InputSource.from_inline(input_source_str)]
         self.assertFalse(t1 == t2)
 
         t2 = Transaction.from_signed_raw(tx_raw)
-        t2.outputs = OutputSource.from_inline(output_source_str)
+        t2.outputs = [OutputSource.from_inline(output_source_str)]
         self.assertFalse(t1 == t2)
 
 
