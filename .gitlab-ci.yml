@@ -1,8 +1,9 @@
 stages:
   - github-sync
   - prepare
-  - build
+  - black
   - test
+  - build
   - release
 
 variables:
@@ -10,6 +11,7 @@ variables:
 
 image: registry.duniter.org/docker/python3/duniterpy-builder:0.0.4
 
+# todo: remove useless github mirror as only repo is mirrored, not issues
 push_to_github:
   stage: github-sync
   variables:
@@ -47,14 +49,14 @@ push_to_github:
       - setup.py
       - tests/**/*.py
 
-build: &build
+black:
   <<: *pyenv
   <<: *changes
-  stage: build
+  stage: black
   script:
-    - pip install -r requirements.txt
-    - pip install wheel
-    - python setup.py sdist bdist_wheel
+    - pyenv shell 3.6.4  # black install and run needs python 3.6.x minimum
+    - pip install -r requirements_dev.txt
+    - make black
 
 test:
   <<: *pyenv
@@ -70,10 +72,22 @@ check:
   <<: *changes
   stage: test
   script:
+    - pyenv shell 3.6.4  # black install needs python 3.6.x minimum
     - pip install -r requirements.txt
     - pip install -r requirements_dev.txt
-    - make check
+    - make mypy
+    - make pylint
 
+build: &build
+  <<: *pyenv
+  <<: *changes
+  stage: build
+  script:
+    - pip install -r requirements.txt
+    - pip install wheel
+    - python setup.py sdist bdist_wheel
+
+# todo: use build anchor as build stage is repeated here
 releases:
   <<: *pyenv
   stage: release
