@@ -2,6 +2,7 @@ class DuniterError(Exception):
     """
     Handle duniter error
     """
+
     def __init__(self, data: dict) -> None:
         """
         Init instance from Duniter data

@@ -45,14 +45,16 @@ class ParserMissingPublicKeysException(Exception):
 
 
 # Exception messages listed here
-PARSER_MISSING_SIGNING_KEY_EXCEPTION = ParserMissingSigningKeyException('The message is encrypted but no SigningKey '
-                                                                        'instance is provided')
-PARSER_MISSING_PUBLIC_KEYS_EXCEPTION = ParserMissingPublicKeysException('At least one signature but no public keys '
-                                                                        'are provided')
+PARSER_MISSING_SIGNING_KEY_EXCEPTION = ParserMissingSigningKeyException(
+    "The message is encrypted but no SigningKey " "instance is provided"
+)
+PARSER_MISSING_PUBLIC_KEYS_EXCEPTION = ParserMissingPublicKeysException(
+    "At least one signature but no public keys " "are provided"
+)
 
-MISSING_PUBLIC_KEY_AND_SIGNING_KEY_EXCEPTION = MissingPublickeyAndSigningKeyException('Ascii Armor Message needs a '
-                                                                                      'public key or a SigningKey but '
-                                                                                      'none are provided')
+MISSING_PUBLIC_KEY_AND_SIGNING_KEY_EXCEPTION = MissingPublickeyAndSigningKeyException(
+    "Ascii Armor Message needs a " "public key or a SigningKey but " "none are provided"
+)
 
 
 class AsciiArmor:
@@ -61,8 +63,13 @@ class AsciiArmor:
     """
 
     @staticmethod
-    def create(message: str, pubkey: Optional[str] = None, signing_keys: Optional[List[SigningKey]] = None,
-               message_comment: Optional[str] = None, signatures_comment: Optional[str] = None) -> str:
+    def create(
+        message: str,
+        pubkey: Optional[str] = None,
+        signing_keys: Optional[List[SigningKey]] = None,
+        message_comment: Optional[str] = None,
+        signatures_comment: Optional[str] = None,
+    ) -> str:
         """
         Encrypt a message in ascii armor format, optionally signing it
 
@@ -83,28 +90,38 @@ class AsciiArmor:
 
         # create block with headers
         ascii_armor_block = """{begin_message_header}
-""".format(begin_message_header=BEGIN_MESSAGE_HEADER)
+""".format(
+            begin_message_header=BEGIN_MESSAGE_HEADER
+        )
 
         # if encrypted message...
         if pubkey:
             # add encrypted message fields
             ascii_armor_block += """{version_field}
-""".format(version_field=AsciiArmor._get_version_field())
+""".format(
+                version_field=AsciiArmor._get_version_field()
+            )
 
         # add message comment if specified
         if message_comment:
             ascii_armor_block += """{comment_field}
-""".format(comment_field=AsciiArmor._get_comment_field(message_comment))
+""".format(
+                comment_field=AsciiArmor._get_comment_field(message_comment)
+            )
 
         # blank line separator
-        ascii_armor_block += '\n'
+        ascii_armor_block += "\n"
 
         if pubkey:
             # add encrypted message
             pubkey_instance = PublicKey(pubkey)
-            base64_encrypted_message = base64.b64encode(pubkey_instance.encrypt_seal(message))  # type: bytes
+            base64_encrypted_message = base64.b64encode(
+                pubkey_instance.encrypt_seal(message)
+            )  # type: bytes
             ascii_armor_block += """{base64_encrypted_message}
-""".format(base64_encrypted_message=base64_encrypted_message.decode('utf-8'))
+""".format(
+                base64_encrypted_message=base64_encrypted_message.decode("utf-8")
+            )
         else:
             # remove trailing spaces
             message = AsciiArmor._remove_trailing_spaces(message)
@@ -120,8 +137,9 @@ class AsciiArmor:
             # add signature blocks and close block on last signature
             count = 1
             for signing_key in signing_keys:
-                ascii_armor_block += AsciiArmor._get_signature_block(message, signing_key, count == len(signing_keys),
-                                                                     signatures_comment)
+                ascii_armor_block += AsciiArmor._get_signature_block(
+                    message, signing_key, count == len(signing_keys), signatures_comment
+                )
                 count += 1
 
         return ascii_armor_block
@@ -167,7 +185,7 @@ class AsciiArmor:
         :return:
         """
         text = str()
-        regex_dash_escape_prefix = re.compile('^' + DASH_ESCAPE_PREFIX)
+        regex_dash_escape_prefix = re.compile("^" + DASH_ESCAPE_PREFIX)
         # if prefixed by a dash escape prefix...
         if regex_dash_escape_prefix.match(dash_escaped_line):
             # remove dash '-' (0x2D) and space ' ' (0x20) prefix
@@ -195,8 +213,12 @@ class AsciiArmor:
         return "Comment: {comment}".format(comment=comment)
 
     @staticmethod
-    def _get_signature_block(message: str, signing_key: SigningKey, close_block: bool = True,
-                             comment: Optional[str] = None) -> str:
+    def _get_signature_block(
+        message: str,
+        signing_key: SigningKey,
+        close_block: bool = True,
+        comment: Optional[str] = None,
+    ) -> str:
         """
         Return a signature block
 
@@ -210,18 +232,25 @@ class AsciiArmor:
 
         block = """{begin_signature_header}
 {version_field}
-""".format(begin_signature_header=BEGIN_SIGNATURE_HEADER, version_field=AsciiArmor._get_version_field())
+""".format(
+            begin_signature_header=BEGIN_SIGNATURE_HEADER,
+            version_field=AsciiArmor._get_version_field(),
+        )
 
         # add message comment if specified
         if comment:
             block += """{comment_field}
-""".format(comment_field=AsciiArmor._get_comment_field(comment))
+""".format(
+                comment_field=AsciiArmor._get_comment_field(comment)
+            )
 
         # blank line separator
-        block += '\n'
+        block += "\n"
 
         block += """{base64_signature}
-""".format(base64_signature=base64_signature.decode('utf-8'))
+""".format(
+            base64_signature=base64_signature.decode("utf-8")
+        )
 
         if close_block:
             block += END_SIGNATURE_HEADER
@@ -229,8 +258,11 @@ class AsciiArmor:
         return block
 
     @staticmethod
-    def parse(ascii_armor_message: str, signing_key: Optional[SigningKey] = None,
-              sender_pubkeys: Optional[List[str]] = None) -> dict:
+    def parse(
+        ascii_armor_message: str,
+        signing_key: Optional[SigningKey] = None,
+        sender_pubkeys: Optional[List[str]] = None,
+    ) -> dict:
         """
         Return a dict with parsed content (decrypted message, signature validation) ::
 
@@ -265,15 +297,11 @@ class AsciiArmor:
 
         # init vars
         parsed_result = {
-            'message':
-                {
-                    'fields': {},
-                    'content': '',
-                },
-            'signatures': []
+            "message": {"fields": {}, "content": ""},
+            "signatures": [],
         }  # type: Dict[str, Any]
         cursor_status = 0
-        message = ''
+        message = ""
         signatures_index = 0
 
         # parse each line...
@@ -292,11 +320,11 @@ class AsciiArmor:
                     # capture field
                     msg_field_name = m.groups()[0]
                     msg_field_value = m.groups()[1]
-                    parsed_result['message']['fields'][msg_field_name] = msg_field_value
+                    parsed_result["message"]["fields"][msg_field_name] = msg_field_value
                     continue
 
                 # if blank line...
-                if line.strip("\n\t\r ") == '':
+                if line.strip("\n\t\r ") == "":
                     cursor_status = ON_MESSAGE_CONTENT
                     continue
 
@@ -307,7 +335,7 @@ class AsciiArmor:
                 if line.startswith(HEADER_PREFIX):
 
                     # if field Version is present, the message is encrypted...
-                    if 'Version' in parsed_result['message']['fields']:
+                    if "Version" in parsed_result["message"]["fields"]:
 
                         # If keypair instance to decrypt not given...
                         if signing_key is None:
@@ -318,7 +346,7 @@ class AsciiArmor:
                         message = AsciiArmor._decrypt(message, signing_key)
 
                     # save message content in result
-                    parsed_result['message']['content'] = message
+                    parsed_result["message"]["content"] = message
 
                     # if message end header...
                     if regex_end_message.match(line):
@@ -328,14 +356,12 @@ class AsciiArmor:
                     # if signature begin header...
                     if regex_begin_signature.match(line):
                         # add signature dict in list
-                        parsed_result['signatures'].append({
-                            'fields': {}
-                        })
+                        parsed_result["signatures"].append({"fields": {}})
                         cursor_status = ON_SIGNATURE_FIELDS
                         continue
                 else:
                     # if field Version is present, the message is encrypted...
-                    if 'Version' in parsed_result['message']['fields']:
+                    if "Version" in parsed_result["message"]["fields"]:
                         # concatenate encrypted line to message content
                         message += line
                     else:
@@ -351,11 +377,13 @@ class AsciiArmor:
                     # capture field
                     sig_field_name = m.groups()[0]
                     sig_field_value = m.groups()[1]
-                    parsed_result['signatures'][signatures_index]['fields'][sig_field_name] = sig_field_value
+                    parsed_result["signatures"][signatures_index]["fields"][
+                        sig_field_name
+                    ] = sig_field_value
                     continue
 
                 # if blank line...
-                if line.strip("\n\t\r ") == '':
+                if line.strip("\n\t\r ") == "":
                     cursor_status = ON_SIGNATURE_CONTENT
                     continue
 
@@ -381,12 +409,14 @@ class AsciiArmor:
                 for pubkey in sender_pubkeys:
                     verifier = VerifyingKey(pubkey)
                     signature = base64.b64decode(line)
-                    parsed_result['signatures'][signatures_index]['pubkey'] = pubkey
+                    parsed_result["signatures"][signatures_index]["pubkey"] = pubkey
                     try:
-                        libnacl.crypto_sign_verify_detached(signature, message, verifier.vk)
-                        parsed_result['signatures'][signatures_index]['valid'] = True
+                        libnacl.crypto_sign_verify_detached(
+                            signature, message, verifier.vk
+                        )
+                        parsed_result["signatures"][signatures_index]["valid"] = True
                     except ValueError:
-                        parsed_result['signatures'][signatures_index]['valid'] = False
+                        parsed_result["signatures"][signatures_index]["valid"] = False
 
         return parsed_result
 
@@ -401,4 +431,4 @@ class AsciiArmor:
         """
         data = signing_key.decrypt_seal(base64.b64decode(ascii_armor_message))
 
-        return data.decode('utf-8')
+        return data.decode("utf-8")

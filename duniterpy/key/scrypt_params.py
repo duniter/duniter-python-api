@@ -7,9 +7,14 @@ class ScryptParams:
     """
     Class to simplify handling of scrypt parameters
     """
-    def __init__(self, n: Optional[int] = SCRYPT_PARAMS['N'], r: Optional[int] = SCRYPT_PARAMS['r'],
-                 p: Optional[int] = SCRYPT_PARAMS['p'],
-                 seed_length: Optional[int] = SCRYPT_PARAMS['seed_length']) -> None:
+
+    def __init__(
+        self,
+        n: Optional[int] = SCRYPT_PARAMS["N"],
+        r: Optional[int] = SCRYPT_PARAMS["r"],
+        p: Optional[int] = SCRYPT_PARAMS["p"],
+        seed_length: Optional[int] = SCRYPT_PARAMS["seed_length"],
+    ) -> None:
         """
         Init a ScryptParams instance with crypto parameters
 

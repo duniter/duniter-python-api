@@ -23,84 +23,44 @@ from duniterpy.api.client import Client, RESPONSE_AIOHTTP
 
 logger = logging.getLogger("duniter/network")
 
-MODULE = 'network'
+MODULE = "network"
 
 PEERING_SCHEMA = {
     "type": "object",
     "properties": {
-        "version": {
-            "type": ["number", "string"]
-        },
-        "currency": {
-            "type": "string"
-        },
-        "pubkey": {
-            "type": "string"
-        },
-        "endpoints": {
-            "type": "array",
-            "items": {
-                "type": "string"
-            }
-        },
-        "signature": {
-            "type": "string"
-        }
+        "version": {"type": ["number", "string"]},
+        "currency": {"type": "string"},
+        "pubkey": {"type": "string"},
+        "endpoints": {"type": "array", "items": {"type": "string"}},
+        "signature": {"type": "string"},
     },
-    "required": ["version", "currency", "pubkey", "endpoints", "signature"]
+    "required": ["version", "currency", "pubkey", "endpoints", "signature"],
 }
 
 PEERS_SCHEMA = schema = {
     "type": ["object"],
     "properties": {
-        "depth": {
-            "type": "number"
-        },
-        "nodesCount": {
-            "type": "number"
-        },
-        "leavesCount": {
-            "type": "number"
-        },
-        "root": {
-            "type": "string"
-        },
-        "hash": {
-            "type": "string"
-        },
+        "depth": {"type": "number"},
+        "nodesCount": {"type": "number"},
+        "leavesCount": {"type": "number"},
+        "root": {"type": "string"},
+        "hash": {"type": "string"},
         "value": {
             "type": "object",
             "properties": {
-                "version": {
-                    "type": "string"
-                },
-                "currency": {
-                    "type": "string"
-                },
-                "pubkey": {
-                    "type": "string"
-                },
-                "endpoints": {
-                    "type": "array",
-                    "items": {
-                        "type": "string"
-                    }
-                },
-                "signature": {
-                    "type": "string"
-                }
+                "version": {"type": "string"},
+                "currency": {"type": "string"},
+                "pubkey": {"type": "string"},
+                "endpoints": {"type": "array", "items": {"type": "string"}},
+                "signature": {"type": "string"},
             },
-            "required": ["version", "currency", "pubkey", "endpoints", "signature"]
-        }
+            "required": ["version", "currency", "pubkey", "endpoints", "signature"],
+        },
     },
     "oneOf": [
-        {
-            "required": ["depth", "nodesCount", "leavesCount", "root"]
-        },
-        {
-            "required": ["hash", "value"]
-        }
-    ]
+        {"required": ["depth", "nodesCount", "leavesCount", "root"]},
+        {"required": ["hash", "value"]},
+    ],
 }
 
 WS2P_HEADS_SCHEMA = {
@@ -111,27 +71,17 @@ WS2P_HEADS_SCHEMA = {
             "items": {
                 "type": "object",
                 "properties": {
-                    "message": {
-                        "type": "string"
-                    },
-                    "sig": {
-                        "type": "string",
-                    },
-                    "messageV2": {
-                        "type": "string"
-                    },
-                    "sigV2": {
-                        "type": "string",
-                    },
-                    "step": {
-                        "type": "number",
-                    },
+                    "message": {"type": "string"},
+                    "sig": {"type": "string"},
+                    "messageV2": {"type": "string"},
+                    "sigV2": {"type": "string"},
+                    "step": {"type": "number"},
                 },
-                "required": ["messageV2", "sigV2", "step"]
-            }
+                "required": ["messageV2", "sigV2", "step"],
+            },
         }
     },
-    "required": ["heads"]
+    "required": ["heads"],
 }
 
 
@@ -142,7 +92,7 @@ async def peering(client: Client) -> dict:
     :param client: Client to connect to the api
     :return:
     """
-    return await client.get(MODULE + '/peering', schema=PEERING_SCHEMA)
+    return await client.get(MODULE + "/peering", schema=PEERING_SCHEMA)
 
 
 async def peers(client: Client, leaves: bool = False, leaf: str = "") -> dict:
@@ -155,9 +105,13 @@ async def peers(client: Client, leaves: bool = False, leaf: str = "") -> dict:
     :return:
     """
     if leaves is True:
-        response = await client.get(MODULE + '/peering/peers', {"leaves": "true"}, schema=PEERS_SCHEMA)
+        response = await client.get(
+            MODULE + "/peering/peers", {"leaves": "true"}, schema=PEERS_SCHEMA
+        )
     else:
-        response = await client.get(MODULE + '/peering/peers', {"leaf": leaf}, schema=PEERS_SCHEMA)
+        response = await client.get(
+            MODULE + "/peering/peers", {"leaf": leaf}, schema=PEERS_SCHEMA
+        )
     return response
 
 
@@ -169,7 +123,9 @@ async def peer(client: Client, peer_signed_raw: str) -> ClientResponse:
     :param peer_signed_raw: Peer signed raw document
     :return:
     """
-    return await client.post(MODULE + '/peering/peers', {'peer': peer_signed_raw}, rtype=RESPONSE_AIOHTTP)
+    return await client.post(
+        MODULE + "/peering/peers", {"peer": peer_signed_raw}, rtype=RESPONSE_AIOHTTP
+    )
 
 
 async def ws2p_heads(client: Client) -> dict:
@@ -179,4 +135,4 @@ async def ws2p_heads(client: Client) -> dict:
     :param client: Client to connect to the api
     :rtype: dict
     """
-    return await client.get(MODULE + '/ws2p/heads', schema=WS2P_HEADS_SCHEMA)
+    return await client.get(MODULE + "/ws2p/heads", schema=WS2P_HEADS_SCHEMA)

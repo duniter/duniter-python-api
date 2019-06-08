@@ -1,16 +1,18 @@
 stages:
-  - github-sync
   - prepare
-  - build
+  - format
   - test
+  - build
   - release
+  - github-sync
 
 variables:
     PYENV_PYTHON_VERSION: 3.5.5
 
 image: registry.duniter.org/docker/python3/duniterpy-builder:0.0.4
 
-push_to_github:
+# SUB-TASKS
+.push_to_github: &push_to_github
   stage: github-sync
   variables:
     GIT_STRATEGY: none
@@ -47,14 +49,20 @@ push_to_github:
       - setup.py
       - tests/**/*.py
 
-build: &build
+.release_pip: &release_pip
+  script:
+    - pip install twine
+    - twine upload dist/* --username duniter --password $PYPI_PASSWORD
+
+# TASKS
+format:
   <<: *pyenv
   <<: *changes
-  stage: build
+  stage: format
   script:
-    - pip install -r requirements.txt
-    - pip install wheel
-    - python setup.py sdist bdist_wheel
+    - pyenv shell 3.6.4  # black install and run needs python 3.6.x minimum
+    - pip install -r requirements_dev.txt
+    - make check-format
 
 test:
   <<: *pyenv
@@ -70,18 +78,26 @@ check:
   <<: *changes
   stage: test
   script:
+    - pyenv shell 3.6.4  # black install needs python 3.6.x minimum
     - pip install -r requirements.txt
     - pip install -r requirements_dev.txt
-    - make check
+    - make mypy
+    - make pylint
 
-releases:
+build: &build
   <<: *pyenv
-  stage: release
-  when: manual
+  <<: *changes
+  stage: build
   script:
     - pip install -r requirements.txt
     - pip install wheel
-    - pip install twine
     - python setup.py sdist bdist_wheel
-    - twine upload dist/* --username duniter --password $PYPI_PASSWORD
+
+releases:
+  <<: *pyenv
+  <<: *build
+  <<: *release_pip
+  <<: *push_to_github
+  stage: release
+  when: manual
 

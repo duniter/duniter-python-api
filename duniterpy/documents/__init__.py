@@ -5,6 +5,13 @@ from .certification import Certification
 from .revocation import Revocation
 from .identity import Identity
 from .membership import Membership
-from .transaction import SimpleTransaction, Transaction, InputSource, OutputSource, \
-   SIGParameter, Unlock, UnlockParameter
+from .transaction import (
+    SimpleTransaction,
+    Transaction,
+    InputSource,
+    OutputSource,
+    SIGParameter,
+    Unlock,
+    UnlockParameter,
+)
 from .crc_pubkey import CRCPubkey

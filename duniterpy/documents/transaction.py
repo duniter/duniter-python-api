@@ -6,7 +6,12 @@ import pypeg2
 from duniterpy.grammars.output import Condition
 from .block_uid import BlockUID
 from .document import Document, MalformedDocumentError
-from ..constants import PUBKEY_REGEX, TRANSACTION_HASH_REGEX, BLOCK_ID_REGEX, BLOCK_UID_REGEX
+from ..constants import (
+    PUBKEY_REGEX,
+    TRANSACTION_HASH_REGEX,
+    BLOCK_ID_REGEX,
+    BLOCK_UID_REGEX,
+)
 from ..grammars import output
 
 
@@ -38,7 +43,7 @@ def reduce_base(amount: int, base: int) -> tuple:
 
 
 # required to type hint cls in classmethod
-InputSourceType = TypeVar('InputSourceType', bound='InputSource')
+InputSourceType = TypeVar("InputSourceType", bound="InputSource")
 
 
 class InputSource:
@@ -49,14 +54,19 @@ class InputSource:
     INDEX:SOURCE:FINGERPRINT:AMOUNT
 
     """
+
     re_inline = re.compile(
         "([0-9]+):([0-9]):(?:(?:(D):({pubkey_regex}):({block_id_regex}))|(?:(T):({transaction_hash_regex}):\
-([0-9]+)))"
-        .format(pubkey_regex=PUBKEY_REGEX,
-                block_id_regex=BLOCK_ID_REGEX,
-                transaction_hash_regex=TRANSACTION_HASH_REGEX))
+([0-9]+)))".format(
+            pubkey_regex=PUBKEY_REGEX,
+            block_id_regex=BLOCK_ID_REGEX,
+            transaction_hash_regex=TRANSACTION_HASH_REGEX,
+        )
+    )
 
-    def __init__(self, amount: int, base: int, source: str, origin_id: str, index: int) -> None:
+    def __init__(
+        self, amount: int, base: int, source: str, origin_id: str, index: int
+    ) -> None:
         """
         An input source can come from a dividend or a transaction.
 
@@ -79,11 +89,13 @@ class InputSource:
         """
         if not isinstance(other, InputSource):
             return NotImplemented
-        return self.amount == other.amount and \
-            self.base == other.base and \
-            self.source == other.source and \
-            self.origin_id == other.origin_id and \
-            self.index == other.index
+        return (
+            self.amount == other.amount
+            and self.base == other.base
+            and self.source == other.source
+            and self.origin_id == other.origin_id
+            and self.index == other.index
+        )
 
     def __hash__(self) -> int:
         return hash((self.amount, self.base, self.source, self.origin_id, self.index))
@@ -119,21 +131,20 @@ class InputSource:
 
         :return:
         """
-        return "{0}:{1}:{2}:{3}:{4}".format(self.amount,
-                                                self.base,
-                                                self.source,
-                                                self.origin_id,
-                                                self.index)
+        return "{0}:{1}:{2}:{3}:{4}".format(
+            self.amount, self.base, self.source, self.origin_id, self.index
+        )
 
 
 # required to type hint cls in classmethod
-OutputSourceType = TypeVar('OutputSourceType', bound='OutputSource')
+OutputSourceType = TypeVar("OutputSourceType", bound="OutputSource")
 
 
 class OutputSource:
     """
     A Transaction OUTPUT
     """
+
     re_inline = re.compile("([0-9]+):([0-9]):(.*)")
 
     def __init__(self, amount: int, base: int, condition: str) -> None:
@@ -154,9 +165,11 @@ class OutputSource:
         """
         if not isinstance(other, OutputSource):
             return NotImplemented
-        return self.amount == other.amount and \
-            self.base == other.base and \
-            self.condition == other.condition
+        return (
+            self.amount == other.amount
+            and self.base == other.base
+            and self.condition == other.condition
+        )
 
     def __hash__(self) -> int:
         return hash((self.amount, self.base, self.condition))
@@ -184,8 +197,9 @@ class OutputSource:
 
         :return:
         """
-        return "{0}:{1}:{2}".format(self.amount, self.base,
-                                    pypeg2.compose(self.condition, output.Condition))
+        return "{0}:{1}:{2}".format(
+            self.amount, self.base, pypeg2.compose(self.condition, output.Condition)
+        )
 
     def inline_condition(self) -> str:
         """
@@ -213,13 +227,14 @@ class OutputSource:
 
 
 # required to type hint cls in classmethod
-SIGParameterType = TypeVar('SIGParameterType', bound='SIGParameter')
+SIGParameterType = TypeVar("SIGParameterType", bound="SIGParameter")
 
 
 class SIGParameter:
     """
     A Transaction UNLOCK SIG parameter
     """
+
     re_sig = re.compile("SIG\\(([0-9]+)\\)")
 
     def __init__(self, index: int) -> None:
@@ -229,7 +244,6 @@ class SIGParameter:
         :param index: Index in list
         """
         self.index = index
-
 
     def __eq__(self, other: Any) -> bool:
         """
@@ -242,9 +256,10 @@ class SIGParameter:
     def __hash__(self) -> int:
         return hash((self.index))
 
-
     @classmethod
-    def from_parameter(cls: Type[SIGParameterType], parameter: str) -> Optional[SIGParameterType]:
+    def from_parameter(
+        cls: Type[SIGParameterType], parameter: str
+    ) -> Optional[SIGParameterType]:
         """
         Return a SIGParameter instance from an index parameter
 
@@ -268,13 +283,14 @@ class SIGParameter:
 
 
 # required to type hint cls in classmethod
-XHXParameterType = TypeVar('XHXParameterType', bound='XHXParameter')
+XHXParameterType = TypeVar("XHXParameterType", bound="XHXParameter")
 
 
 class XHXParameter:
     """
     A Transaction UNLOCK XHX parameter
     """
+
     re_xhx = re.compile("XHX\\(([0-9]+)\\)")
 
     def __init__(self, integer: int) -> None:
@@ -284,7 +300,6 @@ class XHXParameter:
         :param integer: XHX number
         """
         self.integer = integer
-
 
     def __eq__(self, other: Any) -> bool:
         """
@@ -297,9 +312,10 @@ class XHXParameter:
     def __hash__(self) -> int:
         return hash((self.integer))
 
-
     @classmethod
-    def from_parameter(cls: Type[XHXParameterType], parameter: str) -> Optional[XHXParameterType]:
+    def from_parameter(
+        cls: Type[XHXParameterType], parameter: str
+    ) -> Optional[XHXParameterType]:
         """
         Return a XHXParameter instance from an index parameter
 
@@ -326,13 +342,14 @@ class XHXParameter:
 
 
 # required to type hint cls in classmethod
-UnlockParameterType = TypeVar('UnlockParameterType', bound='UnlockParameter')
+UnlockParameterType = TypeVar("UnlockParameterType", bound="UnlockParameter")
 
 
 class UnlockParameter:
-
     @classmethod
-    def from_parameter(cls: Type[UnlockParameterType], parameter: str) -> Optional[Union[SIGParameter, XHXParameter]]:
+    def from_parameter(
+        cls: Type[UnlockParameterType], parameter: str
+    ) -> Optional[Union[SIGParameter, XHXParameter]]:
         """
         Return UnlockParameter instance from parameter string
 
@@ -355,16 +372,19 @@ class UnlockParameter:
 
 
 # required to type hint cls in classmethod
-UnlockType = TypeVar('UnlockType', bound='Unlock')
+UnlockType = TypeVar("UnlockType", bound="Unlock")
 
 
 class Unlock:
     """
     A Transaction UNLOCK
     """
+
     re_inline = re.compile("([0-9]+):((?:SIG\\([0-9]+\\)|XHX\\([0-9]+\\)|\\s)+)\n")
 
-    def __init__(self, index: int, parameters: List[Union[SIGParameter, XHXParameter]]) -> None:
+    def __init__(
+        self, index: int, parameters: List[Union[SIGParameter, XHXParameter]]
+    ) -> None:
         """
         Init Unlock instance
 
@@ -373,7 +393,6 @@ class Unlock:
         """
         self.index = index
         self.parameters = parameters
-
 
     def __eq__(self, other: Any) -> bool:
         """
@@ -391,7 +410,6 @@ class Unlock:
     def __hash__(self) -> int:
         return hash((self.index, self.parameters))
 
-
     @classmethod
     def from_inline(cls: Type[UnlockType], inline: str) -> UnlockType:
         """
@@ -405,7 +423,7 @@ class Unlock:
         if data is None:
             raise MalformedDocumentError("Inline input")
         index = int(data.group(1))
-        parameters_str = data.group(2).split(' ')
+        parameters_str = data.group(2).split(" ")
         parameters = []
         for p in parameters_str:
             param = UnlockParameter.from_parameter(p)
@@ -419,11 +437,11 @@ class Unlock:
 
         :return:
         """
-        return "{0}:{1}".format(self.index, ' '.join([str(p) for p in self.parameters]))
+        return "{0}:{1}".format(self.index, " ".join([str(p) for p in self.parameters]))
 
 
 # required to type hint cls in classmethod
-TransactionType = TypeVar('TransactionType', bound='Transaction')
+TransactionType = TypeVar("TransactionType", bound="Transaction")
 
 
 class Transaction(Document):
@@ -462,9 +480,15 @@ class Transaction(Document):
     """
 
     re_type = re.compile("Type: (Transaction)\n")
-    re_header = re.compile("TX:([0-9]+):([0-9]+):([0-9]+):([0-9]+):([0-9]+):([01]):([0-9]+)\n")
-    re_compact_blockstamp = re.compile("({block_uid_regex})\n".format(block_uid_regex=BLOCK_UID_REGEX))
-    re_blockstamp = re.compile("Blockstamp: ({block_uid_regex})\n".format(block_uid_regex=BLOCK_UID_REGEX))
+    re_header = re.compile(
+        "TX:([0-9]+):([0-9]+):([0-9]+):([0-9]+):([0-9]+):([01]):([0-9]+)\n"
+    )
+    re_compact_blockstamp = re.compile(
+        "({block_uid_regex})\n".format(block_uid_regex=BLOCK_UID_REGEX)
+    )
+    re_blockstamp = re.compile(
+        "Blockstamp: ({block_uid_regex})\n".format(block_uid_regex=BLOCK_UID_REGEX)
+    )
     re_locktime = re.compile("Locktime: ([0-9]+)\n")
     re_issuers = re.compile("Issuers:\n")
     re_inputs = re.compile("Inputs:\n")
@@ -474,25 +498,38 @@ class Transaction(Document):
     re_comment = re.compile("Comment: ([^\n]*)\n")
     re_pubkey = re.compile("({pubkey_regex})\n".format(pubkey_regex=PUBKEY_REGEX))
 
-    fields_parsers = {**Document.fields_parsers, **{
-        "Type": re_type,
-        "Blockstamp": re_blockstamp,
-        "CompactBlockstamp": re_compact_blockstamp,
-        "Locktime": re_locktime,
-        "TX": re_header,
-        "Issuers": re_issuers,
-        "Inputs": re_inputs,
-        "Unlocks": re_unlocks,
-        "Outputs": re_outputs,
-        "Comment": re_comment,
-        "Compact comment": re_compact_comment,
-        "Pubkey": re_pubkey
+    fields_parsers = {
+        **Document.fields_parsers,
+        **{
+            "Type": re_type,
+            "Blockstamp": re_blockstamp,
+            "CompactBlockstamp": re_compact_blockstamp,
+            "Locktime": re_locktime,
+            "TX": re_header,
+            "Issuers": re_issuers,
+            "Inputs": re_inputs,
+            "Unlocks": re_unlocks,
+            "Outputs": re_outputs,
+            "Comment": re_comment,
+            "Compact comment": re_compact_comment,
+            "Pubkey": re_pubkey,
+        },
     }
-                      }
 
-    def __init__(self, version: int, currency: str, blockstamp: Optional[BlockUID], locktime: int, issuers: List[str],
-                 inputs: List[InputSource], unlocks: List[Unlock], outputs: List[OutputSource],
-                 comment: str, signatures: List[str], time: Optional[int] = None) -> None:
+    def __init__(
+        self,
+        version: int,
+        currency: str,
+        blockstamp: Optional[BlockUID],
+        locktime: int,
+        issuers: List[str],
+        inputs: List[InputSource],
+        unlocks: List[Unlock],
+        outputs: List[OutputSource],
+        comment: str,
+        signatures: List[str],
+        time: Optional[int] = None,
+    ) -> None:
         """
         Init Transaction instance
 
@@ -518,32 +555,47 @@ class Transaction(Document):
         self.comment = comment
         self.time = time
 
-
     def __eq__(self, other: Any) -> bool:
         """
         Check Transaction instances equality
         """
         if not isinstance(other, Transaction):
             return NotImplemented
-        return self.version == other.version and \
-            self.currency == other.currency and \
-            self.signatures == other.signatures and \
-            self.blockstamp == other.blockstamp and \
-            self.locktime == other.locktime and \
-            self.issuers == other.issuers and \
-            self.inputs == other.inputs and \
-            self.unlocks == other.unlocks and \
-            self.outputs == other.outputs and \
-            self.comment == other.comment and \
-            self.time == other.time
-
+        return (
+            self.version == other.version
+            and self.currency == other.currency
+            and self.signatures == other.signatures
+            and self.blockstamp == other.blockstamp
+            and self.locktime == other.locktime
+            and self.issuers == other.issuers
+            and self.inputs == other.inputs
+            and self.unlocks == other.unlocks
+            and self.outputs == other.outputs
+            and self.comment == other.comment
+            and self.time == other.time
+        )
 
     def __hash__(self) -> int:
-        return hash((self.version, self.currency, self.signatures, self.blockstamp, self.locktime, self.issuers, self.inputs, self.unlocks, self.outputs, self.comment, self.time))
-
+        return hash(
+            (
+                self.version,
+                self.currency,
+                self.signatures,
+                self.blockstamp,
+                self.locktime,
+                self.issuers,
+                self.inputs,
+                self.unlocks,
+                self.outputs,
+                self.comment,
+                self.time,
+            )
+        )
 
     @classmethod
-    def from_bma_history(cls: Type[TransactionType], currency: str, tx_data: Dict) -> TransactionType:
+    def from_bma_history(
+        cls: Type[TransactionType], currency: str, tx_data: Dict
+    ) -> TransactionType:
         """
         Get the transaction instance from json
 
@@ -554,9 +606,10 @@ class Transaction(Document):
         """
         tx_data = tx_data.copy()
         tx_data["currency"] = currency
-        for data_list in ('issuers', 'outputs', 'inputs', 'unlocks', 'signatures'):
-            tx_data['multiline_{0}'.format(data_list)] = '\n'.join(tx_data[data_list])
-        return cls.from_signed_raw("""Version: {version}
+        for data_list in ("issuers", "outputs", "inputs", "unlocks", "signatures"):
+            tx_data["multiline_{0}".format(data_list)] = "\n".join(tx_data[data_list])
+        return cls.from_signed_raw(
+            """Version: {version}
 Type: Transaction
 Currency: {currency}
 Blockstamp: {blockstamp}
@@ -571,10 +624,16 @@ Outputs:
 {multiline_outputs}
 Comment: {comment}
 {multiline_signatures}
-""".format(**tx_data), tx_data["time"])
+""".format(
+                **tx_data
+            ),
+            tx_data["time"],
+        )
 
     @classmethod
-    def from_compact(cls: Type[TransactionType], currency: str, compact: str) -> TransactionType:
+    def from_compact(
+        cls: Type[TransactionType], currency: str, compact: str
+    ) -> TransactionType:
         """
         Return Transaction instance from compact string format
 
@@ -597,7 +656,9 @@ Comment: {comment}
         locktime = int(header_data.group(7))
         n += 1
 
-        blockstamp = BlockUID.from_str(Transaction.parse_field("CompactBlockstamp", lines[n]))
+        blockstamp = BlockUID.from_str(
+            Transaction.parse_field("CompactBlockstamp", lines[n])
+        )
         n += 1
 
         issuers = []
@@ -642,10 +703,23 @@ Comment: {comment}
             else:
                 raise MalformedDocumentError("Compact TX Signatures")
 
-        return cls(version, currency, blockstamp, locktime, issuers, inputs, unlocks, outputs, comment, signatures)
+        return cls(
+            version,
+            currency,
+            blockstamp,
+            locktime,
+            issuers,
+            inputs,
+            unlocks,
+            outputs,
+            comment,
+            signatures,
+        )
 
     @classmethod
-    def from_signed_raw(cls: Type[TransactionType], raw: str, time: int = 0) -> TransactionType:
+    def from_signed_raw(
+        cls: Type[TransactionType], raw: str, time: int = 0
+    ) -> TransactionType:
         """
         Return a Transaction instance from a raw string format
 
@@ -715,8 +789,19 @@ Comment: {comment}
                 signatures.append(sign)
                 n += 1
 
-        return cls(version, currency, blockstamp, locktime, issuers, inputs, unlocks, outputs,
-                   comment, signatures, time)
+        return cls(
+            version,
+            currency,
+            blockstamp,
+            locktime,
+            issuers,
+            inputs,
+            unlocks,
+            outputs,
+            comment,
+            signatures,
+            time,
+        )
 
     def raw(self) -> str:
         """
@@ -727,8 +812,9 @@ Comment: {comment}
         doc = """Version: {0}
 Type: Transaction
 Currency: {1}
-""".format(self.version,
-           self.currency)
+""".format(
+            self.version, self.currency
+        )
 
         doc += "Blockstamp: {0}\n".format(self.blockstamp)
 
@@ -770,13 +856,15 @@ PUBLIC_KEY:AMOUNT
 ...
 COMMENT"
 """
-        doc = "TX:{0}:{1}:{2}:{3}:{4}:{5}:{6}\n".format(self.version,
-                                                        len(self.issuers),
-                                                        len(self.inputs),
-                                                        len(self.unlocks),
-                                                        len(self.outputs),
-                                                        '1' if self.comment != "" else '0',
-                                                        self.locktime)
+        doc = "TX:{0}:{1}:{2}:{3}:{4}:{5}:{6}\n".format(
+            self.version,
+            len(self.issuers),
+            len(self.inputs),
+            len(self.unlocks),
+            len(self.outputs),
+            "1" if self.comment != "" else "0",
+            self.locktime,
+        )
         doc += "{0}\n".format(self.blockstamp)
 
         for pubkey in self.issuers:
@@ -801,9 +889,20 @@ class SimpleTransaction(Transaction):
     ...
     """
 
-    def __init__(self, version: int, currency: str, blockstamp: BlockUID, locktime: int, issuer: str,
-                 single_input: InputSource, unlocks: List[Unlock], outputs: List[OutputSource], comment: str,
-                 signature: str, time: int) -> None:
+    def __init__(
+        self,
+        version: int,
+        currency: str,
+        blockstamp: BlockUID,
+        locktime: int,
+        issuer: str,
+        single_input: InputSource,
+        unlocks: List[Unlock],
+        outputs: List[OutputSource],
+        comment: str,
+        signature: str,
+        time: int,
+    ) -> None:
         """
         Init instance
 
@@ -819,8 +918,19 @@ class SimpleTransaction(Transaction):
         :param time: time when the transaction enters the blockchain
         :param signature: Signature
         """
-        super().__init__(version, currency, blockstamp, locktime, [issuer], [single_input], unlocks,
-                         outputs, comment, [signature], time)
+        super().__init__(
+            version,
+            currency,
+            blockstamp,
+            locktime,
+            [issuer],
+            [single_input],
+            unlocks,
+            outputs,
+            comment,
+            [signature],
+            time,
+        )
 
     @staticmethod
     def is_simple(tx: Transaction) -> bool:
@@ -845,7 +955,7 @@ class SimpleTransaction(Transaction):
                 simple = False
         for o in tx.outputs:
             # if right condition is not None...
-            if getattr(o.condition, 'right', None):
+            if getattr(o.condition, "right", None):
                 simple = False
                 # if left is not SIG...
             elif type(o.condition.left) is not output.SIG:

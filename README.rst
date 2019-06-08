@@ -42,6 +42,10 @@ Please take a look at the document `HTTP API <https://git.duniter.org/nodes/type
 Development
 -----------
 
+.. warning::
+
+    The development tools require Python 3.6.x or higher.
+
 * Create a python virtual environment with `pyenv <https://github.com/pyenv/pyenv>`_ ::
 
     curl -L https://github.com/pyenv/pyenv-installer/raw/master/bin/pyenv-installer | bash`

@@ -11,7 +11,7 @@ from .document import Document, MalformedDocumentError
 from ..constants import BLOCK_UID_REGEX, SIGNATURE_REGEX, PUBKEY_REGEX
 
 # required to type hint cls in classmethod
-MembershipType = TypeVar('MembershipType', bound='Membership')
+MembershipType = TypeVar("MembershipType", bound="Membership")
 
 
 class Membership(Document):
@@ -31,28 +31,49 @@ class Membership(Document):
 
     # PUBLIC_KEY:SIGNATURE:NUMBER:HASH:TIMESTAMP:USER_ID
     re_inline = re.compile(
-        "({pubkey_regex}):({signature_regex}):({ms_block_uid_regex}):({identity_block_uid_regex}):([^\n]+)\n"
-        .format(pubkey_regex=PUBKEY_REGEX, signature_regex=SIGNATURE_REGEX,
-                ms_block_uid_regex=BLOCK_UID_REGEX,
-                identity_block_uid_regex=BLOCK_UID_REGEX))
+        "({pubkey_regex}):({signature_regex}):({ms_block_uid_regex}):({identity_block_uid_regex}):([^\n]+)\n".format(
+            pubkey_regex=PUBKEY_REGEX,
+            signature_regex=SIGNATURE_REGEX,
+            ms_block_uid_regex=BLOCK_UID_REGEX,
+            identity_block_uid_regex=BLOCK_UID_REGEX,
+        )
+    )
     re_type = re.compile("Type: (Membership)")
-    re_issuer = re.compile("Issuer: ({pubkey_regex})\n".format(pubkey_regex=PUBKEY_REGEX))
-    re_block = re.compile("Block: ({block_uid_regex})\n".format(block_uid_regex=BLOCK_UID_REGEX))
+    re_issuer = re.compile(
+        "Issuer: ({pubkey_regex})\n".format(pubkey_regex=PUBKEY_REGEX)
+    )
+    re_block = re.compile(
+        "Block: ({block_uid_regex})\n".format(block_uid_regex=BLOCK_UID_REGEX)
+    )
     re_membership_type = re.compile("Membership: (IN|OUT)")
     re_userid = re.compile("UserID: ([^\n]+)\n")
-    re_certts = re.compile("CertTS: ({block_uid_regex})\n".format(block_uid_regex=BLOCK_UID_REGEX))
+    re_certts = re.compile(
+        "CertTS: ({block_uid_regex})\n".format(block_uid_regex=BLOCK_UID_REGEX)
+    )
 
-    fields_parsers = {**Document.fields_parsers, **{
-        "Type": re_type,
-        "Issuer": re_issuer,
-        "Block": re_block,
-        "Membership": re_membership_type,
-        "UserID": re_userid,
-        "CertTS": re_certts
-    }}
+    fields_parsers = {
+        **Document.fields_parsers,
+        **{
+            "Type": re_type,
+            "Issuer": re_issuer,
+            "Block": re_block,
+            "Membership": re_membership_type,
+            "UserID": re_userid,
+            "CertTS": re_certts,
+        },
+    }
 
-    def __init__(self, version: int, currency: str, issuer: str, membership_ts: BlockUID,
-                 membership_type: str, uid: str, identity_ts: BlockUID, signature: str) -> None:
+    def __init__(
+        self,
+        version: int,
+        currency: str,
+        issuer: str,
+        membership_ts: BlockUID,
+        membership_type: str,
+        uid: str,
+        identity_ts: BlockUID,
+        signature: str,
+    ) -> None:
         """
         Create a membership document
 
@@ -73,8 +94,13 @@ class Membership(Document):
         self.identity_ts = identity_ts
 
     @classmethod
-    def from_inline(cls: Type[MembershipType], version: int, currency: str, membership_type: str,
-                    inline: str) -> MembershipType:
+    def from_inline(
+        cls: Type[MembershipType],
+        version: int,
+        currency: str,
+        membership_type: str,
+        inline: str,
+    ) -> MembershipType:
         """
         Return Membership instance from inline format
 
@@ -92,7 +118,16 @@ class Membership(Document):
         membership_ts = BlockUID.from_str(data.group(3))
         identity_ts = BlockUID.from_str(data.group(4))
         uid = data.group(5)
-        return cls(version, currency, issuer, membership_ts, membership_type, uid, identity_ts, signature)
+        return cls(
+            version,
+            currency,
+            issuer,
+            membership_ts,
+            membership_type,
+            uid,
+            identity_ts,
+            signature,
+        )
 
     @classmethod
     def from_signed_raw(cls: Type[MembershipType], signed_raw: str) -> MembershipType:
@@ -132,8 +167,16 @@ class Membership(Document):
         signature = Membership.parse_field("Signature", lines[n])
         n += 1
 
-        return cls(version, currency, issuer, membership_ts,
-                   membership_type, uid, identity_ts, signature)
+        return cls(
+            version,
+            currency,
+            issuer,
+            membership_ts,
+            membership_type,
+            uid,
+            identity_ts,
+            signature,
+        )
 
     def raw(self) -> str:
         """
@@ -149,21 +192,25 @@ Block: {3}
 Membership: {4}
 UserID: {5}
 CertTS: {6}
-""".format(self.version,
-           self.currency,
-           self.issuer,
-           self.membership_ts,
-           self.membership_type,
-           self.uid,
-           self.identity_ts)
+""".format(
+            self.version,
+            self.currency,
+            self.issuer,
+            self.membership_ts,
+            self.membership_type,
+            self.uid,
+            self.identity_ts,
+        )
 
     def inline(self) -> str:
         """
         Return inline string format of the Membership instance
         :return:
         """
-        return "{0}:{1}:{2}:{3}:{4}".format(self.issuer,
-                                            self.signatures[0],
-                                            self.membership_ts,
-                                            self.identity_ts,
-                                            self.uid)
+        return "{0}:{1}:{2}:{3}:{4}".format(
+            self.issuer,
+            self.signatures[0],
+            self.membership_ts,
+            self.identity_ts,
+            self.uid,
+        )

@@ -15,22 +15,15 @@ from .errors import DuniterError
 logger = logging.getLogger("duniter")
 
 # Response type constants
-RESPONSE_JSON = 'json'
-RESPONSE_TEXT = 'text'
-RESPONSE_AIOHTTP = 'aiohttp'
+RESPONSE_JSON = "json"
+RESPONSE_TEXT = "text"
+RESPONSE_AIOHTTP = "aiohttp"
 
 # jsonschema validator
 ERROR_SCHEMA = {
     "type": "object",
-    "properties": {
-        "ucode": {
-            "type": "number"
-        },
-        "message": {
-            "type": "string"
-        }
-    },
-    "required": ["ucode", "message"]
+    "properties": {"ucode": {"type": "number"}, "message": {"type": "string"}},
+    "required": ["ucode", "message"],
 }
 
 
@@ -90,7 +83,11 @@ class API:
     API is a class used as an abstraction layer over the request library (AIOHTTP).
     """
 
-    def __init__(self, connection_handler: endpoint.ConnectionHandler, headers: Optional[dict] = None) -> None:
+    def __init__(
+        self,
+        connection_handler: endpoint.ConnectionHandler,
+        headers: Optional[dict] = None,
+    ) -> None:
         """
         Asks a module in order to create the url used then by derivated classes.
 
@@ -109,18 +106,17 @@ class API:
         :return:
         """
         # remove starting slash in path if present
-        path = path.lstrip('/')
+        path = path.lstrip("/")
 
         server, port = self.connection_handler.server, self.connection_handler.port
         if self.connection_handler.path:
-            url = '{scheme}://{server}:{port}/{path}'.format(scheme=scheme,
-                                                             server=server,
-                                                             port=port,
-                                                             path=path)
+            url = "{scheme}://{server}:{port}/{path}".format(
+                scheme=scheme, server=server, port=port, path=path
+            )
         else:
-            url = '{scheme}://{server}:{port}/'.format(scheme=scheme,
-                                                       server=server,
-                                                       port=port)
+            url = "{scheme}://{server}:{port}/".format(
+                scheme=scheme, server=server, port=port
+            )
 
         return url + path
 
@@ -131,17 +127,26 @@ class API:
         :param path: the request path
         :return:
         """
-        logging.debug("Request : %s", self.reverse_url(self.connection_handler.http_scheme, path))
+        logging.debug(
+            "Request : %s", self.reverse_url(self.connection_handler.http_scheme, path)
+        )
         url = self.reverse_url(self.connection_handler.http_scheme, path)
-        response = await self.connection_handler.session.get(url, params=kwargs, headers=self.headers,
-                                                             proxy=self.connection_handler.proxy,
-                                                             timeout=15)
+        response = await self.connection_handler.session.get(
+            url,
+            params=kwargs,
+            headers=self.headers,
+            proxy=self.connection_handler.proxy,
+            timeout=15,
+        )
         if response.status != 200:
             try:
                 error_data = parse_error(await response.text())
                 raise DuniterError(error_data)
             except (TypeError, jsonschema.ValidationError):
-                raise ValueError('status code != 200 => %d (%s)' % (response.status, (await response.text())))
+                raise ValueError(
+                    "status code != 200 => %d (%s)"
+                    % (response.status, (await response.text()))
+                )
 
         return response
 
@@ -152,8 +157,8 @@ class API:
         :param path: the request path
         :return:
         """
-        if 'self_' in kwargs:
-            kwargs['self'] = kwargs.pop('self_')
+        if "self_" in kwargs:
+            kwargs["self"] = kwargs.pop("self_")
 
         logging.debug("POST : %s", kwargs)
         response = await self.connection_handler.session.post(
@@ -161,7 +166,7 @@ class API:
             data=kwargs,
             headers=self.headers,
             proxy=self.connection_handler.proxy,
-            timeout=15
+            timeout=15,
         )
         return response
 
@@ -178,7 +183,9 @@ class API:
         :return:
         """
         url = self.reverse_url(self.connection_handler.ws_scheme, path)
-        return self.connection_handler.session.ws_connect(url, proxy=self.connection_handler.proxy)
+        return self.connection_handler.session.ws_connect(
+            url, proxy=self.connection_handler.proxy
+        )
 
 
 class Client:
@@ -186,8 +193,12 @@ class Client:
     Main class to create an API client
     """
 
-    def __init__(self, _endpoint: Union[str, endpoint.Endpoint], session: ClientSession = None,
-                 proxy: str = None) -> None:
+    def __init__(
+        self,
+        _endpoint: Union[str, endpoint.Endpoint],
+        session: ClientSession = None,
+        proxy: str = None,
+    ) -> None:
         """
         Init Client instance
 
@@ -202,7 +213,9 @@ class Client:
             self.endpoint = _endpoint
 
         if isinstance(self.endpoint, endpoint.UnknownEndpoint):
-            raise NotImplementedError("{0} endpoint in not supported".format(self.endpoint.api))
+            raise NotImplementedError(
+                "{0} endpoint in not supported".format(self.endpoint.api)
+            )
 
         # if no user session...
         if session is None:
@@ -212,7 +225,13 @@ class Client:
             self.session = session
         self.proxy = proxy
 
-    async def get(self, url_path: str, params: dict = None, rtype: str = RESPONSE_JSON, schema: dict = None) -> Any:
+    async def get(
+        self,
+        url_path: str,
+        params: dict = None,
+        rtype: str = RESPONSE_JSON,
+        schema: dict = None,
+    ) -> Any:
         """
         GET request on self.endpoint + url_path
 
@@ -244,7 +263,13 @@ class Client:
 
         return result
 
-    async def post(self, url_path: str, params: dict = None, rtype: str = RESPONSE_JSON, schema: dict = None) -> Any:
+    async def post(
+        self,
+        url_path: str,
+        params: dict = None,
+        rtype: str = RESPONSE_JSON,
+        schema: dict = None,
+    ) -> Any:
         """
         POST request on self.endpoint + url_path
 
