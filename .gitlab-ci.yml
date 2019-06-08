@@ -1,6 +1,6 @@
 stages:
   - prepare
-  - black
+  - format
   - test
   - build
   - release
@@ -48,14 +48,14 @@ push_to_github:
       - setup.py
       - tests/**/*.py
 
-black:
+format:
   <<: *pyenv
   <<: *changes
-  stage: black
+  stage: format
   script:
     - pyenv shell 3.6.4  # black install and run needs python 3.6.x minimum
     - pip install -r requirements_dev.txt
-    - make black
+    - make check-format
 
 test:
   <<: *pyenv
