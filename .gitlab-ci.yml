@@ -11,7 +11,8 @@ variables:
 
 image: registry.duniter.org/docker/python3/duniterpy-builder:0.0.4
 
-push_to_github:
+# SUB-TASKS
+.push_to_github: &push_to_github
   stage: github-sync
   variables:
     GIT_STRATEGY: none
@@ -48,6 +49,12 @@ push_to_github:
       - setup.py
       - tests/**/*.py
 
+.release_pip: &release_pip
+  script:
+    - pip install twine
+    - twine upload dist/* --username duniter --password $PYPI_PASSWORD
+
+# TASKS
 format:
   <<: *pyenv
   <<: *changes
@@ -89,9 +96,8 @@ build: &build
 releases:
   <<: *pyenv
   <<: *build
+  <<: *release_pip
+  <<: *push_to_github
   stage: release
   when: manual
-  script:
-    - pip install twine
-    - twine upload dist/* --username duniter --password $PYPI_PASSWORD
 
