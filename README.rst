@@ -37,10 +37,31 @@ You can install duniter-python-api and all its dependencies via the following pi
 
     pip3 install duniterpy
 
-Please take a look at the document `HTTP API <https://git.duniter.org/nodes/typescript/duniter/blob/master/doc/HTTP_API.md>`_ to learn about the API.
+Documentation
+-------------
+
+`Examples <https://git.duniter.org/clients/python/duniterpy/tree/master/examples>`_ folder is full of scripts to help you!
+
+But you can also generate and read the autodoc:
+
+* Install Sphinx::
+
+    pip install -r requirements_dev.txt
+
+* Generate documentation::
+
+    make docs
+
+* HTML Documentation is generated in docs/_build/html folder.
+
+Please take a look at the document `HTTP API <https://git.duniter.org/nodes/typescript/duniter/blob/master/doc/HTTP_API.md>`_
+to learn more about the BMA API.
 
 Development
 -----------
+
+* When writing docstrings, use the reStructuredText format recommended by https://www.python.org/dev/peps/pep-0287/#docstring-significant-features
+* Use make commands to check your code and format it correctly.
 
 .. warning::
 
@@ -77,21 +98,6 @@ Development
 
     make tests TESTS_FILTER=tests.documents.test_block.TestBlock.test_fromraw
 
-Documentation
--------------
-
-When writing docstrings, use the rst format recommended by https://www.python.org/dev/peps/pep-0287/#docstring-significant-features
-
-* Install Sphinx::
-
-    pip install -r requirements_dev.txt
-
-* Generate documentation::
-
-    make docs
-
-* HTML Documentation is generated in docs/_build/html folder.
-* `Examples are more fun than a TLTR doc <https://git.duniter.org/clients/python/duniterpy/tree/master/examples>`_
 
 Packaging and deploy
 --------------------
