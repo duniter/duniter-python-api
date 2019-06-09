@@ -1,5 +1,7 @@
 import unittest
 
+from jsonschema import SchemaError, ValidationError
+
 from duniterpy.api.bma.ws import WS_BLOCK_SCHEMA, WS_PEER_SCHEMA
 from duniterpy.api.client import parse_text
 from tests.api.webserver import WebFunctionalSetupMixin
@@ -82,7 +84,10 @@ class TestBmaWebsocket(WebFunctionalSetupMixin, unittest.TestCase):
   "signature": "H41/8OGV2W4CLKbE35kk5t1HJQsb3jEM0/QGLUf80CwJvGZf3HvVCcNtHPUFoUBKEDQO9mPK3KJkqOoxHpqHCw=="
 }
 """
-        parse_text(json_sample, WS_BLOCK_SCHEMA)
+        try:
+            parse_text(json_sample, WS_BLOCK_SCHEMA)
+        except (SchemaError, ValidationError):
+            raise self.failureException
 
     def test_peer(self):
         json_sample = """{

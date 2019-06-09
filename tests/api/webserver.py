@@ -8,6 +8,19 @@ from aiohttp import web
 
 # Thanks to aiohttp tests courtesy
 # Here is a nice mocking server
+def find_unused_port() -> int:
+    """
+    Return first free network port
+
+    :return:
+    """
+    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    s.bind(('127.0.0.1', 0))
+    port = s.getsockname()[1]
+    s.close()
+    return port
+
+
 class WebFunctionalSetupMixin:
 
     def setUp(self) -> None:
@@ -28,13 +41,6 @@ class WebFunctionalSetupMixin:
         finally:
             asyncio.set_event_loop(None)
 
-    def find_unused_port(self) -> int:
-        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        s.bind(('127.0.0.1', 0))
-        port = s.getsockname()[1]
-        s.close()
-        return port
-
     async def create_server(self, method: str, path: str, handler: Optional[Callable] = None,
                             ssl_ctx: Optional[ssl.SSLContext] = None) -> Tuple[web.Application, int, str]:
         """
@@ -51,7 +57,7 @@ class WebFunctionalSetupMixin:
 
         await self.runner.setup()
 
-        port = self.find_unused_port()
+        port = find_unused_port()
         site = web.TCPSite(self.runner, '127.0.0.1', port)
         await site.start()
 
