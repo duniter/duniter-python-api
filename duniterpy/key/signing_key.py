@@ -1,7 +1,7 @@
 """
 duniter public and private keys
 
-@author: inso
+@author: inso, vtexier, Moul
 """
 import re
 from typing import Optional, Union, TypeVar, Type

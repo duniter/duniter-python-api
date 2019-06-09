@@ -4,7 +4,7 @@ Created on 2 déc. 2014
 @author: inso
 """
 import re
-from typing import TypeVar, Type
+from typing import TypeVar, Type, Optional
 
 from .block_uid import BlockUID
 from .document import Document, MalformedDocumentError
@@ -72,7 +72,7 @@ class Membership(Document):
         membership_type: str,
         uid: str,
         identity_ts: BlockUID,
-        signature: str,
+        signature: Optional[str] = None,
     ) -> None:
         """
         Create a membership document
@@ -86,7 +86,12 @@ class Membership(Document):
         :param identity_ts:  BlockUID of the identity
         :param signature: Signature of the document
         """
-        super().__init__(version, currency, [signature])
+        if signature:
+            signatures = [signature]
+        else:
+            signatures = []
+        super().__init__(version, currency, signatures)
+
         self.issuer = issuer
         self.membership_ts = membership_ts
         self.membership_type = membership_type

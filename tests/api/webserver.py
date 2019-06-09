@@ -12,7 +12,8 @@ class WebFunctionalSetupMixin:
 
     def setUp(self) -> None:
         self.handler = None
-        self.runner = None
+        self.app = web.Application()
+        self.runner = web.AppRunner(self.app)
         self.loop = asyncio.new_event_loop()
         asyncio.set_event_loop(self.loop)
 
@@ -45,16 +46,15 @@ class WebFunctionalSetupMixin:
         :param ssl_ctx: SSL context (https is used if not None)
         :return:
         """
-        app = web.Application()
         if handler:
-            app.router.add_route(method, path, handler)
+            self.app.router.add_route(method, path, handler)
+
+        await self.runner.setup()
 
         port = self.find_unused_port()
-        self.runner = web.AppRunner(app)
-        await self.runner.setup()
         site = web.TCPSite(self.runner, '127.0.0.1', port)
         await site.start()
 
         protocol = "https" if ssl_ctx else "http"
         url = "{}://127.0.0.1:{}".format(protocol, port) + path
-        return app, port, url
+        return self.app, port, url

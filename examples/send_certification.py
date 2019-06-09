@@ -1,5 +1,6 @@
 import asyncio
 import getpass
+from typing import Optional
 
 import duniterpy.api.bma as bma
 from duniterpy.api.client import Client
@@ -17,7 +18,7 @@ BMAS_ENDPOINT = "BMAS g1-test.duniter.org 443"
 ################################################
 
 
-async def get_identity_document(client: Client, current_block: dict, pubkey: str) -> Identity:
+async def get_identity_document(client: Client, current_block: dict, pubkey: str) -> Optional[Identity]:
     """
     Get the identity document of the pubkey
 
@@ -29,24 +30,20 @@ async def get_identity_document(client: Client, current_block: dict, pubkey: str
     """
     # Here we request for the path wot/lookup/pubkey
     lookup_data = await client(bma.wot.lookup, pubkey)
-
-    # init vars
-    uid = None
-    timestamp = BlockUID.empty()
-    signature = None
+    identity = None
 
     # parse results
     for result in lookup_data['results']:
         if result["pubkey"] == pubkey:
             uids = result['uids']
-            for uid_data in uids:
-                # capture data
-                timestamp = BlockUID.from_str(uid_data["meta"]["timestamp"])
-                uid = uid_data["uid"]
-                signature = uid_data["self"]
+            uid_data = uids[0]
+            # capture data
+            timestamp = BlockUID.from_str(uid_data["meta"]["timestamp"])
+            uid = uid_data["uid"]  # type: str
+            signature = uid_data["self"]  # type: str
 
             # return self-certification document
-            return Identity(
+            identity = Identity(
                 version=10,
                 currency=current_block['currency'],
                 pubkey=pubkey,
@@ -54,6 +51,9 @@ async def get_identity_document(client: Client, current_block: dict, pubkey: str
                 ts=timestamp,
                 signature=signature
             )
+            break
+
+    return identity
 
 
 def get_certification_document(current_block: dict, self_cert_document: Identity, from_pubkey: str) -> Certification:
@@ -101,6 +101,11 @@ async def main():
 
     # create our Identity document to sign the Certification document
     identity = await get_identity_document(client, current_block, pubkey_to)
+    if identity is None:
+        print("Identity not found for pubkey {0}".format(pubkey_to))
+        # Close client aiohttp session
+        await client.close()
+        exit(1)
 
     # send the Certification document to the node
     certification = get_certification_document(current_block, identity, pubkey_from)

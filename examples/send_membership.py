@@ -79,8 +79,7 @@ def get_membership_document(membership_type: str, current_block: dict, identity:
         membership_ts=timestamp,
         membership_type=membership_type,
         uid=identity.uid,
-        identity_ts=identity.timestamp,
-        signature=None
+        identity_ts=identity.timestamp
     )
 
     # sign document

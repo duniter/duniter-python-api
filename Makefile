@@ -14,6 +14,8 @@ check: mypy pylint check-format
 # check static typing
 mypy:
 	python3 -m mypy duniterpy --ignore-missing-imports
+	python3 -m mypy tests --ignore-missing-imports
+	python3 -m mypy examples --ignore-missing-imports
 
 # check code errors
 pylint:

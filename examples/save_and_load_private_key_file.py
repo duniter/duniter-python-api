@@ -44,7 +44,7 @@ signer.save_private_key(PRIVATE_KEYS_FILE_PATH)
 print("Private keys for public key %s saved in %s" % (pubkey, PRIVATE_KEYS_FILE_PATH))
 
 # load private keys from file
-loaded_signer = SigningKey.from_private_key(PRIVATE_KEYS_FILE_PATH)
+loaded_signer = SigningKey.from_private_key(PRIVATE_KEYS_FILE_PATH)  # type: SigningKey
 
 # check public key from file
 print("Public key %s loaded from file %s" % (pubkey, PRIVATE_KEYS_FILE_PATH))

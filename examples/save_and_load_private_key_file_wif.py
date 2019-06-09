@@ -45,7 +45,7 @@ print("Private key for public key %s saved in %s" % (signer.pubkey, PRIVATE_KEY_
 
 try:
     # load private keys from file
-    loaded_signer = SigningKey.from_wif_file(PRIVATE_KEY_FILE_PATH)
+    loaded_signer = SigningKey.from_wif_file(PRIVATE_KEY_FILE_PATH)  # type: SigningKey
 
     # check public key from file
     print("Public key %s loaded from file %s" % (loaded_signer.pubkey, PRIVATE_KEY_FILE_PATH))
