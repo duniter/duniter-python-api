@@ -1,12 +1,10 @@
 import unittest
 
-from duniterpy.documents.ws2p.heads import *
+from duniterpy.documents.ws2p.heads import HeadV0, HeadV1, HeadV2, BlockUID
 
 headv1_clear = ""
 
 headv1_tor = ""
-
-headv2 = ""
 
 
 class TestWS2PHeads(unittest.TestCase):

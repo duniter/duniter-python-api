@@ -92,4 +92,5 @@ class TestPeer(unittest.TestCase):
     def test_incorrect(self):
         peer = Peer.from_signed_raw(test_weird_ipv6_peer)
         rendered_peer = peer.signed_raw()
+        self.assertEqual(test_weird_ipv6_peer, rendered_peer)
         Peer.from_signed_raw(rendered_peer)

@@ -1,13 +1,14 @@
-'''
+"""
 Created on 12 déc. 2014
 
 @author: inso
-'''
+"""
 import unittest
 import pypeg2
 from duniterpy.grammars import output
 from duniterpy.documents import BlockUID
-from duniterpy.documents.transaction import Transaction, reduce_base, SimpleTransaction, InputSource, OutputSource, Unlock, SIGParameter
+from duniterpy.documents.transaction import Transaction, reduce_base, SimpleTransaction, InputSource, OutputSource,\
+    Unlock, SIGParameter
 
 compact_change = """TX:10:1:1:1:1:1:0
 13410-000041DF0CCA173F09B5FBA48F619D4BC934F12ADF1D0B798639EB2149C4A8CC
@@ -16,6 +17,23 @@ D8BsQZN9hangHVuqwD6McfxM1xvGJ8DPuPYrswwnSif3
 0:SIG(0)
 1500:1:(XHX(8AFC8DF633FC158F9DB4864ABED696C1AA0FE5D617A7B5F7AB8DE7CA2EFCD4CB) && SIG(36j6pCNzKDPo92m7UXJLFpgDbcLFAZBgThD2TCwTwGrd)) || (SIG(D8BsQZN9hangHVuqwD6McfxM1xvGJ8DPuPYrswwnSif3) && SIG(36j6pCNzKDPo92m7UXJLFpgDbcLFAZBgThD2TCwTwGrd))
 META tic to toc
+eNAZpJjhZaPKbx5pUvuDDM1j4XNWJ4ABK48ouTvimvg3ceIcoZUvgLHmXuSwk2bgxZaB5qSKP9H6T7qsBcLtBg==
+"""
+
+tx_from_compact_change = """Version: 10
+Type: Transaction
+Currency: gtest
+Blockstamp: 13410-000041DF0CCA173F09B5FBA48F619D4BC934F12ADF1D0B798639EB2149C4A8CC
+Locktime: 0
+Issuers:
+D8BsQZN9hangHVuqwD6McfxM1xvGJ8DPuPYrswwnSif3
+Inputs:
+1500:1:T:0D0264F324BC4A23C4B2C696CD1907BD6E70FD1F409BB1D42E84847AA4C1E87C:0
+Unlocks:
+0:SIG(0)
+Outputs:
+1500:1:(XHX(8AFC8DF633FC158F9DB4864ABED696C1AA0FE5D617A7B5F7AB8DE7CA2EFCD4CB) && SIG(36j6pCNzKDPo92m7UXJLFpgDbcLFAZBgThD2TCwTwGrd)) || (SIG(D8BsQZN9hangHVuqwD6McfxM1xvGJ8DPuPYrswwnSif3) && SIG(36j6pCNzKDPo92m7UXJLFpgDbcLFAZBgThD2TCwTwGrd))
+Comment: META tic to toc
 eNAZpJjhZaPKbx5pUvuDDM1j4XNWJ4ABK48ouTvimvg3ceIcoZUvgLHmXuSwk2bgxZaB5qSKP9H6T7qsBcLtBg==
 """
 
@@ -109,6 +127,7 @@ input_source_str = "30:0:T:6991C993631BED4733972ED7538E41CCC33660F554E3C51963E2A
 
 output_source_str = "460:0:SIG(8kXygUHh1vLjmcRzXVM86t38EL8dfFJgfBeHmkaWLamu)"
 
+
 class TestTransaction(unittest.TestCase):
     def test_fromcompact(self):
         tx = Transaction.from_compact("zeta_brousouf", tx_compact)
@@ -195,7 +214,8 @@ class TestTransaction(unittest.TestCase):
     def test_fromraw_toraw(self):
         tx = Transaction.from_signed_raw(tx_raw)
         rendered_tx = tx.signed_raw()
-        from_rendered_tx = Transaction.from_signed_raw(rendered_tx)
+        self.assertEqual(tx_raw, rendered_tx)
+        Transaction.from_signed_raw(rendered_tx)
 
         self.assertEqual(tx.version, 10)
         self.assertEqual(tx.currency, "beta_brousouf")
@@ -270,7 +290,8 @@ class TestTransaction(unittest.TestCase):
     def test_compact_change(self):
         tx = Transaction.from_compact("gtest", compact_change)
         rendered_tx = tx.signed_raw()
-        from_rendered_tx = Transaction.from_signed_raw(rendered_tx)
+        self.assertEqual(tx_from_compact_change, rendered_tx)
+        Transaction.from_signed_raw(rendered_tx)
 
     def test_reduce_base(self):
         amount = 1200
@@ -348,6 +369,6 @@ class TestTransaction(unittest.TestCase):
             comment='',
             signatures=[]
         )
-        self.assertTrue(transaction.time == None)
+        self.assertTrue(transaction.time is None)
         self.assertTrue(transaction.currency == "gtest")
         self.assertTrue(transaction.inputs[0].amount == 30)
