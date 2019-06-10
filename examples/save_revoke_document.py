@@ -131,7 +131,7 @@ async def main():
         exit(1)
 
     # get the revoke document
-    revocation_signed_raw_document = get_signed_raw_revocation_document(identity_document, salt, password)
+    revocation_signed_raw_document = get_signed_raw_revocation_document(identity, salt, password)
 
     # save revoke document in a file
     fp = open(REVOCATION_DOCUMENT_FILE_PATH, 'w')

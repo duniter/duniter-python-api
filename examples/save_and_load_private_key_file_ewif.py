@@ -53,8 +53,8 @@ try:
     # check public key from file
     print("Public key %s loaded from file %s" % (loaded_signer.pubkey, PRIVATE_KEY_FILE_PATH))
 
-except Exception as e:
-    print(e)
+except IOError as error:
+    print(error)
     exit(1)
 
 
