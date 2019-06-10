@@ -4,8 +4,16 @@ import unittest
 import jsonschema
 from jsonschema import SchemaError, ValidationError
 
-from duniterpy.api.bma.wot import lookup, members, certified_by, certifiers_of, REQUIREMENTS_SCHEMA, \
-    CERTIFICATIONS_SCHEMA, LOOKUP_SCHEMA, MEMBERS_SCHEMA
+from duniterpy.api.bma.wot import (
+    lookup,
+    members,
+    certified_by,
+    certifiers_of,
+    REQUIREMENTS_SCHEMA,
+    CERTIFICATIONS_SCHEMA,
+    LOOKUP_SCHEMA,
+    MEMBERS_SCHEMA,
+)
 from duniterpy.api.client import Client
 from duniterpy.api.endpoint import BMAEndpoint
 from tests.api.webserver import WebFunctionalSetupMixin, web
@@ -33,30 +41,26 @@ class TestBmaWot(WebFunctionalSetupMixin, unittest.TestCase):
                                     "pubkey": "Ds1z6Wd8hNTexBoo3LVG2oXLZN4dC9ZWxoWwnDbF1NEW",
                                     "meta": {
                                         "block_number": 0,
-                                        "block_hash": "000003D02B95D3296A4F06DBAC51775C4336A4DC09D0E958DC40033BE7E20F3D"
+                                        "block_hash": "000003D02B95D3296A4F06DBAC51775C4336A4DC09D0E958DC40033BE7E20F3D",
                                     },
-                                    "uids": [
-                                        "Galuel"
-                                    ],
+                                    "uids": ["Galuel"],
                                     "isMember": True,
                                     "wasMember": True,
-                                    "signature": "iK3TOdqrHhUbHNB3cPpmWd8sTL2hz0wiScZmXlRc8WhLg2et3xMjAHMuF+wuiM9/7R3daKZq5dOGF3drOuApAg=="
+                                    "signature": "iK3TOdqrHhUbHNB3cPpmWd8sTL2hz0wiScZmXlRc8WhLg2et3xMjAHMuF+wuiM9/7R3daKZq5dOGF3drOuApAg==",
                                 },
                                 {
                                     "pubkey": "7F6oyFQywURCACWZZGtG97Girh9EL1kg2WBwftEZxDoJ",
                                     "meta": {
                                         "block_number": 0,
-                                        "block_hash": "000003D02B95D3296A4F06DBAC51775C4336A4DC09D0E958DC40033BE7E20F3D"
+                                        "block_hash": "000003D02B95D3296A4F06DBAC51775C4336A4DC09D0E958DC40033BE7E20F3D",
                                     },
-                                    "uids": [
-                                        "vit"
-                                    ],
+                                    "uids": ["vit"],
                                     "isMember": True,
                                     "wasMember": True,
-                                    "signature": "eTdxT+2VikgYgdFENy/zmYxFyDDpBuGDBHedS7CzlEfYWU7iClZ9se06QdtzkFtiOtQ1BBkWPVMXxbqF8KSECw=="
+                                    "signature": "eTdxT+2VikgYgdFENy/zmYxFyDDpBuGDBHedS7CzlEfYWU7iClZ9se06QdtzkFtiOtQ1BBkWPVMXxbqF8KSECw==",
                                 },
-                            ]
-                        },
+                            ],
+                        }
                     ],
                     "signed": [
                         {
@@ -65,12 +69,10 @@ class TestBmaWot(WebFunctionalSetupMixin, unittest.TestCase):
                             "meta": {
                                 "timestamp": "0-E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
                             },
-                            "cert_time": {
-                                "block": 0
-                            },
+                            "cert_time": {"block": 0},
                             "isMember": True,
                             "wasMember": True,
-                            "signature": "lYdOV3uLH3DQHzuODuaZXQnfPIKKF9AsT84b8pkmgU65trAojmTpuBgaYaPN0Yce+8dwtdHxby7h5pO0RWgRBw=="
+                            "signature": "lYdOV3uLH3DQHzuODuaZXQnfPIKKF9AsT84b8pkmgU65trAojmTpuBgaYaPN0Yce+8dwtdHxby7h5pO0RWgRBw==",
                         },
                         {
                             "uid": "Galuel",
@@ -78,14 +80,12 @@ class TestBmaWot(WebFunctionalSetupMixin, unittest.TestCase):
                             "meta": {
                                 "timestamp": "0-E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
                             },
-                            "cert_time": {
-                                "block": 0
-                            },
+                            "cert_time": {"block": 0},
                             "isMember": True,
                             "wasMember": True,
-                            "signature": "PcZUAleSeR38CbL5zfcdN2+ir+s11Y6oIl2iO4t80M4PXKXWHeqd0uYore0JibMBVnIhpLqcC8SpyVmZnfdaAQ=="
-                        }
-                    ]
+                            "signature": "PcZUAleSeR38CbL5zfcdN2+ir+s11Y6oIl2iO4t80M4PXKXWHeqd0uYore0JibMBVnIhpLqcC8SpyVmZnfdaAQ==",
+                        },
+                    ],
                 },
                 {
                     "pubkey": "7hygreNPE4LJpQhB6zHqGsofKA2G3dDXQM2n6LkDBakB",
@@ -104,27 +104,23 @@ class TestBmaWot(WebFunctionalSetupMixin, unittest.TestCase):
                                     "pubkey": "zio4Jp8hnqkYmoz5FMYm1siCjGmjWzVUg27KMfDoefA",
                                     "meta": {
                                         "block_number": 19452,
-                                        "block_hash": "00000B96722EC36F4089D2490929931B3CF26994A8ED6708C6C71370D60AA25F"
+                                        "block_hash": "00000B96722EC36F4089D2490929931B3CF26994A8ED6708C6C71370D60AA25F",
                                     },
-                                    "uids": [
-                                        "eliadem"
-                                    ],
+                                    "uids": ["eliadem"],
                                     "isMember": True,
                                     "wasMember": True,
-                                    "signature": "GJJa4T9eOJf6oL+SYLGQDnD4K1TpC1492ItGa4+51imkJRXMTvvYmZguwbOuBn8GRISxlMqfgzbHzj5SFG0ODg=="
+                                    "signature": "GJJa4T9eOJf6oL+SYLGQDnD4K1TpC1492ItGa4+51imkJRXMTvvYmZguwbOuBn8GRISxlMqfgzbHzj5SFG0ODg==",
                                 },
                                 {
                                     "pubkey": "5SwfQubSat5SunNafCsunEGTY93nVM4kLSsuprNqQb6S",
                                     "meta": {
                                         "block_number": 19452,
-                                        "block_hash": "00000B96722EC36F4089D2490929931B3CF26994A8ED6708C6C71370D60AA25F"
+                                        "block_hash": "00000B96722EC36F4089D2490929931B3CF26994A8ED6708C6C71370D60AA25F",
                                     },
-                                    "uids": [
-                                        "Patrice_F"
-                                    ],
+                                    "uids": ["Patrice_F"],
                                     "isMember": True,
                                     "wasMember": True,
-                                    "signature": "E2Km7x6L8/iiFuWVa+UHailM/AOsM/1COj9aQM7B0bDRMx6h+iSfOPxnUSXydiaeT1FPlNeLZOEKIcNmRk6gCA=="
+                                    "signature": "E2Km7x6L8/iiFuWVa+UHailM/AOsM/1COj9aQM7B0bDRMx6h+iSfOPxnUSXydiaeT1FPlNeLZOEKIcNmRk6gCA==",
                                 },
                             ],
                         }
@@ -136,12 +132,10 @@ class TestBmaWot(WebFunctionalSetupMixin, unittest.TestCase):
                             "meta": {
                                 "timestamp": "20544-000008FFA0AABEA96759559DA426D92880EA35878C680479135A5C9A3FFA8BF9"
                             },
-                            "cert_time": {
-                                "block": 35202
-                            },
+                            "cert_time": {"block": 35202},
                             "isMember": True,
                             "wasMember": True,
-                            "signature": "regfnOZWIrA4Tkj+MU6PFwHcfm/8G+ygDlNGKUP7b5pLhBHGVVMIw3xh6PcLHSkUUmnxlTImuqGJg+ky6dl3CA=="
+                            "signature": "regfnOZWIrA4Tkj+MU6PFwHcfm/8G+ygDlNGKUP7b5pLhBHGVVMIw3xh6PcLHSkUUmnxlTImuqGJg+ky6dl3CA==",
                         },
                         {
                             "uid": "NicolasCARRAT",
@@ -149,16 +143,14 @@ class TestBmaWot(WebFunctionalSetupMixin, unittest.TestCase):
                             "meta": {
                                 "timestamp": "21924-000007B75B75D8E6393F609BD42423776FAB90500BCAE7EAAC498BD8EC6DFABB"
                             },
-                            "cert_time": {
-                                "block": 36645
-                            },
+                            "cert_time": {"block": 36645},
                             "isMember": True,
                             "wasMember": True,
-                            "signature": "kC8hoeM2b0wiis5iaF4aHEzRUs0YQy7qJyPFD4rGtZ6II+EN5WbvmxQaN7PckoRUbbSFhNC4gMcnrClNdchBBQ=="
+                            "signature": "kC8hoeM2b0wiis5iaF4aHEzRUs0YQy7qJyPFD4rGtZ6II+EN5WbvmxQaN7PckoRUbbSFhNC4gMcnrClNdchBBQ==",
                         },
-                    ]
-                }
-            ]
+                    ],
+                },
+            ],
         }
         try:
             jsonschema.validate(json_sample, LOOKUP_SCHEMA)
@@ -168,13 +160,13 @@ class TestBmaWot(WebFunctionalSetupMixin, unittest.TestCase):
     def test_bma_wot_lookup_bad(self):
         async def handler(request):
             await request.read()
-            return web.Response(body=b'{}', content_type='application/json')
+            return web.Response(body=b"{}", content_type="application/json")
 
         async def go():
-            _, port, _ = await self.create_server('GET', '/wot/lookup/pubkey', handler)
+            _, port, _ = await self.create_server("GET", "/wot/lookup/pubkey", handler)
             with self.assertRaises(jsonschema.exceptions.ValidationError):
                 client = Client(BMAEndpoint("127.0.0.1", "", "", port))
-                await client(lookup, 'pubkey')
+                await client(lookup, "pubkey")
             await client.close()
 
         self.loop.run_until_complete(go())
@@ -182,9 +174,18 @@ class TestBmaWot(WebFunctionalSetupMixin, unittest.TestCase):
     def test_bma_wot_members(self):
         json_sample = {
             "results": [
-                {"pubkey": "HsLShAtzXTVxeUtQd7yi5Z5Zh4zNvbu8sTEZ53nfKcqY", "uid": "cat"},
-                {"pubkey": "9kNEiyseUNoPn3pmNUhWpvCCwPRgavsLu7YFKZuzzd1L", "uid": "tac"},
-                {"pubkey": "9HJ9VXa9wc6EKC6NkCi8b5TKWBot68VhYDg7kDk5T8Cz", "uid": "toc"}
+                {
+                    "pubkey": "HsLShAtzXTVxeUtQd7yi5Z5Zh4zNvbu8sTEZ53nfKcqY",
+                    "uid": "cat",
+                },
+                {
+                    "pubkey": "9kNEiyseUNoPn3pmNUhWpvCCwPRgavsLu7YFKZuzzd1L",
+                    "uid": "tac",
+                },
+                {
+                    "pubkey": "9HJ9VXa9wc6EKC6NkCi8b5TKWBot68VhYDg7kDk5T8Cz",
+                    "uid": "toc",
+                },
             ]
         }
         try:
@@ -195,10 +196,10 @@ class TestBmaWot(WebFunctionalSetupMixin, unittest.TestCase):
     def test_bma_wot_members_bad(self):
         async def handler(request):
             await request.read()
-            return web.Response(body=b'{}', content_type='application/json')
+            return web.Response(body=b"{}", content_type="application/json")
 
         async def go():
-            _, port, _ = await self.create_server('GET', '/wot/members', handler)
+            _, port, _ = await self.create_server("GET", "/wot/members", handler)
             with self.assertRaises(jsonschema.exceptions.ValidationError):
                 client = Client(BMAEndpoint("127.0.0.1", "", "", port))
                 await client(members)
@@ -215,33 +216,27 @@ class TestBmaWot(WebFunctionalSetupMixin, unittest.TestCase):
                 {
                     "pubkey": "9WYHTavL1pmhunFCzUwiiq4pXwvgGG5ysjZnjz9H8yB",
                     "uid": "certifier uid",
-                    "cert_time": {
-                        "block": 88,
-                        "medianTime": 1509991044
-                    },
+                    "cert_time": {"block": 88, "medianTime": 1509991044},
                     "sigDate": "80-D30978C9D6C5A348A8188603F039423D90E50DC5",
                     "written": {
                         "number": 872768,
-                        "hash": "D30978C9D6C5A348A8188603F039423D90E50DC5"
+                        "hash": "D30978C9D6C5A348A8188603F039423D90E50DC5",
                     },
                     "isMember": True,
                     "wasMember": True,
-                    "signature": "42yQm4hGTJYWkPg39hQAUgP6S6EQ4vTfXdJuxKEHL1ih6YHiDL2hcwrFgBHjXLRgxRhj2VNVqqc6b4JayKqTE14r"
+                    "signature": "42yQm4hGTJYWkPg39hQAUgP6S6EQ4vTfXdJuxKEHL1ih6YHiDL2hcwrFgBHjXLRgxRhj2VNVqqc6b4JayKqTE14r",
                 },
                 {
                     "pubkey": "9WYHTavL1pmhunFCzUwiiq4pXwvgGG5ysjZnjz9H8yB",
                     "uid": "certifier uid",
                     "sigDate": "80-D30978C9D6C5A348A8188603F039423D90E50DC5",
-                    "cert_time": {
-                        "block": 88,
-                        "medianTime": 1509991044
-                    },
+                    "cert_time": {"block": 88, "medianTime": 1509991044},
                     "written": None,
                     "isMember": True,
                     "wasMember": False,
-                    "signature": "42yQm4hGTJYWkPg39hQAUgP6S6EQ4vTfXdJuxKEHL1ih6YHiDL2hcwrFgBHjXLRgxRhj2VNVqqc6b4JayKqTE14r"
-                }
-            ]
+                    "signature": "42yQm4hGTJYWkPg39hQAUgP6S6EQ4vTfXdJuxKEHL1ih6YHiDL2hcwrFgBHjXLRgxRhj2VNVqqc6b4JayKqTE14r",
+                },
+            ],
         }
         try:
             jsonschema.validate(json_sample, CERTIFICATIONS_SCHEMA)
@@ -251,13 +246,15 @@ class TestBmaWot(WebFunctionalSetupMixin, unittest.TestCase):
     def test_bma_wot_certifiers_bad(self):
         async def handler(request):
             await request.read()
-            return web.Response(body=b'{}', content_type='application/json')
+            return web.Response(body=b"{}", content_type="application/json")
 
         async def go():
-            _, port, _ = await self.create_server('GET', '/wot/certifiers-of/pubkey', handler)
+            _, port, _ = await self.create_server(
+                "GET", "/wot/certifiers-of/pubkey", handler
+            )
             with self.assertRaises(jsonschema.exceptions.ValidationError):
                 client = Client(BMAEndpoint("127.0.0.1", "", "", port))
-                await client(certifiers_of, 'pubkey')
+                await client(certifiers_of, "pubkey")
             await client.close()
 
         self.loop.run_until_complete(go())
@@ -265,31 +262,37 @@ class TestBmaWot(WebFunctionalSetupMixin, unittest.TestCase):
     def test_bma_wot_certifiers_inner_bad(self):
         async def handler(request):
             await request.read()
-            return web.Response(body=bytes(json.dumps({
-                "pubkey": "7Aqw6Efa9EzE7gtsc8SveLLrM7gm6NEGoywSv4FJx6pZ",
-                "uid": "john",
-                "isMember": True,
-                "certifications": [
-                    {
-                        "pubkey": "FADxcH5LmXGmGFgdixSes6nWnC4Vb4pRUBYT81zQRhjn",
-                        "meta": {
-                            "block_number": 38580
-                        },
-                        "uids": [
-                            "doe"
-                        ],
-                        "isMember": True,
-                        "wasMember": True,
-                        "signature": "8XYmBdElqNkkl4AeFjJnC5oj/ujBrzH9FNgPZvK8Cicp8Du0PQa0yYFG95EQ46MJhdV0fUT2g5xyH8N3/OGhDA=="
-                    },
-                ]
-            }), "utf-8"), content_type='application/json')
+            return web.Response(
+                body=bytes(
+                    json.dumps(
+                        {
+                            "pubkey": "7Aqw6Efa9EzE7gtsc8SveLLrM7gm6NEGoywSv4FJx6pZ",
+                            "uid": "john",
+                            "isMember": True,
+                            "certifications": [
+                                {
+                                    "pubkey": "FADxcH5LmXGmGFgdixSes6nWnC4Vb4pRUBYT81zQRhjn",
+                                    "meta": {"block_number": 38580},
+                                    "uids": ["doe"],
+                                    "isMember": True,
+                                    "wasMember": True,
+                                    "signature": "8XYmBdElqNkkl4AeFjJnC5oj/ujBrzH9FNgPZvK8Cicp8Du0PQa0yYFG95EQ46MJhdV0fUT2g5xyH8N3/OGhDA==",
+                                }
+                            ],
+                        }
+                    ),
+                    "utf-8",
+                ),
+                content_type="application/json",
+            )
 
         async def go():
-            _, port, _ = await self.create_server('GET', '/wot/certifiers-of/pubkey', handler)
+            _, port, _ = await self.create_server(
+                "GET", "/wot/certifiers-of/pubkey", handler
+            )
             with self.assertRaises(jsonschema.exceptions.ValidationError):
                 client = Client(BMAEndpoint("127.0.0.1", "", "", port))
-                await client(certifiers_of, 'pubkey')
+                await client(certifiers_of, "pubkey")
             await client.close()
 
         self.loop.run_until_complete(go())
@@ -297,13 +300,15 @@ class TestBmaWot(WebFunctionalSetupMixin, unittest.TestCase):
     def test_bma_wot_certified_bad(self):
         async def handler(request):
             await request.read()
-            return web.Response(body=b'{}', content_type='application/json')
+            return web.Response(body=b"{}", content_type="application/json")
 
         async def go():
-            _, port, _ = await self.create_server('GET', '/wot/certified-by/pubkey', handler)
+            _, port, _ = await self.create_server(
+                "GET", "/wot/certified-by/pubkey", handler
+            )
             with self.assertRaises(jsonschema.exceptions.ValidationError):
                 client = Client(BMAEndpoint("127.0.0.1", "", "", port))
-                await client(certified_by, 'pubkey')
+                await client(certified_by, "pubkey")
             await client.close()
 
         self.loop.run_until_complete(go())
@@ -328,26 +333,26 @@ class TestBmaWot(WebFunctionalSetupMixin, unittest.TestCase):
                         {
                             "from": "J78bPUvLjxmjaEkdjxWLeENQtcfXm7iobqB49uT1Bgp3",
                             "to": "8Fi1VSTbjkXguwThF4v2ZxC5whK7pwG2vcGTkPUPjPGU",
-                            "expiresIn": 30423649
+                            "expiresIn": 30423649,
                         },
                         {
                             "from": "9bZEATXBGPUSsk8oAYi4KAChg3rHKwNt67hVdErbNGCW",
                             "to": "8Fi1VSTbjkXguwThF4v2ZxC5whK7pwG2vcGTkPUPjPGU",
-                            "expiresIn": 30488510
+                            "expiresIn": 30488510,
                         },
                         {
                             "from": "HGYV5C16mrdvE9vpb1S9nMDHkVPsubBgANs9pSb6HWCV",
                             "to": "8Fi1VSTbjkXguwThF4v2ZxC5whK7pwG2vcGTkPUPjPGU",
-                            "expiresIn": 30505972
+                            "expiresIn": 30505972,
                         },
                         {
                             "from": "5ocqzyDMMWf1V8bsoNhWb1iNwax1e9M7VTUN6navs8of",
                             "to": "8Fi1VSTbjkXguwThF4v2ZxC5whK7pwG2vcGTkPUPjPGU",
-                            "expiresIn": 30923721
-                        }
+                            "expiresIn": 30923721,
+                        },
                     ],
                     "membershipPendingExpiresIn": 0,
-                    "membershipExpiresIn": 14707940
+                    "membershipExpiresIn": 14707940,
                 }
             ]
         }

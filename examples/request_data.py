@@ -47,25 +47,21 @@ async def main():
             "duniter": {
                 "type": "object",
                 "properties": {
-                    "software": {
-                        "type": "string"
-                    },
-                    "version": {
-                        "type": "string",
-                    },
-                    "forkWindowSize": {
-                        "type": "number"
-                    }
+                    "software": {"type": "string"},
+                    "version": {"type": "string"},
+                    "forkWindowSize": {"type": "number"},
                 },
-                "required": ["software", "version"]
-            },
+                "required": ["software", "version"],
+            }
         },
-        "required": ["duniter"]
+        "required": ["duniter"],
     }
 
     # Get the node summary infos (direct REST GET request)
     print("\nCall direct get on node/summary")
-    response = await client.get('node/summary', rtype=RESPONSE_AIOHTTP, schema=summary_schema)
+    response = await client.get(
+        "node/summary", rtype=RESPONSE_AIOHTTP, schema=summary_schema
+    )
     print(response)
 
     # Close client aiohttp session

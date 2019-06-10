@@ -8,7 +8,6 @@ from tests.api.webserver import WebFunctionalSetupMixin
 
 
 class TestBmaWebsocket(WebFunctionalSetupMixin, unittest.TestCase):
-
     def test_block(self):
         json_sample = """
 {
@@ -107,5 +106,7 @@ class TestBmaWebsocket(WebFunctionalSetupMixin, unittest.TestCase):
         self.assertEqual(data["currency"], "beta_brouzouf")
         self.assertEqual(data["pubkey"], "HsLShAtzXTVxeUtQd7yi5Z5Zh4zNvbu8sTEZ53nfKcqY")
         self.assertEqual(len(data["endpoints"]), 3)
-        self.assertEqual(data["signature"],
-                         "42yQm4hGTJYWkPg39hQAUgP6S6EQ4vTfXdJuxKEHL1ih6YHiDL2hcwrFgBHjXLRgxRhj2VNVqqc6b4JayKqTE14r")
+        self.assertEqual(
+            data["signature"],
+            "42yQm4hGTJYWkPg39hQAUgP6S6EQ4vTfXdJuxKEHL1ih6YHiDL2hcwrFgBHjXLRgxRhj2VNVqqc6b4JayKqTE14r",
+        )

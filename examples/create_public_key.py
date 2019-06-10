@@ -3,7 +3,7 @@ from duniterpy.key import SigningKey
 
 ################################################
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     # prompt hidden user entry
     salt = getpass.getpass("Enter your passphrase (salt): ")
 

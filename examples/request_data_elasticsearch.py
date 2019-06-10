@@ -26,12 +26,14 @@ async def main():
 
     # Get the current node (direct REST GET request)
     print("\nGET g1-test/block/current/_source:")
-    response = await client.get('g1-test/block/current/_source')
+    response = await client.get("g1-test/block/current/_source")
     print(response)
 
     # Get the node number 2 with only selected fields (direct REST GET request)
     print("\nGET g1-test/block/2/_source:")
-    response = await client.get('g1-test/block/2/_source', {'_source': 'number,hash,dividend,membersCount'})
+    response = await client.get(
+        "g1-test/block/2/_source", {"_source": "number,hash,dividend,membersCount"}
+    )
     print(response)
 
     # Close client aiohttp session
@@ -45,7 +47,7 @@ async def main():
 
     # Get the profil of a public key (direct REST GET request)
     print("\nGET user/profile/{0}/_source:".format(pubkey))
-    response = await client.get('user/profile/{0}/_source'.format(pubkey.strip(' \n')))
+    response = await client.get("user/profile/{0}/_source".format(pubkey.strip(" \n")))
     print(response)
 
     # Close client aiohttp session

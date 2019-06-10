@@ -4,7 +4,12 @@ import getpass
 from duniterpy.api import bma
 from duniterpy.api.client import Client
 from duniterpy.documents import BlockUID, Transaction
-from duniterpy.documents.transaction import InputSource, OutputSource, Unlock, SIGParameter
+from duniterpy.documents.transaction import (
+    InputSource,
+    OutputSource,
+    Unlock,
+    SIGParameter,
+)
 from duniterpy.key import SigningKey
 
 # CONFIG #######################################
@@ -21,7 +26,9 @@ TRANSACTION_VERSION = 10
 ################################################
 
 
-def get_transaction_document(current_block: dict, source: dict, from_pubkey: str, to_pubkey: str) -> Transaction:
+def get_transaction_document(
+    current_block: dict, source: dict, from_pubkey: str, to_pubkey: str
+) -> Transaction:
     """
     Return a Transaction document
 
@@ -35,18 +42,16 @@ def get_transaction_document(current_block: dict, source: dict, from_pubkey: str
     # list of inputs (sources)
     inputs = [
         InputSource(
-            amount=source['amount'],
-            base=source['base'],
-            source=source['type'],
-            origin_id=source['identifier'],
-            index=source['noffset']
+            amount=source["amount"],
+            base=source["base"],
+            source=source["type"],
+            origin_id=source["identifier"],
+            index=source["noffset"],
         )
     ]
 
     # list of issuers of the inputs
-    issuers = [
-        from_pubkey
-    ]
+    issuers = [from_pubkey]
 
     # list of unlocks of the inputs
     unlocks = [
@@ -54,26 +59,30 @@ def get_transaction_document(current_block: dict, source: dict, from_pubkey: str
             # inputs[index]
             index=0,
             # unlock inputs[index] if signatures[0] is from public key of issuers[0]
-            parameters=[SIGParameter(0)]
+            parameters=[SIGParameter(0)],
         )
     ]
 
     # lists of outputs
     outputs = [
-        OutputSource(amount=source['amount'], base=source['base'], condition="SIG({0})".format(to_pubkey))
+        OutputSource(
+            amount=source["amount"],
+            base=source["base"],
+            condition="SIG({0})".format(to_pubkey),
+        )
     ]
 
     transaction = Transaction(
         version=TRANSACTION_VERSION,
-        currency=current_block['currency'],
-        blockstamp=BlockUID(current_block['number'], current_block['hash']),
+        currency=current_block["currency"],
+        blockstamp=BlockUID(current_block["number"], current_block["hash"]),
         locktime=0,
         issuers=issuers,
         inputs=inputs,
         unlocks=unlocks,
         outputs=outputs,
-        comment='',
-        signatures=[]
+        comment="",
+        signatures=[],
     )
 
     return transaction
@@ -109,15 +118,17 @@ async def main():
     # capture sources of account
     response = await client(bma.tx.sources, pubkey_from)
 
-    if len(response['sources']) == 0:
+    if len(response["sources"]) == 0:
         print("no sources found for account %s" % pubkey_to)
         exit(1)
 
     # get the first source
-    source = response['sources'][0]
+    source = response["sources"][0]
 
     # create the transaction document
-    transaction = get_transaction_document(current_block, source, pubkey_from, pubkey_to)
+    transaction = get_transaction_document(
+        current_block, source, pubkey_from, pubkey_to
+    )
 
     # sign document
     transaction.sign([key])

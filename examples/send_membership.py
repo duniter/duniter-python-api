@@ -17,7 +17,9 @@ BMAS_ENDPOINT = "BMAS g1-test.duniter.org 443"
 ################################################
 
 
-def get_identity_document(current_block: dict, uid: str, salt: str, password: str) -> Identity:
+def get_identity_document(
+    current_block: dict, uid: str, salt: str, password: str
+) -> Identity:
     """
     Get an Identity document
 
@@ -30,7 +32,7 @@ def get_identity_document(current_block: dict, uid: str, salt: str, password: st
     """
 
     # get current block BlockStamp
-    timestamp = BlockUID(current_block['number'], current_block['hash'])
+    timestamp = BlockUID(current_block["number"], current_block["hash"])
 
     # create keys from credentials
     key = SigningKey.from_credentials(salt, password)
@@ -38,11 +40,11 @@ def get_identity_document(current_block: dict, uid: str, salt: str, password: st
     # create identity document
     identity = Identity(
         version=10,
-        currency=current_block['currency'],
+        currency=current_block["currency"],
         pubkey=key.pubkey,
         uid=uid,
         ts=timestamp,
-        signature=None
+        signature=None,
     )
 
     # sign document
@@ -51,8 +53,13 @@ def get_identity_document(current_block: dict, uid: str, salt: str, password: st
     return identity
 
 
-def get_membership_document(membership_type: str, current_block: dict, identity: Identity, salt: str,
-                            password: str) -> Membership:
+def get_membership_document(
+    membership_type: str,
+    current_block: dict,
+    identity: Identity,
+    salt: str,
+    password: str,
+) -> Membership:
     """
     Get a Membership document
 
@@ -66,7 +73,7 @@ def get_membership_document(membership_type: str, current_block: dict, identity:
     """
 
     # get current block BlockStamp
-    timestamp = BlockUID(current_block['number'], current_block['hash'])
+    timestamp = BlockUID(current_block["number"], current_block["hash"])
 
     # create keys from credentials
     key = SigningKey.from_credentials(salt, password)
@@ -74,12 +81,12 @@ def get_membership_document(membership_type: str, current_block: dict, identity:
     # create identity document
     membership = Membership(
         version=10,
-        currency=current_block['currency'],
+        currency=current_block["currency"],
         issuer=key.pubkey,
         membership_ts=timestamp,
         membership_type=membership_type,
         uid=identity.uid,
-        identity_ts=identity.timestamp
+        identity_ts=identity.timestamp,
     )
 
     # sign document

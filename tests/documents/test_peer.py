@@ -33,7 +33,9 @@ class TestPeer(unittest.TestCase):
         peer = Peer.from_signed_raw(rawpeer)
         self.assertEqual(peer.currency, "beta_brousouf")
         self.assertEqual(peer.pubkey, "HsLShAtzXTVxeUtQd7yi5Z5Zh4zNvbu8sTEZ53nfKcqY")
-        self.assertEqual(str(peer.blockUID), "8-1922C324ABC4AF7EF7656734A31F5197888DDD52")
+        self.assertEqual(
+            str(peer.blockUID), "8-1922C324ABC4AF7EF7656734A31F5197888DDD52"
+        )
         self.assertEqual(len(peer.endpoints), 4)
         self.assertIsInstance(peer.endpoints[0], BMAEndpoint)
         self.assertIsInstance(peer.endpoints[1], BMAEndpoint)
@@ -54,8 +56,10 @@ class TestPeer(unittest.TestCase):
         self.assertEqual(peer.endpoints[2].ws2pid, "d2edcb92")
         self.assertEqual(peer.endpoints[2].port, 20902)
 
-        self.assertEqual(peer.signatures[0],
-                         "dkaXIiCYUJtCg8Feh/BKvPYf4uFH9CJ/zY6J4MlA9BsjmcMe4YAblvNt/gJy31b1aGq3ue3h14mLMCu84rraDg==")
+        self.assertEqual(
+            peer.signatures[0],
+            "dkaXIiCYUJtCg8Feh/BKvPYf4uFH9CJ/zY6J4MlA9BsjmcMe4YAblvNt/gJy31b1aGq3ue3h14mLMCu84rraDg==",
+        )
 
     def test_fromraw_toraw(self):
         peer = Peer.from_signed_raw(rawpeer)
@@ -63,8 +67,13 @@ class TestPeer(unittest.TestCase):
         from_rendered_peer = Peer.from_signed_raw(rendered_peer)
 
         self.assertEqual(from_rendered_peer.currency, "beta_brousouf")
-        self.assertEqual(from_rendered_peer.pubkey, "HsLShAtzXTVxeUtQd7yi5Z5Zh4zNvbu8sTEZ53nfKcqY")
-        self.assertEqual(str(from_rendered_peer.blockUID), "8-1922C324ABC4AF7EF7656734A31F5197888DDD52")
+        self.assertEqual(
+            from_rendered_peer.pubkey, "HsLShAtzXTVxeUtQd7yi5Z5Zh4zNvbu8sTEZ53nfKcqY"
+        )
+        self.assertEqual(
+            str(from_rendered_peer.blockUID),
+            "8-1922C324ABC4AF7EF7656734A31F5197888DDD52",
+        )
         self.assertEqual(len(peer.endpoints), 4)
         self.assertIsInstance(peer.endpoints[0], BMAEndpoint)
         self.assertIsInstance(peer.endpoints[1], BMAEndpoint)
@@ -85,8 +94,10 @@ class TestPeer(unittest.TestCase):
         self.assertEqual(peer.endpoints[2].ws2pid, "d2edcb92")
         self.assertEqual(peer.endpoints[2].port, 20902)
 
-        self.assertEqual(from_rendered_peer.signatures[0],
-                         "dkaXIiCYUJtCg8Feh/BKvPYf4uFH9CJ/zY6J4MlA9BsjmcMe4YAblvNt/gJy31b1aGq3ue3h14mLMCu84rraDg==")
+        self.assertEqual(
+            from_rendered_peer.signatures[0],
+            "dkaXIiCYUJtCg8Feh/BKvPYf4uFH9CJ/zY6J4MlA9BsjmcMe4YAblvNt/gJy31b1aGq3ue3h14mLMCu84rraDg==",
+        )
         self.assertEqual(rawpeer, from_rendered_peer.signed_raw())
 
     def test_incorrect(self):

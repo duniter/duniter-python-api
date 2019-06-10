@@ -6,11 +6,11 @@ from duniterpy.key import SigningKey
 
 # CONFIG #######################################
 
-SIGNED_MESSAGE_FILENAME = '/tmp/duniter_signed_message.bin'
+SIGNED_MESSAGE_FILENAME = "/tmp/duniter_signed_message.bin"
 
 ################################################
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     # prompt hidden user entry
     salt = getpass.getpass("Enter your passphrase (salt): ")
 
@@ -27,7 +27,7 @@ if __name__ == '__main__':
 
     # Sign the message, the signed string is the message itself plus the
     # signature
-    signed_message = key.sign(bytes(message, 'utf-8'))  # type: bytes
+    signed_message = key.sign(bytes(message, "utf-8"))  # type: bytes
 
     # To create a verifier pass in the verify key:
     veri = libnacl.sign.Verifier(key.hex_vk())
@@ -35,7 +35,7 @@ if __name__ == '__main__':
     verified = veri.verify(signed_message)
 
     # save signed message in a file
-    with open(SIGNED_MESSAGE_FILENAME, 'wb') as file_handler:
+    with open(SIGNED_MESSAGE_FILENAME, "wb") as file_handler:
         file_handler.write(signed_message)
 
     print("Signed message saved in file ./{0}".format(SIGNED_MESSAGE_FILENAME))

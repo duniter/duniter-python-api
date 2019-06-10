@@ -9,6 +9,6 @@ class TestPublicKey(unittest.TestCase):
         public_key = PublicKey(sign_key.pubkey)
 
         message = "Hello world with utf-8 chars like éàè !"
-        encrypted_message = public_key.encrypt_seal(bytes(message, 'utf-8'))
+        encrypted_message = public_key.encrypt_seal(bytes(message, "utf-8"))
         decrypted_message = sign_key.decrypt_seal(encrypted_message)
-        self.assertEqual(message, decrypted_message.decode('utf-8'))
+        self.assertEqual(message, decrypted_message.decode("utf-8"))

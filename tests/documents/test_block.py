@@ -289,7 +289,9 @@ class TestBlock(unittest.TestCase):
         self.assertEqual(block.mediantime, 1418080208)
         self.assertEqual(block.issuer, "HnFcSms8jzwngtVomTTnzudZx7SHUQY8sVE1y8yBmULk")
         self.assertEqual(block.prev_hash, "0000E73C340601ACA1AD5AAA5B5E56B03E178EF8")
-        self.assertEqual(block.prev_issuer, "HnFcSms8jzwngtVomTTnzudZx7SHUQY8sVE1y8yBmULk")
+        self.assertEqual(
+            block.prev_issuer, "HnFcSms8jzwngtVomTTnzudZx7SHUQY8sVE1y8yBmULk"
+        )
         self.assertEqual(block.members_count, 4)
         self.assertEqual(block.identities, [])
         self.assertEqual(block.joiners, [])
@@ -309,10 +311,31 @@ class TestBlock(unittest.TestCase):
         self.assertEqual(block.time, 1418077277)
         self.assertEqual(block.mediantime, 1418077277)
         self.assertEqual(block.issuer, "HnFcSms8jzwngtVomTTnzudZx7SHUQY8sVE1y8yBmULk")
-        self.assertEqual(block.parameters,
-                         ("0.0488", "86400", "1000", "432000", "100", "5259600", "63115200", "5", "5259600",
-                          "5259600", "0.8", "31557600", "5", "24", "300", "12", "0.67", "1488970800",
-                          "1490094000", "15778800"))
+        self.assertEqual(
+            block.parameters,
+            (
+                "0.0488",
+                "86400",
+                "1000",
+                "432000",
+                "100",
+                "5259600",
+                "63115200",
+                "5",
+                "5259600",
+                "5259600",
+                "0.8",
+                "31557600",
+                "5",
+                "24",
+                "300",
+                "12",
+                "0.67",
+                "1488970800",
+                "1490094000",
+                "15778800",
+            ),
+        )
         self.assertEqual(block.members_count, 4)
         self.assertEqual(len(block.identities), 4)
         self.assertEqual(len(block.joiners), 4)
@@ -336,9 +359,16 @@ class TestBlock(unittest.TestCase):
         self.assertEqual(from_rendered_raw.powmin, 4)
         self.assertEqual(from_rendered_raw.time, 1418083330)
         self.assertEqual(from_rendered_raw.mediantime, 1418080208)
-        self.assertEqual(from_rendered_raw.issuer, "HnFcSms8jzwngtVomTTnzudZx7SHUQY8sVE1y8yBmULk")
-        self.assertEqual(from_rendered_raw.prev_hash, "0000E73C340601ACA1AD5AAA5B5E56B03E178EF8")
-        self.assertEqual(from_rendered_raw.prev_issuer, "HnFcSms8jzwngtVomTTnzudZx7SHUQY8sVE1y8yBmULk")
+        self.assertEqual(
+            from_rendered_raw.issuer, "HnFcSms8jzwngtVomTTnzudZx7SHUQY8sVE1y8yBmULk"
+        )
+        self.assertEqual(
+            from_rendered_raw.prev_hash, "0000E73C340601ACA1AD5AAA5B5E56B03E178EF8"
+        )
+        self.assertEqual(
+            from_rendered_raw.prev_issuer,
+            "HnFcSms8jzwngtVomTTnzudZx7SHUQY8sVE1y8yBmULk",
+        )
         self.assertEqual(from_rendered_raw.members_count, 4)
         self.assertEqual(from_rendered_raw.identities, [])
         self.assertEqual(from_rendered_raw.joiners, [])
@@ -362,7 +392,9 @@ class TestBlock(unittest.TestCase):
         self.assertEqual(from_rendered_raw.powmin, 3)
         self.assertEqual(from_rendered_raw.time, 1418077277)
         self.assertEqual(from_rendered_raw.mediantime, 1418077277)
-        self.assertEqual(from_rendered_raw.issuer, "HnFcSms8jzwngtVomTTnzudZx7SHUQY8sVE1y8yBmULk")
+        self.assertEqual(
+            from_rendered_raw.issuer, "HnFcSms8jzwngtVomTTnzudZx7SHUQY8sVE1y8yBmULk"
+        )
         self.assertEqual(from_rendered_raw.members_count, 4)
         self.assertEqual(len(from_rendered_raw.identities), 4)
         self.assertEqual(len(from_rendered_raw.joiners), 4)
@@ -386,7 +418,9 @@ class TestBlock(unittest.TestCase):
         self.assertEqual(from_rendered_raw.powmin, 5)
         self.assertEqual(from_rendered_raw.time, 1443896211)
         self.assertEqual(from_rendered_raw.mediantime, 1443881811)
-        self.assertEqual(from_rendered_raw.issuer, "HnFcSms8jzwngtVomTTnzudZx7SHUQY8sVE1y8yBmULk")
+        self.assertEqual(
+            from_rendered_raw.issuer, "HnFcSms8jzwngtVomTTnzudZx7SHUQY8sVE1y8yBmULk"
+        )
         self.assertEqual(from_rendered_raw.parameters, None)
         self.assertEqual(from_rendered_raw.members_count, 19)
         self.assertEqual(from_rendered_raw.identities, [])
@@ -410,9 +444,16 @@ class TestBlock(unittest.TestCase):
         self.assertEqual(from_rendered_raw.powmin, 4)
         self.assertEqual(from_rendered_raw.time, 1444434128)
         self.assertEqual(from_rendered_raw.mediantime, 1444426438)
-        self.assertEqual(from_rendered_raw.issuer, "HnFcSms8jzwngtVomTTnzudZx7SHUQY8sVE1y8yBmULk")
-        self.assertEqual(from_rendered_raw.prev_hash, "0000E88115ADDF79344372C0212928501E21622B")
-        self.assertEqual(from_rendered_raw.prev_issuer, "HnFcSms8jzwngtVomTTnzudZx7SHUQY8sVE1y8yBmULk")
+        self.assertEqual(
+            from_rendered_raw.issuer, "HnFcSms8jzwngtVomTTnzudZx7SHUQY8sVE1y8yBmULk"
+        )
+        self.assertEqual(
+            from_rendered_raw.prev_hash, "0000E88115ADDF79344372C0212928501E21622B"
+        )
+        self.assertEqual(
+            from_rendered_raw.prev_issuer,
+            "HnFcSms8jzwngtVomTTnzudZx7SHUQY8sVE1y8yBmULk",
+        )
         self.assertEqual(from_rendered_raw.parameters, None)
         self.assertEqual(from_rendered_raw.members_count, 21)
         self.assertEqual(from_rendered_raw.identities, [])
@@ -426,8 +467,12 @@ class TestBlock(unittest.TestCase):
         self.assertEqual(block.signed_raw(), raw_block_with_leavers)
 
     def test_block_uid__compare(self):
-        lower = BlockUID(10, "8101618234DBE5AAD529C13C8BE45E2F9BBE1150CD2FAA25095671F56C1DCDA5")
-        higher = BlockUID(14, "E1C0AD728983D8A57335E52CF1064F1AFFD1D454173D8CEBD3ED8B4A72B48704")
+        lower = BlockUID(
+            10, "8101618234DBE5AAD529C13C8BE45E2F9BBE1150CD2FAA25095671F56C1DCDA5"
+        )
+        higher = BlockUID(
+            14, "E1C0AD728983D8A57335E52CF1064F1AFFD1D454173D8CEBD3ED8B4A72B48704"
+        )
         self.assertTrue(lower < higher)
         self.assertFalse(lower > higher)
         self.assertFalse(lower == higher)
@@ -445,21 +490,35 @@ class TestBlock(unittest.TestCase):
         self.assertEqual(from_rendered_raw.signed_raw(), negative_issuers_frame_var)
 
     def test_block_uid_converter(self):
-        buid = block_uid("1345-0000338C775613399FA508A8F8B22EB60F525884730639E2A707299E373F43C0")
+        buid = block_uid(
+            "1345-0000338C775613399FA508A8F8B22EB60F525884730639E2A707299E373F43C0"
+        )
         self.assertEqual(buid.number, 1345)
-        self.assertEqual(buid.sha_hash, "0000338C775613399FA508A8F8B22EB60F525884730639E2A707299E373F43C0")
+        self.assertEqual(
+            buid.sha_hash,
+            "0000338C775613399FA508A8F8B22EB60F525884730639E2A707299E373F43C0",
+        )
 
     def test_block_uid_converter_error(self):
         with self.assertRaises(TypeError):
             block_uid(1235654)
 
     def test_block_uid_no_convert(self):
-        buid = block_uid(BlockUID(1345, "0000338C775613399FA508A8F8B22EB60F525884730639E2A707299E373F43C0"))
+        buid = block_uid(
+            BlockUID(
+                1345, "0000338C775613399FA508A8F8B22EB60F525884730639E2A707299E373F43C0"
+            )
+        )
         self.assertEqual(buid.number, 1345)
-        self.assertEqual(buid.sha_hash, "0000338C775613399FA508A8F8B22EB60F525884730639E2A707299E373F43C0")
+        self.assertEqual(
+            buid.sha_hash,
+            "0000338C775613399FA508A8F8B22EB60F525884730639E2A707299E373F43C0",
+        )
 
     def test_block_uid_non_zero(self):
-        buid = BlockUID(1345, "0000338C775613399FA508A8F8B22EB60F525884730639E2A707299E373F43C0")
+        buid = BlockUID(
+            1345, "0000338C775613399FA508A8F8B22EB60F525884730639E2A707299E373F43C0"
+        )
         if not buid:
             self.fail("__nonzero__ comparison failed")
         elif BlockUID.empty():
@@ -494,8 +553,11 @@ Nonce: 10200000037440
 AywstQpC0S5iaA/YQvbz2alpP6zTYG3tjkWpxy1jgeCo028Te2V327bBZbfDGDzsjxOrF4UVmEBiGsgbqhL9CA==
 """
         block_doc = Block.from_signed_raw(block)
-        self.assertEqual(block_doc.proof_of_work(), "00000A84839226046082E2B1AD49664E382D98C845644945D133D4A90408813A")
+        self.assertEqual(
+            block_doc.proof_of_work(),
+            "00000A84839226046082E2B1AD49664E382D98C845644945D133D4A90408813A",
+        )
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

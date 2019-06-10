@@ -2,11 +2,11 @@ from duniterpy.key import PublicKey
 
 # CONFIG #######################################
 
-ENCRYPTED_MESSAGE_FILENAME = '/tmp/duniter_encrypted_message.bin'
+ENCRYPTED_MESSAGE_FILENAME = "/tmp/duniter_encrypted_message.bin"
 
 ################################################
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     # Ask public key of the recipient
     pubkeyBase58 = input("Enter public key of the message recipient: ")
 
@@ -18,7 +18,7 @@ if __name__ == '__main__':
     encrypted_message = pubkey_instance.encrypt_seal(message)
 
     # Save encrypted message in a file
-    with open(ENCRYPTED_MESSAGE_FILENAME, 'wb') as file_handler:
+    with open(ENCRYPTED_MESSAGE_FILENAME, "wb") as file_handler:
         file_handler.write(encrypted_message)
 
     print("Encrypted message saved in file ./{0}".format(ENCRYPTED_MESSAGE_FILENAME))

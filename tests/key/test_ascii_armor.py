@@ -1,6 +1,10 @@
 from duniterpy.key import AsciiArmor, SigningKey
-from duniterpy.key.ascii_armor import BEGIN_MESSAGE_HEADER, BEGIN_SIGNATURE_HEADER, END_SIGNATURE_HEADER, \
-    END_MESSAGE_HEADER
+from duniterpy.key.ascii_armor import (
+    BEGIN_MESSAGE_HEADER,
+    BEGIN_SIGNATURE_HEADER,
+    END_SIGNATURE_HEADER,
+    END_MESSAGE_HEADER,
+)
 import unittest
 
 
@@ -22,7 +26,9 @@ This is a utf-8 message...
        
        """
         # create encrypted and signed ascii armor message
-        encrypted_and_signed_aa_message = AsciiArmor.create(message, alice_signing_key.pubkey, [bob_signing_key])
+        encrypted_and_signed_aa_message = AsciiArmor.create(
+            message, alice_signing_key.pubkey, [bob_signing_key]
+        )
 
         # split in lines for check up
         aa_message_lines = encrypted_and_signed_aa_message.splitlines()
@@ -39,11 +45,13 @@ This is a utf-8 message...
         self.assertEqual(aa_message_lines[8], END_SIGNATURE_HEADER)
 
         # parse ascii armor message
-        result = AsciiArmor.parse(encrypted_and_signed_aa_message, alice_signing_key, [bob_signing_key.pubkey])
+        result = AsciiArmor.parse(
+            encrypted_and_signed_aa_message, alice_signing_key, [bob_signing_key.pubkey]
+        )
 
         # check result
-        self.assertEqual(message + "\n", result['message']['content'])
-        self.assertTrue(message + "\n", result['signatures'][0]['valid'])
+        self.assertEqual(message + "\n", result["message"]["content"])
+        self.assertTrue(message + "\n", result["signatures"][0]["valid"])
 
     def test_create_encrypted(self):
         # pubkey of recipient
@@ -76,7 +84,7 @@ This is a utf-8 message...
         result = AsciiArmor.parse(encrypted_aa_message, alice_signing_key)
 
         # check result
-        self.assertEqual(message + "\n", result['message']['content'])
+        self.assertEqual(message + "\n", result["message"]["content"])
 
     def test_create_signed_cleartext(self):
         # signing key of issuer
@@ -92,7 +100,9 @@ This is a utf-8 message...
 
        """
         # create encrypted and signed ascii armor message
-        signed_cleartext_aa_message = AsciiArmor.create(message, None, [bob_signing_key])
+        signed_cleartext_aa_message = AsciiArmor.create(
+            message, None, [bob_signing_key]
+        )
 
         # split in lines for check up
         aa_message_lines = signed_cleartext_aa_message.splitlines()
@@ -108,8 +118,10 @@ This is a utf-8 message...
         self.assertEqual(aa_message_lines[14], END_SIGNATURE_HEADER)
 
         # parse ascii armor message
-        result = AsciiArmor.parse(signed_cleartext_aa_message, None, [bob_signing_key.pubkey])
+        result = AsciiArmor.parse(
+            signed_cleartext_aa_message, None, [bob_signing_key.pubkey]
+        )
 
         # check result
-        self.assertEqual(message + "\n", result['message']['content'])
-        self.assertTrue(message + "\n", result['signatures'][0]['valid'])
+        self.assertEqual(message + "\n", result["message"]["content"])
+        self.assertTrue(message + "\n", result["signatures"][0]["valid"])

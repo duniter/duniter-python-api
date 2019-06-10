@@ -27,7 +27,9 @@ BMAS_ENDPOINT = "BMAS g1-test.duniter.org 443"
 # WARNING : Hide this file in a safe and secure place
 # If one day you forget your credentials,
 # you'll have to use your private key instead
-REVOCATION_DOCUMENT_FILE_PATH = os.path.join(home_path, "duniter_account_revocation_document.txt")
+REVOCATION_DOCUMENT_FILE_PATH = os.path.join(
+    home_path, "duniter_account_revocation_document.txt"
+)
 
 # Current protocol version
 PROTOCOL_VERSION = 10
@@ -36,7 +38,9 @@ PROTOCOL_VERSION = 10
 ################################################
 
 
-async def get_identity_document(client: Client, current_block: dict, pubkey: str) -> Optional[Identity]:
+async def get_identity_document(
+    client: Client, current_block: dict, pubkey: str
+) -> Optional[Identity]:
     """
     Get the identity document of the pubkey
 
@@ -51,9 +55,9 @@ async def get_identity_document(client: Client, current_block: dict, pubkey: str
     identity = None
 
     # parse results
-    for result in lookup_data['results']:
+    for result in lookup_data["results"]:
         if result["pubkey"] == pubkey:
-            uids = result['uids']
+            uids = result["uids"]
             uid_data = uids[0]
             # capture data
             timestamp = BlockUID.from_str(uid_data["meta"]["timestamp"])
@@ -63,18 +67,20 @@ async def get_identity_document(client: Client, current_block: dict, pubkey: str
             # return self-certification document
             identity = Identity(
                 version=10,
-                currency=current_block['currency'],
+                currency=current_block["currency"],
                 pubkey=pubkey,
                 uid=uid,
                 ts=timestamp,
-                signature=signature
+                signature=signature,
             )
             break
 
     return identity
 
 
-def get_signed_raw_revocation_document(identity: Identity, salt: str, password: str) -> str:
+def get_signed_raw_revocation_document(
+    identity: Identity, salt: str, password: str
+) -> str:
     """
     Generate account revocation document for given identity
 
@@ -131,10 +137,12 @@ async def main():
         exit(1)
 
     # get the revoke document
-    revocation_signed_raw_document = get_signed_raw_revocation_document(identity, salt, password)
+    revocation_signed_raw_document = get_signed_raw_revocation_document(
+        identity, salt, password
+    )
 
     # save revoke document in a file
-    fp = open(REVOCATION_DOCUMENT_FILE_PATH, 'w')
+    fp = open(REVOCATION_DOCUMENT_FILE_PATH, "w")
     fp.write(revocation_signed_raw_document)
     fp.close()
 

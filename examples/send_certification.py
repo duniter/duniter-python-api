@@ -18,7 +18,9 @@ BMAS_ENDPOINT = "BMAS g1-test.duniter.org 443"
 ################################################
 
 
-async def get_identity_document(client: Client, current_block: dict, pubkey: str) -> Optional[Identity]:
+async def get_identity_document(
+    client: Client, current_block: dict, pubkey: str
+) -> Optional[Identity]:
     """
     Get the identity document of the pubkey
 
@@ -33,9 +35,9 @@ async def get_identity_document(client: Client, current_block: dict, pubkey: str
     identity = None
 
     # parse results
-    for result in lookup_data['results']:
+    for result in lookup_data["results"]:
         if result["pubkey"] == pubkey:
-            uids = result['uids']
+            uids = result["uids"]
             uid_data = uids[0]
             # capture data
             timestamp = BlockUID.from_str(uid_data["meta"]["timestamp"])
@@ -45,18 +47,20 @@ async def get_identity_document(client: Client, current_block: dict, pubkey: str
             # return self-certification document
             identity = Identity(
                 version=10,
-                currency=current_block['currency'],
+                currency=current_block["currency"],
                 pubkey=pubkey,
                 uid=uid,
                 ts=timestamp,
-                signature=signature
+                signature=signature,
             )
             break
 
     return identity
 
 
-def get_certification_document(current_block: dict, self_cert_document: Identity, from_pubkey: str) -> Certification:
+def get_certification_document(
+    current_block: dict, self_cert_document: Identity, from_pubkey: str
+) -> Certification:
     """
     Create and return a Certification document
 
@@ -67,9 +71,14 @@ def get_certification_document(current_block: dict, self_cert_document: Identity
     :rtype: Certification
     """
     # construct Certification Document
-    return Certification(version=10, currency=current_block['currency'], pubkey_from=from_pubkey,
-                                  identity=self_cert_document,
-                                  timestamp=BlockUID(current_block['number'], current_block['hash']), signature="")
+    return Certification(
+        version=10,
+        currency=current_block["currency"],
+        pubkey_from=from_pubkey,
+        identity=self_cert_document,
+        timestamp=BlockUID(current_block["number"], current_block["hash"]),
+        signature="",
+    )
 
 
 async def main():

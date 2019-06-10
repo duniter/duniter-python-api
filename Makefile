@@ -26,7 +26,11 @@ pylint:
 # check format
 check-format:
 	black --check duniterpy
+	black --check tests
+	black --check examples
 
 # format code
 format:
 	black duniterpy
+	black tests
+	black examples

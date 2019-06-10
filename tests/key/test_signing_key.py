@@ -4,11 +4,10 @@ from duniterpy.key import VerifyingKey, SigningKey, PublicKey
 from duniterpy.key.scrypt_params import ScryptParams
 import unittest
 
-TEST_FILE_PATH = '/tmp/test_file.txt'
+TEST_FILE_PATH = "/tmp/test_file.txt"
 
 
 class TestSigningKey(unittest.TestCase):
-
     def tearDown(self) -> None:
         super(TestSigningKey, self)
 
@@ -21,9 +20,9 @@ class TestSigningKey(unittest.TestCase):
         public_key = PublicKey(sign_key.pubkey)
 
         message = "Hello world with utf-8 chars like éàè !"
-        encrypted_message = public_key.encrypt_seal(bytes(message, 'utf-8'))
+        encrypted_message = public_key.encrypt_seal(bytes(message, "utf-8"))
         decrypted_message = sign_key.decrypt_seal(encrypted_message)
-        self.assertEqual(message, decrypted_message.decode('utf-8'))
+        self.assertEqual(message, decrypted_message.decode("utf-8"))
 
     def test_from_credentials(self):
         sign_key = SigningKey.from_credentials("alice", "password", ScryptParams())
