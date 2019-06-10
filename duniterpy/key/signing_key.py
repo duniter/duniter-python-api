@@ -146,7 +146,7 @@ class SigningKey(libnacl.sign.Signer):
 
         # line patterns
         regex_pubkey = re.compile("pub: ([1-9A-HJ-NP-Za-km-z]{43,44})", re.MULTILINE)
-        regex_signkey = re.compile("sec: ([1-9A-HJ-NP-Za-km-z]{88,90})", re.MULTILINE)
+        regex_signkey = re.compile("sec: ([1-9A-HJ-NP-Za-km-z]{87,90})", re.MULTILINE)
 
         # check public key field
         match = re.search(regex_pubkey, pubsec_content)
