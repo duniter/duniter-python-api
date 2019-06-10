@@ -1,7 +1,7 @@
 from duniterpy.key import VerifyingKey, SigningKey
 from duniterpy.key.scrypt_params import ScryptParams
 from duniterpy.documents.peer import Peer
-from duniterpy.documents.ws2p.heads import *
+from duniterpy.documents.ws2p.heads import HeadV0, HeadV1, HeadV2
 import unittest
 
 
