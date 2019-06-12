@@ -49,11 +49,13 @@ setup(
 
     packages=find_packages(),
 
-    author="inso, canercanda, s_b, vit",
+    package_data={"duniterpy": ["py.typed"]},
+
+    author="inso, canercanda, s_b, vit, Moul",
 
     author_email="insomniak.fr@gmail.com",
 
-    description="A python implementation of [duniter](https://git.duniter.org/nodes/typescript/duniter) API",
+    description="A python library for [duniter](https://git.duniter.org/nodes/typescript/duniter) client developers",
 
     long_description=open('README.rst').read(),
 
