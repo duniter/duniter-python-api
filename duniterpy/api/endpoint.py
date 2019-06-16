@@ -630,7 +630,7 @@ MANAGED_API = {
 
 def endpoint(value: Any) -> Any:
     """
-    Convert a endpoint string to the corresponding Endpoint instance type
+    Convert an endpoint string to the corresponding Endpoint instance type
 
     :param value: Endpoint string or subclass
     :return:
