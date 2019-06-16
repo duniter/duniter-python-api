@@ -1,5 +1,4 @@
 stages:
-  - prepare
   - format
   - test
   - build
