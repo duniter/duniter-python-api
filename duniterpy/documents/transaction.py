@@ -1,5 +1,5 @@
 import re
-from typing import TypeVar, List, Any, Type, Optional, Dict, Union
+from typing import TypeVar, List, Any, Type, Optional, Dict, Union, Tuple
 
 import pypeg2
 
@@ -15,7 +15,7 @@ from ..constants import (
 from ..grammars import output
 
 
-def reduce_base(amount: int, base: int) -> tuple:
+def reduce_base(amount: int, base: int) -> Tuple[int, int]:
     """
     Compute the reduced base of the given parameters
 
