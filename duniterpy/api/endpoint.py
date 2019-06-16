@@ -130,12 +130,6 @@ class UnknownEndpoint(Endpoint):
         return hash((self.api, self.properties))
 
 
-ERROR_SCHEMA = {
-    "type": "object",
-    "properties": {"ucode": {"type": "number"}, "message": {"type": "string"}},
-    "required": ["ucode", "message"],
-}
-
 # required to type hint cls in classmethod
 BMAEndpointType = TypeVar("BMAEndpointType", bound="BMAEndpoint")
 
