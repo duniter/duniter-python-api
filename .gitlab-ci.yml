@@ -42,6 +42,7 @@ image: registry.duniter.org/docker/python3/duniterpy-builder:0.0.4
     changes:
       - duniterpy/**/*.py
       - .gitlab-ci.yml
+      - Makefile
       - requirements_dev.txt
       - requirements.txt
       - setup.py
