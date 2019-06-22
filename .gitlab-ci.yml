@@ -68,9 +68,8 @@ test:
   <<: *changes
   stage: test
   script:
-    - pip install coveralls
     - pip install -r requirements.txt
-    - coverage run --source=duniterpy setup.py test
+    - make tests
 
 check:
   <<: *pyenv
