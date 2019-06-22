@@ -47,7 +47,7 @@ setup(
 
     version=duniterpy.__version__,
 
-    packages=find_packages(),
+    packages=['duniterpy'],
 
     package_data={"duniterpy": ["py.typed"]},
 
