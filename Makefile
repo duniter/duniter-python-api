@@ -34,3 +34,9 @@ format:
 	black duniterpy
 	black tests
 	black examples
+
+# build a wheel package in build folder and put it in dist folder
+build:
+	if [ -d "./build" ]; then rm -r build/*; fi
+	if [ -d "./dist" ]; then rm -r dist/*; fi
+	python setup.py sdist bdist_wheel

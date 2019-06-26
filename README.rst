@@ -117,7 +117,7 @@ Change the version number (semantic version number)::
 
 Build the Pypi package in the ``dist`` folder::
 
-    python setup.py sdist bdist_wheel
+    make build
 
 Deploy the package on the Pypi repository::
 
