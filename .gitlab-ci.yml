@@ -85,7 +85,7 @@ build:
     - pip install -r requirements_deploy.txt
     - make build
 
-releases:
+release:
   <<: *pyenv
   <<: *push_to_github
   stage: release
@@ -94,6 +94,14 @@ releases:
     - pip install -r requirements.txt
     - pip install -r requirements_deploy.txt
     - make build
-    - pip install twine
-    - twine upload dist/* --username duniter --password $PYPI_PASSWORD
+    - make deploy PYPI_LOGIN=${PYPI_LOGIN} PYPI_PASSWORD=${PYPI_PASSWORD}
 
+release_test:
+  <<: *pyenv
+  stage: release
+  when: manual
+  script:
+    - pip install -r requirements.txt
+    - pip install -r requirements_deploy.txt
+    - make build
+    - make deploy_test PYPI_TEST_LOGIN=${PYPI_TEST_LOGIN} PYPI_TEST_PASSWORD=${PYPI_TEST_PASSWORD}
