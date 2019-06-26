@@ -82,8 +82,8 @@ build:
   stage: build
   script:
     - pip install -r requirements.txt
-    - pip install wheel
-    - python setup.py sdist bdist_wheel
+    - pip install -r requirements_deploy.txt
+    - make build
 
 releases:
   <<: *pyenv
@@ -92,8 +92,8 @@ releases:
   when: manual
   script:
     - pip install -r requirements.txt
-    - pip install wheel
-    - python setup.py sdist bdist_wheel
+    - pip install -r requirements_deploy.txt
+    - make build
     - pip install twine
     - twine upload dist/* --username duniter --password $PYPI_PASSWORD
 
