@@ -105,13 +105,12 @@ Packaging and deploy
 Pypi
 ++++
 
-In the development pyenv environment, install the following tools::
+In the development pyenv environment, install the build and deploy tools::
 
-    pip install --upgrade pip setuptools wheel
-
+    pip install --upgrade -r requirements_deploy.txt
     pip install twine
 
-Change the version number (semantic version number)::
+Change and commit and tag the new version number (semantic version number)::
 
     ./release.sh 0.42.3
 
