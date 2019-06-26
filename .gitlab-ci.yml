@@ -12,12 +12,11 @@ image: registry.duniter.org/docker/python3/duniterpy-builder:0.0.4
 
 # SUB-TASKS
 .push_to_github: &push_to_github
-  stage: github-sync
   variables:
     GIT_STRATEGY: none
   tags:
     - github
-  script:
+  after_script:
     - rm -rf ./*
     - rm -rf .git
     - git clone --mirror $CI_REPOSITORY_URL .
@@ -48,11 +47,6 @@ image: registry.duniter.org/docker/python3/duniterpy-builder:0.0.4
       - setup.py
       - tests/**/*.py
 
-.release_pip: &release_pip
-  script:
-    - pip install twine
-    - twine upload dist/* --username duniter --password $PYPI_PASSWORD
-
 # TASKS
 format:
   <<: *pyenv
@@ -82,7 +76,7 @@ check:
     - make mypy
     - make pylint
 
-build: &build
+build:
   <<: *pyenv
   <<: *changes
   stage: build
@@ -93,9 +87,13 @@ build: &build
 
 releases:
   <<: *pyenv
-  <<: *build
-  <<: *release_pip
   <<: *push_to_github
   stage: release
   when: manual
+  script:
+    - pip install -r requirements.txt
+    - pip install wheel
+    - python setup.py sdist bdist_wheel
+    - pip install twine
+    - twine upload dist/* --username duniter --password $PYPI_PASSWORD
 
