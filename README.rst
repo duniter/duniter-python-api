@@ -108,7 +108,6 @@ Pypi
 In the development pyenv environment, install the build and deploy tools::
 
     pip install --upgrade -r requirements_deploy.txt
-    pip install twine
 
 Change and commit and tag the new version number (semantic version number)::
 
@@ -118,7 +117,16 @@ Build the Pypi package in the ``dist`` folder::
 
     make build
 
-Deploy the package on the Pypi repository::
+Deploy the package on the Pypi test repository (use a space before make to not keep command with password in shell history)::
 
-    twine upload dist/*
+    [SPACE]make deploy_test PYPI_TEST_LOGIN=xxxx PYPI_TEST_PASSWORD=xxxx
+
+Install the package from Pypi test repository::
+
+    pip install --index-url https://test.pypi.org/simple/ --extra-index-url https://pypi.python.org/simple/ duniterpy
+
+Deploy the package on the Pypi repository (use a space before make to not keep command with password in shell history)::
+
+    [SPACE]make deploy PYPI_LOGIN=xxxx PYPI_PASSWORD=xxxx
+
 

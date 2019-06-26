@@ -1,4 +1,5 @@
-.PHONY: docs tests check check-format mypy pylint format
+.PHONY: docs tests check check-format mypy pylint format deploy deploy_test
+.SILENT: deploy deploy_test # do not echo commands with password
 
 # generate documentation
 docs:
@@ -40,3 +41,11 @@ build:
 	if [ -d "./build" ]; then rm -r build/*; fi
 	if [ -d "./dist" ]; then rm -r dist/*; fi
 	python setup.py sdist bdist_wheel
+
+# upload on PyPi repository
+deploy:
+	twine upload dist/* --username ${PYPI_LOGIN} --password ${PYPI_PASSWORD}
+
+# upload on PyPi test repository
+deploy_test:
+	twine upload dist/* --username ${PYPI_TEST_LOGIN} --password ${PYPI_TEST_PASSWORD} --repository-url https://test.pypi.org/legacy/
