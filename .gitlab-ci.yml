@@ -11,7 +11,7 @@ variables:
 image: registry.duniter.org/docker/python3/duniterpy-builder:0.0.4
 
 # SUB-TASKS
-.push_to_github: &push_to_github
+.push_to_github:
   variables:
     GIT_STRATEGY: none
   tags:
@@ -28,7 +28,7 @@ image: registry.duniter.org/docker/python3/duniterpy-builder:0.0.4
     - mv packed-refs-new packed-refs
     - bash -c "git push --force --mirror github 2>&1 | grep -v duniter-gitlab; echo $?"
 
-.pyenv: &pyenv
+.pyenv:
   tags:
     - redshift-docker-python
   before_script:
@@ -37,7 +37,7 @@ image: registry.duniter.org/docker/python3/duniterpy-builder:0.0.4
     - eval "$(pyenv init -)"
     - pyenv shell $PYENV_PYTHON_VERSION
 
-.changes: &changes
+.changes:
   only:
     changes:
       - duniterpy/**/*.py
@@ -50,8 +50,9 @@ image: registry.duniter.org/docker/python3/duniterpy-builder:0.0.4
 
 # TASKS
 format:
-  <<: *pyenv
-  <<: *changes
+  extends:
+    - .pyenv
+    - .changes
   stage: format
   script:
     - pyenv shell 3.6.4  # black install and run needs python 3.6.x minimum
@@ -59,16 +60,18 @@ format:
     - make check-format
 
 test:
-  <<: *pyenv
-  <<: *changes
+  extends:
+    - .pyenv
+    - .changes
   stage: test
   script:
     - pip install -r requirements.txt
     - make tests
 
 check:
-  <<: *pyenv
-  <<: *changes
+  extends:
+    - .pyenv
+    - .changes
   stage: test
   script:
     - pyenv shell 3.6.4  # black install needs python 3.6.x minimum
@@ -78,8 +81,9 @@ check:
     - make pylint
 
 build:
-  <<: *pyenv
-  <<: *changes
+  extends:
+    - .pyenv
+    - .changes
   stage: build
   script:
     - pip install -r requirements.txt
@@ -87,8 +91,9 @@ build:
     - make build
 
 release:
-  <<: *pyenv
-  <<: *push_to_github
+  extends:
+    - .pyenv
+    - .push_to_github
   stage: release
   when: manual
   script:
@@ -100,7 +105,7 @@ release:
     - tags
 
 release_test:
-  <<: *pyenv
+  extends: .pyenv
   stage: release
   when: manual
   script:
