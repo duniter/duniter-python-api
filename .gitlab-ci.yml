@@ -14,17 +14,19 @@ image: registry.duniter.org/docker/python3/duniterpy-builder:0.0.4
   tags:
     - github
   after_script:
-    # remove last clone
+    # remove all files in current repo
     - rm -rf ./*
-    - rm -rf .git
-    # do a mirror clone
+    - rm -rf .git*
+    # do a mirror clone in current repo
     - git clone --mirror $CI_REPOSITORY_URL .
+    # do config for github push
     - git remote add github $GITHUB_URL_AND_KEY
     - git config --global user.email "contact@duniter.org"
     - git config --global user.name "Duniter"
-    # Job would fail if we don't remove refs about pull requests
-    - bash -c "cat packed-refs | grep -v 'refs/pull' > packed-refs-new; echo 'Removed pull refs.'"
+    # remove refs about merge requests
+    - bash -c "cat packed-refs | grep -v 'refs/merge-requests' > packed-refs-new; echo 'Removed merge-requests refs.'"
     - mv packed-refs-new packed-refs
+    # github push
     - bash -c "git push --force --mirror github 2>&1 | grep -v duniter-gitlab; echo $?"
 
 .pyenv:
