@@ -3,7 +3,6 @@ stages:
   - test
   - build
   - release
-  - github-sync
 
 variables:
     PYENV_PYTHON_VERSION: 3.5.5
