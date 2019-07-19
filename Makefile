@@ -1,4 +1,4 @@
-.PHONY: docs tests check check-format mypy pylint format deploy deploy_test
+.PHONY: docs tests check check-format mypy pylint format build deploy deploy_test
 .SILENT: deploy deploy_test # do not echo commands with password
 
 # generate documentation
