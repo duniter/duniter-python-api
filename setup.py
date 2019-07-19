@@ -1,4 +1,4 @@
-from setuptools import setup
+from setuptools import setup, find_packages
 import duniterpy
 import os
 import re
@@ -47,7 +47,7 @@ setup(
 
     version=duniterpy.__version__,
 
-    packages=['duniterpy'],
+    packages=find_packages(exclude=["tests*"]),
 
     package_data={"duniterpy": ["py.typed"]},
 
