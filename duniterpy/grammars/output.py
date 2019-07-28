@@ -1,4 +1,4 @@
-from typing import Optional, TypeVar, Type, Any
+from typing import Optional, TypeVar, Type, Any, Union
 
 from pypeg2 import re, attr, Keyword, Enum, contiguous, maybe_some, whitespace, K
 
@@ -321,9 +321,9 @@ class Condition:
         :param value: Content of the condition as string
         """
         self.value = value
-        self.left = ""
-        self.right = ""
-        self.op = ""
+        self.left = ""  # type: Union[str, Condition]
+        self.right = ""  # type: Union[str, Condition]
+        self.op = ""  # type: Union[str, Condition]
 
     def __eq__(self, other: Any) -> bool:
         """

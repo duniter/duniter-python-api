@@ -1,9 +1,9 @@
-from typing import Union, Type, Any
-from duniterpy.grammars.output import SIG, CSV, CLTV, XHX, ConditionType
+from typing import Union, Any
+from duniterpy.grammars.output import SIG, CSV, CLTV, XHX, Condition
 
 
 def output_available(
-    condition: Type[ConditionType], comparison: Any, value: Union[str, int]
+    condition: Condition, comparison: Any, value: Union[str, int]
 ) -> bool:
     """
     Check if output source is available
@@ -14,13 +14,13 @@ def output_available(
     operator.gt(a, b) is equivalent to a > b
     operator.ge(a, b) is equivalent to a >= b
     """
-    if type(condition.left) == SIG:
+    if isinstance(condition.left, SIG):
         return comparison(condition.left.pubkey, value)
-    if type(condition.left) == CSV:
+    if isinstance(condition.left, CSV):
         return comparison(int(condition.left.time), value)
-    if type(condition.left) == CLTV:
+    if isinstance(condition.left, CLTV):
         return comparison(int(condition.left.timestamp), value)
-    if type(condition.left) == XHX:
+    if isinstance(condition.left, XHX):
         return comparison(condition.left.sha_hash, value)
-    else:
-        return False
+
+    return False
