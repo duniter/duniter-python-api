@@ -103,6 +103,7 @@ release:
     - make build
     - make deploy PYPI_LOGIN=${PYPI_LOGIN} PYPI_PASSWORD=${PYPI_PASSWORD}
   only:
+    - tags
     - master
 
 release_test:
