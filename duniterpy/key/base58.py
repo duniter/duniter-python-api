@@ -2,7 +2,7 @@ from typing import Union
 
 import base58
 
-from ..helpers import ensure_str, ensure_bytes
+from ..tools import ensure_str, ensure_bytes
 
 
 class Base58Encoder:

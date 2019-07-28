@@ -13,7 +13,7 @@ from pylibscrypt import scrypt
 
 from .scrypt_params import ScryptParams
 from .base58 import Base58Encoder
-from ..helpers import (
+from ..tools import (
     ensure_bytes,
     xor_bytes,
     convert_seedhex_to_seed,

@@ -4,7 +4,7 @@ import base58
 import re
 import hashlib
 from ..constants import PUBKEY_REGEX
-from ..helpers import ensure_str
+from ..tools import ensure_str
 
 # required to type hint cls in classmethod
 CRCPubkeyType = TypeVar("CRCPubkeyType", bound="CRCPubkey")

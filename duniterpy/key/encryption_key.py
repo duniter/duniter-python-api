@@ -10,7 +10,7 @@ from pylibscrypt import scrypt
 
 from .scrypt_params import ScryptParams
 from .base58 import Base58Encoder
-from ..helpers import ensure_bytes
+from ..tools import ensure_bytes
 
 
 class SecretKey(libnacl.public.SecretKey):
