@@ -1,3 +1,8 @@
+## v0.55.1 (19th July 2019)
+- #102: wheel build does not longer include `duniterpy` sub-folders
+- Trigger release only on `master` not on tag as protected environment variables are not shared with pipelines started on a tag
+- Fix Makefile: rebuild not working
+
 ## [v0.55.0](https://git.duniter.org/clients/python/duniterpy/-/milestones/9) (18th July 2019)
 ### Code
 - Refactor request `api.ws2p.heads` in `api.bma.network.ws2p_heads` (BMA command to get ws2p heads)
