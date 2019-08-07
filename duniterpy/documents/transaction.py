@@ -847,14 +847,14 @@ Currency: {1}
 
         :return:
 
-        "TX:VERSION:NB_ISSUERS:NB_INPUTS:NB_UNLOCKS:NB_OUTPUTS:HAS_COMMENT:LOCKTIME
-PUBLIC_KEY:INDEX
-...
-INDEX:SOURCE:FINGERPRINT:AMOUNT
-...
-PUBLIC_KEY:AMOUNT
-...
-COMMENT"
+        TX:VERSION:NB_ISSUERS:NB_INPUTS:NB_UNLOCKS:NB_OUTPUTS:HAS_COMMENT:LOCKTIME
+        PUBLIC_KEY:INDEX
+        ...
+        INDEX:SOURCE:FINGERPRINT:AMOUNT
+        ...
+        PUBLIC_KEY:AMOUNT
+        ...
+        COMMENT
 """
         doc = "TX:{0}:{1}:{2}:{3}:{4}:{5}:{6}\n".format(
             self.version,
