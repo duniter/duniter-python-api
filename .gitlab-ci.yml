@@ -3,6 +3,7 @@ stages:
   - test
   - build
   - release
+  - publish_doc
 
 variables:
     PYENV_PYTHON_VERSION: 3.5.5
@@ -115,3 +116,21 @@ release_test:
     - pip install -r requirements_deploy.txt
     - make build
     - make deploy_test PYPI_TEST_LOGIN=${PYPI_TEST_LOGIN} PYPI_TEST_PASSWORD=${PYPI_TEST_PASSWORD}
+
+pages:
+  extends: .pyenv
+  stage: publish_doc
+  when: manual
+  only:
+    - tags
+    - master
+  script:
+    - pip install -r requirements.txt
+    - pip install -r requirements_dev.txt
+    - make docs
+    - mv docs/_build/html public
+    - ls public
+  artifacts:
+    untracked: true
+    paths:
+      - public

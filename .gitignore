@@ -39,3 +39,6 @@ nosetests.xml
 docs/_build
 docs/duniterpy.*
 .mypy_cache
+
+# gitlab pages
+/public/
