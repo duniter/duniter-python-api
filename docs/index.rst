@@ -13,6 +13,11 @@ Duniterpy helps to handle the following problem :
 * Request nodes in a non-blocking way
 * Handle duniter signing keys
 
+Requirements
+------------
+
+Duniterpy requires Python 3.5.x minimum.
+
 Installation
 ------------
 
