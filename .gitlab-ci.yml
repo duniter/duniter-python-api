@@ -124,7 +124,9 @@ pages:
   only:
     - tags
     - master
+    - doc_on_gitlab-pages
   script:
+    - pyenv shell 3.6.4  # black install needs python 3.6.x minimum
     - pip install -r requirements.txt
     - pip install -r requirements_dev.txt
     - make docs
