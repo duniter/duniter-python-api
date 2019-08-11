@@ -40,9 +40,14 @@ You can install duniter-python-api and all its dependencies via the following pi
 Documentation
 -------------
 
-`Examples <https://git.duniter.org/clients/python/duniterpy/tree/master/examples>`_ folder is full of scripts to help you!
+Online official autodoc documentation: https://clients.duniter.io/python/duniterpy/index.html
 
-But you can also generate and read the autodoc:
+`Examples folder <https://git.duniter.org/clients/python/duniterpy/tree/master/examples>`_ is full of scripts to help you!
+
+Please take a look at the document `HTTP API <https://git.duniter.org/nodes/typescript/duniter/blob/master/doc/HTTP_API.md>`_
+to learn more about the BMA API.
+
+How to generate and read locally the autodoc:
 
 * Install Sphinx::
 
@@ -52,10 +57,7 @@ But you can also generate and read the autodoc:
 
     make docs
 
-* HTML Documentation is generated in docs/_build/html folder.
-
-Please take a look at the document `HTTP API <https://git.duniter.org/nodes/typescript/duniter/blob/master/doc/HTTP_API.md>`_
-to learn more about the BMA API.
+* HTML Documentation is generated in `docs/_build/html` folder.
 
 Development
 -----------
