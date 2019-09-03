@@ -57,7 +57,8 @@ setup(
 
     description="A python library for [duniter](https://git.duniter.org/nodes/typescript/duniter) client developers",
 
-    long_description=open('README.rst').read(),
+    long_description=open('README.md').read(),
+    long_description_content_type="text/markdown",
 
     # Active la prise en compte du fichier MANIFEST.in
     include_package_data=True,
