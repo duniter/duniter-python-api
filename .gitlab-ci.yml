@@ -77,7 +77,6 @@ check:
   stage: test
   script:
     - pyenv shell 3.6.4  # black install needs python 3.6.x minimum
-    - pip install -r requirements.txt
     - pip install -r requirements_dev.txt
     - make mypy
     - make pylint
@@ -88,7 +87,6 @@ build:
     - .changes
   stage: build
   script:
-    - pip install -r requirements.txt
     - pip install -r requirements_deploy.txt
     - make build
 
@@ -99,7 +97,6 @@ release:
   stage: release
   when: manual
   script:
-    - pip install -r requirements.txt
     - pip install -r requirements_deploy.txt
     - make build
     - make deploy PYPI_LOGIN=${PYPI_LOGIN} PYPI_PASSWORD=${PYPI_PASSWORD}
@@ -112,7 +109,6 @@ release_test:
   stage: release
   when: manual
   script:
-    - pip install -r requirements.txt
     - pip install -r requirements_deploy.txt
     - make build
     - make deploy_test PYPI_TEST_LOGIN=${PYPI_TEST_LOGIN} PYPI_TEST_PASSWORD=${PYPI_TEST_PASSWORD}
@@ -126,7 +122,6 @@ pages:
     - master
   script:
     - pyenv shell 3.6.4  # black install needs python 3.6.x minimum
-    - pip install -r requirements.txt
     - pip install -r requirements_dev.txt
     - make docs
     - mv docs/_build/html public
