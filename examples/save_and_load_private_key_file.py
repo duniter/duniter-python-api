@@ -1,6 +1,7 @@
 from duniterpy.key import SigningKey
 import getpass
 import os
+import sys
 
 if "XDG_CONFIG_HOME" in os.environ:
     home_path = os.environ["XDG_CONFIG_HOME"]
@@ -35,7 +36,7 @@ signer = SigningKey.from_credentials(salt, password)
 # check public key
 if signer.pubkey != pubkey:
     print("Bad credentials!")
-    exit(1)
+    sys.exit(1)
 
 # save private keys in a file (json format)
 signer.save_private_key(PRIVATE_KEYS_FILE_PATH)
@@ -49,4 +50,4 @@ loaded_signer = SigningKey.from_private_key(PRIVATE_KEYS_FILE_PATH)  # type: Sig
 # check public key from file
 print("Public key %s loaded from file %s" % (pubkey, PRIVATE_KEYS_FILE_PATH))
 
-exit(0)
+sys.exit(0)

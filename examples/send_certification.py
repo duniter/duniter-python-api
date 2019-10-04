@@ -1,3 +1,4 @@
+import sys
 import asyncio
 import getpass
 from typing import Optional
@@ -114,7 +115,7 @@ async def main():
         print("Identity not found for pubkey {0}".format(pubkey_to))
         # Close client aiohttp session
         await client.close()
-        exit(1)
+        sys.exit(1)
 
     # send the Certification document to the node
     certification = get_certification_document(current_block, identity, pubkey_from)

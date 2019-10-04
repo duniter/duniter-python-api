@@ -1,6 +1,7 @@
 import asyncio
 import getpass
 import os
+import sys
 from typing import Optional
 
 import duniterpy.api.bma as bma
@@ -123,7 +124,7 @@ async def main():
     # check public key
     if signer.pubkey != pubkey:
         print("Bad credentials!")
-        exit(0)
+        sys.exit(0)
 
     # capture current block to get currency name
     current_block = await client(bma.blockchain.current)
@@ -134,7 +135,7 @@ async def main():
         print("Identity not found for pubkey {0}".format(pubkey))
         # Close client aiohttp session
         await client.close()
-        exit(1)
+        sys.exit(1)
 
     # get the revoke document
     revocation_signed_raw_document = get_signed_raw_revocation_document(

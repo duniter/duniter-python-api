@@ -1,3 +1,4 @@
+import sys
 import asyncio
 import getpass
 
@@ -120,7 +121,7 @@ async def main():
 
     if len(response["sources"]) == 0:
         print("no sources found for account %s" % pubkey_to)
-        exit(1)
+        sys.exit(1)
 
     # get the first source
     source = response["sources"][0]
