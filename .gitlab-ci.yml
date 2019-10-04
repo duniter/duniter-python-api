@@ -6,9 +6,10 @@ stages:
   - publish_doc
 
 variables:
-    PYENV_PYTHON_VERSION: 3.5.5
+  DOCKER_IMAGE: "registry.duniter.org/docker/python3/poetry"
+  PYTHON_VERSION: "3.5"
 
-image: registry.duniter.org/docker/python3/duniterpy-builder:0.0.4
+image: $DOCKER_IMAGE/$PYTHON_VERSION:latest
 
 # SUB-TASKS
 .push_to_github:
@@ -30,15 +31,6 @@ image: registry.duniter.org/docker/python3/duniterpy-builder:0.0.4
     # github push
     - bash -c "git push --force --mirror github 2>&1 | grep -v duniter-gitlab; echo $?"
 
-.pyenv:
-  tags:
-    - redshift-docker-python
-  before_script:
-    - export PYENV_ROOT="$HOME/.pyenv"
-    - export PATH="$PYENV_ROOT/bin:$PATH"
-    - eval "$(pyenv init -)"
-    - pyenv shell $PYENV_PYTHON_VERSION
-
 .changes:
   only:
     changes:
@@ -53,17 +45,15 @@ image: registry.duniter.org/docker/python3/duniterpy-builder:0.0.4
 # TASKS
 format:
   extends:
-    - .pyenv
     - .changes
   stage: format
+  image: $DOCKER_IMAGE/3.8:latest
   script:
-    - pyenv shell 3.6.4  # black install and run needs python 3.6.x minimum
     - pip install -r requirements_dev.txt
     - make check-format
 
 test:
   extends:
-    - .pyenv
     - .changes
   stage: test
   script:
@@ -72,18 +62,15 @@ test:
 
 check:
   extends:
-    - .pyenv
     - .changes
   stage: test
   script:
-    - pyenv shell 3.6.4  # black install needs python 3.6.x minimum
     - pip install -r requirements_dev.txt
     - make mypy
     - make pylint
 
 build:
   extends:
-    - .pyenv
     - .changes
   stage: build
   script:
@@ -92,7 +79,6 @@ build:
 
 release:
   extends:
-    - .pyenv
     - .push_to_github
   stage: release
   when: manual
@@ -105,7 +91,6 @@ release:
     - master
 
 release_test:
-  extends: .pyenv
   stage: release
   when: manual
   script:
@@ -114,14 +99,12 @@ release_test:
     - make deploy_test PYPI_TEST_LOGIN=${PYPI_TEST_LOGIN} PYPI_TEST_PASSWORD=${PYPI_TEST_PASSWORD}
 
 pages:
-  extends: .pyenv
   stage: publish_doc
   when: manual
   only:
     - tags
     - master
   script:
-    - pyenv shell 3.6.4  # black install needs python 3.6.x minimum
     - pip install -r requirements_dev.txt
     - make docs
     - mv docs/_build/html public
