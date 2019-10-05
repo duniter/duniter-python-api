@@ -37,10 +37,8 @@ image: $DOCKER_IMAGE/$PYTHON_VERSION:latest
       - duniterpy/**/*.py
       - .gitlab-ci.yml
       - Makefile
-      - requirements_dev.txt
-      - requirements.txt
-      - setup.py
       - tests/**/*.py
+      - pyproject.toml
 
 # TASKS
 format:
