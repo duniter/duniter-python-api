@@ -47,7 +47,6 @@ format:
   stage: format
   image: $DOCKER_IMAGE/3.8:latest
   script:
-    - pip install -r requirements_dev.txt
     - make check-format
 
 test:
@@ -55,7 +54,7 @@ test:
     - .changes
   stage: test
   script:
-    - pip install -r requirements.txt
+    - poetry install --no-dev
     - make tests
 
 check:
@@ -63,7 +62,7 @@ check:
     - .changes
   stage: test
   script:
-    - pip install -r requirements_dev.txt
+    - poetry install
     - make mypy
     - make pylint
 
@@ -72,8 +71,7 @@ build:
     - .changes
   stage: build
   script:
-    - pip install -r requirements_deploy.txt
-    - make build
+    - poetry build
 
 release:
   extends:
@@ -81,9 +79,7 @@ release:
   stage: release
   when: manual
   script:
-    - pip install -r requirements_deploy.txt
-    - make build
-    - make deploy PYPI_LOGIN=${PYPI_LOGIN} PYPI_PASSWORD=${PYPI_PASSWORD}
+    - poetry publish --build --username $PYPI_LOGIN --password $PYPI_PASSWORD
   only:
     - tags
     - master
@@ -92,9 +88,8 @@ release_test:
   stage: release
   when: manual
   script:
-    - pip install -r requirements_deploy.txt
-    - make build
-    - make deploy_test PYPI_TEST_LOGIN=${PYPI_TEST_LOGIN} PYPI_TEST_PASSWORD=${PYPI_TEST_PASSWORD}
+    - poetry config repositories.pypi_test https://test.pypi.org/legacy/
+    - poetry publish --build --username $PYPI_TEST_LOGIN --password $PYPI_TEST_PASSWORD --repository pypi_test
 
 pages:
   stage: publish_doc
@@ -103,7 +98,7 @@ pages:
     - tags
     - master
   script:
-    - pip install -r requirements_dev.txt
+    - poetry install
     - make docs
     - mv docs/_build/html public
     - ls public
