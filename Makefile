@@ -3,26 +3,26 @@
 
 # generate documentation
 docs:
-	cd docs && rm duniterpy.*; sphinx-apidoc -o . ../duniterpy && make clean && make html && cd ..
+	cd docs && rm duniterpy.*; poetry run sphinx-apidoc -o . ../duniterpy && make clean && make html && cd ..
 
 # run tests
 tests:
-	python3 -m unittest ${TESTS_FILTER}
+	poetry run python3 -m unittest ${TESTS_FILTER}
 
 # check
 check: mypy pylint check-format
 
 # check static typing
 mypy:
-	python3 -m mypy duniterpy --ignore-missing-imports
-	python3 -m mypy tests --ignore-missing-imports
-	python3 -m mypy examples --ignore-missing-imports
+	 poetry run mypy duniterpy --ignore-missing-imports
+	 poetry run mypy tests --ignore-missing-imports
+	 poetry run mypy examples --ignore-missing-imports
 
 # check code errors
 pylint:
-	pylint --disable=C,R0902,R0903,R0904,R0912,R0913,R0914,R0915,W0613 --enable=C0121,C0202,C0321 --jobs=0 duniterpy/
-	pylint --disable=C,R0902,R0903,R0904,R0912,R0913,R0914,R0915,W0613 --enable=C0121,C0202,C0321 --jobs=0 tests/
-	pylint --disable=C,R0902,R0903,R0904,R0912,R0913,R0914,R0915,W0613 --enable=C0121,C0202,C0321 --jobs=0 examples/
+	poetry run pylint --disable=C,R0902,R0903,R0904,R0912,R0913,R0914,R0915,W0613 --enable=C0121,C0202,C0321 --jobs=0 duniterpy/
+	poetry run pylint --disable=C,R0902,R0903,R0904,R0912,R0913,R0914,R0915,W0613 --enable=C0121,C0202,C0321 --jobs=0 tests/
+	poetry run pylint --disable=C,R0902,R0903,R0904,R0912,R0913,R0914,R0915,W0613 --enable=C0121,C0202,C0321 --jobs=0 examples/
 
 # check format
 check-format:
@@ -44,8 +44,9 @@ build:
 
 # upload on PyPi repository
 deploy:
-	twine upload dist/* --username ${PYPI_LOGIN} --password ${PYPI_PASSWORD}
+	poetry publish --build --username ${PYPI_LOGIN} --password ${PYPI_PASSWORD} --repository pypi_test
 
 # upload on PyPi test repository
 deploy_test:
-	twine upload dist/* --username ${PYPI_TEST_LOGIN} --password ${PYPI_TEST_PASSWORD} --repository-url https://test.pypi.org/legacy/
+	poetry config repositories.pypi_test https://test.pypi.org/legacy/
+	poetry publish --build --username ${PYPI_TEST_LOGIN} --password ${PYPI_TEST_PASSWORD} --repository pypi_test
