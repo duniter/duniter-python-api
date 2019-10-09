@@ -30,6 +30,12 @@ You can install DuniterPy and its dependencies with the following command:
 pip3 install duniterpy --user
 ```
 
+## Install the development environement
+- Install [Poetry](https://poetry.eustace.io):
+```bash
+curl -sSL https://raw.githubusercontent.com/sdispater/poetry/master/get-poetry.py | python --preview
+```
+
 ## Documentation
 Online official automaticaly generated documentation: https://clients.duniter.io/python/duniterpy/index.html
 
@@ -41,7 +47,7 @@ How to generate and read locally the autodoc:
 
 - Install Sphinx
 ```bash
-pip install -r requirements_dev.txt
+poetry install -E sphinx
 ```
 
 - Generate documentation
@@ -55,29 +61,24 @@ make docs
 * When writing docstrings, use the reStructuredText format recommended by https://www.python.org/dev/peps/pep-0287/#docstring-significant-features
 * Use make commands to check the code and the format it correct.
 
-The development tools require Python 3.6.x or higher.
+Black, the formatting tool, requires Python 3.6 or higher.
 
-* Create a python virtual environment with [pyenv](https://github.com/pyenv/pyenv)
+* Install runtime dependencies
 ```bash
-curl -L https://github.com/pyenv/pyenv-installer/raw/master/bin/pyenv-installer | bash
-```
-
-* Install dependencies
-```bash
-pip install -r requirements.txt
+poetry install --no-dev
 ```
 
 * Have a look at the examples folder
 * Run examples from parent folder
 ```bash
-PYTHONPATH=`pwd` python examples/request_data.py
+poetry run python examples/request_data.py
 ```
 
 * Before submiting a merge requests, please check the static typing and tests.
 
 * Install dev dependencies
 ```bash
-pip install -r requirements_dev.txt
+poetry instal
 ```
 
 * Check static typing with [mypy](http://mypy-lang.org/)
@@ -97,11 +98,6 @@ make tests TESTS_FILTER=tests.documents.test_block.TestBlock.test_fromraw
 
 ## Packaging and deploy
 ### PyPi
-In the development pyenv environment, install the tools to build and deploy
-```bash
-pip install --upgrade -r requirements_deploy.txt
-```
-
 Change and commit and tag the new version number (semantic version number)
 ```bash
 ./release.sh 0.42.3
@@ -109,7 +105,7 @@ Change and commit and tag the new version number (semantic version number)
 
 Build the PyPi package in the `dist` folder
 ```bash
-make build
+Noetry build
 ```
 
 Deploy the package to PyPi test repository (prefix the command with a space in order for the shell not to save in its history system the command containing the password)
