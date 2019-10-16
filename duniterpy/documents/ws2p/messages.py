@@ -4,7 +4,7 @@ from typing import Optional, Any
 
 from duniterpy.documents import Document
 from duniterpy.key import VerifyingKey, SigningKey
-from duniterpy.helpers import get_ws2p_challenge
+from duniterpy.tools import get_ws2p_challenge
 
 
 class Connect(Document):
