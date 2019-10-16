@@ -8,7 +8,7 @@ import aiohttp
 import jsonschema
 from jsonschema import ValidationError
 
-from duniterpy.helpers import get_ws2p_challenge
+from duniterpy.tools import get_ws2p_challenge
 from duniterpy.key import SigningKey
 
 from duniterpy.api import ws2p
@@ -73,7 +73,7 @@ async def main():
             await ws.send_str(connect_message)
 
             # Iterate on each message received...
-            async for msg in ws:
+            async for msg in ws:  # type: aiohttp.WSMessage
 
                 # Display incoming message from peer
                 print(msg)
@@ -162,14 +162,14 @@ async def main():
                 parse_text(response_str, requests.BLOCK_RESPONSE_SCHEMA)
                 # If valid display response
                 print("Response: " + response_str)
-            except ValidationError as exception:
+            except ValidationError:
                 # If invalid response...
                 try:
                     # Check error response format
                     parse_text(response_str, requests.ERROR_RESPONSE_SCHEMA)
                     # If valid, display error response
                     print("Error response: " + response_str)
-                except ValidationError as e:
+                except ValidationError as exception:
                     # If invalid, display exception on response validation
                     print(exception)
 
@@ -189,14 +189,14 @@ async def main():
                 parse_text(response_str, requests.BLOCK_RESPONSE_SCHEMA)
                 # If valid display response
                 print("Response: " + response_str)
-            except ValidationError as exception:
+            except ValidationError:
                 # If invalid response...
                 try:
                     # Check error response format
                     parse_text(response_str, requests.ERROR_RESPONSE_SCHEMA)
                     # If valid, display error response
                     print("Error response: " + response_str)
-                except ValidationError as e:
+                except ValidationError as exception:
                     # If invalid, display exception on response validation
                     print(exception)
 
@@ -216,14 +216,14 @@ async def main():
                 parse_text(response_str, requests.BLOCKS_RESPONSE_SCHEMA)
                 # If valid display response
                 print("Response: " + response_str)
-            except ValidationError as exception:
+            except ValidationError:
                 # If invalid response...
                 try:
                     # Check error response format
                     parse_text(response_str, requests.ERROR_RESPONSE_SCHEMA)
                     # If valid, display error response
                     print("Error response: " + response_str)
-                except ValidationError as e:
+                except ValidationError as exception:
                     # If invalid, display exception on response validation
                     print(exception)
 
@@ -242,14 +242,14 @@ async def main():
                 parse_text(response_str, requests.REQUIREMENTS_RESPONSE_SCHEMA)
                 # If valid display response
                 print("Response: " + response_str)
-            except ValidationError as exception:
+            except ValidationError:
                 # If invalid response...
                 try:
                     # Check error response format
                     parse_text(response_str, requests.ERROR_RESPONSE_SCHEMA)
                     # If valid, display error response
                     print("Error response: " + response_str)
-                except ValidationError as e:
+                except ValidationError as exception:
                     # If invalid, display exception on response validation
                     print(exception)
 
