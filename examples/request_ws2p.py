@@ -83,24 +83,35 @@ async def main():
                     # print(msg.data)
                     try:
                         # Validate json string with jsonschema and return a dict
-                        data = parse_text(msg.data, ws2p.network.WS2P_CONNECT_MESSAGE_SCHEMA)
+                        data = parse_text(
+                            msg.data, ws2p.network.WS2P_CONNECT_MESSAGE_SCHEMA
+                        )
 
                     except jsonschema.exceptions.ValidationError:
                         try:
                             # Validate json string with jsonschema and return a dict
-                            data = parse_text(msg.data, ws2p.network.WS2P_ACK_MESSAGE_SCHEMA)
+                            data = parse_text(
+                                msg.data, ws2p.network.WS2P_ACK_MESSAGE_SCHEMA
+                            )
 
                         except jsonschema.exceptions.ValidationError:
                             try:
                                 # Validate json string with jsonschema and return a dict
-                                data = parse_text(msg.data, ws2p.network.WS2P_OK_MESSAGE_SCHEMA)
+                                data = parse_text(
+                                    msg.data, ws2p.network.WS2P_OK_MESSAGE_SCHEMA
+                                )
 
                             except jsonschema.exceptions.ValidationError:
                                 continue
 
                             print("Received a OK message")
 
-                            Ok(CURRENCY, remote_connect_document.pubkey, connect_document.challenge, data["sig"])
+                            Ok(
+                                CURRENCY,
+                                remote_connect_document.pubkey,
+                                connect_document.challenge,
+                                data["sig"],
+                            )
                             print("Received OK message signature is valid")
 
                             # END HANDSHAKE #######################################################
@@ -116,11 +127,17 @@ async def main():
                         print("Received a ACK message")
 
                         # Create ACK document from ACK response to verify signature
-                        Ack(CURRENCY, data["pub"], connect_document.challenge, data["sig"])
+                        Ack(
+                            CURRENCY,
+                            data["pub"],
+                            connect_document.challenge,
+                            data["sig"],
+                        )
                         print("Received ACK message signature is valid")
                         # If ACK response is ok, create OK message
-                        ok_message = Ok(CURRENCY, signing_key.pubkey, connect_document.challenge).get_signed_json(
-                            signing_key)
+                        ok_message = Ok(
+                            CURRENCY, signing_key.pubkey, connect_document.challenge
+                        ).get_signed_json(signing_key)
 
                         # Send OK message
                         print("Send OK message...")
@@ -129,12 +146,14 @@ async def main():
 
                     print("Received a CONNECT message")
 
-                    remote_connect_document = Connect(CURRENCY, data["pub"], data["challenge"], data["sig"])
+                    remote_connect_document = Connect(
+                        CURRENCY, data["pub"], data["challenge"], data["sig"]
+                    )
                     print("Received CONNECT message signature is valid")
 
-                    ack_message = Ack(CURRENCY, signing_key.pubkey,
-                                      remote_connect_document.challenge).get_signed_json(
-                        signing_key)
+                    ack_message = Ack(
+                        CURRENCY, signing_key.pubkey, remote_connect_document.challenge
+                    ).get_signed_json(signing_key)
                     # Send ACK message
                     print("Send ACK message...")
                     await ws.send_str(ack_message)
@@ -154,7 +173,9 @@ async def main():
             # Wait response with request id
             response_str = await ws.receive_str()
             while "resId" not in json.loads(response_str) or (
-                    "resId" in json.loads(response_str) and json.loads(response_str)["resId"] != request_id):
+                "resId" in json.loads(response_str)
+                and json.loads(response_str)["resId"] != request_id
+            ):
                 response_str = await ws.receive_str()
                 time.sleep(1)
             try:
@@ -181,7 +202,9 @@ async def main():
             # Wait response with request id
             response_str = await ws.receive_str()
             while "resId" not in json.loads(response_str) or (
-                    "resId" in json.loads(response_str) and json.loads(response_str)["resId"] != request_id):
+                "resId" in json.loads(response_str)
+                and json.loads(response_str)["resId"] != request_id
+            ):
                 response_str = await ws.receive_str()
                 time.sleep(1)
             try:
@@ -208,7 +231,9 @@ async def main():
             # Wait response with request id
             response_str = await ws.receive_str()
             while "resId" not in json.loads(response_str) or (
-                    "resId" in json.loads(response_str) and json.loads(response_str)["resId"] != request_id):
+                "resId" in json.loads(response_str)
+                and json.loads(response_str)["resId"] != request_id
+            ):
                 response_str = await ws.receive_str()
                 time.sleep(1)
             try:
@@ -234,7 +259,9 @@ async def main():
             # Wait response with request id
             response_str = await ws.receive_str()
             while "resId" not in json.loads(response_str) or (
-                    "resId" in json.loads(response_str) and json.loads(response_str)["resId"] != request_id):
+                "resId" in json.loads(response_str)
+                and json.loads(response_str)["resId"] != request_id
+            ):
                 response_str = await ws.receive_str()
                 time.sleep(1)
             try:

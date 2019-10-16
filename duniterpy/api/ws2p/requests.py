@@ -5,37 +5,28 @@ from duniterpy.api.bma.blockchain import BLOCK_SCHEMA, BLOCKS_SCHEMA
 ERROR_RESPONSE_SCHEMA = {
     "type": "object",
     "properties": {
-        "resId": {
-            "type": "string",
-            "pattern": "^[0-9,a-z,A-Z]{8}$"
-        },
-        "err": {"type": "string"}
+        "resId": {"type": "string", "pattern": "^[0-9,a-z,A-Z]{8}$"},
+        "err": {"type": "string"},
     },
-    "required": ["resId", "err"]
+    "required": ["resId", "err"],
 }
 
 BLOCK_RESPONSE_SCHEMA = {
     "type": "object",
     "properties": {
-        "resId": {
-            "type": "string",
-            "pattern": "^[0-9,a-z,A-Z]{8}$"
-        },
-        "body": BLOCK_SCHEMA
+        "resId": {"type": "string", "pattern": "^[0-9,a-z,A-Z]{8}$"},
+        "body": BLOCK_SCHEMA,
     },
-    "required": ["resId", "body"]
+    "required": ["resId", "body"],
 }
 
 BLOCKS_RESPONSE_SCHEMA = {
     "type": "object",
     "properties": {
-        "resId": {
-            "type": "string",
-            "pattern": "^[0-9,a-z,A-Z]{8}$"
-        },
-        "body": BLOCKS_SCHEMA
+        "resId": {"type": "string", "pattern": "^[0-9,a-z,A-Z]{8}$"},
+        "body": BLOCKS_SCHEMA,
     },
-    "required": ["resId", "body"]
+    "required": ["resId", "body"],
 }
 
 REQUIREMENTS_SCHEMA = {
@@ -51,46 +42,24 @@ REQUIREMENTS_SCHEMA = {
                         "items": {
                             "type": "object",
                             "properties": {
-                                "from": {
-                                    "type": "string"
-                                },
-                                "to": {
-                                    "type": "string"
-                                },
-                                "expiresIn": {
-                                    "type": "number"
-                                },
-                                "timestamp": {
-                                    "type": "number"
-                                }
+                                "from": {"type": "string"},
+                                "to": {"type": "string"},
+                                "expiresIn": {"type": "number"},
+                                "timestamp": {"type": "number"},
                             },
-                            "required": ["from", "to", "expiresIn", "timestamp"]
-                        }
+                            "required": ["from", "to", "expiresIn", "timestamp"],
+                        },
                     },
-                    "expired": {
-                        "type": "boolean"
-                    },
-                    "isSentry": {
-                        "type": "boolean"
-                    },
-                    "membershipExpiresIn": {
-                        "type": "number"
-                    },
-                    "membershipPendingExpiresIn": {
-                        "type": "number"
-                    },
+                    "expired": {"type": "boolean"},
+                    "isSentry": {"type": "boolean"},
+                    "membershipExpiresIn": {"type": "number"},
+                    "membershipPendingExpiresIn": {"type": "number"},
                     "meta": {
                         "type": "object",
-                        "properties": {
-                            "timestamp": {
-                                "type": "string"
-                            }
-                        },
-                        "required": ["timestamp"]
+                        "properties": {"timestamp": {"type": "string"}},
+                        "required": ["timestamp"],
                     },
-                    "outdistanced": {
-                        "type": "boolean"
-                    },
+                    "outdistanced": {"type": "boolean"},
                     "pendingCerts": {
                         "type": "array",
                         "items": {
@@ -108,10 +77,16 @@ REQUIREMENTS_SCHEMA = {
                                 "target": {"type": "string"},
                                 "to": {"type": "string"},
                                 "written": {"type": "boolean", "const": False},
-                                "written_block": {"type": ["string", "null"], "const": None},
-                                "written_hash": {"type": ["string", "null"], "const": None}
-                            }
-                        }
+                                "written_block": {
+                                    "type": ["string", "null"],
+                                    "const": None,
+                                },
+                                "written_hash": {
+                                    "type": ["string", "null"],
+                                    "const": None,
+                                },
+                            },
+                        },
                     },
                     "pendingMemberships": {
                         "type": "array",
@@ -135,48 +110,50 @@ REQUIREMENTS_SCHEMA = {
                                 "type": {"type": "string"},
                                 "userid": {"type": "string"},
                                 "linked": {"type": "boolean", "const": False},
-                                "written_number": {"type": ["number", "null"], "const": None},
-                            }
-                        }
+                                "written_number": {
+                                    "type": ["number", "null"],
+                                    "const": None,
+                                },
+                            },
+                        },
                     },
-                    "pubkey": {
-                        "type": "string"
-                    },
-                    "revokation_sig": {
-                        "type": ["string", "null"]
-                    },
-                    "revoked": {
-                        "type": "boolean"
-                    },
-                    "sig": {
-                        "type": "string"
-                    },
-                    "uid": {
-                        "type": "string"
-                    },
-                    "wasMember": {
-                        "type": "boolean"
-                    },
+                    "pubkey": {"type": "string"},
+                    "revokation_sig": {"type": ["string", "null"]},
+                    "revoked": {"type": "boolean"},
+                    "sig": {"type": "string"},
+                    "uid": {"type": "string"},
+                    "wasMember": {"type": "boolean"},
                 },
-                "required": ["certifications", "expired", "isSentry", "membershipExpiresIn",
-                             "membershipPendingExpiresIn", "meta", "outdistanced", "pendingCerts",
-                             "pendingMemberships", "pubkey", "revocation_sig", "revoked", "sig", "uid", "wasMember"]
-            }
+                "required": [
+                    "certifications",
+                    "expired",
+                    "isSentry",
+                    "membershipExpiresIn",
+                    "membershipPendingExpiresIn",
+                    "meta",
+                    "outdistanced",
+                    "pendingCerts",
+                    "pendingMemberships",
+                    "pubkey",
+                    "revocation_sig",
+                    "revoked",
+                    "sig",
+                    "uid",
+                    "wasMember",
+                ],
+            },
         }
     },
-    "required": ["identities"]
+    "required": ["identities"],
 }
 
 REQUIREMENTS_RESPONSE_SCHEMA = {
     "type": "object",
     "properties": {
-        "resId": {
-            "type": "string",
-            "pattern": "^[0-9,a-z,A-Z]{8}$"
-        },
-        "body": REQUIREMENTS_SCHEMA
+        "resId": {"type": "string", "pattern": "^[0-9,a-z,A-Z]{8}$"},
+        "body": REQUIREMENTS_SCHEMA,
     },
-    "required": ["resId", "body"]
+    "required": ["resId", "body"],
 }
 
 
@@ -188,13 +165,7 @@ def get_current(request_id: str) -> str:
     """
     if not re.fullmatch("^[0-9a-zA-Z]{8}$", request_id):
         raise Exception("Invalid ws2p request unique id")
-    return json.dumps({
-        "reqId": request_id,
-        "body": {
-            "name": "CURRENT",
-            "params": {}
-        }
-    })
+    return json.dumps({"reqId": request_id, "body": {"name": "CURRENT", "params": {}}})
 
 
 def get_block(request_id: str, block_number: int) -> str:
@@ -205,15 +176,12 @@ def get_block(request_id: str, block_number: int) -> str:
     """
     if not re.fullmatch("^[0-9a-zA-Z]{8}$", request_id):
         raise Exception("Invalid ws2p request unique id")
-    return json.dumps({
-        "reqId": request_id,
-        "body": {
-            "name": "BLOCK_BY_NUMBER",
-            "params": {
-                "number": block_number
-            }
+    return json.dumps(
+        {
+            "reqId": request_id,
+            "body": {"name": "BLOCK_BY_NUMBER", "params": {"number": block_number}},
         }
-    })
+    )
 
 
 def get_blocks(request_id: str, from_number: int, count: int) -> str:
@@ -224,16 +192,15 @@ def get_blocks(request_id: str, from_number: int, count: int) -> str:
     """
     if not re.fullmatch("^[0-9a-zA-Z]{8}$", request_id):
         raise Exception("Invalid ws2p request unique id")
-    return json.dumps({
-        "reqId": request_id,
-        "body": {
-            "name": "BLOCKS_CHUNK",
-            "params": {
-                "fromNumber": from_number,
-                "count": count
-            }
+    return json.dumps(
+        {
+            "reqId": request_id,
+            "body": {
+                "name": "BLOCKS_CHUNK",
+                "params": {"fromNumber": from_number, "count": count},
+            },
         }
-    })
+    )
 
 
 def get_requirements_pending(request_id: str, min_cert: int) -> str:
@@ -244,12 +211,12 @@ def get_requirements_pending(request_id: str, min_cert: int) -> str:
     """
     if not re.fullmatch("^[0-9a-zA-Z]{8}$", request_id):
         raise Exception("Invalid ws2p request unique id")
-    return json.dumps({
-        "reqId": request_id,
-        "body": {
-            "name": "WOT_REQUIREMENTS_OF_PENDING",
-            "params": {
-                "minCert": min_cert
-            }
+    return json.dumps(
+        {
+            "reqId": request_id,
+            "body": {
+                "name": "WOT_REQUIREMENTS_OF_PENDING",
+                "params": {"minCert": min_cert},
+            },
         }
-    })
+    )

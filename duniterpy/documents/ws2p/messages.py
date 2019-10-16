@@ -11,8 +11,13 @@ class Connect(Document):
     version = 2
     auth = "CONNECT"
 
-    def __init__(self, currency: str, pubkey: str, challenge: Optional[str] = None,
-                 signature: Optional[str] = None) -> None:
+    def __init__(
+        self,
+        currency: str,
+        pubkey: str,
+        challenge: Optional[str] = None,
+        signature: Optional[str] = None,
+    ) -> None:
         """
         Init Connect message document
 
@@ -47,8 +52,9 @@ class Connect(Document):
 
         :return:
         """
-        return "WS2P:CONNECT:{currency}:{pub}:{challenge}".format(currency=self.currency, pub=self.pubkey,
-                                                                  challenge=self.challenge)
+        return "WS2P:CONNECT:{currency}:{pub}:{challenge}".format(
+            currency=self.currency, pub=self.pubkey, challenge=self.challenge
+        )
 
     def get_signed_json(self, signing_key: SigningKey) -> str:
         """
@@ -63,7 +69,7 @@ class Connect(Document):
             "auth": self.auth,
             "pub": self.pubkey,
             "challenge": self.challenge,
-            "sig": self.signatures[0]
+            "sig": self.signatures[0],
         }
         return json.dumps(data)
 
@@ -75,8 +81,13 @@ class Ack(Document):
     version = 2
     auth = "ACK"
 
-    def __init__(self, currency: str, pubkey: str, challenge: str,
-                 signature: Optional[str] = None) -> None:
+    def __init__(
+        self,
+        currency: str,
+        pubkey: str,
+        challenge: str,
+        signature: Optional[str] = None,
+    ) -> None:
         """
         Init Ack message document
 
@@ -106,8 +117,9 @@ class Ack(Document):
 
         :return:
         """
-        return "WS2P:ACK:{currency}:{pub}:{challenge}".format(currency=self.currency, pub=self.pubkey,
-                                                              challenge=self.challenge)
+        return "WS2P:ACK:{currency}:{pub}:{challenge}".format(
+            currency=self.currency, pub=self.pubkey, challenge=self.challenge
+        )
 
     def get_signed_json(self, signing_key: SigningKey) -> str:
         """
@@ -118,11 +130,7 @@ class Ack(Document):
         :return:
         """
         self.sign([signing_key])
-        data = {
-            "auth": self.auth,
-            "pub": self.pubkey,
-            "sig": self.signatures[0]
-        }
+        data = {"auth": self.auth, "pub": self.pubkey, "sig": self.signatures[0]}
         return json.dumps(data)
 
     def __str__(self) -> str:
@@ -133,8 +141,13 @@ class Ok(Document):
     version = 2
     auth = "OK"
 
-    def __init__(self, currency: str, pubkey: str, challenge: str,
-                 signature: Optional[str] = None) -> None:
+    def __init__(
+        self,
+        currency: str,
+        pubkey: str,
+        challenge: str,
+        signature: Optional[str] = None,
+    ) -> None:
         """
         Init Ok message document
 
@@ -163,8 +176,9 @@ class Ok(Document):
 
         :return:
         """
-        return "WS2P:OK:{currency}:{pub}:{challenge}".format(currency=self.currency, pub=self.pubkey,
-                                                             challenge=self.challenge)
+        return "WS2P:OK:{currency}:{pub}:{challenge}".format(
+            currency=self.currency, pub=self.pubkey, challenge=self.challenge
+        )
 
     def get_signed_json(self, signing_key: SigningKey) -> str:
         """
@@ -175,10 +189,7 @@ class Ok(Document):
         :return:
         """
         self.sign([signing_key])
-        data = {
-            "auth": self.auth,
-            "sig": self.signatures[0]
-        }
+        data = {"auth": self.auth, "sig": self.signatures[0]}
         return json.dumps(data)
 
     def __str__(self) -> str:
@@ -199,7 +210,7 @@ class DocumentMessage:
         2: "membership",
         3: "certification",
         4: "identity",
-        5: "block"
+        5: "block",
     }
 
     def get_json(self, document_type_id: int, document: str) -> str:
@@ -212,7 +223,7 @@ class DocumentMessage:
         data = {
             "body": {
                 "name": document_type_id,
-                self.DOCUMENT_TYPE_NAMES[document_type_id]: document
+                self.DOCUMENT_TYPE_NAMES[document_type_id]: document,
             }
         }
         return json.dumps(data)

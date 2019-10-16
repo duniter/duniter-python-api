@@ -21,7 +21,7 @@ from duniterpy.api.client import Client
 
 logger = logging.getLogger("duniter/network")
 
-MODULE = 'network'
+MODULE = "network"
 
 WS2P_HEADS_SCHEMA = {
     "type": "object",
@@ -31,27 +31,17 @@ WS2P_HEADS_SCHEMA = {
             "items": {
                 "type": "object",
                 "properties": {
-                    "message": {
-                        "type": "string"
-                    },
-                    "sig": {
-                        "type": "string",
-                    },
-                    "messageV2": {
-                        "type": "string"
-                    },
-                    "sigV2": {
-                        "type": "string",
-                    },
-                    "step": {
-                        "type": "number",
-                    },
+                    "message": {"type": "string"},
+                    "sig": {"type": "string"},
+                    "messageV2": {"type": "string"},
+                    "sigV2": {"type": "string"},
+                    "step": {"type": "number"},
                 },
-                "required": ["message", "sig"]
-            }
+                "required": ["message", "sig"],
+            },
         }
     },
-    "required": ["heads"]
+    "required": ["heads"],
 }
 
 
@@ -62,59 +52,36 @@ def heads(client: Client):
     :param client: Client to connect to the api
     :rtype: dict
     """
-    return client.get(MODULE + '/ws2p/heads', schema=WS2P_HEADS_SCHEMA)
+    return client.get(MODULE + "/ws2p/heads", schema=WS2P_HEADS_SCHEMA)
 
 
 WS2P_CONNECT_MESSAGE_SCHEMA = {
     "type": "object",
     "properties": {
-        "auth": {
-            "type": "string",
-            "pattern": "^CONNECT$"
-        },
-        "challenge": {
-            "type": "string",
-        },
-        "currency": {
-            "type": "string",
-        },
-        "pub": {
-            "type": "string",
-        },
-        "sig": {
-            "type": "string",
-        },
+        "auth": {"type": "string", "pattern": "^CONNECT$"},
+        "challenge": {"type": "string"},
+        "currency": {"type": "string"},
+        "pub": {"type": "string"},
+        "sig": {"type": "string"},
     },
-    "required": ["auth", "challenge", "currency", "pub", "sig"]
+    "required": ["auth", "challenge", "currency", "pub", "sig"],
 }
 
 WS2P_ACK_MESSAGE_SCHEMA = {
     "type": "object",
     "properties": {
-        "auth": {
-            "type": "string",
-            "pattern": "^ACK$"
-        },
-        "pub": {
-            "type": "string",
-        },
-        "sig": {
-            "type": "string",
-        }
+        "auth": {"type": "string", "pattern": "^ACK$"},
+        "pub": {"type": "string"},
+        "sig": {"type": "string"},
     },
-    "required": ["auth", "pub", "sig"]
+    "required": ["auth", "pub", "sig"],
 }
 
 WS2P_OK_MESSAGE_SCHEMA = {
     "type": "object",
     "properties": {
-        "auth": {
-            "type": "string",
-            "pattern": "^OK$"
-        },
-        "sig": {
-            "type": "string",
-        }
+        "auth": {"type": "string", "pattern": "^OK$"},
+        "sig": {"type": "string"},
     },
-    "required": ["auth", "sig"]
+    "required": ["auth", "sig"],
 }

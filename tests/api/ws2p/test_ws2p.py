@@ -5,15 +5,18 @@ import jsonschema
 
 from duniterpy.api.client import parse_text
 from duniterpy.api.ws2p.network import WS2P_HEADS_SCHEMA
-from duniterpy.api.ws2p.requests import BLOCK_RESPONSE_SCHEMA, ERROR_RESPONSE_SCHEMA, BLOCKS_RESPONSE_SCHEMA, \
-    REQUIREMENTS_RESPONSE_SCHEMA
+from duniterpy.api.ws2p.requests import (
+    BLOCK_RESPONSE_SCHEMA,
+    ERROR_RESPONSE_SCHEMA,
+    BLOCKS_RESPONSE_SCHEMA,
+    REQUIREMENTS_RESPONSE_SCHEMA,
+)
 from duniterpy.documents import Identity, BlockUID
 from duniterpy.documents.ws2p.messages import DocumentMessage
 from tests.api.webserver import WebFunctionalSetupMixin
 
 
 class TestWs2p(WebFunctionalSetupMixin, unittest.TestCase):
-
     def test_block(self):
         json_sample = {
             "heads": [
@@ -25,7 +28,7 @@ class TestWs2p(WebFunctionalSetupMixin, unittest.TestCase):
                     102102-000002C0694C7D373A78B095419C86584B81804CFB9641B7EBC3A18040B6FEE6:e66254bf:\
                     duniter:1.6.20:1:15:14",
                     "sigV2": "ReXzbgUya9jo4dL/R4g19Y+RE9BGB0xDkw7mrBWoldlRLkq3KFyRkAf9VthVx1UUb/AINr3nxImZKVQiVH9+DQ==",
-                    "step": 0
+                    "step": 0,
                 },
                 {
                     "message": "WS2POCAIC:HEAD:1:2ny7YAdmzReQxAayyJZsyVYwYhVyax2thKcGknmQy5nQ:\
@@ -35,7 +38,7 @@ class TestWs2p(WebFunctionalSetupMixin, unittest.TestCase):
                     102102-000002C0694C7D373A78B095419C86584B81804CFB9641B7EBC3A18040B6FEE6:a0a45ed2:\
                     duniter:1.6.21:1:34:28",
                     "sigV2": "p5f7/KfQqjTaCYSMUXpjUDH7uF2DafetHNgphGzkOXgxM+Upeii0Fz2RFBwnZvN+Gjp81hAqSuH48PJP6HJSAw==",
-                    "step": 1
+                    "step": 1,
                 },
                 {
                     "message": "WS2POCA:HEAD:1:GRBPV3Y7PQnB9LaZhSGuS3BqBJbSHyibzYq65kTh1nQ4:\
@@ -45,7 +48,7 @@ class TestWs2p(WebFunctionalSetupMixin, unittest.TestCase):
                     102102-000002C0694C7D373A78B095419C86584B81804CFB9641B7EBC3A18040B6FEE6:6d0e96f9:\
                     duniter:1.6.21:1:20:20",
                     "sigV2": "VsyQmXOUYrfHWy0FeS4rJrIJCUBI+3BergbSYQ78icJWV6MQzZSw7Z+Yl7urujCYZriDQM76D6GW+6F0EELpBQ==",
-                    "step": 2
+                    "step": 2,
                 },
             ]
         }
@@ -170,11 +173,17 @@ class TestWs2p(WebFunctionalSetupMixin, unittest.TestCase):
         document_message = DocumentMessage()
         # prepare document
         identity_document = Identity(
-            10, "beta_brousouf", "HgTTJLAQ5sqfknMq7yLPZbehtuLSsKj9CxWN7k8QvYJd", "lolcat",
+            10,
+            "beta_brousouf",
+            "HgTTJLAQ5sqfknMq7yLPZbehtuLSsKj9CxWN7k8QvYJd",
+            "lolcat",
             BlockUID(32, "DB30D958EE5CB75186972286ED3F4686B8A1C2CD"),
-            "J3G9oM5AKYZNLAB5Wx499w61NuUoS57JVccTShUbGpCMjCqj9yXXqNq7dyZpDWA6BxipsiaMZhujMeBfCznzyci")
+            "J3G9oM5AKYZNLAB5Wx499w61NuUoS57JVccTShUbGpCMjCqj9yXXqNq7dyZpDWA6BxipsiaMZhujMeBfCznzyci",
+        )
         # get json string message
-        json_document_message = document_message.get_json(DocumentMessage.IDENTITY_TYPE_ID, identity_document.inline())
+        json_document_message = document_message.get_json(
+            DocumentMessage.IDENTITY_TYPE_ID, identity_document.inline()
+        )
         # convert to dict to verify
         dict_document_message = json.loads(json_document_message)
 

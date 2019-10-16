@@ -389,12 +389,20 @@ class WS2PEndpoint(Endpoint):
         :param proxy: Proxy url
         :return:
         """
-        http_scheme = 'http'
-        websocket_scheme = 'ws'
+        http_scheme = "http"
+        websocket_scheme = "ws"
         if self.port == 443:
-            http_scheme += 's'
-            websocket_scheme += 's'
-        return ConnectionHandler(http_scheme, websocket_scheme, self.server, self.port, self.path, session, proxy)
+            http_scheme += "s"
+            websocket_scheme += "s"
+        return ConnectionHandler(
+            http_scheme,
+            websocket_scheme,
+            self.server,
+            self.port,
+            self.path,
+            session,
+            proxy,
+        )
 
     def __str__(self) -> str:
         return self.inline()

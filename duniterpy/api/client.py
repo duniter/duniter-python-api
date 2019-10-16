@@ -301,7 +301,7 @@ class Client:
 
         return result
 
-    def connect_ws(self, path: str = '') -> _WSRequestContextManager:
+    def connect_ws(self, path: str = "") -> _WSRequestContextManager:
         """
         Connect to a websocket in order to use API parameters
 
