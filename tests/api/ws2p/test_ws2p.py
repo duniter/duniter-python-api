@@ -3,17 +3,16 @@ import unittest
 
 import jsonschema
 
-from duniterpy.api.client import Client, parse_text
-from duniterpy.api.endpoint import BMAEndpoint
-from duniterpy.api.ws2p.network import heads, WS2P_HEADS_SCHEMA
+from duniterpy.api.client import parse_text
+from duniterpy.api.ws2p.network import WS2P_HEADS_SCHEMA
 from duniterpy.api.ws2p.requests import BLOCK_RESPONSE_SCHEMA, ERROR_RESPONSE_SCHEMA, BLOCKS_RESPONSE_SCHEMA, \
     REQUIREMENTS_RESPONSE_SCHEMA
 from duniterpy.documents import Identity, BlockUID
 from duniterpy.documents.ws2p.messages import DocumentMessage
-from tests.api.webserver import WebFunctionalSetupMixin, web
+from tests.api.webserver import WebFunctionalSetupMixin
 
 
-class TestWs2pHeads(WebFunctionalSetupMixin, unittest.TestCase):
+class TestWs2p(WebFunctionalSetupMixin, unittest.TestCase):
 
     def test_block(self):
         json_sample = {
@@ -52,20 +51,6 @@ class TestWs2pHeads(WebFunctionalSetupMixin, unittest.TestCase):
         }
 
         jsonschema.validate(json_sample, WS2P_HEADS_SCHEMA)
-
-    def test_ws2p_heads_bad(self):
-        async def handler(request):
-            await request.read()
-            return web.Response(body=b'{}', content_type='application/json')
-
-        async def go():
-            _, port, url = await self.create_server('GET', '/network/ws2p/heads', handler)
-            with self.assertRaises(jsonschema.ValidationError):
-                client = Client(BMAEndpoint("127.0.0.1", "", "", port))
-                await client(heads)
-            await client.close()
-
-        self.loop.run_until_complete(go())
 
     def test_error_response_validation(self):
         error_response_string = """{"resId":"cfe10cc4","err":"Error message"}"""
