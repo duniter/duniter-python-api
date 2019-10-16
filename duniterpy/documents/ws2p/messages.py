@@ -1,6 +1,6 @@
 import json
 
-from typing import Optional, Any
+from typing import Optional
 
 from duniterpy.documents import Document
 from duniterpy.key import VerifyingKey, SigningKey
@@ -21,17 +21,23 @@ class Connect(Document):
         :param challenge: [Optional, default=None] Big random string, typically an uuid
         :param signature: [Optional, default=None] Base64 encoded signature of raw formated document
         """
-        super().__init__(self.version, currency, [signature])
+        if signature is not None:
+            signatures = [signature]
+        else:
+            signatures = []
+
+        super().__init__(self.version, currency, signatures)
 
         self.pubkey = pubkey
+
         if challenge is None:
             # create challenge
             self.challenge = get_ws2p_challenge()
         else:
             self.challenge = challenge
-        # add and verify signature
+
         if signature is not None:
-            self.signatures.append(signature)
+            # verify signature
             verifying_key = VerifyingKey(self.pubkey)
             verifying_key.verify_document(self)
 
@@ -79,13 +85,18 @@ class Ack(Document):
         :param challenge: The challenge sent in the connect message
         :param signature: [Optional, default=None] Base64 encoded signature of raw formated document
         """
-        super().__init__(self.version, currency, [signature])
+        if signature is not None:
+            signatures = [signature]
+        else:
+            signatures = []
+
+        super().__init__(self.version, currency, signatures)
 
         self.pubkey = pubkey
         self.challenge = challenge
-        # add and verify signature
+
         if signature is not None:
-            self.signatures.append(signature)
+            # verify signature
             verifying_key = VerifyingKey(self.pubkey)
             verifying_key.verify_document(self)
 
@@ -132,13 +143,17 @@ class Ok(Document):
         :param challenge: The challenge sent in the connect message
         :param signature: [Optional, default=None] Base64 encoded signature of raw formated document
         """
-        super().__init__(self.version, currency, [signature])
+        if signature is not None:
+            signatures = [signature]
+        else:
+            signatures = []
+        super().__init__(self.version, currency, signatures)
 
         self.pubkey = pubkey
         self.challenge = challenge
-        # add and verify signature
+
         if signature is not None:
-            self.signatures.append(signature)
+            # verify signature
             verifying_key = VerifyingKey(self.pubkey)
             verifying_key.verify_document(self)
 
@@ -170,8 +185,6 @@ class Ok(Document):
         return self.raw()
 
 
-# fixme: the document format to send is to be determine
-# does raw or inline format works ?
 class DocumentMessage:
     PEER_TYPE_ID = 0
     TRANSACTION_TYPE_ID = 1
@@ -189,13 +202,12 @@ class DocumentMessage:
         5: "block"
     }
 
-    def get_json(self, document_type_id: int, document: Any) -> str:
+    def get_json(self, document_type_id: int, document: str) -> str:
         """
         Return the document message in json format
 
         :param document_type_id: Id of the document type, use class properties
-        :param document: Document object to send
-        :return:
+        :param document: Raw or Inline Document to send
         """
         data = {
             "body": {
