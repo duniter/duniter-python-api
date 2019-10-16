@@ -1,8 +1,5 @@
 import json
 import re
-from typing import Optional
-
-from duniterpy.helpers import get_ws2p_challenge
 from duniterpy.api.bma.blockchain import BLOCK_SCHEMA, BLOCKS_SCHEMA
 
 ERROR_RESPONSE_SCHEMA = {
@@ -96,7 +93,7 @@ REQUIREMENTS_SCHEMA = {
                     },
                     "pendingCerts": {
                         "type": "array",
-                        "items" : {
+                        "items": {
                             "type": "object",
                             "properties": {
                                 "block": {"type": "number"},
@@ -118,7 +115,7 @@ REQUIREMENTS_SCHEMA = {
                     },
                     "pendingMemberships": {
                         "type": "array",
-                        "items" : {
+                        "items": {
                             "type": "object",
                             "properties": {
                                 "block": {"type": "string"},
