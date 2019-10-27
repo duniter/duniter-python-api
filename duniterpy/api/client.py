@@ -7,7 +7,7 @@ import logging
 from typing import Callable, Union, Any, Optional
 
 import jsonschema
-from aiohttp import ClientResponse, ClientSession
+from aiohttp import ClientResponse, ClientSession, ClientWebSocketResponse
 from aiohttp.client import _WSRequestContextManager
 import duniterpy.api.endpoint as endpoint
 from .errors import DuniterError
@@ -18,6 +18,9 @@ logger = logging.getLogger("duniter")
 RESPONSE_JSON = "json"
 RESPONSE_TEXT = "text"
 RESPONSE_AIOHTTP = "aiohttp"
+
+# Connection type constants
+CONNECTION_TYPE_AIOHTTP = 1
 
 # jsonschema validator
 ERROR_SCHEMA = {
@@ -76,6 +79,88 @@ async def parse_response(response: ClientResponse, schema: dict) -> Any:
         return data
     except (TypeError, json.decoder.JSONDecodeError) as e:
         raise jsonschema.ValidationError("Could not parse json : {0}".format(str(e)))
+
+
+class WSConnection:
+
+    # From the documentation of the aiohttp_library, the web socket connection
+    #
+    #   await ws_connection = session.ws_connect()
+    #
+    # should return a ClientWebSocketResponse object...
+    #
+    # https://docs.aiohttp.org/en/stable/client_quickstart.html#websockets
+    #
+    # In fact, aiohttp.session.ws_connect() returns a aiohttp.client._WSRequestContextManager instance.
+    # It must be used in a with statement to get the ClientWebSocketResponse instance from it (__aenter__).
+    # At the end of the with statement, aiohttp.client._WSRequestContextManager.__aexit__ is called
+    # and close the ClientWebSocketResponse in it.
+    #
+    #   await with ws_connection as ws:
+    #       await ws.receive_str()
+    #
+    def __init__(self, connection: _WSRequestContextManager) -> None:
+        """
+        Init WSConnection instance
+
+        :param connection: Connection instance of the connection library
+        """
+        if not isinstance(connection, _WSRequestContextManager):
+            raise Exception(
+                BaseException(
+                    "Only  aiohttp.client._WSRequestContextManager class supported"
+                )
+            )
+
+        self.connection_type = CONNECTION_TYPE_AIOHTTP
+        self._connection = connection  # type: _WSRequestContextManager
+        self.connection = None  # type: Optional[ClientWebSocketResponse]
+
+    async def send_str(self, data: str) -> None:
+        """
+        Send a data string to the web socket connection
+
+        :param data: Data string
+        :return:
+        """
+        if self.connection is None:
+            raise Exception("Connection property is empty")
+
+        await self.connection.send_str(data)
+        return None
+
+    async def receive_str(self, timeout: Optional[float] = None) -> Optional[str]:
+        """
+        Wait for a data string from the web socket connection
+
+        :param timeout: Timeout in seconds
+        :return:
+        """
+        if self.connection is None:
+            raise Exception("Connection property is empty")
+
+        return await self.connection.receive_str(timeout=timeout)
+
+    async def init_connection(self):
+        """
+        Mandatory for aiohttp library to avoid the use of the with statement
+
+        :return:
+        """
+        self.connection = await self._connection.__aenter__()
+
+    async def close(self) -> None:
+        """
+        Close the web socket connection
+
+        :return:
+        """
+        await self._connection.__aexit__(None, None, None)
+
+        if self.connection is None:
+            raise Exception("Connection property is empty")
+
+        await self.connection.close()
 
 
 class API:
@@ -170,7 +255,7 @@ class API:
         )
         return response
 
-    def connect_ws(self, path: str) -> _WSRequestContextManager:
+    async def connect_ws(self, path: str) -> WSConnection:
         """
         Connect to a websocket in order to use API parameters
 
@@ -183,9 +268,17 @@ class API:
         :return:
         """
         url = self.reverse_url(self.connection_handler.ws_scheme, path)
-        return self.connection_handler.session.ws_connect(
-            url, proxy=self.connection_handler.proxy
+
+        connection = WSConnection(
+            self.connection_handler.session.ws_connect(
+                url, proxy=self.connection_handler.proxy, autoclose=False
+            )
         )
+
+        # init aiohttp connection
+        await connection.init_connection()
+
+        return connection
 
 
 class Client:
@@ -301,7 +394,7 @@ class Client:
 
         return result
 
-    def connect_ws(self, path: str = "") -> _WSRequestContextManager:
+    async def connect_ws(self, path: str = "") -> WSConnection:
         """
         Connect to a websocket in order to use API parameters
 
@@ -309,7 +402,7 @@ class Client:
         :return:
         """
         client = API(self.endpoint.conn_handler(self.session, self.proxy))
-        return client.connect_ws(path)
+        return await client.connect_ws(path)
 
     async def close(self):
         """

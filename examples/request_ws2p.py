@@ -50,238 +50,209 @@ async def main():
     client = Client(WS2P_ENDPOINT)
 
     try:
-        # Create Web Socket connection on block path
-        ws_connection = client.connect_ws()
+        # Create a Web Socket connection
+        ws = await client.connect_ws()
 
-        # From the documentation ws_connection should be a ClientWebSocketResponse object...
-        #
-        # https://docs.aiohttp.org/en/stable/client_quickstart.html#websockets
-        #
-        # In reality, aiohttp.session.ws_connect() returns a aiohttp.client._WSRequestContextManager instance.
-        # It must be used in a with statement to get the ClientWebSocketResponse instance from it (__aenter__).
-        # At the end of the with statement, aiohttp.client._WSRequestContextManager.__aexit__ is called
-        # and close the ClientWebSocketResponse in it.
+        print("Connected successfully to web socket endpoint")
 
-        # Mandatory to get the "for msg in ws" to work !
-        async with ws_connection as ws:
-            print("Connected successfully to web socket endpoint")
+        # START HANDSHAKE #######################################################
+        print("\nSTART HANDSHAKE...")
 
-            # START HANDSHAKE #######################################################
-            print("\nSTART HANDSHAKE...")
+        print("Send CONNECT message")
+        await ws.send_str(connect_message)
 
-            print("Send CONNECT message")
-            await ws.send_str(connect_message)
+        loop = True
+        # Iterate on each message received...
+        while loop:
+            print("ws.receive_str()")
+            msg = await ws.receive_str()
 
-            # Iterate on each message received...
-            async for msg in ws:  # type: aiohttp.WSMessage
+            # Display incoming message from peer
+            print(msg)
 
-                # Display incoming message from peer
-                print(msg)
+            try:
+                # Validate json string with jsonschema and return a dict
+                data = parse_text(msg, ws2p.network.WS2P_CONNECT_MESSAGE_SCHEMA)
 
-                # If message type is text...
-                if msg.type == aiohttp.WSMsgType.TEXT:
-                    # print(msg.data)
+            except jsonschema.exceptions.ValidationError:
+                try:
+                    # Validate json string with jsonschema and return a dict
+                    data = parse_text(msg, ws2p.network.WS2P_ACK_MESSAGE_SCHEMA)
+
+                except jsonschema.exceptions.ValidationError:
                     try:
                         # Validate json string with jsonschema and return a dict
-                        data = parse_text(
-                            msg.data, ws2p.network.WS2P_CONNECT_MESSAGE_SCHEMA
-                        )
+                        data = parse_text(msg, ws2p.network.WS2P_OK_MESSAGE_SCHEMA)
 
                     except jsonschema.exceptions.ValidationError:
-                        try:
-                            # Validate json string with jsonschema and return a dict
-                            data = parse_text(
-                                msg.data, ws2p.network.WS2P_ACK_MESSAGE_SCHEMA
-                            )
-
-                        except jsonschema.exceptions.ValidationError:
-                            try:
-                                # Validate json string with jsonschema and return a dict
-                                data = parse_text(
-                                    msg.data, ws2p.network.WS2P_OK_MESSAGE_SCHEMA
-                                )
-
-                            except jsonschema.exceptions.ValidationError:
-                                continue
-
-                            print("Received a OK message")
-
-                            Ok(
-                                CURRENCY,
-                                remote_connect_document.pubkey,
-                                connect_document.challenge,
-                                data["sig"],
-                            )
-                            print("Received OK message signature is valid")
-
-                            # END HANDSHAKE #######################################################
-                            print("END OF HANDSHAKE\n")
-
-                            # Uncomment the following command to stop listening for messages anymore
-                            break
-
-                            # Uncomment the following commands to continue to listen incoming messages
-                            # print("waiting for incoming messages...\n")
-                            # continue
-
-                        print("Received a ACK message")
-
-                        # Create ACK document from ACK response to verify signature
-                        Ack(
-                            CURRENCY,
-                            data["pub"],
-                            connect_document.challenge,
-                            data["sig"],
-                        )
-                        print("Received ACK message signature is valid")
-                        # If ACK response is ok, create OK message
-                        ok_message = Ok(
-                            CURRENCY, signing_key.pubkey, connect_document.challenge
-                        ).get_signed_json(signing_key)
-
-                        # Send OK message
-                        print("Send OK message...")
-                        await ws.send_str(ok_message)
                         continue
 
-                    print("Received a CONNECT message")
+                    print("Received a OK message")
 
-                    remote_connect_document = Connect(
-                        CURRENCY, data["pub"], data["challenge"], data["sig"]
+                    Ok(
+                        CURRENCY,
+                        remote_connect_document.pubkey,
+                        connect_document.challenge,
+                        data["sig"],
                     )
-                    print("Received CONNECT message signature is valid")
+                    print("Received OK message signature is valid")
 
-                    ack_message = Ack(
-                        CURRENCY, signing_key.pubkey, remote_connect_document.challenge
-                    ).get_signed_json(signing_key)
-                    # Send ACK message
-                    print("Send ACK message...")
-                    await ws.send_str(ack_message)
+                    # END HANDSHAKE #######################################################
+                    print("END OF HANDSHAKE\n")
 
-                elif msg.type == aiohttp.WSMsgType.CLOSED:
-                    # Connection is closed
-                    print("Web socket connection closed !")
-                elif msg.type == aiohttp.WSMsgType.ERROR:
-                    # Connection error
-                    print("Web socket connection error !")
+                    # Uncomment the following command to stop listening for messages anymore
+                    break
 
-            # Send ws2p request
-            print("Send getCurrent() request")
-            request_id = get_ws2p_challenge()[:8]
-            await ws.send_str(requests.get_current(request_id))
+                    # Uncomment the following commands to continue to listen incoming messages
+                    # print("waiting for incoming messages...\n")
+                    # continue
 
-            # Wait response with request id
+                print("Received a ACK message")
+
+                # Create ACK document from ACK response to verify signature
+                Ack(CURRENCY, data["pub"], connect_document.challenge, data["sig"])
+                print("Received ACK message signature is valid")
+                # If ACK response is ok, create OK message
+                ok_message = Ok(
+                    CURRENCY, signing_key.pubkey, connect_document.challenge
+                ).get_signed_json(signing_key)
+
+                # Send OK message
+                print("Send OK message...")
+                await ws.send_str(ok_message)
+                continue
+
+            print("Received a CONNECT message")
+
+            remote_connect_document = Connect(
+                CURRENCY, data["pub"], data["challenge"], data["sig"]
+            )
+            print("Received CONNECT message signature is valid")
+
+            ack_message = Ack(
+                CURRENCY, signing_key.pubkey, remote_connect_document.challenge
+            ).get_signed_json(signing_key)
+            # Send ACK message
+            print("Send ACK message...")
+            await ws.send_str(ack_message)
+
+        # Send ws2p request
+        print("Send getCurrent() request")
+        request_id = get_ws2p_challenge()[:8]
+        await ws.send_str(requests.get_current(request_id))
+
+        # Wait response with request id
+        response_str = await ws.receive_str()
+        while "resId" not in json.loads(response_str) or (
+            "resId" in json.loads(response_str)
+            and json.loads(response_str)["resId"] != request_id
+        ):
             response_str = await ws.receive_str()
-            while "resId" not in json.loads(response_str) or (
-                "resId" in json.loads(response_str)
-                and json.loads(response_str)["resId"] != request_id
-            ):
-                response_str = await ws.receive_str()
-                time.sleep(1)
+            time.sleep(1)
+        try:
+            # Check response format
+            parse_text(response_str, requests.BLOCK_RESPONSE_SCHEMA)
+            # If valid display response
+            print("Response: " + response_str)
+        except ValidationError:
+            # If invalid response...
             try:
-                # Check response format
-                parse_text(response_str, requests.BLOCK_RESPONSE_SCHEMA)
-                # If valid display response
-                print("Response: " + response_str)
-            except ValidationError:
-                # If invalid response...
-                try:
-                    # Check error response format
-                    parse_text(response_str, requests.ERROR_RESPONSE_SCHEMA)
-                    # If valid, display error response
-                    print("Error response: " + response_str)
-                except ValidationError as exception:
-                    # If invalid, display exception on response validation
-                    print(exception)
+                # Check error response format
+                parse_text(response_str, requests.ERROR_RESPONSE_SCHEMA)
+                # If valid, display error response
+                print("Error response: " + response_str)
+            except ValidationError as exception:
+                # If invalid, display exception on response validation
+                print(exception)
 
-            # Send ws2p request
-            print("Send getBlock(360000) request")
-            request_id = get_ws2p_challenge()[:8]
-            await ws.send_str(requests.get_block(request_id, 360000))
+        # Send ws2p request
+        print("Send getBlock(360000) request")
+        request_id = get_ws2p_challenge()[:8]
+        await ws.send_str(requests.get_block(request_id, 360000))
 
-            # Wait response with request id
+        # Wait response with request id
+        response_str = await ws.receive_str()
+        while "resId" not in json.loads(response_str) or (
+            "resId" in json.loads(response_str)
+            and json.loads(response_str)["resId"] != request_id
+        ):
             response_str = await ws.receive_str()
-            while "resId" not in json.loads(response_str) or (
-                "resId" in json.loads(response_str)
-                and json.loads(response_str)["resId"] != request_id
-            ):
-                response_str = await ws.receive_str()
-                time.sleep(1)
+            time.sleep(1)
+        try:
+            # Check response format
+            parse_text(response_str, requests.BLOCK_RESPONSE_SCHEMA)
+            # If valid display response
+            print("Response: " + response_str)
+        except ValidationError:
+            # If invalid response...
             try:
-                # Check response format
-                parse_text(response_str, requests.BLOCK_RESPONSE_SCHEMA)
-                # If valid display response
-                print("Response: " + response_str)
-            except ValidationError:
-                # If invalid response...
-                try:
-                    # Check error response format
-                    parse_text(response_str, requests.ERROR_RESPONSE_SCHEMA)
-                    # If valid, display error response
-                    print("Error response: " + response_str)
-                except ValidationError as exception:
-                    # If invalid, display exception on response validation
-                    print(exception)
+                # Check error response format
+                parse_text(response_str, requests.ERROR_RESPONSE_SCHEMA)
+                # If valid, display error response
+                print("Error response: " + response_str)
+            except ValidationError as exception:
+                # If invalid, display exception on response validation
+                print(exception)
 
-            # Send ws2p request
-            print("Send getBlocks(360000, 2) request")
-            request_id = get_ws2p_challenge()[:8]
-            await ws.send_str(requests.get_blocks(request_id, 360000, 2))
+        # Send ws2p request
+        print("Send getBlocks(360000, 2) request")
+        request_id = get_ws2p_challenge()[:8]
+        await ws.send_str(requests.get_blocks(request_id, 360000, 2))
 
-            # Wait response with request id
+        # Wait response with request id
+        response_str = await ws.receive_str()
+        while "resId" not in json.loads(response_str) or (
+            "resId" in json.loads(response_str)
+            and json.loads(response_str)["resId"] != request_id
+        ):
             response_str = await ws.receive_str()
-            while "resId" not in json.loads(response_str) or (
-                "resId" in json.loads(response_str)
-                and json.loads(response_str)["resId"] != request_id
-            ):
-                response_str = await ws.receive_str()
-                time.sleep(1)
+            time.sleep(1)
+        try:
+            # Check response format
+            parse_text(response_str, requests.BLOCKS_RESPONSE_SCHEMA)
+            # If valid display response
+            print("Response: " + response_str)
+        except ValidationError:
+            # If invalid response...
             try:
-                # Check response format
-                parse_text(response_str, requests.BLOCKS_RESPONSE_SCHEMA)
-                # If valid display response
-                print("Response: " + response_str)
-            except ValidationError:
-                # If invalid response...
-                try:
-                    # Check error response format
-                    parse_text(response_str, requests.ERROR_RESPONSE_SCHEMA)
-                    # If valid, display error response
-                    print("Error response: " + response_str)
-                except ValidationError as exception:
-                    # If invalid, display exception on response validation
-                    print(exception)
+                # Check error response format
+                parse_text(response_str, requests.ERROR_RESPONSE_SCHEMA)
+                # If valid, display error response
+                print("Error response: " + response_str)
+            except ValidationError as exception:
+                # If invalid, display exception on response validation
+                print(exception)
 
-            # Send ws2p request
-            print("Send getRequirementsPending(3) request")
-            request_id = get_ws2p_challenge()[:8]
-            await ws.send_str(requests.get_requirements_pending(request_id, 3))
-            # Wait response with request id
+        # Send ws2p request
+        print("Send getRequirementsPending(3) request")
+        request_id = get_ws2p_challenge()[:8]
+        await ws.send_str(requests.get_requirements_pending(request_id, 3))
+        # Wait response with request id
+        response_str = await ws.receive_str()
+        while "resId" not in json.loads(response_str) or (
+            "resId" in json.loads(response_str)
+            and json.loads(response_str)["resId"] != request_id
+        ):
             response_str = await ws.receive_str()
-            while "resId" not in json.loads(response_str) or (
-                "resId" in json.loads(response_str)
-                and json.loads(response_str)["resId"] != request_id
-            ):
-                response_str = await ws.receive_str()
-                time.sleep(1)
+            time.sleep(1)
+        try:
+            # Check response format
+            parse_text(response_str, requests.REQUIREMENTS_RESPONSE_SCHEMA)
+            # If valid display response
+            print("Response: " + response_str)
+        except ValidationError:
+            # If invalid response...
             try:
-                # Check response format
-                parse_text(response_str, requests.REQUIREMENTS_RESPONSE_SCHEMA)
-                # If valid display response
-                print("Response: " + response_str)
-            except ValidationError:
-                # If invalid response...
-                try:
-                    # Check error response format
-                    parse_text(response_str, requests.ERROR_RESPONSE_SCHEMA)
-                    # If valid, display error response
-                    print("Error response: " + response_str)
-                except ValidationError as exception:
-                    # If invalid, display exception on response validation
-                    print(exception)
+                # Check error response format
+                parse_text(response_str, requests.ERROR_RESPONSE_SCHEMA)
+                # If valid, display error response
+                print("Error response: " + response_str)
+            except ValidationError as exception:
+                # If invalid, display exception on response validation
+                print(exception)
 
-            # Close session
-            await client.close()
+        # Close session
+        await client.close()
 
     except (aiohttp.WSServerHandshakeError, ValueError) as e:
         print("Websocket handshake {0} : {1}".format(type(e).__name__, str(e)))
