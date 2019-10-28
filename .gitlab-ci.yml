@@ -90,6 +90,7 @@ release_test:
   script:
     - poetry config repositories.pypi_test https://test.pypi.org/legacy/
     - poetry publish --build --username $PYPI_TEST_LOGIN --password $PYPI_TEST_PASSWORD --repository pypi_test
+  only: [tags]
 
 pages:
   stage: publish_doc
