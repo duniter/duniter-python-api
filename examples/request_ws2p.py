@@ -11,10 +11,9 @@ from jsonschema import ValidationError
 from duniterpy.tools import get_ws2p_challenge
 from duniterpy.key import SigningKey
 
-from duniterpy.api import ws2p
+from duniterpy.helpers.ws2p import handshake
 from duniterpy.api.ws2p import requests
-from duniterpy.documents.ws2p.messages import Connect, Ack, Ok
-from duniterpy.api.client import Client, parse_text
+from duniterpy.api.client import Client
 
 # CONFIG #######################################
 
@@ -43,9 +42,6 @@ async def main():
     # Init signing_key instance
     signing_key = SigningKey.from_credentials(salt, password)
 
-    connect_document = Connect(CURRENCY, signing_key.pubkey)
-    connect_message = connect_document.get_signed_json(signing_key)
-
     # Create Client from endpoint string in Duniter format
     client = Client(WS2P_ENDPOINT)
 
@@ -55,86 +51,13 @@ async def main():
 
         print("Connected successfully to web socket endpoint")
 
-        # START HANDSHAKE #######################################################
-        print("\nSTART HANDSHAKE...")
-
-        print("Send CONNECT message")
-        await ws.send_str(connect_message)
-
-        loop = True
-        # Iterate on each message received...
-        while loop:
-            print("ws.receive_str()")
-            msg = await ws.receive_str()
-
-            # Display incoming message from peer
-            print(msg)
-
-            try:
-                # Validate json string with jsonschema and return a dict
-                data = parse_text(msg, ws2p.network.WS2P_CONNECT_MESSAGE_SCHEMA)
-
-            except jsonschema.exceptions.ValidationError:
-                try:
-                    # Validate json string with jsonschema and return a dict
-                    data = parse_text(msg, ws2p.network.WS2P_ACK_MESSAGE_SCHEMA)
-
-                except jsonschema.exceptions.ValidationError:
-                    try:
-                        # Validate json string with jsonschema and return a dict
-                        data = parse_text(msg, ws2p.network.WS2P_OK_MESSAGE_SCHEMA)
-
-                    except jsonschema.exceptions.ValidationError:
-                        continue
-
-                    print("Received a OK message")
-
-                    Ok(
-                        CURRENCY,
-                        remote_connect_document.pubkey,
-                        connect_document.challenge,
-                        data["sig"],
-                    )
-                    print("Received OK message signature is valid")
-
-                    # END HANDSHAKE #######################################################
-                    print("END OF HANDSHAKE\n")
-
-                    # Uncomment the following command to stop listening for messages anymore
-                    break
-
-                    # Uncomment the following commands to continue to listen incoming messages
-                    # print("waiting for incoming messages...\n")
-                    # continue
-
-                print("Received a ACK message")
-
-                # Create ACK document from ACK response to verify signature
-                Ack(CURRENCY, data["pub"], connect_document.challenge, data["sig"])
-                print("Received ACK message signature is valid")
-                # If ACK response is ok, create OK message
-                ok_message = Ok(
-                    CURRENCY, signing_key.pubkey, connect_document.challenge
-                ).get_signed_json(signing_key)
-
-                # Send OK message
-                print("Send OK message...")
-                await ws.send_str(ok_message)
-                continue
-
-            print("Received a CONNECT message")
-
-            remote_connect_document = Connect(
-                CURRENCY, data["pub"], data["challenge"], data["sig"]
-            )
-            print("Received CONNECT message signature is valid")
-
-            ack_message = Ack(
-                CURRENCY, signing_key.pubkey, remote_connect_document.challenge
-            ).get_signed_json(signing_key)
-            # Send ACK message
-            print("Send ACK message...")
-            await ws.send_str(ack_message)
+        # HANDSHAKE #######################################################
+        try:
+            await handshake(ws, signing_key, CURRENCY, True)
+        except ValidationError as exception:
+            print(exception.message)
+            print("HANDSHAKE FAILED !")
+            exit(1)
 
         # Send ws2p request
         print("Send getCurrent() request")
@@ -142,25 +65,24 @@ async def main():
         await ws.send_str(requests.get_current(request_id))
 
         # Wait response with request id
-        response_str = await ws.receive_str()
-        while "resId" not in json.loads(response_str) or (
-            "resId" in json.loads(response_str)
-            and json.loads(response_str)["resId"] != request_id
+        response = await ws.receive_json()
+        while "resId" not in response or (
+            "resId" in response and response["resId"] != request_id
         ):
-            response_str = await ws.receive_str()
+            response = await ws.receive_json()
             time.sleep(1)
         try:
             # Check response format
-            parse_text(response_str, requests.BLOCK_RESPONSE_SCHEMA)
+            jsonschema.validate(response, requests.BLOCK_RESPONSE_SCHEMA)
             # If valid display response
-            print("Response: " + response_str)
+            print("Response: " + json.dumps(response, indent=2))
         except ValidationError:
             # If invalid response...
             try:
                 # Check error response format
-                parse_text(response_str, requests.ERROR_RESPONSE_SCHEMA)
+                jsonschema.validate(response, requests.ERROR_RESPONSE_SCHEMA)
                 # If valid, display error response
-                print("Error response: " + response_str)
+                print("Error response: " + json.dumps(response, indent=2))
             except ValidationError as exception:
                 # If invalid, display exception on response validation
                 print(exception)
@@ -171,25 +93,24 @@ async def main():
         await ws.send_str(requests.get_block(request_id, 360000))
 
         # Wait response with request id
-        response_str = await ws.receive_str()
-        while "resId" not in json.loads(response_str) or (
-            "resId" in json.loads(response_str)
-            and json.loads(response_str)["resId"] != request_id
+        response = await ws.receive_json()
+        while "resId" not in response or (
+            "resId" in response and response["resId"] != request_id
         ):
-            response_str = await ws.receive_str()
+            response = await ws.receive_json()
             time.sleep(1)
         try:
             # Check response format
-            parse_text(response_str, requests.BLOCK_RESPONSE_SCHEMA)
+            jsonschema.validate(response, requests.BLOCK_RESPONSE_SCHEMA)
             # If valid display response
-            print("Response: " + response_str)
+            print("Response: " + json.dumps(response, indent=2))
         except ValidationError:
             # If invalid response...
             try:
                 # Check error response format
-                parse_text(response_str, requests.ERROR_RESPONSE_SCHEMA)
+                jsonschema.validate(response, requests.ERROR_RESPONSE_SCHEMA)
                 # If valid, display error response
-                print("Error response: " + response_str)
+                print("Error response: " + json.dumps(response, indent=2))
             except ValidationError as exception:
                 # If invalid, display exception on response validation
                 print(exception)
@@ -200,25 +121,24 @@ async def main():
         await ws.send_str(requests.get_blocks(request_id, 360000, 2))
 
         # Wait response with request id
-        response_str = await ws.receive_str()
-        while "resId" not in json.loads(response_str) or (
-            "resId" in json.loads(response_str)
-            and json.loads(response_str)["resId"] != request_id
+        response = await ws.receive_json()
+        while "resId" not in response or (
+            "resId" in response and response["resId"] != request_id
         ):
-            response_str = await ws.receive_str()
+            response = await ws.receive_json()
             time.sleep(1)
         try:
             # Check response format
-            parse_text(response_str, requests.BLOCKS_RESPONSE_SCHEMA)
+            jsonschema.validate(response, requests.BLOCKS_RESPONSE_SCHEMA)
             # If valid display response
-            print("Response: " + response_str)
+            print("Response: " + json.dumps(response, indent=2))
         except ValidationError:
             # If invalid response...
             try:
                 # Check error response format
-                parse_text(response_str, requests.ERROR_RESPONSE_SCHEMA)
+                jsonschema.validate(response, requests.ERROR_RESPONSE_SCHEMA)
                 # If valid, display error response
-                print("Error response: " + response_str)
+                print("Error response: " + json.dumps(response, indent=2))
             except ValidationError as exception:
                 # If invalid, display exception on response validation
                 print(exception)
@@ -228,25 +148,24 @@ async def main():
         request_id = get_ws2p_challenge()[:8]
         await ws.send_str(requests.get_requirements_pending(request_id, 3))
         # Wait response with request id
-        response_str = await ws.receive_str()
-        while "resId" not in json.loads(response_str) or (
-            "resId" in json.loads(response_str)
-            and json.loads(response_str)["resId"] != request_id
+        response = await ws.receive_json()
+        while "resId" not in response or (
+            "resId" in response and response["resId"] != request_id
         ):
-            response_str = await ws.receive_str()
+            response = await ws.receive_json()
             time.sleep(1)
         try:
             # Check response format
-            parse_text(response_str, requests.REQUIREMENTS_RESPONSE_SCHEMA)
+            jsonschema.validate(response, requests.REQUIREMENTS_RESPONSE_SCHEMA)
             # If valid display response
-            print("Response: " + response_str)
+            print("Response: " + json.dumps(response, indent=2))
         except ValidationError:
             # If invalid response...
             try:
                 # Check error response format
-                parse_text(response_str, requests.ERROR_RESPONSE_SCHEMA)
+                jsonschema.validate(response, requests.ERROR_RESPONSE_SCHEMA)
                 # If valid, display error response
-                print("Error response: " + response_str)
+                print("Error response: " + json.dumps(response, indent=2))
             except ValidationError as exception:
                 # If invalid, display exception on response validation
                 print(exception)
