@@ -1,11 +1,12 @@
 import asyncio
+import json
 from _socket import gaierror
 
 import aiohttp
 import jsonschema
 
 from duniterpy.api import bma
-from duniterpy.api.client import Client, parse_text
+from duniterpy.api.client import Client
 
 # CONFIG #######################################
 
@@ -26,38 +27,19 @@ async def main():
     client = Client(BMAS_ENDPOINT)
 
     try:
-        # Create Web Socket connection on block path
-        ws_connection = client(bma.ws.block)
+        # Create Web Socket connection on block path (async method)
+        ws = await client(bma.ws.block)  # Type: WSConnection
 
-        # From the documentation ws_connection should be a ClientWebSocketResponse object...
-        #
-        # https://docs.aiohttp.org/en/stable/client_quickstart.html#websockets
-        #
-        # In reality, aiohttp.session.ws_connect() returns a aiohttp.client._WSRequestContextManager instance.
-        # It must be used in a with statement to get the ClientWebSocketResponse instance from it (__aenter__).
-        # At the end of the with statement, aiohttp.client._WSRequestContextManager.__aexit__ is called
-        # and close the ClientWebSocketResponse in it.
+        print("Connected successfully to web socket block path")
 
-        # Mandatory to get the "for msg in ws" to work !
-        async with ws_connection as ws:
-            print("Connected successfully to web socket block path")
-            # Iterate on each message received...
-            async for msg in ws:
-                # if message type is text...
-                if msg.type == aiohttp.WSMsgType.TEXT:
-                    print("Received a block")
-                    # Validate jsonschema and return a the json dict
-                    block_data = parse_text(msg.data, bma.ws.WS_BLOCK_SCHEMA)
-                    print(block_data)
-                elif msg.type == aiohttp.WSMsgType.CLOSED:
-                    # Connection is closed
-                    print("Web socket connection closed !")
-                elif msg.type == aiohttp.WSMsgType.ERROR:
-                    # Connection error
-                    print("Web socket connection error !")
+        data = await ws.receive_json()
 
-                # Close session
-                await client.close()
+        jsonschema.validate(data, bma.ws.WS_BLOCK_SCHEMA)
+        print("Received a block")
+        print(json.dumps(data, indent=2))
+
+        # Close session
+        await client.close()
 
     except (aiohttp.WSServerHandshakeError, ValueError) as e:
         print("Websocket block {0} : {1}".format(type(e).__name__, str(e)))
