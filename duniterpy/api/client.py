@@ -129,7 +129,7 @@ class WSConnection:
         await self.connection.send_str(data)
         return None
 
-    async def receive_str(self, timeout: Optional[float] = None) -> Optional[str]:
+    async def receive_str(self, timeout: Optional[float] = None) -> str:
         """
         Wait for a data string from the web socket connection
 
@@ -140,6 +140,18 @@ class WSConnection:
             raise Exception("Connection property is empty")
 
         return await self.connection.receive_str(timeout=timeout)
+
+    async def receive_json(self, timeout: Optional[float] = None) -> Any:
+        """
+        Wait for json data from the web socket connection
+
+        :param timeout: Timeout in seconds
+        :return:
+        """
+        if self.connection is None:
+            raise Exception("Connection property is empty")
+
+        return await self.connection.receive_json(timeout=timeout)
 
     async def init_connection(self):
         """
