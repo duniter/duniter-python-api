@@ -30,7 +30,7 @@ You can install DuniterPy and its dependencies with the following command:
 pip3 install duniterpy --user
 ```
 
-## Install the development environement
+## Install the development environment
 - Install [Poetry](https://poetry.eustace.io):
 ```bash
 curl -sSL https://raw.githubusercontent.com/sdispater/poetry/master/get-poetry.py | python --preview
@@ -59,7 +59,7 @@ make docs
 
 ## Development
 * When writing docstrings, use the reStructuredText format recommended by https://www.python.org/dev/peps/pep-0287/#docstring-significant-features
-* Use make commands to check the code and the format it correct.
+* Use make commands to check the code and the format.
 
 Black, the formatting tool, requires Python 3.6 or higher.
 
@@ -74,11 +74,11 @@ poetry install --no-dev
 poetry run python examples/request_data.py
 ```
 
-* Before submiting a merge requests, please check the static typing and tests.
+* Before submitting a merge requests, please check the static typing and tests.
 
 * Install dev dependencies
 ```bash
-poetry instal
+poetry install
 ```
 
 * Check static typing with [mypy](http://mypy-lang.org/)
@@ -105,7 +105,7 @@ Change and commit and tag the new version number (semantic version number)
 
 Build the PyPi package in the `dist` folder
 ```bash
-Noetry build
+poetry build
 ```
 
 Deploy the package to PyPi test repository (prefix the command with a space in order for the shell not to save in its history system the command containing the password)
