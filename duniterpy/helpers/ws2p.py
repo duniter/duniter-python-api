@@ -9,6 +9,15 @@ from duniterpy.key import SigningKey
 async def handshake(
     ws: WSConnection, signing_key: SigningKey, currency: str, verbose: bool = False
 ):
+    """
+    Perform ws2p handshake on the web socket connection using the signing_key instance
+
+    :param ws: Web socket connection instance
+    :param signing_key: SigningKey instance
+    :param currency: Currency name
+    :param verbose: Default=False, True to see console progress messages
+    :return:
+    """
     # START HANDSHAKE #######################################################
     if verbose:
         print("\nSTART HANDSHAKE...")
@@ -20,6 +29,7 @@ async def handshake(
     await ws.send_str(connect_message)
 
     loop = True
+    remote_connect_document = None
     # Iterate on each message received...
     while loop:
 
@@ -67,7 +77,11 @@ async def handshake(
 
             await ws.send_str(ok_message)
 
-        if "auth" in data and data["auth"] == "OK":
+        if (
+            remote_connect_document is not None
+            and "auth" in data
+            and data["auth"] == "OK"
+        ):
             jsonschema.validate(data, ws2p.network.WS2P_OK_MESSAGE_SCHEMA)
             if verbose:
                 print("Received a OK message")
