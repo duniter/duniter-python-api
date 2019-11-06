@@ -98,7 +98,7 @@ The class Block handles Block documents.
     re_hash = re.compile(
         "InnerHash: ({block_hash_regex})\n".format(block_hash_regex=BLOCK_HASH_REGEX)
     )
-    re_noonce = re.compile("Nonce: ([0-9]+)\n")
+    re_nonce = re.compile("Nonce: ([0-9]+)\n")
 
     fields_parsers = {
         **Document.fields_parsers,
@@ -127,7 +127,7 @@ The class Block handles Block documents.
             "Certifications": re_certifications,
             "Transactions": re_transactions,
             "InnerHash": re_hash,
-            "Noonce": re_noonce,
+            "Nonce": re_nonce,
         },
     }
 
@@ -158,7 +158,7 @@ The class Block handles Block documents.
         certifications: List[Certification],
         transactions: List[Transaction],
         inner_hash: str,
-        noonce: int,
+        nonce: int,
         signature: str,
     ) -> None:
         """
@@ -188,8 +188,8 @@ The class Block handles Block documents.
         :param excluded: members excluded because of missing certifications
         :param certifications: certifications documents
         :param transactions: transactions documents
-        :param inner_hash: the block hah
-        :param noonce: the noonce value of the block
+        :param inner_hash: the block hash
+        :param nonce: the nonce value of the block
         :param signature: the block signature
         """
         super().__init__(version, currency, [signature])
@@ -229,7 +229,7 @@ The class Block handles Block documents.
         self.certifications = certifications
         self.transactions = transactions
         self.inner_hash = inner_hash
-        self.noonce = noonce
+        self.nonce = nonce
 
     @property
     def blockUID(self) -> BlockUID:
@@ -399,7 +399,7 @@ The class Block handles Block documents.
         inner_hash = Block.parse_field("InnerHash", lines[n])
         n += 1
 
-        noonce = int(Block.parse_field("Noonce", lines[n]))
+        nonce = int(Block.parse_field("Nonce", lines[n]))
         n += 1
 
         signature = Block.parse_field("Signature", lines[n])
@@ -430,7 +430,7 @@ The class Block handles Block documents.
             certifications,
             transactions,
             inner_hash,
-            noonce,
+            nonce,
             signature,
         )
 
@@ -509,7 +509,7 @@ PreviousIssuer: {1}\n".format(
 
         doc += "InnerHash: {0}\n".format(self.inner_hash)
 
-        doc += "Nonce: {0}\n".format(self.noonce)
+        doc += "Nonce: {0}\n".format(self.nonce)
 
         return doc
 
@@ -518,7 +518,7 @@ PreviousIssuer: {1}\n".format(
 Nonce: {nonce}
 {signature}
 """.format(
-            inner_hash=self.inner_hash, nonce=self.noonce, signature=self.signatures[0]
+            inner_hash=self.inner_hash, nonce=self.nonce, signature=self.signatures[0]
         )
         return hashlib.sha256(doc_str.encode("ascii")).hexdigest().upper()
 
