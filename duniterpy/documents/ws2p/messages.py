@@ -7,9 +7,9 @@ from duniterpy.key import VerifyingKey, SigningKey
 from duniterpy.tools import get_ws2p_challenge
 
 
-class Connect(Document):
+class HandshakeMessage(Document):
     version = 2
-    auth = "CONNECT"
+    auth = ""
 
     def __init__(
         self,
@@ -21,8 +21,8 @@ class Connect(Document):
         """
         Init Connect message document
 
-        :param currency: Name of currency
-        :param pubkey: Public key of node
+        :param currency: Name of the currency
+        :param pubkey: Public key of the node
         :param challenge: [Optional, default=None] Big random string, typically an uuid
         :param signature: [Optional, default=None] Base64 encoded signature of raw formated document
         """
@@ -52,8 +52,11 @@ class Connect(Document):
 
         :return:
         """
-        return "WS2P:CONNECT:{currency}:{pub}:{challenge}".format(
-            currency=self.currency, pub=self.pubkey, challenge=self.challenge
+        return "WS2P:{auth}:{currency}:{pub}:{challenge}".format(
+            auth=self.auth,
+            currency=self.currency,
+            pub=self.pubkey,
+            challenge=self.challenge,
         )
 
     def get_signed_json(self, signing_key: SigningKey) -> str:
@@ -77,8 +80,11 @@ class Connect(Document):
         return self.raw()
 
 
-class Ack(Document):
-    version = 2
+class Connect(HandshakeMessage):
+    auth = "CONNECT"
+
+
+class Ack(HandshakeMessage):
     auth = "ACK"
 
     def __init__(
@@ -89,37 +95,14 @@ class Ack(Document):
         signature: Optional[str] = None,
     ) -> None:
         """
-        Init Ack message document
+        Init Connect message document
 
-        :param currency: Name of currency
-        :param pubkey: Public key of node
-        :param challenge: The challenge sent in the connect message
+        :param currency: Name of the currency
+        :param pubkey: Public key of the node
+        :param challenge: Big random string, typically an uuid
         :param signature: [Optional, default=None] Base64 encoded signature of raw formated document
         """
-        if signature is not None:
-            signatures = [signature]
-        else:
-            signatures = []
-
-        super().__init__(self.version, currency, signatures)
-
-        self.pubkey = pubkey
-        self.challenge = challenge
-
-        if signature is not None:
-            # verify signature
-            verifying_key = VerifyingKey(self.pubkey)
-            verifying_key.verify_document(self)
-
-    def raw(self):
-        """
-        Return the document in raw format
-
-        :return:
-        """
-        return "WS2P:ACK:{currency}:{pub}:{challenge}".format(
-            currency=self.currency, pub=self.pubkey, challenge=self.challenge
-        )
+        super().__init__(currency, pubkey, challenge, signature)
 
     def get_signed_json(self, signing_key: SigningKey) -> str:
         """
@@ -133,12 +116,8 @@ class Ack(Document):
         data = {"auth": self.auth, "pub": self.pubkey, "sig": self.signatures[0]}
         return json.dumps(data)
 
-    def __str__(self) -> str:
-        return self.raw()
 
-
-class Ok(Document):
-    version = 2
+class Ok(HandshakeMessage):
     auth = "OK"
 
     def __init__(
@@ -149,36 +128,14 @@ class Ok(Document):
         signature: Optional[str] = None,
     ) -> None:
         """
-        Init Ok message document
+        Init Connect message document
 
-        :param currency: Name of currency
-        :param pubkey: Public key of node
-        :param challenge: The challenge sent in the connect message
+        :param currency: Name of the currency
+        :param pubkey: Public key of the node
+        :param challenge: Big random string, typically an uuid
         :param signature: [Optional, default=None] Base64 encoded signature of raw formated document
         """
-        if signature is not None:
-            signatures = [signature]
-        else:
-            signatures = []
-        super().__init__(self.version, currency, signatures)
-
-        self.pubkey = pubkey
-        self.challenge = challenge
-
-        if signature is not None:
-            # verify signature
-            verifying_key = VerifyingKey(self.pubkey)
-            verifying_key.verify_document(self)
-
-    def raw(self):
-        """
-        Return the document in raw format
-
-        :return:
-        """
-        return "WS2P:OK:{currency}:{pub}:{challenge}".format(
-            currency=self.currency, pub=self.pubkey, challenge=self.challenge
-        )
+        super().__init__(currency, pubkey, challenge, signature)
 
     def get_signed_json(self, signing_key: SigningKey) -> str:
         """
@@ -191,9 +148,6 @@ class Ok(Document):
         self.sign([signing_key])
         data = {"auth": self.auth, "sig": self.signatures[0]}
         return json.dumps(data)
-
-    def __str__(self) -> str:
-        return self.raw()
 
 
 class DocumentMessage:
