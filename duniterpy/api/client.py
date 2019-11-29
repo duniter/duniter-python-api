@@ -82,23 +82,24 @@ async def parse_response(response: ClientResponse, schema: dict) -> Any:
 
 
 class WSConnection:
+    """
+    From the documentation of the aiohttp_library, the web socket connection
 
-    # From the documentation of the aiohttp_library, the web socket connection
-    #
-    #   await ws_connection = session.ws_connect()
-    #
-    # should return a ClientWebSocketResponse object...
-    #
-    # https://docs.aiohttp.org/en/stable/client_quickstart.html#websockets
-    #
-    # In fact, aiohttp.session.ws_connect() returns a aiohttp.client._WSRequestContextManager instance.
-    # It must be used in a with statement to get the ClientWebSocketResponse instance from it (__aenter__).
-    # At the end of the with statement, aiohttp.client._WSRequestContextManager.__aexit__ is called
-    # and close the ClientWebSocketResponse in it.
-    #
-    #   await with ws_connection as ws:
-    #       await ws.receive_str()
-    #
+      await ws_connection = session.ws_connect()
+
+    should return a ClientWebSocketResponse object...
+
+    https://docs.aiohttp.org/en/stable/client_quickstart.html#websockets
+
+    In fact, aiohttp.session.ws_connect() returns a aiohttp.client._WSRequestContextManager instance.
+    It must be used in a with statement to get the ClientWebSocketResponse instance from it (__aenter__).
+    At the end of the with statement, aiohttp.client._WSRequestContextManager.__aexit__ is called
+    and close the ClientWebSocketResponse in it.
+
+      await with ws_connection as ws:
+          await ws.receive_str()
+    """
+
     def __init__(self, connection: _WSRequestContextManager) -> None:
         """
         Init WSConnection instance
@@ -155,8 +156,7 @@ class WSConnection:
 
     async def init_connection(self):
         """
-        Mandatory for aiohttp library to avoid the use of the with statement
-
+        Mandatory for aiohttp library in order to avoid the usage of the 'with' statement
         :return:
         """
         self.connection = await self._connection.__aenter__()
@@ -181,9 +181,9 @@ class API:
     """
 
     def __init__(
-        self,
-        connection_handler: endpoint.ConnectionHandler,
-        headers: Optional[dict] = None,
+            self,
+            connection_handler: endpoint.ConnectionHandler,
+            headers: Optional[dict] = None,
     ) -> None:
         """
         Asks a module in order to create the url used then by derivated classes.
@@ -299,10 +299,10 @@ class Client:
     """
 
     def __init__(
-        self,
-        _endpoint: Union[str, endpoint.Endpoint],
-        session: ClientSession = None,
-        proxy: str = None,
+            self,
+            _endpoint: Union[str, endpoint.Endpoint],
+            session: ClientSession = None,
+            proxy: str = None,
     ) -> None:
         """
         Init Client instance
@@ -331,11 +331,11 @@ class Client:
         self.proxy = proxy
 
     async def get(
-        self,
-        url_path: str,
-        params: dict = None,
-        rtype: str = RESPONSE_JSON,
-        schema: dict = None,
+            self,
+            url_path: str,
+            params: dict = None,
+            rtype: str = RESPONSE_JSON,
+            schema: dict = None,
     ) -> Any:
         """
         GET request on self.endpoint + url_path
@@ -369,11 +369,11 @@ class Client:
         return result
 
     async def post(
-        self,
-        url_path: str,
-        params: dict = None,
-        rtype: str = RESPONSE_JSON,
-        schema: dict = None,
+            self,
+            url_path: str,
+            params: dict = None,
+            rtype: str = RESPONSE_JSON,
+            schema: dict = None,
     ) -> Any:
         """
         POST request on self.endpoint + url_path
