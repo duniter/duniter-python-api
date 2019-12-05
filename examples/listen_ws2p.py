@@ -50,7 +50,7 @@ async def main():
         try:
             # Resolve handshake
             print("Handshake...")
-            await handshake(ws, signing_key, CURRENCY, True)
+            await handshake(ws, signing_key, CURRENCY)
         except ValidationError as exception:
             print(exception.message)
             print("HANDSHAKE FAILED !")
