@@ -32,11 +32,15 @@ async def main():
 
         print("Connected successfully to web socket block path")
 
-        data = await ws.receive_json()
-
-        jsonschema.validate(data, bma.ws.WS_BLOCK_SCHEMA)
-        print("Received a block")
-        print(json.dumps(data, indent=2))
+        loop = True
+        # Iterate on each message received...
+        while loop:
+            print("Waiting message...")
+            # Wait and capture next message
+            data = await ws.receive_json()
+            jsonschema.validate(data, bma.ws.WS_BLOCK_SCHEMA)
+            print("Message received:")
+            print(json.dumps(data, indent=2))
 
         # Close session
         await client.close()
