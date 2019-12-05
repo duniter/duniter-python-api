@@ -7,13 +7,14 @@ from _socket import gaierror
 import aiohttp
 import jsonschema
 from jsonschema import ValidationError
+from typing import Any
 
 from duniterpy.tools import get_ws2p_challenge
 from duniterpy.key import SigningKey
 
 from duniterpy.helpers.ws2p import handshake
 from duniterpy.api.ws2p import requests
-from duniterpy.api.client import Client
+from duniterpy.api.client import Client, WSConnection
 
 # CONFIG #######################################
 
@@ -27,6 +28,43 @@ CURRENCY = "g1-test"
 
 
 ################################################
+
+
+async def send(ws: WSConnection, request: str, request_id: str, schema: dict) -> Any:
+    """
+    Send a WS2P request
+
+    :rtype: Any
+    :param ws: WSConnection instance
+    :param request: Request string to send
+    :param request_id: Unique request id
+    :param schema: Validation schema
+    """
+    # Send request
+    await ws.send_str(request)
+
+    # Wait response with request id
+    response = await ws.receive_json()
+    while "resId" not in response or (
+        "resId" in response and response["resId"] != request_id
+    ):
+        response = await ws.receive_json()
+        time.sleep(1)
+    try:
+        # Check response format
+        jsonschema.validate(response, schema)
+        # If valid display response
+    except ValidationError:
+        # If invalid response...
+        try:
+            # Check error response format
+            jsonschema.validate(response, requests.ERROR_RESPONSE_SCHEMA)
+            # If valid, display error response
+        except ValidationError as exception:
+            # If invalid, display exception on response validation
+            print(exception)
+
+    return response
 
 
 async def main():
@@ -67,113 +105,46 @@ async def main():
         # Send ws2p request
         print("Send getCurrent() request")
         request_id = get_ws2p_challenge()[:8]
-        await ws.send_str(requests.get_current(request_id))
-
-        # Wait response with request id
-        response = await ws.receive_json()
-        while "resId" not in response or (
-            "resId" in response and response["resId"] != request_id
-        ):
-            response = await ws.receive_json()
-            time.sleep(1)
-        try:
-            # Check response format
-            jsonschema.validate(response, requests.BLOCK_RESPONSE_SCHEMA)
-            # If valid display response
-            print("Response: " + json.dumps(response, indent=2))
-        except ValidationError:
-            # If invalid response...
-            try:
-                # Check error response format
-                jsonschema.validate(response, requests.ERROR_RESPONSE_SCHEMA)
-                # If valid, display error response
-                print("Error response: " + json.dumps(response, indent=2))
-            except ValidationError as exception:
-                # If invalid, display exception on response validation
-                print(exception)
+        response = await send(
+            ws,
+            requests.get_current(request_id),
+            request_id,
+            requests.BLOCK_RESPONSE_SCHEMA,
+        )
+        print("Response: " + json.dumps(response, indent=2))
 
         # Send ws2p request
         print("Send getBlock(360000) request")
         request_id = get_ws2p_challenge()[:8]
-        await ws.send_str(requests.get_block(request_id, 360000))
-
-        # Wait response with request id
-        response = await ws.receive_json()
-        while "resId" not in response or (
-            "resId" in response and response["resId"] != request_id
-        ):
-            response = await ws.receive_json()
-            time.sleep(1)
-        try:
-            # Check response format
-            jsonschema.validate(response, requests.BLOCK_RESPONSE_SCHEMA)
-            # If valid display response
-            print("Response: " + json.dumps(response, indent=2))
-        except ValidationError:
-            # If invalid response...
-            try:
-                # Check error response format
-                jsonschema.validate(response, requests.ERROR_RESPONSE_SCHEMA)
-                # If valid, display error response
-                print("Error response: " + json.dumps(response, indent=2))
-            except ValidationError as exception:
-                # If invalid, display exception on response validation
-                print(exception)
+        response = await send(
+            ws,
+            requests.get_block(request_id, 360000),
+            request_id,
+            requests.BLOCK_RESPONSE_SCHEMA,
+        )
+        print("Response: " + json.dumps(response, indent=2))
 
         # Send ws2p request
         print("Send getBlocks(360000, 2) request")
         request_id = get_ws2p_challenge()[:8]
-        await ws.send_str(requests.get_blocks(request_id, 360000, 2))
-
-        # Wait response with request id
-        response = await ws.receive_json()
-        while "resId" not in response or (
-            "resId" in response and response["resId"] != request_id
-        ):
-            response = await ws.receive_json()
-            time.sleep(1)
-        try:
-            # Check response format
-            jsonschema.validate(response, requests.BLOCKS_RESPONSE_SCHEMA)
-            # If valid display response
-            print("Response: " + json.dumps(response, indent=2))
-        except ValidationError:
-            # If invalid response...
-            try:
-                # Check error response format
-                jsonschema.validate(response, requests.ERROR_RESPONSE_SCHEMA)
-                # If valid, display error response
-                print("Error response: " + json.dumps(response, indent=2))
-            except ValidationError as exception:
-                # If invalid, display exception on response validation
-                print(exception)
+        response = await send(
+            ws,
+            requests.get_blocks(request_id, 360000, 2),
+            request_id,
+            requests.BLOCKS_RESPONSE_SCHEMA,
+        )
+        print("Response: " + json.dumps(response, indent=2))
 
         # Send ws2p request
         print("Send getRequirementsPending(3) request")
         request_id = get_ws2p_challenge()[:8]
-        await ws.send_str(requests.get_requirements_pending(request_id, 3))
-        # Wait response with request id
-        response = await ws.receive_json()
-        while "resId" not in response or (
-            "resId" in response and response["resId"] != request_id
-        ):
-            response = await ws.receive_json()
-            time.sleep(1)
-        try:
-            # Check response format
-            jsonschema.validate(response, requests.REQUIREMENTS_RESPONSE_SCHEMA)
-            # If valid display response
-            print("Response: " + json.dumps(response, indent=2))
-        except ValidationError:
-            # If invalid response...
-            try:
-                # Check error response format
-                jsonschema.validate(response, requests.ERROR_RESPONSE_SCHEMA)
-                # If valid, display error response
-                print("Error response: " + json.dumps(response, indent=2))
-            except ValidationError as exception:
-                # If invalid, display exception on response validation
-                print(exception)
+        response = await send(
+            ws,
+            requests.get_requirements_pending(request_id, 3),
+            request_id,
+            requests.REQUIREMENTS_RESPONSE_SCHEMA,
+        )
+        print("Response: " + json.dumps(response, indent=2))
 
         # Close session
         await client.close()
