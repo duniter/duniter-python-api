@@ -254,7 +254,7 @@ class SIGParameter:
         return self.index == other.index
 
     def __hash__(self) -> int:
-        return hash((self.index))
+        return hash(self.index)
 
     @classmethod
     def from_parameter(
@@ -310,7 +310,7 @@ class XHXParameter:
         return self.integer == other.integer
 
     def __hash__(self) -> int:
-        return hash((self.integer))
+        return hash(self.integer)
 
     @classmethod
     def from_parameter(
@@ -380,7 +380,7 @@ class Unlock:
     A Transaction UNLOCK
     """
 
-    re_inline = re.compile("([0-9]+):((?:SIG\\([0-9]+\\)|XHX\\([0-9]+\\)|\\s)+)\n")
+    re_inline = re.compile("([0-9]+):((?:SIG\\([0-9]+\\)|XHX\\([0-9]+\\)|\\s)+)")
 
     def __init__(
         self, index: int, parameters: List[Union[SIGParameter, XHXParameter]]
@@ -425,8 +425,8 @@ class Unlock:
         index = int(data.group(1))
         parameters_str = data.group(2).split(" ")
         parameters = []
-        for p in parameters_str:
-            param = UnlockParameter.from_parameter(p)
+        for parameter in parameters_str:
+            param = UnlockParameter.from_parameter(parameter)
             if param:
                 parameters.append(param)
         return cls(index, parameters)
@@ -437,7 +437,9 @@ class Unlock:
 
         :return:
         """
-        return "{0}:{1}".format(self.index, " ".join([str(p) for p in self.parameters]))
+        return "{0}:{1}".format(
+            self.index, " ".join([str(parameter) for parameter in self.parameters])
+        )
 
 
 # required to type hint cls in classmethod

@@ -436,3 +436,8 @@ class TestTransaction(unittest.TestCase):
         self.assertTrue(transaction.time is None)
         self.assertTrue(transaction.currency == "gtest")
         self.assertTrue(transaction.inputs[0].amount == 30)
+
+    def test_unlock(self):
+        unlock1 = Unlock(0, [SIGParameter(0)])
+        unlock2 = Unlock.from_inline(unlock1.inline())
+        self.assertEqual(unlock1.inline(), unlock2.inline())
