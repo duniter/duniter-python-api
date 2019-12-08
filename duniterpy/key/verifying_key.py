@@ -11,6 +11,7 @@ import libnacl.sign
 import libnacl.encode
 
 from duniterpy.documents import Document
+from duniterpy.documents.block import Block
 from .base58 import Base58Encoder
 
 
@@ -34,7 +35,13 @@ class VerifyingKey(libnacl.sign.Verifier):
         :return:
         """
         signature = base64.b64decode(document.signatures[0])
-        prepended = signature + bytes(document.raw(), "ascii")
+        if isinstance(document, Block):
+            content_to_verify = "InnerHash: {0}\nNonce: {1}\n".format(
+                document.inner_hash, document.nonce
+            )
+        else:
+            content_to_verify = document.raw()
+        prepended = signature + bytes(content_to_verify, "ascii")
 
         try:
             self.verify(prepended)
