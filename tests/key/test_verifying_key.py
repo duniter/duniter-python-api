@@ -2,6 +2,7 @@ from duniterpy.key import VerifyingKey, SigningKey
 from duniterpy.key.scrypt_params import ScryptParams
 from duniterpy.documents.peer import Peer
 from duniterpy.documents.ws2p.heads import HeadV0, HeadV1, HeadV2
+from duniterpy.documents import Block
 import unittest
 
 
@@ -76,3 +77,35 @@ BASIC_MERKLED_API testnet.duniter.inso.ovh 80
 
         verifying_key = VerifyingKey(headv2.pubkey)
         self.assertTrue(verifying_key.verify_ws2p_head(headv2))
+
+    def test_block_document(self):
+        block_document = """Version: 10
+Type: Block
+Currency: g1
+Number: 15145
+PoWMin: 80
+Time: 1493684276
+MedianTime: 1493681245
+UnitBase: 0
+Issuer: 6fFt4zdvtNyVcfJn7Y41mKLmMDizyK3nVeNW3qdDXzpc
+IssuersFrame: 106
+IssuersFrameVar: 0
+DifferentIssuersCount: 21
+PreviousHash: 00000A0CE0AE54F3F6B63383F386067160C477B5338FB93AF3AF0776A959AA32
+PreviousIssuer: D9D2zaJoWYWveii1JRYLVK3J4Z7ZH3QczoKrnQeiM6mx
+MembersCount: 98
+Identities:
+Joiners:
+Actives:
+Leavers:
+Revoked:
+Excluded:
+Certifications:
+Transactions:
+InnerHash: AA01ABD5C6D3F99A189C0CF0E37768DA0F876526AF93FE150E92B135D4AD0D85
+Nonce: 10300000099432
+"""
+        block_signature = "Uxa3L+/m/dWLex2xSh7Jv1beAn4f99BmoYAs7iX3Lr+t1l5jzJpd9m4iI1cHppIizCgbg6ztaiZedQ+Mp6KuDg=="
+        block = Block.from_signed_raw(block_document + block_signature + "\n")
+        verifying_key = VerifyingKey(block.issuer)
+        self.assertTrue(verifying_key.verify_document(block))
