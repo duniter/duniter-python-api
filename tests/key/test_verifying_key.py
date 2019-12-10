@@ -27,8 +27,7 @@ class TestVerifyingKey(unittest.TestCase):
         self.assertEqual(message, verified_message.decode("utf-8"))
 
     def test_peer_signature(self):
-        signed_raw = (
-            """Version: 2
+        signed_raw = """Version: 2
 Type: Peer
 Currency: test_net
 PublicKey: 8Fi1VSTbjkXguwThF4v2ZxC5whK7pwG2vcGTkPUPjPGU
@@ -37,8 +36,6 @@ Endpoints:
 BASIC_MERKLED_API testnet.duniter.inso.ovh 80
 4aQ/sfqFAFUeYkkLdC2OfgXqTBjCIcMptpR/GIlGqbe4aFVJcy9NEVAFx7sHiLuAb+VNnec3XHHC+xOk3MLzDA==
 """
-            ""
-        )
         peer = Peer.from_signed_raw(signed_raw)
         pubkey = "8Fi1VSTbjkXguwThF4v2ZxC5whK7pwG2vcGTkPUPjPGU"
         verifying_key = VerifyingKey(pubkey)
