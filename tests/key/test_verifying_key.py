@@ -3,6 +3,7 @@ from duniterpy.key.scrypt_params import ScryptParams
 from duniterpy.documents.peer import Peer
 from duniterpy.documents.ws2p.heads import HeadV0, HeadV1, HeadV2
 from duniterpy.documents import Block
+from duniterpy.documents.transaction import Transaction
 import unittest
 
 
@@ -109,3 +110,28 @@ Nonce: 10300000099432
         block = Block.from_signed_raw(block_document + block_signature + "\n")
         verifying_key = VerifyingKey(block.issuer)
         self.assertTrue(verifying_key.verify_document(block))
+
+    def test_transaction_document(self):
+        transaction_document = """TX:10:1:6:6:2:1:0
+278644-000004546FCB16F2851A8B6D1066219B0EBB3580C882850411618E35241719EA
+8rYgYd64F2Y3Gfxwohjrc7K3zSNpDz79yNxRJorUwmse
+1011:0:D:8rYgYd64F2Y3Gfxwohjrc7K3zSNpDz79yNxRJorUwmse:278052
+1011:0:D:8rYgYd64F2Y3Gfxwohjrc7K3zSNpDz79yNxRJorUwmse:278333
+1011:0:D:8rYgYd64F2Y3Gfxwohjrc7K3zSNpDz79yNxRJorUwmse:278609
+1011:0:T:4116D06975AE613C96183390FC5A2BE2561F36C86F5CFE69EB23E3B517AA6F17:1
+20330:0:T:56D8A0ACE3BC7E1173FF8BFB8A97A2F3353B6F3AEBCF4923C8BE2E81FDCC0685:1
+11121:0:T:7CC29A8707D72936ED0EB9C618CEB3278DFAB4647B6639AA09620FA31EAD95D8:1
+0:SIG(0)
+1:SIG(0)
+2:SIG(0)
+3:SIG(0)
+4:SIG(0)
+5:SIG(0)
+30000:0:SIG(2mKmto464oWCVsRgcYM6vpwsLsGk6MhMtrBKf7DTAU34)
+5495:0:SIG(8rYgYd64F2Y3Gfxwohjrc7K3zSNpDz79yNxRJorUwmse)
+Solde huile Millepertuis
+rgjOmzFH5h+hkDbJLk1b88X7Z83HMgTa5rBckeMSdF/yZtItN3zMn09MphcXjffdrKcK+MebwoisLJqV+jXrDg==
+"""
+        tx = Transaction.from_compact("g1", transaction_document)
+        verifying_key = VerifyingKey(tx.issuers[0])
+        self.assertTrue(verifying_key.verify_document(tx))
