@@ -181,9 +181,9 @@ class API:
     """
 
     def __init__(
-            self,
-            connection_handler: endpoint.ConnectionHandler,
-            headers: Optional[dict] = None,
+        self,
+        connection_handler: endpoint.ConnectionHandler,
+        headers: Optional[dict] = None,
     ) -> None:
         """
         Asks a module in order to create the url used then by derivated classes.
@@ -207,8 +207,11 @@ class API:
 
         server, port = self.connection_handler.server, self.connection_handler.port
         if self.connection_handler.path:
-            url = "{scheme}://{server}:{port}/{path}".format(
-                scheme=scheme, server=server, port=port, path=path
+            url = "{scheme}://{server}:{port}/{api_path}".format(
+                scheme=scheme,
+                server=server,
+                port=port,
+                api_path=self.connection_handler.path,
             )
         else:
             url = "{scheme}://{server}:{port}/".format(
@@ -299,10 +302,10 @@ class Client:
     """
 
     def __init__(
-            self,
-            _endpoint: Union[str, endpoint.Endpoint],
-            session: ClientSession = None,
-            proxy: str = None,
+        self,
+        _endpoint: Union[str, endpoint.Endpoint],
+        session: ClientSession = None,
+        proxy: str = None,
     ) -> None:
         """
         Init Client instance
@@ -331,11 +334,11 @@ class Client:
         self.proxy = proxy
 
     async def get(
-            self,
-            url_path: str,
-            params: dict = None,
-            rtype: str = RESPONSE_JSON,
-            schema: dict = None,
+        self,
+        url_path: str,
+        params: dict = None,
+        rtype: str = RESPONSE_JSON,
+        schema: dict = None,
     ) -> Any:
         """
         GET request on self.endpoint + url_path
@@ -369,11 +372,11 @@ class Client:
         return result
 
     async def post(
-            self,
-            url_path: str,
-            params: dict = None,
-            rtype: str = RESPONSE_JSON,
-            schema: dict = None,
+        self,
+        url_path: str,
+        params: dict = None,
+        rtype: str = RESPONSE_JSON,
+        schema: dict = None,
     ) -> Any:
         """
         POST request on self.endpoint + url_path

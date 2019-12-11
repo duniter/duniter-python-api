@@ -4,8 +4,8 @@ from duniterpy.api import bma
 
 # CONFIG #######################################
 
-# You can either use a complete defined endpoint : [NAME_OF_THE_API] [DOMAIN] [IPv4] [IPv6] [PORT]
-# or the simple definition : [NAME_OF_THE_API] [DOMAIN] [PORT]
+# You can either use a complete defined endpoint : [NAME_OF_THE_API] [DOMAIN] [IPv4] [IPv6] [PORT] [PATH]
+# or the simple definition : [NAME_OF_THE_API] [DOMAIN] [PORT] [PATH]
 # Here we use the secure BASIC_MERKLED_API (BMAS)
 BMAS_ENDPOINT = "BMAS g1-test.duniter.org 443"
 

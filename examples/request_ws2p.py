@@ -17,9 +17,9 @@ from duniterpy.api.client import Client
 
 # CONFIG #######################################
 
-# You can either use a complete defined endpoint : [NAME_OF_THE_API] [DOMAIN] [IPv4] [IPv6] [PORT]
-# or the simple definition : [NAME_OF_THE_API] [DOMAIN] [PORT]
-# Here we use the WS2P API (WS2P [UUID] [DOMAIN] [PORT])
+# You can either use a complete defined endpoint : [NAME_OF_THE_API] [DOMAIN] [IPv4] [IPv6] [PORT] [PATH]
+# or the simple definition : [NAME_OF_THE_API] [DOMAIN] [PORT] [PATH]
+# Here we use the WS2P API (WS2P [UUID] [DOMAIN] [PORT] [PATH])
 # You can find the UUID of a node with the /network/ws2p/heads BMA API request
 # or in your node user interface in the network view in the WS2PID column
 WS2P_ENDPOINT = "WS2P 96675302 g1-test.duniter.org 443"
