@@ -19,8 +19,10 @@ from duniterpy.api.client import Client
 
 # You can either use a complete defined endpoint : [NAME_OF_THE_API] [DOMAIN] [IPv4] [IPv6] [PORT]
 # or the simple definition : [NAME_OF_THE_API] [DOMAIN] [PORT]
-# Here we use the WS2P API (WS2P)
-WS2P_ENDPOINT = "WS2P 2f731dcd 127.0.0.1 20900"
+# Here we use the WS2P API (WS2P [UUID] [DOMAIN] [PORT])
+# You can find the UUID of a node with the /network/ws2p/heads BMA API request
+# or in your node user interface in the network view in the WS2PID column
+WS2P_ENDPOINT = "WS2P 96675302 g1-test.duniter.org 443"
 CURRENCY = "g1-test"
 
 
@@ -31,13 +33,16 @@ async def main():
     """
     Main code
     """
-
+    # You can connect with member credentials in case there is not much slots available on the endpoint
+    #
     # # Prompt hidden user entry
     # salt = getpass.getpass("Enter your passphrase (salt): ")
     #
     # # Prompt hidden user entry
     # password = getpass.getpass("Enter your password: ")
-    salt = password = "toto"
+
+    # dummy credentials
+    salt = password = "test"
 
     # Init signing_key instance
     signing_key = SigningKey.from_credentials(salt, password)
@@ -49,7 +54,7 @@ async def main():
         # Create a Web Socket connection
         ws = await client.connect_ws()
 
-        print("Connected successfully to web socket endpoint")
+        print("Successfully connected to the web socket endpoint")
 
         # HANDSHAKE #######################################################
         try:
