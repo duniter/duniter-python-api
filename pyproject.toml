@@ -32,6 +32,7 @@ attrs = "^20.2.0"
 base58 = "^2.0.0"
 libnacl = "^1.7.2"
 pyaes = "^1.6.1"
+graphql-core = "^3.1.2"
 
 [tool.poetry.dev-dependencies]
 black = "^20.8b1"
