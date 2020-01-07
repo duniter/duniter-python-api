@@ -439,5 +439,5 @@ class TestTransaction(unittest.TestCase):
 
     def test_unlock(self):
         unlock1 = Unlock(0, [SIGParameter(0)])
-        unlock2 = Unlock.from_inline(unlock1.inline())
-        self.assertEqual(unlock1.inline(), unlock2.inline())
+        unlock2 = Unlock.from_inline("0:SIG(0)")
+        self.assertEqual(unlock1, unlock2)
