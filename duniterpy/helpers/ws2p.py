@@ -14,9 +14,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 import jsonschema
-
-from duniterpy.api import ws2p
-from duniterpy.api.client import WSConnection
+from typing import Union
+from duniterpy.api import ws2p, bma
+from duniterpy.api.client import WSConnection, Client
+from duniterpy.api.endpoint import BMAEndpoint, SecuredBMAEndpoint, WS2PEndpoint
 from duniterpy.documents.ws2p.messages import Connect, Ack, Ok
 from duniterpy.key import SigningKey
 import logging
@@ -108,3 +109,20 @@ async def handshake(ws: WSConnection, signing_key: SigningKey, currency: str):
 
             # exit loop
             break
+
+
+async def generate_ws2p_endpoint(
+    bma_endpoint: Union[str, BMAEndpoint, SecuredBMAEndpoint]
+) -> WS2PEndpoint:
+    """
+    Retrieve WS2P endpoints from BMA peering
+    Take the first one found
+    """
+    bma_client = Client(bma_endpoint)
+    peering = await bma_client(bma.network.peering)
+    await bma_client.close()
+
+    for endpoint in peering["endpoints"]:
+        if endpoint.startswith("WS2P"):
+            return WS2PEndpoint.from_inline(endpoint)
+    raise ValueError("No WS2P endpoint found")
