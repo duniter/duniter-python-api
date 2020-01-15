@@ -9,7 +9,7 @@ from jsonschema import ValidationError
 
 from duniterpy.key import SigningKey
 
-from duniterpy.helpers.ws2p import handshake
+from duniterpy.helpers.ws2p import handshake, generate_ws2p_endpoint
 from duniterpy.api.client import Client
 
 # CONFIG #######################################
@@ -17,10 +17,7 @@ from duniterpy.api.client import Client
 # You can either use a complete defined endpoint : [NAME_OF_THE_API] [DOMAIN] [IPv4] [IPv6] [PORT] [PATH]
 # or the simple definition : [NAME_OF_THE_API] [DOMAIN] [PORT] [PATH]
 # Here we use the WS2P API (WS2P [UUID] [DOMAIN] [PORT] [PATH])
-# You can find the UUID of a node with the /network/ws2p/heads BMA API request,
-# using the UUID of the HEAD with step 0
-# or in your node user interface in the network view in the WS2PID column
-WS2P_ENDPOINT = "WS2P 96675302 g1-test.duniter.org 443"
+BMAS_ENDPOINT = "BMAS g1-test.duniter.org 443"
 CURRENCY = "g1-test"
 
 
@@ -38,7 +35,12 @@ async def main():
     signing_key = SigningKey.from_credentials(salt, password)
 
     # Create Client from endpoint string in Duniter format
-    client = Client(WS2P_ENDPOINT)
+    try:
+        ws2p_endpoint = await generate_ws2p_endpoint(BMAS_ENDPOINT)
+    except ValueError as e:
+        print(e)
+        return
+    client = Client(ws2p_endpoint)
 
     try:
         # Create a Web Socket connection
@@ -73,7 +75,7 @@ async def main():
     except (aiohttp.WSServerHandshakeError, ValueError) as e:
         print("Websocket handshake {0} : {1}".format(type(e).__name__, str(e)))
     except (aiohttp.ClientError, gaierror, TimeoutError) as e:
-        print("{0} : {1}".format(str(e), WS2P_ENDPOINT))
+        print("{0} : {1}".format(str(e), ws2p_endpoint.inline()))
     except jsonschema.ValidationError as e:
         print("{:}:{:}".format(str(e.__class__.__name__), str(e)))
 
