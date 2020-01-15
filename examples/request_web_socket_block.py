@@ -51,6 +51,7 @@ async def main():
         print("{0} : {1}".format(str(e), BMAS_ENDPOINT))
     except jsonschema.ValidationError as e:
         print("{:}:{:}".format(str(e.__class__.__name__), str(e)))
+    await client.close()
 
 
 # Latest duniter-python-api is asynchronous and you have to use asyncio, an asyncio loop and a "as" on the data.

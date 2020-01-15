@@ -1,6 +1,7 @@
 import asyncio
 import json
 import time
+import sys
 
 from _socket import gaierror
 
@@ -69,16 +70,17 @@ async def main():
     """
     Main code
     """
+    # dummy credentials
+    salt = password = "test"
+
     # You can connect with member credentials in case there is not much slots available on the endpoint
     #
     # # Prompt hidden user entry
+    # import getpass
     # salt = getpass.getpass("Enter your passphrase (salt): ")
     #
     # # Prompt hidden user entry
     # password = getpass.getpass("Enter your password: ")
-
-    # dummy credentials
-    salt = password = "test"
 
     # Init signing_key instance
     signing_key = SigningKey.from_credentials(salt, password)
@@ -103,7 +105,7 @@ async def main():
         except ValidationError as exception:
             print(exception.message)
             print("HANDSHAKE FAILED !")
-            exit(1)
+            sys.exit(1)
 
         # Send ws2p request
         print("Send getCurrent() request")
@@ -117,22 +119,22 @@ async def main():
         print("Response: " + json.dumps(response, indent=2))
 
         # Send ws2p request
-        print("Send getBlock(360000) request")
+        print("Send getBlock(30000) request")
         request_id = get_ws2p_challenge()[:8]
         response = await send(
             ws,
-            requests.get_block(request_id, 360000),
+            requests.get_block(request_id, 30000),
             request_id,
             requests.BLOCK_RESPONSE_SCHEMA,
         )
         print("Response: " + json.dumps(response, indent=2))
 
         # Send ws2p request
-        print("Send getBlocks(360000, 2) request")
+        print("Send getBlocks(30000, 2) request")
         request_id = get_ws2p_challenge()[:8]
         response = await send(
             ws,
-            requests.get_blocks(request_id, 360000, 2),
+            requests.get_blocks(request_id, 30000, 2),
             request_id,
             requests.BLOCKS_RESPONSE_SCHEMA,
         )
@@ -158,6 +160,7 @@ async def main():
         print("{0} : {1}".format(str(e), ws2p_endpoint.inline()))
     except jsonschema.ValidationError as e:
         print("{:}:{:}".format(str(e.__class__.__name__), str(e)))
+    await client.close()
 
 
 # Latest duniter-python-api is asynchronous and you have to use asyncio, an asyncio loop and a "as" on the data.

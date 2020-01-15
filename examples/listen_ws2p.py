@@ -1,5 +1,6 @@
 import asyncio
 import json
+import sys
 
 from _socket import gaierror
 
@@ -31,6 +32,15 @@ async def main():
     # Arbitrary credentials to create the node key pair to sign ws2p documents
     salt = password = "test"
 
+    # You can connect with member credentials in case there is not much slots available on the endpoint
+    #
+    # # Prompt hidden user entry
+    # import getpass
+    # salt = getpass.getpass("Enter your passphrase (salt): ")
+    #
+    # # Prompt hidden user entry
+    # password = getpass.getpass("Enter your password: ")
+
     # Init signing_key instance
     signing_key = SigningKey.from_credentials(salt, password)
 
@@ -56,7 +66,7 @@ async def main():
         except ValidationError as exception:
             print(exception.message)
             print("HANDSHAKE FAILED !")
-            exit(1)
+            sys.exit(1)
 
         print("Handshake ok")
 
@@ -78,6 +88,7 @@ async def main():
         print("{0} : {1}".format(str(e), ws2p_endpoint.inline()))
     except jsonschema.ValidationError as e:
         print("{:}:{:}".format(str(e.__class__.__name__), str(e)))
+    await client.close()
 
 
 # Latest duniter-python-api is asynchronous and you have to use asyncio, an asyncio loop and a "as" on the data.
