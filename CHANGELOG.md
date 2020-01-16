@@ -1,3 +1,28 @@
+## [v0.56.0](https://git.duniter.org/clients/python/duniterpy/-/milestones/10) (20th January 2020)
+### Code
+- #58, !84: Support for WS2P API
+  BREAK BACKWARD COMPATIBILITY: now websocket connections use a special class WSConnection and async, see examples.
+- #113, !89: Blocks signature verification is handled correctly now, differently from other documents.
+- #112, !88: fix Unlock.from_inline error on a newly created Unlock
+- !87: Typos in Block: noonce −> nonce, hash
+- !82: Use sys.exit() instead of exit()
+- !79: Move tools, introduce helper to check if an output is available
+
+### Dependencies
+-    !91: fix attrs install in requirements.txt
+
+### Build
+-    #107, !81: Enhance version definition in setup.py
+
+### CI/CD
+- !78: Release on PyPi only on tags
+
+### Documentation
+-    #101, !80: Publish auto-documentation on gitlab-pages with gitlab-ci
+     
+### Others
+-    #106, !83: Migrate the README back to markdown
+
 ## v0.55.1 (19th July 2019)
 - #102: wheel build does not longer include `duniterpy` sub-folders
 - Trigger release only on `master` not on tag as protected environment variables are not shared with pipelines started on a tag
@@ -19,7 +44,7 @@
 - Add `format` and `check-format` commands to the `MakeFile`
 - !63: Format the code with Black
 
-#### Other
+#### Others
 - `Makefile`: `check` command for `mypy`, `pylint`, and `check-format` checks
 - #94: Apply Mypy, Pylint and Black on `tests` and `examples` folders
 
