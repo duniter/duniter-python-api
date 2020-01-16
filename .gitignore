@@ -42,3 +42,7 @@ docs/duniterpy.*
 
 # gitlab pages
 /public/
+
+# Poetry
+# https://python-poetry.org/docs/libraries/#lock-file
+poetry.lock
