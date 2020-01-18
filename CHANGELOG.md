@@ -1,27 +1,34 @@
 ## [v0.56.0](https://git.duniter.org/clients/python/duniterpy/-/milestones/10) (20th January 2020)
 ### Code
-- #58, !84: Support for WS2P API
-  BREAK BACKWARD COMPATIBILITY: now websocket connections use a special class WSConnection and async, see examples.
-- #113, !89: Blocks signature verification is handled correctly now, differently from other documents.
-- #112, !88: fix Unlock.from_inline error on a newly created Unlock
-- !87: Typos in Block: noonce −> nonce, hash
-- !82: Use sys.exit() instead of exit()
-- !79: Move tools, introduce helper to check if an output is available
+- #58, !84: Introduce WS2P API support: **BREAK BACKWARD COMPATIBILITY**:
+  - `bma.ws`: now websocket connections use the special `WSConnection` class and `async`, check examples.
+  - Add two examples, a helper to retrieve the WS2P API from BMA.
+- #113, !89: Blocks signature verification is correctly handled now, differently from other documents.
+- #112, !88: fix `Unlock.from_inline()` error on a newly created Unlock
+- !87: Typos in Block: `noonce` −> `nonce`, hash
+- !82: Use `sys.exit()` instead of `exit()`
+- !79:
+  - Move tools out of the `helper` folder
+  - Dedicate the `helper` folder to helpers
+  - Introduce `output_available()` helper to check if an output is available
 
 ### Dependencies
--    !91: fix attrs install in requirements.txt
+- !91: fix the `attrs`/`attr` dependency
 
 ### Build
--    #107, !81: Enhance version definition in setup.py
+- #107, !81: Enhance version definition in `setup.py`
 
 ### CI/CD
-- !78: Release on PyPi only on tags
+- !78: Release on PyPI only on tags
 
 ### Documentation
--    #101, !80: Publish auto-documentation on gitlab-pages with gitlab-ci
-     
-### Others
--    #106, !83: Migrate the README back to markdown
+- #101, !80: Publish auto-documentation on GitLab Pages
+- #106, !83: Migrate the `README` back to markdown, reword and update it.
+- !77: Improve v0.55.0 and add v0.55.1 changelog
+- !92: Add v0.56.0 changelog
+---
+
+- Thanks @vtexier, @Moul
 
 ## v0.55.1 (19th July 2019)
 - #102: wheel build does not longer include `duniterpy` sub-folders
