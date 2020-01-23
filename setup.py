@@ -45,7 +45,7 @@ for requirement in (l.strip() for l in open('requirements.txt')):
 setup(
     name='duniterpy',
 
-    version="0.55.1",
+    version="0.56.0",
 
     packages=find_packages(exclude=["tests*"]),
 
