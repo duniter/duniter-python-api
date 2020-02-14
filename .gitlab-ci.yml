@@ -57,7 +57,6 @@ type:
     - .changes
   stage: checks
   script:
-    - poetry install
     - make mypy
 
 lint:
@@ -128,7 +127,7 @@ pages:
   stage: publish_doc
   script:
     - poetry install
-    - poetry run make docs
+    - make docs
     - mv docs/_build/html public
     - ls public
   artifacts:
