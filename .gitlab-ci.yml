@@ -1,7 +1,6 @@
 stages:
-  - format
+  - checks
   - tests
-  - build
   - release
   - publish_doc
 
@@ -11,7 +10,6 @@ variables:
 
 image: $DOCKER_IMAGE/$PYTHON_VERSION:latest
 
-# SUB-TASKS
 .push_to_github:
   tags:
     - github
@@ -40,13 +38,28 @@ image: $DOCKER_IMAGE/$PYTHON_VERSION:latest
       - tests/**/*.py
       - pyproject.toml
 
-# TASKS
 format:
   extends:
     - .changes
-  stage: format
+  stage: checks
   script:
     - make check-format
+
+build:
+  extends:
+    - .changes
+  stage: checks
+  script:
+    - poetry build
+
+check:
+  extends:
+    - .changes
+  stage: checks
+  script:
+    - poetry install
+    - make mypy
+    - make pylint
 
 .tests:
   extends: .changes
@@ -77,22 +90,6 @@ tests-3.9:
   tags: [redshift]
   variables:
     PYTHON_VERSION: "3.9"
-
-check:
-  extends:
-    - .changes
-  stage: tests
-  script:
-    - poetry install
-    - make mypy
-    - make pylint
-
-build:
-  extends:
-    - .changes
-  stage: build
-  script:
-    - poetry build
 
 release:
   extends:
