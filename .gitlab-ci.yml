@@ -1,6 +1,6 @@
 stages:
   - format
-  - test
+  - tests
   - build
   - release
   - publish_doc
@@ -48,18 +48,40 @@ format:
   script:
     - make check-format
 
-test:
-  extends:
-    - .changes
-  stage: test
+.tests:
+  extends: .changes
+  stage: tests
+  image: $DOCKER_IMAGE/$PYTHON_VERSION:latest
   script:
     - poetry install --no-dev
     - make tests
 
+tests-3.6:
+  extends: .tests
+  tags: [mille]
+  variables:
+    PYTHON_VERSION: "3.6"
+
+tests-3.7:
+  extends: .tests
+  tags: [mille]
+  variables:
+    PYTHON_VERSION: "3.7"
+
+tests-3.8:
+  extends: .tests
+  tags: [redshift]
+
+tests-3.9:
+  extends: .tests
+  tags: [redshift]
+  variables:
+    PYTHON_VERSION: "3.9"
+
 check:
   extends:
     - .changes
-  stage: test
+  stage: tests
   script:
     - poetry install
     - make mypy
