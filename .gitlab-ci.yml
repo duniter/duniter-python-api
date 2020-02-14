@@ -52,13 +52,21 @@ build:
   script:
     - poetry build
 
-check:
+type:
   extends:
     - .changes
   stage: checks
   script:
     - poetry install
     - make mypy
+
+lint:
+  extends:
+    - .changes
+  stage: tests
+  tags: [redshift]
+  script:
+    - poetry install
     - make pylint
 
 .tests:
