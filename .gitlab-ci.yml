@@ -29,18 +29,26 @@ image: $DOCKER_IMAGE/$PYTHON_VERSION:latest
     # github push
     - bash -c "git push --force --mirror github 2>&1 | grep -v duniter-gitlab; echo $?"
 
+.code_changes:
+  only:
+    changes:
+      - duniterpy/**/*.py
+      - tests/**/*.py
+      - examples/*.py
+
 .changes:
   rules:
     - changes:
       - duniterpy/**/*.py
+      - tests/**/*.py
+      - examples/*.py
       - .gitlab-ci.yml
       - Makefile
-      - tests/**/*.py
       - pyproject.toml
 
 format:
   extends:
-    - .changes
+    - .code_changes
   stage: checks
   script:
     - make check-format
@@ -54,14 +62,14 @@ build:
 
 type:
   extends:
-    - .changes
+    - .code_changes
   stage: checks
   script:
     - make mypy
 
 lint:
   extends:
-    - .changes
+    - .code_changes
   stage: tests
   tags: [redshift]
   script:
