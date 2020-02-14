@@ -7,7 +7,7 @@ stages:
 
 variables:
   DOCKER_IMAGE: "registry.duniter.org/docker/python3/poetry"
-  PYTHON_VERSION: "3.6"
+  PYTHON_VERSION: "3.8"
 
 image: $DOCKER_IMAGE/$PYTHON_VERSION:latest
 
@@ -45,7 +45,6 @@ format:
   extends:
     - .changes
   stage: format
-  image: $DOCKER_IMAGE/3.8:latest
   script:
     - make check-format
 
