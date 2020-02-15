@@ -10,25 +10,6 @@ variables:
 
 image: $DOCKER_IMAGE/$PYTHON_VERSION:latest
 
-.push_to_github:
-  tags:
-    - github
-  after_script:
-    # remove all files in current repo
-    - rm -rf ./*
-    - rm -rf .git*
-    # do a mirror clone in current repo
-    - git clone --mirror $CI_REPOSITORY_URL .
-    # do config for github push
-    - git remote add github $GITHUB_URL_AND_KEY
-    - git config --global user.email "contact@duniter.org"
-    - git config --global user.name "Duniter"
-    # remove refs about merge requests
-    - bash -c "cat packed-refs | grep -v 'refs/merge-requests' > packed-refs-new; echo 'Removed merge-requests refs.'"
-    - mv packed-refs-new packed-refs
-    # github push
-    - bash -c "git push --force --mirror github 2>&1 | grep -v duniter-gitlab; echo $?"
-
 .code_changes:
   only:
     changes:
@@ -107,8 +88,6 @@ tests-3.9:
     PYTHON_VERSION: "3.9"
 
 release:
-  extends:
-    - .push_to_github
   stage: release
   script:
     - poetry publish --build --username $PYPI_LOGIN --password $PYPI_PASSWORD
