@@ -10,6 +10,14 @@ class Request:
         self.content = content
 
 
+def find_unused_port():
+    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    s.bind(('127.0.0.1', 0))
+    port = s.getsockname()[1]
+    s.close()
+    return port
+
+
 class HTTPServer:
     def __init__(self, port, loop):
         self.lp = loop
@@ -18,7 +26,7 @@ class HTTPServer:
 
         self.handler = None
         self.runner = None
-        self.port = self.find_unused_port() if not port else port
+        self.port = find_unused_port() if not port else port
 
     def get_request(self, i):
         return self.requests[i]
@@ -48,20 +56,13 @@ class HTTPServer:
         self.app.router.add_route(req_type, url,
                                   lambda request: self._handler(request, handle))
 
-    def find_unused_port(self):
-        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        s.bind(('127.0.0.1', 0))
-        port = s.getsockname()[1]
-        s.close()
-        return port
-
     async def create_server(self, ssl_ctx=None):
         self.handler = self.app.make_handler(
             keep_alive_on=False,
             access_log=log.access_logger,
         )
 
-        self.port = self.find_unused_port()
+        self.port = find_unused_port()
         self.runner = web.AppRunner(self.app)
         await self.runner.setup()
         site = web.TCPSite(self.runner, '127.0.0.1', self.port)

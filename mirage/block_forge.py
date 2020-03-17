@@ -26,7 +26,7 @@ class BlockForge:
 
     @classmethod
     def start(cls, currency, salt, password, scrypt_params):
-        key = SigningKey(salt, password, scrypt_params)
+        key = SigningKey.from_credentials(salt, password, scrypt_params)
         return cls(currency, key)
 
     def push(self, document):
@@ -41,6 +41,7 @@ class BlockForge:
                 return 100
             finally:
                 self._ud = False
+        return 100
 
     def previous_hash(self):
         try:
@@ -79,6 +80,9 @@ class BlockForge:
                 and d.issuer in self.user_identities and self.user_identities[d.issuer].member]
 
     def excluded(self):
+        # for pylint
+        if self:
+            pass
         return []
 
     def certifications(self):
@@ -91,7 +95,7 @@ class BlockForge:
         if not self.blocks:
             return 0.1, 86400, 100000, 10800, 40, 2629800, 31557600, 1, 604800, 604800,\
                     0.9, 15778800, 5, 12, 300, 25, 0.66, 1488970800, 1490094000, 15778800
-
+        return None
 
     def monetary_mass(self, number=None):
         mass = 0
@@ -125,11 +129,11 @@ class BlockForge:
         transactions = self.transactions()
 
         block = Block(10, self.currency, len(self.blocks), 1, int(time.time()),
-                      int(time.time()), self.next_dividend(), 0, 
-                      self.key.pubkey, 5, 5, 5, previous_hash, previous_issuer, 
-                      parameters, members_count, identities, 
-                      joiners, actives, leavers, 
-                      revocations, excluded, certifications, 
+                      int(time.time()), self.next_dividend(), 0,
+                      self.key.pubkey, 5, 5, 5, previous_hash, previous_issuer,
+                      parameters, members_count, identities,
+                      joiners, actives, leavers,
+                      revocations, excluded, certifications,
                       transactions, "", 0, None)
         block.inner_hash = block.computed_inner_hash()
         return block

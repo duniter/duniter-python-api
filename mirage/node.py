@@ -1,5 +1,6 @@
 import attr
 from duniterpy.documents import BlockUID, Identity, Certification, Transaction
+from duniterpy.documents.peer import Peer
 from duniterpy.api.endpoint import BMAEndpoint
 from duniterpy.api import errors
 from duniterpy.key import SigningKey
@@ -436,9 +437,6 @@ class Node:
                 for m in matched
             ]
         }, 200
-
-    async def tx_history_range(self, request):
-        return await self.tx_history(request)
 
     async def tx_history(self, request):
         search = str(request.match_info['search'])
