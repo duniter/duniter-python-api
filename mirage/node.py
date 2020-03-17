@@ -1,7 +1,9 @@
 import attr
-from duniterpy.documents import Peer, BMAEndpoint, BlockUID, Identity, Certification, Transaction
+from duniterpy.documents import BlockUID, Identity, Certification, Transaction
+from duniterpy.api.endpoint import BMAEndpoint
 from duniterpy.api import errors
-from duniterpy.key import SigningKey, ScryptParams
+from duniterpy.key import SigningKey
+from duniterpy.key.scrypt_params import ScryptParams
 from .http import HTTPServer
 from .block_forge import BlockForge
 import logging
@@ -16,7 +18,7 @@ class Node:
 
     @classmethod
     async def start(cls, port, currency, salt, password, loop):
-        key = SigningKey(salt, password, ScryptParams(2 ** 12, 16, 1))
+        key = SigningKey.from_credentials(salt, password, ScryptParams(2 ** 12, 16, 1))
         node = cls(HTTPServer(port, loop), BlockForge(currency, key))
 
         get_routes = {

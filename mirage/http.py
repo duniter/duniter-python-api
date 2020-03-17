@@ -1,8 +1,6 @@
 from aiohttp import web, log
 import json
 import socket
-from duniterpy.documents import Peer
-import asyncio
 
 
 class Request:

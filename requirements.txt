@@ -4,4 +4,4 @@ libnacl
 base58
 jsonschema
 pypeg2
-duniterpy
+duniterpy==0.56.0
