@@ -19,4 +19,3 @@ class UserIdentity:
     tx_sent = attr.ib(default=attr.Factory(list))
     tx_received = attr.ib(default=attr.Factory(list))
     ud_generated = attr.ib(default=attr.Factory(list))
-

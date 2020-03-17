@@ -7,6 +7,3 @@ class UD:
     base = attr.ib(repr=True)
     block_number = attr.ib()
     time = attr.ib()
-
-
-

@@ -9,6 +9,3 @@ class Cert:
     written_on = attr.ib()
     block = attr.ib()
     mediantime = attr.ib()
-
-
-
