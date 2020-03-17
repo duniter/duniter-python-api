@@ -1,5 +1,6 @@
 stages:
-  - github-sync
+  - test
+  - build
   - release
 
 variables:
@@ -7,7 +8,27 @@ variables:
 
 image: registry.duniter.org/docker/python3/duniterpy-builder:0.0.4
 
-.pyenv: &pyenv
+# SUB-TASKS
+.push_to_github:
+  tags:
+    - github
+  after_script:
+    # remove all files in current repo
+    - rm -rf ./*
+    - rm -rf .git*
+    # do a mirror clone in current repo
+    - git clone --mirror $CI_REPOSITORY_URL .
+    # do config for github push
+    - git remote add github $GITHUB_URL_AND_KEY
+    - git config --global user.email "contact@duniter.org"
+    - git config --global user.name "Duniter"
+    # remove refs about merge requests
+    - bash -c "cat packed-refs | grep -v 'refs/merge-requests' > packed-refs-new; echo 'Removed merge-requests refs.'"
+    - mv packed-refs-new packed-refs
+    # github push
+    - bash -c "git push --force --mirror github 2>&1 | grep -v duniter-gitlab; echo $?"
+
+.pyenv:
   tags:
     - redshift-docker-python
   before_script:
@@ -16,32 +37,71 @@ image: registry.duniter.org/docker/python3/duniterpy-builder:0.0.4
     - eval "$(pyenv init -)"
     - pyenv shell $PYENV_PYTHON_VERSION
 
-push_to_github:
-  stage: github-sync
-  variables:
-    GIT_STRATEGY: none
-  tags:
-    - github
+.changes:
+  only:
+    changes:
+      - duniterpy/**/*.py
+      - .gitlab-ci.yml
+      - Makefile
+      - requirements_dev.txt
+      - requirements.txt
+      - setup.py
+
+# TASKS
+format:
+  extends:
+    - .pyenv
+    - .changes
+  stage: test
   script:
-    - rm -rf ./*
-    - rm -rf .git
-    - git clone --mirror $CI_REPOSITORY_URL .
-    - git remote add github $GITHUB_URL_AND_KEY
-    - git config --global user.email "contact@duniter.org"
-    - git config --global user.name "Duniter"
-    # Job would fail if we don't remove refs about pull requests
-    - bash -c "cat packed-refs | grep -v 'refs/pull' > packed-refs-new; echo 'Removed pull refs.'"
-    - mv packed-refs-new packed-refs
-    - bash -c "git push --force --mirror github 2>&1 | grep -v duniter-gitlab; echo $?"
+    - pyenv shell 3.6.4  # black install and run needs python 3.6.x minimum
+    - pip install -r requirements_dev.txt
+    - make check-format
 
+check:
+  extends:
+    - .pyenv
+    - .changes
+  stage: test
+  script:
+    - pyenv shell 3.6.4  # black install needs python 3.6.x minimum
+    - pip install -r requirements.txt
+    - pip install -r requirements_dev.txt
+    - make mypy
+    - make pylint
 
-releases:
-  <<: *pyenv
+build:
+  extends:
+    - .pyenv
+    - .changes
+  stage: build
+  script:
+    - pip install -r requirements.txt
+    - pip install -r requirements_deploy.txt
+    - make build
+
+release:
+  extends:
+    - .pyenv
+    - .push_to_github
   stage: release
   when: manual
   script:
     - pip install -r requirements.txt
-    - pip install wheel
-    - pip install twine
-    - python setup.py sdist bdist_wheel
-    - twine upload dist/* --username duniter --password $PYPI_PASSWORD
+    - pip install -r requirements_deploy.txt
+    - make build
+    - make deploy PYPI_LOGIN=${PYPI_LOGIN} PYPI_PASSWORD=${PYPI_PASSWORD}
+  only:
+    - tags
+    - master
+
+release_test:
+  extends: .pyenv
+  stage: release
+  when: manual
+  script:
+    - pip install -r requirements.txt
+    - pip install -r requirements_deploy.txt
+    - make build
+    - make deploy_test PYPI_TEST_LOGIN=${PYPI_TEST_LOGIN} PYPI_TEST_PASSWORD=${PYPI_TEST_PASSWORD}
+
