@@ -1,0 +1,4 @@
+coveralls
+mypy
+pylint
+black
