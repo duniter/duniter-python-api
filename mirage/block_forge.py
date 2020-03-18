@@ -56,7 +56,7 @@ class BlockForge:
                 return 100
             finally:
                 self._ud = False
-        return 100
+        return None
 
     def previous_hash(self):
         try:
