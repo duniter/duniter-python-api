@@ -293,9 +293,9 @@ class BlockForge:
 
         for tx in block.transactions:
             receivers = [
-                o.conditions.left.pubkey
+                o.condition.left.pubkey
                 for o in tx.outputs
-                if o.conditions.left.pubkey != tx.issuers[0]
+                if o.condition.left.pubkey != tx.issuers[0]
             ]
             self.user_identities[tx.issuers[0]].tx_sent.append(tx)
 
@@ -308,14 +308,14 @@ class BlockForge:
                         self.user_identities[tx.issuers[0]].sources.remove(s)
 
             for i, output in enumerate(tx.outputs):
-                if output.conditions.left.pubkey == tx.issuers[0]:
+                if output.condition.left.pubkey == tx.issuers[0]:
                     self.user_identities[tx.issuers[0]].sources.append(
                         InputSource(output.amount, output.base, "T", tx.sha_hash, i)
                     )
             self.user_identities[tx.issuers[0]].tx_received.append(tx)
             if len(receivers) > 0:
                 for i, output in enumerate(tx.outputs):
-                    if output.conditions.left.pubkey == receivers[0]:
+                    if output.condition.left.pubkey == receivers[0]:
                         self.user_identities[receivers[0]].sources.append(
                             InputSource(output.amount, output.base, "T", tx.sha_hash, i)
                         )
