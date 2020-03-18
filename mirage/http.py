@@ -63,8 +63,8 @@ class HTTPServer:
         )
 
     async def create_server(self, ssl_ctx=None):
-        self.handler = self.app.make_handler(
-            keep_alive_on=False, access_log=log.access_logger,
+        self.handler = web.AppRunner(
+            self.app, keep_alive_on=False, access_log=log.access_logger,
         )
 
         self.port = find_unused_port()
