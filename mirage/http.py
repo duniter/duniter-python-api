@@ -18,11 +18,28 @@ def find_unused_port():
     return port
 
 
+async def middleware_factory(_, handler):
+    async def middleware_handler(request):
+        try:
+            resp = await handler(request)
+            return resp
+        except web.HTTPNotFound:
+            return web.Response(
+                status=404,
+                body=bytes(
+                    json.dumps({"ucode": 1001, "message": "404 error"}), "utf-8"
+                ),
+                headers={"Content-Type": "application/json"},
+            )
+
+    return middleware_handler
+
+
 class HTTPServer:
     def __init__(self, port, loop):
         self.lp = loop
         self.requests = []
-        self.app = web.Application(middlewares=[self.middleware_factory])
+        self.app = web.Application(middlewares=[middleware_factory])
 
         self.handler = None
         self.runner = None
@@ -30,22 +47,6 @@ class HTTPServer:
 
     def get_request(self, i):
         return self.requests[i]
-
-    async def middleware_factory(self, app, handler):
-        async def middleware_handler(request):
-            try:
-                resp = await handler(request)
-                return resp
-            except web.HTTPNotFound:
-                return web.Response(
-                    status=404,
-                    body=bytes(
-                        json.dumps({"ucode": 1001, "message": "404 error"}), "utf-8"
-                    ),
-                    headers={"Content-Type": "application/json"},
-                )
-
-        return middleware_handler
 
     async def _handler(self, request, handle):
         await request.read()

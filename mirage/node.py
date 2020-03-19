@@ -101,7 +101,7 @@ class Node:
                     {
                         "pubkey": user_identity.pubkey,
                         "uid": user_identity.uid,
-                        "meta": {"timestamp": str(user_identity.blockstamp),},
+                        "meta": {"timestamp": str(user_identity.blockstamp)},
                         "wasMember": user_identity.was_member,
                         "isSentry": True,
                         "revoked": user_identity.revoked,
@@ -179,7 +179,7 @@ class Node:
         except IndexError:
             return {"ucode": errors.BLOCK_NOT_FOUND, "message": "Block not found"}, 404
 
-    async def current_block(self, request):
+    async def current_block(self, _):
         try:
             block = self.forge.blocks[-1]
             return (
@@ -251,7 +251,7 @@ class Node:
                 200,
             )
 
-    async def peering(self, request):
+    async def peering(self, _):
         return (
             {
                 "version": 2,
@@ -266,7 +266,7 @@ class Node:
             200,
         )
 
-    async def parameters(self, request):
+    async def parameters(self, _):
         return (
             {
                 "currency": self.forge.currency,
@@ -295,7 +295,7 @@ class Node:
             200,
         )
 
-    async def with_ud(self, request):
+    async def with_ud(self, _):
         return (
             {"result": {"blocks": [b.number for b in self.forge.blocks if b.ud]}},
             200,
@@ -444,7 +444,7 @@ class Node:
                         "uids": [
                             {
                                 "uid": m.uid,
-                                "meta": {"timestamp": str(m.blockstamp),},
+                                "meta": {"timestamp": str(m.blockstamp)},
                                 "revoked": m.revoked,
                                 "revoked_on": m.revoked_on,
                                 "revocation_sig": m.revocation_sig,
@@ -452,7 +452,7 @@ class Node:
                                 "others": [
                                     {
                                         "pubkey": c.to_identity.pubkey,
-                                        "meta": {"block_number": c.block,},
+                                        "meta": {"block_number": c.block},
                                         "uids": [c.to_identity.uid],
                                         "isMember": c.to_identity.member,
                                         "wasMember": c.to_identity.was_member,
@@ -465,7 +465,7 @@ class Node:
                         "signed": [
                             {
                                 "pubkey": c.to_identity.pubkey,
-                                "meta": {"timestamp": str(c.to_identity.blockstamp),},
+                                "meta": {"timestamp": str(c.to_identity.blockstamp)},
                                 "cert_time": {
                                     "block": c.block,
                                     "block_hash": str(
@@ -738,7 +738,7 @@ class Node:
                     {
                         "currency": self.forge.currency,
                         "pubkey": search,
-                        "history": {"history": [],},
+                        "history": {"history": []},
                     },
                     200,
                 )
@@ -759,7 +759,7 @@ class Node:
             self.forge.currency,
             self.forge.key.pubkey,
             BlockUID.empty(),
-            [BMAEndpoint(None, "127.0.0.1", None, self.http.port)],
+            [BMAEndpoint("", "127.0.0.1", "", self.http.port)],
             None,
         )
         peer.sign([self.forge.key])
