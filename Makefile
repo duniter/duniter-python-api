@@ -24,7 +24,8 @@ format:
 build:
 	if [ -d "./build" ]; then rm -r build/*; fi
 	if [ -d "./dist" ]; then rm -r dist/*; fi
-	python setup.py sdist bdist_wheel
+	python3 setup.py sdist bdist_wheel
+	twine check dist/*
 
 # upload on PyPi repository
 deploy:

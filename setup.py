@@ -8,17 +8,19 @@ setup(
     author_email="inso@tuta.io",
     description="A python mock server of [duniter](https://github.com/duniter/duniter) API",
     long_description="""
-    # duniter-mirage
+duniter-mirage
+--------------
+
 A duniter mirage is a fake server for python testing
 
-To install duniter-mirage :
+To install duniter-mirage::
 
-```
-pip install duniter-mirage
-```
+    pip install duniter-mirage
+
 
 Usage is described in example.py.
 """,
+    long_description_content_type="text/x-rst",
     # Active la prise en compte du fichier MANIFEST.in
     include_package_data=True,
     url="https://github.com/Insoleet/mirage",
