@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name="duniter-mirage",
-    version="0.1.51",
+    version="0.1.52",
     packages=find_packages(),
     author="inso",
     author_email="inso@tuta.io",
