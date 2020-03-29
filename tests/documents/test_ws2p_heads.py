@@ -30,7 +30,7 @@ class TestWS2PHeads(unittest.TestCase):
         headv1, _ = HeadV1.from_inline(
             "WS2POCAIC:HEAD:1:HbTqJ1Ts3RhJ8Rx4XkNyh1oSKmoZL1kY5U7t9mKTSjAB:"
             "102131-0000066028B991BDFE3FF6DBA84EF519F76B62EA3787BC29D9A05557675B1F16:1152e46e:"
-            "duniter:1.6.21:1",
+            "duniter:1.6.21-beta:1",
             "ZGpT8HG4uX5Hc96gqhzIkkELVjGQKDp2/L+7BTFG5ODxGYWd2VX/H+hdZRqf0iUWRNuhxlequ68kkwMaE6ymBw==",
         )
 
@@ -38,7 +38,7 @@ class TestWS2PHeads(unittest.TestCase):
         self.assertEqual(headv1.v0.api.private, "OCA")
         self.assertEqual(headv1.v0.head.version, 1)
         self.assertEqual(headv1.software, "duniter")
-        self.assertEqual(headv1.software_version, "1.6.21")
+        self.assertEqual(headv1.software_version, "1.6.21-beta")
         self.assertEqual(headv1.pow_prefix, 1)
 
     def test_ws2p_headv2(self):

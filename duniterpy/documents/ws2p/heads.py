@@ -124,7 +124,7 @@ class HeadV1:
         "({ws2pid}):({software}):({software_version}):({pow_prefix})(?::)?(.*)".format(
             ws2pid=WS2PID_REGEX,
             software="[A-Za-z-_]+",
-            software_version="[0-9]+[.][0-9]+[.][0-9]+",
+            software_version="[0-9]+[.][0-9]+[.][0-9]+[-\\w]*",
             pow_prefix="[0-9]+",
         )
     )
