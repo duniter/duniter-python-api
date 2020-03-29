@@ -33,7 +33,7 @@ pip3 install duniterpy --user
 ## Install the development environment
 - Install [Poetry](https://poetry.eustace.io):
 ```bash
-curl -sSL https://raw.githubusercontent.com/sdispater/poetry/master/get-poetry.py | python --preview
+curl -sSL https://raw.githubusercontent.com/sdispater/poetry/master/get-poetry.py | python - --preview
 ```
 
 ## Documentation
