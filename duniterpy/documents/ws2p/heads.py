@@ -1,5 +1,4 @@
 import re
-
 import attr
 
 from ..block_uid import BlockUID
@@ -46,7 +45,7 @@ class Head:
     re_inline = re.compile(WS2P_HEAD_REGEX)
 
     @classmethod
-    def from_inline(cls, inline: str):
+    def from_inline(cls, inline: str, signature: str):
         try:
             data = Head.re_inline.match(inline)
             if data is None:
@@ -62,11 +61,7 @@ class Head:
 
 
 @attr.s()
-class HeadV0:
-    """
-    A document describing a self certification.
-    """
-
+class HeadV0(Head):
     signature = attr.ib(type=str)
     api = attr.ib(type=API)
     head = attr.ib(type=Head)
@@ -92,11 +87,11 @@ class HeadV0:
             if data is None:
                 raise MalformedDocumentError("HeadV0")
             api = API.from_inline(data.group(1))
-            head = Head.from_inline(data.group(2))
+            head = Head.from_inline(data.group(2), "")
             pubkey = data.group(3)
             blockstamp = BlockUID.from_str(data.group(4))
             offload = data.group(5)
-            return cls(signature, api, head, pubkey, blockstamp), offload
+            return cls(head.version, signature, api, head, pubkey, blockstamp), offload
         except AttributeError:
             raise MalformedDocumentError("HeadV0")
 
@@ -106,15 +101,18 @@ class HeadV0:
             for v in attr.astuple(
                 self,
                 recurse=False,
-                filter=attr.filters.exclude(attr.fields(HeadV0).signature),
+                filter=attr.filters.exclude(
+                    attr.fields(HeadV0).version,
+                    attr.fields(HeadV0).signature,
+                    attr.fields(HeadV0).api,
+                ),
             )
         )
-        return ":".join(values)
+        return "{0}:{1}".format(str(self.api), ":".join(values))
 
 
 @attr.s()
-class HeadV1:
-    v0 = attr.ib(type=HeadV0)
+class HeadV1(HeadV0):
     ws2pid = attr.ib(type=str)
     software = attr.ib(type=str)
     software_version = attr.ib(type=str)
@@ -141,35 +139,27 @@ class HeadV1:
             software_version = data.group(3)
             pow_prefix = int(data.group(4))
             offload = data.group(5)
-            return cls(v0, ws2pid, software, software_version, pow_prefix), offload
+            return (
+                cls(
+                    v0.version,
+                    v0.signature,
+                    v0.api,
+                    v0.head,
+                    v0.pubkey,
+                    v0.blockstamp,
+                    ws2pid,
+                    software,
+                    software_version,
+                    pow_prefix,
+                ),
+                offload,
+            )
         except AttributeError:
             raise MalformedDocumentError("HeadV1")
 
-    def inline(self) -> str:
-        values = [
-            str(v)
-            for v in attr.astuple(
-                self, True, filter=attr.filters.exclude(attr.fields(HeadV1).v0)
-            )
-        ]
-        return self.v0.inline() + ":" + ":".join(values)
-
-    @property
-    def pubkey(self) -> str:
-        return self.v0.pubkey
-
-    @property
-    def signature(self) -> str:
-        return self.v0.signature
-
-    @property
-    def blockstamp(self) -> BlockUID:
-        return self.v0.blockstamp
-
 
 @attr.s
-class HeadV2:
-    v1 = attr.ib(type=HeadV1)
+class HeadV2(HeadV1):
     free_member_room = attr.ib(type=int)
     free_mirror_room = attr.ib(type=int)
 
@@ -188,27 +178,22 @@ class HeadV2:
                 raise MalformedDocumentError("HeadV2")
             free_member_room = int(data.group(1))
             free_mirror_room = int(data.group(2))
-            return cls(v1, free_member_room, free_mirror_room), ""
+            return (
+                cls(
+                    v1.version,
+                    v1.signature,
+                    v1.api,
+                    v1.head,
+                    v1.pubkey,
+                    v1.blockstamp,
+                    v1.ws2pid,
+                    v1.software,
+                    v1.software_version,
+                    v1.pow_prefix,
+                    free_member_room,
+                    free_mirror_room,
+                ),
+                "",
+            )
         except AttributeError:
             raise MalformedDocumentError("HeadV2")
-
-    def inline(self) -> str:
-        values = (
-            str(v)
-            for v in attr.astuple(
-                self, True, filter=attr.filters.exclude(attr.fields(HeadV2).v1)
-            )
-        )
-        return self.v1.inline() + ":" + ":".join(values)
-
-    @property
-    def pubkey(self) -> str:
-        return self.v1.pubkey
-
-    @property
-    def signature(self) -> str:
-        return self.v1.signature
-
-    @property
-    def blockstamp(self) -> BlockUID:
-        return self.v1.blockstamp
