@@ -105,7 +105,7 @@ Change and commit and tag the new version number (semantic version number)
 
 Build the PyPi package in the `dist` folder
 ```bash
-poetry build
+make build
 ```
 
 Deploy the package to PyPi test repository (prefix the command with a space in order for the shell not to save in its history system the command containing the password)
