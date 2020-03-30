@@ -1,3 +1,17 @@
+## [v0.57.0](https://git.duniter.org/clients/python/duniterpy/-/milestones/11) (31st March 2020)
+### Code
+## Enhancements
+- #122, !99 Implement `/wot/requirements-of-pending` command support in BMA api
+- #120, !98 `HeadV2`, `HeadV1`, `HeadV0` and `Head` classes now each inherit from previous class **BREAK BACKWARD COMPATIBILITY**
+## Fixes
+- #119, !96 `software_version` field in WS2Pv1 messages now accept a string after patch number (`1.7.21-beta` accepted)
+- #114, !100 Fix `bma.blockhain.revoked` command class calling `/blockchain/with/excluded` url
+ 
+## CI/CD
+- #66, !93  Migrate to [Poetry](https://python-poetry.org/) (build and development environment)
+
+- Thanks @vtexier, @Moul
+
 ## [v0.56.0](https://git.duniter.org/clients/python/duniterpy/-/milestones/10) (20th January 2020)
 ### Code
 - #58, !84: Introduce WS2P API support: **BREAK BACKWARD COMPATIBILITY**:
