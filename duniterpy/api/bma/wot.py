@@ -331,6 +331,19 @@ async def requirements(client: Client, search: str) -> dict:
     )
 
 
+async def requirements_of_pending(client: Client, minsig: int) -> dict:
+    """
+    GET list of requirements of all pending identities with a minimum of minsig certifications
+
+    :param client: Client to connect to the api
+    :param minsig: Minimum number of certifications
+    :return:
+    """
+    return await client.get(
+        MODULE + "/requirements-of-pending/%d" % minsig, schema=REQUIREMENTS_SCHEMA
+    )
+
+
 async def identity_of(client: Client, search: str) -> dict:
     """
     GET Identity data written in the blockchain
