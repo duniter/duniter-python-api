@@ -398,7 +398,7 @@ async def revoked(client: Client) -> dict:
     :param client: Client to connect to the api
     :return:
     """
-    return await client.get(MODULE + "/with/excluded", schema=BLOCK_NUMBERS_SCHEMA)
+    return await client.get(MODULE + "/with/revoked", schema=BLOCK_NUMBERS_SCHEMA)
 
 
 async def excluded(client: Client) -> dict:
