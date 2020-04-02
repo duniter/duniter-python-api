@@ -3,6 +3,7 @@ duniter public and private keys
 
 @author: inso, vtexier, Moul
 """
+import base64
 import re
 from typing import Optional, Union, TypeVar, Type
 
@@ -469,3 +470,30 @@ Data: {data}""".format(
                     version=version, data=ewif_key
                 )
             )
+
+    @classmethod
+    def from_ssb_file(cls: Type[SigningKeyType], path: str) -> SigningKeyType:
+        """
+        Return SigningKey instance from ScuttleButt .ssb/secret file
+
+        :param path: Path to Scuttlebutt secret file
+        """
+        with open(path, "r") as fh:
+            ssb_content = fh.read()
+
+        # check data field
+        regex = re.compile(
+            '{\\s*"curve": "ed25519",\\s*"public": "(.+)\\.ed25519",\\s*"private":\\s*"(.+)\\.ed25519",\\s*"id":\\s*"@\\1.ed25519"\\s*}',
+            re.MULTILINE,
+        )
+        match = re.search(regex, ssb_content)
+        if not match:
+            raise Exception("Error: Bad scuttlebutt secret file")
+
+        # capture ssb secret key
+        secret = match.groups()[1]
+
+        # extract seed from secret
+        seed = bytes(base64.b64decode(secret)[0:32])
+
+        return cls(seed)

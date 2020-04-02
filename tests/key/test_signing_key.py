@@ -93,3 +93,37 @@ class TestSigningKey(unittest.TestCase):
         self.assertEqual(sign_key_test.sk, sign_key_load.sk)
         self.assertEqual(sign_key_test.pubkey, sign_key_load.pubkey)
         self.assertEqual(sign_key_test.vk, sign_key_load.vk)
+
+    def test_load_ssb_file(self):
+        dummy_content = """
+        # comments
+        #
+        #
+        
+        {
+            "curve": "ed25519",
+            "public": "dGVzdHRlc3R0ZXN0dGV0c3RldHN0dGV0c3RldGV0ZXRldHN0ZXR0c3RldHN0dGV0c3Q=.ed25519",
+            "private": "dGVzdHRlc3R0ZXN0dGV0c3RldHN0dGV0c3RldGV0ZXRldHN0ZXR0c3RldHN0dGV0c3Q==.ed25519",
+            "id": "@qJ8qVfXU2mIWG9WfKIRsd6GDscQlErzPHsxzHcyQMWQ=.ed25519"
+        }
+        
+        #
+        # comments
+        """
+
+        # create dummy .ssb/secret file
+        with open(TEST_FILE_PATH, "w") as fh:
+            fh.write(dummy_content)
+        # test load file
+        sign_key_load = SigningKey.from_credentials_file(TEST_FILE_PATH)
+        self.assertEqual(
+            sign_key_load.pubkey, "FAhCeyWq2Ni2xZS3hmYk5w95f8ELxNhUVvU5VB2LXy49"
+        )
+        self.assertEqual(
+            sign_key_load.sk.hex(),
+            "f2f7ae68635dba3455390a74ca0811e4c06142229bb58556aaa37d5598548c9ed27f4cb2bfadbaf45b61714b896d4639ab90db035aee746611cdd342bdaa8996",
+        )
+        self.assertEqual(
+            sign_key_load.vk.hex(),
+            "d27f4cb2bfadbaf45b61714b896d4639ab90db035aee746611cdd342bdaa8996",
+        )
