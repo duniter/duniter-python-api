@@ -77,3 +77,19 @@ class TestSigningKey(unittest.TestCase):
 
         sign_key_load = SigningKey.from_wif_or_ewif_file(TEST_FILE_PATH)
         self.assertEqual(sign_key_save.sk, sign_key_load.sk)
+
+    def test_load_credentials_file(self):
+        salt = password = "test"
+
+        # create a dummy credentials file
+        with open(TEST_FILE_PATH, "w") as fh:
+            fh.write("{}\n{}\n".format(salt, password))
+
+        # same key from credentials
+        sign_key_test = SigningKey.from_credentials(salt, password)
+
+        # test load file
+        sign_key_load = SigningKey.from_credentials_file(TEST_FILE_PATH)
+        self.assertEqual(sign_key_test.sk, sign_key_load.sk)
+        self.assertEqual(sign_key_test.pubkey, sign_key_load.pubkey)
+        self.assertEqual(sign_key_test.vk, sign_key_load.vk)

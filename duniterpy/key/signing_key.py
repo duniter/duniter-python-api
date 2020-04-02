@@ -46,7 +46,7 @@ class SigningKey(libnacl.sign.Signer):
 
         :param salt: Secret salt passphrase credential
         :param password: Secret password credential
-        :param scrypt_params: ScryptParams instance
+        :param scrypt_params: ScryptParams instance or None
         """
         if scrypt_params is None:
             scrypt_params = ScryptParams()
@@ -63,6 +63,28 @@ class SigningKey(libnacl.sign.Signer):
         )
 
         return cls(seed)
+
+    @classmethod
+    def from_credentials_file(
+        cls, path: str, scrypt_params: Optional[ScryptParams] = None
+    ) -> SigningKeyType:
+        """
+        Create a SigningKey object from a credentials file
+
+        A file with the salt on the first line and the password on the second line
+
+        :param path: Credentials file path
+        :param scrypt_params: ScryptParams instance or None
+        :return:
+        """
+        # capture credentials from file
+        with open(path, "r") as fh:
+            lines = fh.readlines()
+            assert len(lines) > 1
+            salt = lines[0].strip()
+            password = lines[1].strip()
+
+        return cls.from_credentials(salt, password, scrypt_params)
 
     def save_seedhex_file(self, path: str) -> None:
         """
