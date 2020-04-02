@@ -100,7 +100,7 @@ pages:
     - master
   script:
     - poetry install
-    - make docs
+    - poetry run make docs
     - mv docs/_build/html public
     - ls public
   artifacts:

@@ -52,7 +52,7 @@ poetry install -E sphinx
 
 - Generate documentation
 ```bash
-make docs
+poetry run make docs
 ```
 
 - The HTML documentation is generated in `docs/_build/html` folder.
