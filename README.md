@@ -122,3 +122,6 @@ Deploy the package on the PyPi repository (prefix the command with a space in or
 ```bash
 [SPACE]make deploy PYPI_LOGIN=xxxx PYPI_PASSWORD=xxxx
 ```
+
+## Packaging status
+[![Packaging status](https://repology.org/badge/vertical-allrepos/python:duniterpy.svg)](https://repology.org/project/python:duniterpy/versions)
