@@ -38,5 +38,5 @@ pyaes = "^1.6.1"
 black = { version = "^19.3b0", python = "^3.6" }
 mypy = "^0.730"
 pylint = "^2.4.2"
-sphinx = "^2.3.1"
+sphinx = "^3.0.2"
 sphinx_rtd_theme = "^0.4.3"
