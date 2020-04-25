@@ -32,8 +32,8 @@ image: $DOCKER_IMAGE/$PYTHON_VERSION:latest
     - bash -c "git push --force --mirror github 2>&1 | grep -v duniter-gitlab; echo $?"
 
 .changes:
-  only:
-    changes:
+  rules:
+    - changes:
       - duniterpy/**/*.py
       - .gitlab-ci.yml
       - Makefile
@@ -77,27 +77,29 @@ release:
   extends:
     - .push_to_github
   stage: release
-  when: manual
   script:
     - poetry publish --build --username $PYPI_LOGIN --password $PYPI_PASSWORD
-  only:
-    - tags
-    - master
+  rules:
+    - if: $CI_COMMIT_TAG
+      when: manual
+    - if: $CI_COMMIT_BRANCH == "master"
+      when: manual
+    - when: never
 
 release_test:
   stage: release
-  when: manual
   script:
     - poetry config repositories.pypi_test https://test.pypi.org/legacy/
     - poetry publish --build --username $PYPI_TEST_LOGIN --password $PYPI_TEST_PASSWORD --repository pypi_test
-  only: [tags]
+  rules:
+    - if: $CI_COMMIT_TAG
+      when: manual
+    - if: $CI_COMMIT_BRANCH == "dev"
+      when: manual
+    - when: never
 
 pages:
   stage: publish_doc
-  when: manual
-  only:
-    - tags
-    - master
   script:
     - poetry install
     - poetry run make docs
@@ -107,3 +109,9 @@ pages:
     untracked: true
     paths:
       - public
+  rules:
+    - if: $CI_COMMIT_TAG
+      when: manual
+    - if: $CI_COMMIT_BRANCH == "master"
+      when: manual
+    - when: never
