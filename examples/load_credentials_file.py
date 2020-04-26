@@ -3,14 +3,9 @@ import sys
 from duniterpy.key import SigningKey
 
 if __name__ == "__main__":
-
     if len(sys.argv) < 2:
-        print(
-            """
-        Usage:
-            python load_credentials_file.py FILEPATH
-        """
-        )
+        print("Usage: python load_credentials_file.py FILEPATH")
+        sys.exit(1)
 
     # capture filepath argument
     credentials_filepath = sys.argv[1]
