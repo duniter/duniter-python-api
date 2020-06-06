@@ -3,7 +3,7 @@ import getpass
 
 from duniterpy.api import bma
 from duniterpy.api.client import Client
-from duniterpy.documents import BlockUID, Identity, Membership
+from duniterpy.documents import BlockUID, Membership
 from duniterpy.key import SigningKey
 
 # CONFIG #######################################
@@ -17,57 +17,19 @@ BMAS_ENDPOINT = "BMAS g1-test.duniter.org 443"
 ################################################
 
 
-def get_identity_document(
-    current_block: dict, uid: str, salt: str, password: str
-) -> Identity:
-    """
-    Get an Identity document
-
-    :param current_block: Current block data
-    :param uid: Unique Identifier
-    :param salt: Passphrase of the account
-    :param password: Password of the account
-
-    :rtype: Identity
-    """
-
-    # get current block BlockStamp
-    timestamp = BlockUID(current_block["number"], current_block["hash"])
-
-    # create keys from credentials
-    key = SigningKey.from_credentials(salt, password)
-
-    # create identity document
-    identity = Identity(
-        version=10,
-        currency=current_block["currency"],
-        pubkey=key.pubkey,
-        uid=uid,
-        ts=timestamp,
-        signature=None,
-    )
-
-    # sign document
-    identity.sign([key])
-
-    return identity
-
-
 def get_membership_document(
     membership_type: str,
     current_block: dict,
-    identity: Identity,
-    salt: str,
-    password: str,
+    identity: dict,
+    key: SigningKey,
 ) -> Membership:
     """
     Get a Membership document
 
     :param membership_type: "IN" to ask for membership or "OUT" to cancel membership
     :param current_block: Current block data
-    :param identity: Identity document
-    :param salt: Passphrase of the account
-    :param password: Password of the account
+    :param identity: identity card from /wot/lookup
+    :param key: cryptographic key to sign documents
 
     :rtype: Membership
     """
@@ -75,18 +37,19 @@ def get_membership_document(
     # get current block BlockStamp
     timestamp = BlockUID(current_block["number"], current_block["hash"])
 
-    # create keys from credentials
-    key = SigningKey.from_credentials(salt, password)
+    # get the uid and the timestamp of the corresponding identity
+    uid = identity["uids"][0]["uid"]
+    identity_timestamp = identity["uids"][0]["meta"]["timestamp"]
 
-    # create identity document
+    # create membership document
     membership = Membership(
         version=10,
         currency=current_block["currency"],
         issuer=key.pubkey,
         membership_ts=timestamp,
         membership_type=membership_type,
-        uid=identity.uid,
-        identity_ts=identity.timestamp,
+        uid=uid,
+        identity_ts=identity_timestamp,
     )
 
     # sign document
@@ -115,14 +78,16 @@ async def main():
     # prompt hidden user entry
     password = getpass.getpass("Enter your password: ")
 
-    # prompt entry
-    uid = input("Enter your UID: ")
+    # create key from credentials
+    key = SigningKey.from_credentials(salt, password)
 
-    # create our signed identity document
-    identity = get_identity_document(current_block, uid, salt, password)
+    # Look for identities on the network, take the first result since the
+    # lookup was done with a pubkey, which should correspond to the first identity
+    identities = await client(bma.wot.lookup, key.pubkey)
+    identity = identities["results"][0]
 
     # create a membership demand document
-    membership = get_membership_document("IN", current_block, identity, salt, password)
+    membership = get_membership_document("IN", current_block, identity, key)
 
     # send the membership signed raw document to the node
     response = await client(bma.blockchain.membership, membership.signed_raw())
