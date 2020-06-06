@@ -18,24 +18,22 @@ BMAS_ENDPOINT = "BMAS g1-test.duniter.org 443"
 
 
 def get_identity_document(
-    current_block: dict, uid: str, salt: str, password: str
+    current_block: dict,
+    uid: str,
+    key: SigningKey,
 ) -> Identity:
     """
     Get an Identity document
 
     :param current_block: Current block data
     :param uid: Unique IDentifier
-    :param salt: Passphrase of the account
-    :param password: Password of the account
+    :param key: cryptographic key to sign documents
 
     :rtype: Identity
     """
 
     # get current block BlockStamp
     timestamp = BlockUID(current_block["number"], current_block["hash"])
-
-    # create keys from credentials
-    key = SigningKey.from_credentials(salt, password)
 
     # create identity document
     identity = Identity(
@@ -76,10 +74,13 @@ async def main():
     # prompt hidden user entry
     password = getpass.getpass("Enter your password: ")
 
-    # create our signed identity document
-    identity = get_identity_document(current_block, uid, salt, password)
+    # create keys from credentials
+    key = SigningKey.from_credentials(salt, password)
 
-    # send the identity document to the node
+    # create our signed identity document
+    identity = get_identity_document(current_block, uid, key)
+
+    # send the identity signed raw document to the node
     response = await client(bma.wot.add, identity.signed_raw())
     if response.status == 200:
         print(await response.text())
