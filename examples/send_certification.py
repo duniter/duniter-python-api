@@ -3,7 +3,7 @@ import asyncio
 import getpass
 from typing import Optional
 
-import duniterpy.api.bma as bma
+from duniterpy.api import bma
 from duniterpy.api.client import Client
 from duniterpy.documents import BlockUID, Identity, Certification
 from duniterpy.key import SigningKey

@@ -4,7 +4,7 @@ import os
 import sys
 from typing import Optional
 
-import duniterpy.api.bma as bma
+from duniterpy.api import bma
 from duniterpy.api.client import Client
 from duniterpy.documents import Revocation, BlockUID, Identity
 from duniterpy.key import SigningKey

@@ -1,7 +1,7 @@
 import asyncio
 import getpass
 
-import duniterpy.api.bma as bma
+from duniterpy.api import bma
 from duniterpy.api.client import Client
 from duniterpy.documents import BlockUID, Identity, Membership
 from duniterpy.key import SigningKey
