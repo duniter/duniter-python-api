@@ -253,6 +253,62 @@ class Block(Document):
         return BlockUID(self.number, self.proof_of_work())
 
     @classmethod
+    def from_parsed_json(cls: Type[BlockType], parsed_json_block: dict) -> BlockType:
+        """return a block from the python structure produced when parsing json"""
+        b = parsed_json_block # alias for readability
+        version = b["version"]
+        currency = b["currency"]
+        arguments = { # arguments used to create block
+            "version":                  b["version"],
+            "currency":                 b["currency"],
+            "number":                   b["number"],
+            "powmin":                   b["powMin"],
+            "time":                     b["time"],
+            "mediantime":               b["medianTime"],
+            "ud":                       b["dividend"],
+            "unit_base":                b["unitbase"],
+            "issuer":                   b["issuer"],
+            "issuers_frame":            b["issuersFrame"],
+            "issuers_frame_var":        b["issuersFrameVar"],
+            "different_issuers_count":  b["issuersCount"],
+            "prev_hash":                b["previousHash"],
+            "prev_issuer":              b["previousIssuer"],
+            "parameters":               b["parameters"],
+            "members_count":            b["membersCount"],
+            "identities":               b["identities"],
+            "joiners":                  b["joiners"],
+            "actives":                  b["actives"],
+            "leavers":                  b["leavers"],
+            "revokations":              b["revoked"],
+            "excluded":                 b["excluded"],
+            "certifications":           b["certifications"],
+            "transactions":             b["transactions"],
+            "inner_hash":               b["inner_hash"],
+            "nonce":                    b["nonce"],
+            "signature":                b["signature"],
+        }
+        # parameters: Optional[Sequence[str]]
+        if arguments["parameters"]: 
+            arguments["parameters"] = arguments["parameters"].split(":")
+        # identities: List[Identity]
+        arguments["identities"] = [Identity.from_inline(version, currency, i+'\n') for i in arguments["identities"]]
+        # joiners: List[Membership]
+        arguments["joiners"] = [Membership.from_inline(version, currency, "IN", i+'\n') for i in arguments["joiners"]]
+        # actives: List[Membership]
+        arguments["actives"] = [Membership.from_inline(version, currency, "IN", i+'\n') for i in arguments["actives"]]
+        # leavers: List[Membership]
+        arguments["leavers"] = [Membership.from_inline(version, currency, "OUT", i+'\n') for i in arguments["leavers"]]
+        # revokations: List[Revocation]
+        arguments["revokations"] = [Revocation.from_inline(version, currency, i+'\n') for i in arguments["revokations"]]
+        # certifications: List[Certification]
+        arguments["certifications"] = [Certification.from_inline(version, currency, arguments["inner_hash"], i+'\n') for i in arguments["certifications"]]
+        # transactions: List[Transaction]
+        arguments["transactions"] = [Transaction.from_bma_history(currency, i) for i in arguments["transactions"]]
+
+        # now that the arguments are ready, return the block
+        return cls(**arguments)
+
+    @classmethod
     def from_signed_raw(cls: Type[BlockType], signed_raw: str) -> BlockType:
         lines = signed_raw.splitlines(True)
         n = 0
