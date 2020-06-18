@@ -1647,12 +1647,6 @@ json_block_250004 = """
 """
 
 
-
-
-
-
-
-
 class TestBlock(unittest.TestCase):
     def test_fromraw(self):
         block = Block.from_signed_raw(raw_block)
@@ -1970,29 +1964,16 @@ AywstQpC0S5iaA/YQvbz2alpP6zTYG3tjkWpxy1jgeCo028Te2V327bBZbfDGDzsjxOrF4UVmEBiGsgb
     def test_from_parsed_json_block_0(self):
         parsed_json_block = json.loads(json_block_0)
         block = Block.from_parsed_json(parsed_json_block)
-        self.assertEqual(
-            block.version,
-            10
-        )
-        self.assertEqual(
-            len(block.identities),
-            59
-        )
+        self.assertEqual(block.version, 10)
+        self.assertEqual(len(block.identities), 59)
 
     def test_from_parsed_json_block_250004(self):
         parsed_json_block = json.loads(json_block_250004)
         block = Block.from_parsed_json(parsed_json_block)
+        self.assertEqual(len(block.transactions), 8)
+        self.assertEqual(block.transactions[5].blockstamp.number, 250002)
         self.assertEqual(
-            len(block.transactions),
-            8
-        )
-        self.assertEqual(
-            block.transactions[5].blockstamp.number,
-            250002
-        )
-        self.assertEqual(
-            block.transactions[5].comment,
-            'Merci pour la farine de chataigne'
+            block.transactions[5].comment, "Merci pour la farine de chataigne"
         )
 
 
