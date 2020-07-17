@@ -31,7 +31,7 @@ class JsonBlockchain:
     def parsechunk(self):
         """parse a json chunk file"""
         with open(
-            os.path.join(self.folder, f"chunk_{self.current_chunk}-250.json")
+            os.path.join(self.folder, "chunk_" + str(self.current_chunk) + "-250.json")
         ) as f:
             s = f.read()
             p = json.loads(s)
