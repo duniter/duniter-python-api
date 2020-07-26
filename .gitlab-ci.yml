@@ -7,7 +7,7 @@ stages:
 
 variables:
   DOCKER_IMAGE: "registry.duniter.org/docker/python3/poetry"
-  PYTHON_VERSION: "3.5"
+  PYTHON_VERSION: "3.6"
 
 image: $DOCKER_IMAGE/$PYTHON_VERSION:latest
 

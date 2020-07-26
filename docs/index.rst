@@ -16,7 +16,7 @@ Duniterpy helps to handle the following problem :
 Requirements
 ------------
 
-Duniterpy requires Python 3.5.x minimum.
+Duniterpy requires Python 3.6.x minimum.
 
 Installation
 ------------

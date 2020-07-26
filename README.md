@@ -17,7 +17,7 @@ This library is used by two clients:
 - Sign/verify and encrypt/decrypt messages with the Duniter credentials
 
 ## Requirements
-- Python >= 3.5.3
+- Python >= 3.6.8
 - [aiohttp >= 3.6.1](https://pypi.org/pypi/aiohttp)
 - [pylibscrypt](https://pypi.org/pypi/pylibscrypt)
 - [libnacl](https://pypi.org/pypi/libnacl)
