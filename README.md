@@ -19,7 +19,6 @@ This library is used by two clients:
 ## Requirements
 - Python >= 3.6.8
 - [aiohttp >= 3.6.1](https://pypi.org/pypi/aiohttp)
-- [pylibscrypt](https://pypi.org/pypi/pylibscrypt)
 - [libnacl](https://pypi.org/pypi/libnacl)
 - [base58](https://pypi.org/pypi/base58)
 - [attr](https://pypi.org/project/attr/)

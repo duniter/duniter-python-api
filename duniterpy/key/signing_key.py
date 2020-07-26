@@ -10,7 +10,7 @@ from typing import Optional, Union, TypeVar, Type
 import libnacl.sign
 import pyaes
 from libnacl.utils import load_key
-from pylibscrypt import scrypt
+from hashlib import scrypt
 
 from .scrypt_params import ScryptParams
 from .base58 import Base58Encoder
@@ -56,11 +56,11 @@ class SigningKey(libnacl.sign.Signer):
         password = ensure_bytes(password)
         seed = scrypt(
             password,
-            salt,
-            scrypt_params.N,
-            scrypt_params.r,
-            scrypt_params.p,
-            scrypt_params.seed_length,
+            salt=salt,
+            n=scrypt_params.N,
+            r=scrypt_params.r,
+            p=scrypt_params.p,
+            dklen=scrypt_params.seed_length,
         )
 
         return cls(seed)
@@ -394,7 +394,7 @@ Data: {data}""".format(
 
         # SCRYPT
         password_bytes = password.encode("utf-8")
-        scrypt_seed = scrypt(password_bytes, salt, 16384, 8, 8, 64)
+        scrypt_seed = scrypt(password_bytes, salt=salt, n=16384, r=8, p=8, dklen=64)
         derivedhalf1 = scrypt_seed[0:32]
         derivedhalf2 = scrypt_seed[32:64]
 
@@ -435,7 +435,7 @@ Data: {data}""".format(
 
         # SCRYPT
         password_bytes = password.encode("utf-8")
-        scrypt_seed = scrypt(password_bytes, salt, 16384, 8, 8, 64)
+        scrypt_seed = scrypt(password_bytes, salt=salt, n=16384, r=8, p=8, dklen=64)
         derivedhalf1 = scrypt_seed[0:32]
         derivedhalf2 = scrypt_seed[32:64]
 

@@ -6,7 +6,7 @@ duniter public and private keys
 from typing import Union, Optional
 
 import libnacl.public
-from pylibscrypt import scrypt
+from hashlib import scrypt
 
 from .scrypt_params import ScryptParams
 from .base58 import Base58Encoder
@@ -38,11 +38,11 @@ class SecretKey(libnacl.public.SecretKey):
         password = ensure_bytes(password)
         seed = scrypt(
             password,
-            salt,
-            scrypt_params.N,
-            scrypt_params.r,
-            scrypt_params.p,
-            scrypt_params.seed_length,
+            salt=salt,
+            n=scrypt_params.N,
+            r=scrypt_params.r,
+            p=scrypt_params.p,
+            dklen=scrypt_params.seed_length,
         )
 
         super().__init__(seed)
