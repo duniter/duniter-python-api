@@ -85,8 +85,8 @@ class TestBmaWebsocket(WebFunctionalSetupMixin, unittest.TestCase):
 """
         try:
             parse_text(json_sample, WS_BLOCK_SCHEMA)
-        except (SchemaError, ValidationError):
-            raise self.failureException
+        except (SchemaError, ValidationError) as e:
+            raise self.failureException from e
 
     def test_peer(self):
         json_sample = """{

@@ -41,8 +41,8 @@ def parse_text(text: str, schema: dict) -> Any:
     try:
         data = json.loads(text)
         jsonschema.validate(data, schema)
-    except (TypeError, json.decoder.JSONDecodeError):
-        raise jsonschema.ValidationError("Could not parse json")
+    except (TypeError, json.decoder.JSONDecodeError) as e:
+        raise jsonschema.ValidationError("Could not parse json") from e
 
     return data
 
@@ -58,7 +58,9 @@ def parse_error(text: str) -> Any:
         data = json.loads(text)
         jsonschema.validate(data, ERROR_SCHEMA)
     except (TypeError, json.decoder.JSONDecodeError) as e:
-        raise jsonschema.ValidationError("Could not parse json : {0}".format(str(e)))
+        raise jsonschema.ValidationError(
+            "Could not parse json : {0}".format(str(e))
+        ) from e
 
     return data
 
@@ -78,7 +80,9 @@ async def parse_response(response: ClientResponse, schema: dict) -> Any:
             jsonschema.validate(data, schema)
         return data
     except (TypeError, json.decoder.JSONDecodeError) as e:
-        raise jsonschema.ValidationError("Could not parse json : {0}".format(str(e)))
+        raise jsonschema.ValidationError(
+            "Could not parse json : {0}".format(str(e))
+        ) from e
 
 
 class WSConnection:
@@ -242,11 +246,11 @@ class API:
             try:
                 error_data = parse_error(await response.text())
                 raise DuniterError(error_data)
-            except (TypeError, jsonschema.ValidationError):
+            except (TypeError, jsonschema.ValidationError) as e:
                 raise ValueError(
                     "status code != 200 => %d (%s)"
                     % (response.status, (await response.text()))
-                )
+                ) from e
 
         return response
 

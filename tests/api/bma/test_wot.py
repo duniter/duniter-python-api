@@ -154,8 +154,8 @@ class TestBmaWot(WebFunctionalSetupMixin, unittest.TestCase):
         }
         try:
             jsonschema.validate(json_sample, LOOKUP_SCHEMA)
-        except (SchemaError, ValidationError):
-            raise self.failureException
+        except (SchemaError, ValidationError) as e:
+            raise self.failureException from e
 
     def test_bma_wot_lookup_bad(self):
         async def handler(request):
@@ -190,8 +190,8 @@ class TestBmaWot(WebFunctionalSetupMixin, unittest.TestCase):
         }
         try:
             jsonschema.validate(MEMBERS_SCHEMA, json_sample)
-        except (SchemaError, ValidationError):
-            raise self.failureException
+        except (SchemaError, ValidationError) as e:
+            raise self.failureException from e
 
     def test_bma_wot_members_bad(self):
         async def handler(request):
@@ -240,8 +240,8 @@ class TestBmaWot(WebFunctionalSetupMixin, unittest.TestCase):
         }
         try:
             jsonschema.validate(json_sample, CERTIFICATIONS_SCHEMA)
-        except (SchemaError, ValidationError):
-            raise self.failureException
+        except (SchemaError, ValidationError) as e:
+            raise self.failureException from e
 
     def test_bma_wot_certifiers_bad(self):
         async def handler(request):
@@ -358,5 +358,5 @@ class TestBmaWot(WebFunctionalSetupMixin, unittest.TestCase):
         }
         try:
             jsonschema.validate(json_sample, REQUIREMENTS_SCHEMA)
-        except (SchemaError, ValidationError):
-            raise self.failureException
+        except (SchemaError, ValidationError) as e:
+            raise self.failureException from e

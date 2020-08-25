@@ -9,7 +9,7 @@ TEST_FILE_PATH = "/tmp/test_file.txt"
 
 class TestSigningKey(unittest.TestCase):
     def tearDown(self) -> None:
-        super(TestSigningKey, self)
+        super()
 
         # remove test file from disk
         if os.path.exists(TEST_FILE_PATH):

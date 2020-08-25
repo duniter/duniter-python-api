@@ -43,12 +43,12 @@ class BlockUID:
         try:
             number = int(data.group(1))
         except AttributeError:
-            raise MalformedDocumentError("BlockUID")
+            raise MalformedDocumentError("BlockUID") from AttributeError
 
         try:
             sha_hash = data.group(2)
         except AttributeError:
-            raise MalformedDocumentError("BlockHash")
+            raise MalformedDocumentError("BlockHash") from AttributeError
 
         return cls(number, sha_hash)
 

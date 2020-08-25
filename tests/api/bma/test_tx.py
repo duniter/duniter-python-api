@@ -137,8 +137,8 @@ class TestBmaTx(WebFunctionalSetupMixin, unittest.TestCase):
         }
         try:
             jsonschema.validate(json_sample, HISTORY_SCHEMA)
-        except (SchemaError, ValidationError):
-            raise self.failureException
+        except (SchemaError, ValidationError) as e:
+            raise self.failureException from e
 
     def test_bma_tx_history_bad(self):
         async def handler(request):
@@ -195,8 +195,8 @@ class TestBmaTx(WebFunctionalSetupMixin, unittest.TestCase):
         }
         try:
             jsonschema.validate(json_sample, SOURCES_SCHEMA)
-        except (SchemaError, ValidationError):
-            raise self.failureException
+        except (SchemaError, ValidationError) as e:
+            raise self.failureException from e
 
     def test_bma_tx_sources_bad(self):
         async def handler(request):

@@ -91,7 +91,7 @@ class UnknownEndpoint(Endpoint):
             properties = inline.split()[1:]
             return cls(api, properties)
         except IndexError:
-            raise MalformedDocumentError(inline)
+            raise MalformedDocumentError(inline) from IndexError
 
     def inline(self) -> str:
         """

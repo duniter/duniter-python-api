@@ -54,7 +54,7 @@ class Head:
             version = int(head[1]) if len(head) == 2 else 0
             return cls(version)
         except AttributeError:
-            raise MalformedDocumentError("Head")
+            raise MalformedDocumentError("Head") from AttributeError
 
     def __str__(self) -> str:
         return "HEAD" if self.version == 0 else "HEAD:{}".format(str(self.version))
@@ -93,7 +93,7 @@ class HeadV0(Head):
             offload = data.group(5)
             return cls(head.version, signature, api, head, pubkey, blockstamp), offload
         except AttributeError:
-            raise MalformedDocumentError("HeadV0")
+            raise MalformedDocumentError("HeadV0") from AttributeError
 
     def inline(self) -> str:
         values = (
@@ -155,7 +155,7 @@ class HeadV1(HeadV0):
                 offload,
             )
         except AttributeError:
-            raise MalformedDocumentError("HeadV1")
+            raise MalformedDocumentError("HeadV1") from AttributeError
 
 
 @attr.s
@@ -196,4 +196,4 @@ class HeadV2(HeadV1):
                 "",
             )
         except AttributeError:
-            raise MalformedDocumentError("HeadV2")
+            raise MalformedDocumentError("HeadV2") from AttributeError

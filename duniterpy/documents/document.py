@@ -68,7 +68,7 @@ class Document:
                 raise AttributeError
             value = match.group(1)
         except AttributeError:
-            raise MalformedDocumentError(field_name)
+            raise MalformedDocumentError(field_name) from AttributeError
         return value
 
     def sign(self, keys: list) -> None:

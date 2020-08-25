@@ -55,8 +55,8 @@ class TestBmaBlockchain(WebFunctionalSetupMixin, unittest.TestCase):
         }
         try:
             jsonschema.validate(json_sample, PARAMETERS_SCHEMA)
-        except (SchemaError, ValidationError):
-            raise self.failureException
+        except (SchemaError, ValidationError) as e:
+            raise self.failureException from e
 
     def test_parameters_bad(self):
         async def handler(request):
@@ -222,8 +222,8 @@ class TestBmaBlockchain(WebFunctionalSetupMixin, unittest.TestCase):
         }
         try:
             jsonschema.validate(json_sample, BLOCK_SCHEMA)
-        except (SchemaError, ValidationError):
-            raise self.failureException
+        except (SchemaError, ValidationError) as e:
+            raise self.failureException from e
 
     def test_block_bad(self):
         async def handler(request):
@@ -328,15 +328,15 @@ class TestBmaBlockchain(WebFunctionalSetupMixin, unittest.TestCase):
         }
         try:
             jsonschema.validate(json_sample, BLOCK_SCHEMA)
-        except (SchemaError, ValidationError):
-            raise self.failureException
+        except (SchemaError, ValidationError) as e:
+            raise self.failureException from e
 
     def test_schema_hardship(self):
         json_sample = {"block": 40432, "level": 4}
         try:
             jsonschema.validate(json_sample, HARDSHIP_SCHEMA)
-        except (SchemaError, ValidationError):
-            raise self.failureException
+        except (SchemaError, ValidationError) as e:
+            raise self.failureException from e
 
     def test_hardship_bad(self):
         async def handler(request):
@@ -382,8 +382,8 @@ class TestBmaBlockchain(WebFunctionalSetupMixin, unittest.TestCase):
         }
         try:
             jsonschema.validate(json_sample, MEMBERSHIPS_SCHEMA)
-        except (SchemaError, ValidationError):
-            raise self.failureException
+        except (SchemaError, ValidationError) as e:
+            raise self.failureException from e
 
     def test_membership_bad(self):
         async def handler(request):
@@ -410,8 +410,8 @@ class TestBmaBlockchain(WebFunctionalSetupMixin, unittest.TestCase):
         json_sample = {"result": {"blocks": [223, 813]}}
         try:
             jsonschema.validate(json_sample, BLOCK_NUMBERS_SCHEMA)
-        except (SchemaError, ValidationError):
-            raise self.failureException
+        except (SchemaError, ValidationError) as e:
+            raise self.failureException from e
 
     def test_newcomers_bad(self):
         async def handler(request):
@@ -433,8 +433,8 @@ class TestBmaBlockchain(WebFunctionalSetupMixin, unittest.TestCase):
         json_sample = {"result": {"blocks": [223, 813]}}
         try:
             jsonschema.validate(json_sample, BLOCK_NUMBERS_SCHEMA)
-        except (SchemaError, ValidationError):
-            raise self.failureException
+        except (SchemaError, ValidationError) as e:
+            raise self.failureException from e
 
     def test_certifications_bad(self):
         async def handler(request):
@@ -456,8 +456,8 @@ class TestBmaBlockchain(WebFunctionalSetupMixin, unittest.TestCase):
         json_sample = {"result": {"blocks": [223, 813]}}
         try:
             jsonschema.validate(json_sample, BLOCK_NUMBERS_SCHEMA)
-        except (SchemaError, ValidationError):
-            raise self.failureException
+        except (SchemaError, ValidationError) as e:
+            raise self.failureException from e
 
     def test_joiners_bad(self):
         async def handler(request):
@@ -479,8 +479,8 @@ class TestBmaBlockchain(WebFunctionalSetupMixin, unittest.TestCase):
         json_sample = {"result": {"blocks": [223, 813]}}
         try:
             jsonschema.validate(json_sample, BLOCK_NUMBERS_SCHEMA)
-        except (SchemaError, ValidationError):
-            raise self.failureException
+        except (SchemaError, ValidationError) as e:
+            raise self.failureException from e
 
     def test_actives_bad(self):
         async def handler(request):
@@ -502,8 +502,8 @@ class TestBmaBlockchain(WebFunctionalSetupMixin, unittest.TestCase):
         json_sample = {"result": {"blocks": [223, 813]}}
         try:
             jsonschema.validate(json_sample, BLOCK_NUMBERS_SCHEMA)
-        except (SchemaError, ValidationError):
-            raise self.failureException
+        except (SchemaError, ValidationError) as e:
+            raise self.failureException from e
 
     def test_leavers_bad(self):
         async def handler(request):
@@ -525,8 +525,8 @@ class TestBmaBlockchain(WebFunctionalSetupMixin, unittest.TestCase):
         json_sample = {"result": {"blocks": [223, 813]}}
         try:
             jsonschema.validate(json_sample, BLOCK_NUMBERS_SCHEMA)
-        except (SchemaError, ValidationError):
-            raise self.failureException
+        except (SchemaError, ValidationError) as e:
+            raise self.failureException from e
 
     def test_schema_blocks(self):
         json_sample = [
@@ -644,8 +644,8 @@ class TestBmaBlockchain(WebFunctionalSetupMixin, unittest.TestCase):
         ]
         try:
             jsonschema.validate(json_sample, BLOCKS_SCHEMA)
-        except (SchemaError, ValidationError):
-            raise self.failureException
+        except (SchemaError, ValidationError) as e:
+            raise self.failureException from e
 
     def test_ud_bad(self):
         async def handler(request):
@@ -665,8 +665,8 @@ class TestBmaBlockchain(WebFunctionalSetupMixin, unittest.TestCase):
         json_sample = {"result": {"blocks": [223, 813]}}
         try:
             jsonschema.validate(json_sample, BLOCK_NUMBERS_SCHEMA)
-        except (SchemaError, ValidationError):
-            raise self.failureException
+        except (SchemaError, ValidationError) as e:
+            raise self.failureException from e
 
     def test_tx_bad(self):
         async def handler(request):

@@ -299,7 +299,7 @@ class Block(Document):
                 parameters = params_match.groups()
                 n += 1
             except AttributeError:
-                raise MalformedDocumentError("Parameters")
+                raise MalformedDocumentError("Parameters") from AttributeError
 
         members_count = int(Block.parse_field("MembersCount", lines[n]))
         n += 1

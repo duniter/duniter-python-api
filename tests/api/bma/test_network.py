@@ -24,8 +24,8 @@ class TestBmaNetwork(WebFunctionalSetupMixin, unittest.TestCase):
         }
         try:
             jsonschema.validate(json_sample, network.PEERING_SCHEMA)
-        except (SchemaError, ValidationError):
-            raise self.failureException
+        except (SchemaError, ValidationError) as e:
+            raise self.failureException from e
 
     def test_peering_bad(self):
         async def handler(request):
@@ -50,8 +50,8 @@ class TestBmaNetwork(WebFunctionalSetupMixin, unittest.TestCase):
         }
         try:
             jsonschema.validate(json_sample, network.PEERS_SCHEMA)
-        except (SchemaError, ValidationError):
-            raise self.failureException
+        except (SchemaError, ValidationError) as e:
+            raise self.failureException from e
 
     def test_peers_leaf(self):
         json_sample = {
@@ -70,8 +70,8 @@ class TestBmaNetwork(WebFunctionalSetupMixin, unittest.TestCase):
         }
         try:
             jsonschema.validate(json_sample, network.PEERS_SCHEMA)
-        except (SchemaError, ValidationError):
-            raise self.failureException
+        except (SchemaError, ValidationError) as e:
+            raise self.failureException from e
 
     def test_peers_bad(self):
         async def handler(request):
@@ -118,8 +118,8 @@ class TestBmaNetwork(WebFunctionalSetupMixin, unittest.TestCase):
         }
         try:
             jsonschema.validate(json_sample, network.WS2P_HEADS_SCHEMA)
-        except (SchemaError, ValidationError):
-            raise self.failureException
+        except (SchemaError, ValidationError) as e:
+            raise self.failureException from e
 
     def test_ws2p_heads_bad(self):
         async def handler(request):
