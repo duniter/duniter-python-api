@@ -35,7 +35,7 @@ libnacl = "^1.6.1"
 pyaes = "^1.6.1"
 
 [tool.poetry.dev-dependencies]
-black = { version = "^19.3b0", python = "^3.6" }
+black = { version = "^20.8b1", python = "^3.6" }
 mypy = "^0.730"
 pylint = "^2.4.2"
 sphinx = "^3.0.2"

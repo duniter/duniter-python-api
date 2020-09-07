@@ -12,18 +12,18 @@ PeerType = TypeVar("PeerType", bound="Peer")
 
 class Peer(Document):
     """
-.. note:: A peer document is specified by the following format :
+    .. note:: A peer document is specified by the following format :
 
-    | Version: VERSION
-    | Type: Peer
-    | Currency: CURRENCY_NAME
-    | PublicKey: NODE_PUBLICKEY
-    | Block: BLOCK
-    | Endpoints:
-    | END_POINT_1
-    | END_POINT_2
-    | END_POINT_3
-    | [...]
+        | Version: VERSION
+        | Type: Peer
+        | Currency: CURRENCY_NAME
+        | PublicKey: NODE_PUBLICKEY
+        | Block: BLOCK
+        | Endpoints:
+        | END_POINT_1
+        | END_POINT_2
+        | END_POINT_3
+        | [...]
 
     """
 

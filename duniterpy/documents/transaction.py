@@ -48,10 +48,10 @@ InputSourceType = TypeVar("InputSourceType", bound="InputSource")
 
 class InputSource:
     """
-    A Transaction INPUT
+        A Transaction INPUT
 
-.. note:: Compact :
-    INDEX:SOURCE:FINGERPRINT:AMOUNT
+    .. note:: Compact :
+        INDEX:SOURCE:FINGERPRINT:AMOUNT
 
     """
 
@@ -448,36 +448,36 @@ TransactionType = TypeVar("TransactionType", bound="Transaction")
 
 class Transaction(Document):
     """
-.. note:: A transaction document is specified by the following format :
+    .. note:: A transaction document is specified by the following format :
 
-    | Document format :
-    | Version: VERSION
-    | Type: Transaction
-    | Currency: CURRENCY_NAME
-    | Issuers:
-    | PUBLIC_KEY
-    | ...
-    | Inputs:
-    | INDEX:SOURCE:NUMBER:FINGERPRINT:AMOUNT
-    | ...
-    | Outputs:
-    | PUBLIC_KEY:AMOUNT
-    | ...
-    | Comment: COMMENT
-    | ...
-    |
-    |
-    | Compact format :
-    | TX:VERSION:NB_ISSUERS:NB_INPUTS:NB_OUTPUTS:HAS_COMMENT
-    | PUBLIC_KEY:INDEX
-    | ...
-    | INDEX:SOURCE:FINGERPRINT:AMOUNT
-    | ...
-    | PUBLIC_KEY:AMOUNT
-    | ...
-    | COMMENT
-    | SIGNATURE
-    | ...
+        | Document format :
+        | Version: VERSION
+        | Type: Transaction
+        | Currency: CURRENCY_NAME
+        | Issuers:
+        | PUBLIC_KEY
+        | ...
+        | Inputs:
+        | INDEX:SOURCE:NUMBER:FINGERPRINT:AMOUNT
+        | ...
+        | Outputs:
+        | PUBLIC_KEY:AMOUNT
+        | ...
+        | Comment: COMMENT
+        | ...
+        |
+        |
+        | Compact format :
+        | TX:VERSION:NB_ISSUERS:NB_INPUTS:NB_OUTPUTS:HAS_COMMENT
+        | PUBLIC_KEY:INDEX
+        | ...
+        | INDEX:SOURCE:FINGERPRINT:AMOUNT
+        | ...
+        | PUBLIC_KEY:AMOUNT
+        | ...
+        | COMMENT
+        | SIGNATURE
+        | ...
 
     """
 
@@ -856,8 +856,7 @@ Currency: {1}
         ...
         PUBLIC_KEY:AMOUNT
         ...
-        COMMENT
-"""
+        COMMENT"""
         doc = "TX:{0}:{1}:{2}:{3}:{4}:{5}:{6}\n".format(
             self.version,
             len(self.issuers),

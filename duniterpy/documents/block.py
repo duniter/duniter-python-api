@@ -18,46 +18,46 @@ BlockType = TypeVar("BlockType", bound="Block")
 
 class Block(Document):
     """
-The class Block handles Block documents.
+    The class Block handles Block documents.
 
-.. note:: A block document is specified by the following format :
+    .. note:: A block document is specified by the following format :
 
-    | Version: VERSION
-    | Type: Block
-    | Currency: CURRENCY
-    | Nonce: NONCE
-    | Number: BLOCK_NUMBER
-    | PoWMin: NUMBER_OF_ZEROS
-    | Time: GENERATED_ON
-    | MedianTime: MEDIAN_DATE
-    | UniversalDividend: DIVIDEND_AMOUNT
-    | Issuer: ISSUER_KEY
-    | PreviousHash: PREVIOUS_HASH
-    | PreviousIssuer: PREVIOUS_ISSUER_KEY
-    | Parameters: PARAMETERS
-    | MembersCount: WOT_MEM_COUNT
-    | Identities:
-    | PUBLIC_KEY:SIGNATURE:TIMESTAMP:USER_ID
-    | ...
-    | Joiners:
-    | PUBLIC_KEY:SIGNATURE:NUMBER:HASH:TIMESTAMP:USER_ID
-    | ...
-    | Actives:
-    | PUBLIC_KEY:SIGNATURE:NUMBER:HASH:TIMESTAMP:USER_ID
-    | ...
-    | Leavers:
-    | PUBLIC_KEY:SIGNATURE:NUMBER:HASH:TIMESTAMP:USER_ID
-    | ...
-    | Excluded:
-    | PUBLIC_KEY
-    | ...
-    | Certifications:
-    | PUBKEY_FROM:PUBKEY_TO:BLOCK_NUMBER:SIGNATURE
-    | ...
-    | Transactions:
-    | COMPACT_TRANSACTION
-    | ...
-    | BOTTOM_SIGNATURE
+        | Version: VERSION
+        | Type: Block
+        | Currency: CURRENCY
+        | Nonce: NONCE
+        | Number: BLOCK_NUMBER
+        | PoWMin: NUMBER_OF_ZEROS
+        | Time: GENERATED_ON
+        | MedianTime: MEDIAN_DATE
+        | UniversalDividend: DIVIDEND_AMOUNT
+        | Issuer: ISSUER_KEY
+        | PreviousHash: PREVIOUS_HASH
+        | PreviousIssuer: PREVIOUS_ISSUER_KEY
+        | Parameters: PARAMETERS
+        | MembersCount: WOT_MEM_COUNT
+        | Identities:
+        | PUBLIC_KEY:SIGNATURE:TIMESTAMP:USER_ID
+        | ...
+        | Joiners:
+        | PUBLIC_KEY:SIGNATURE:NUMBER:HASH:TIMESTAMP:USER_ID
+        | ...
+        | Actives:
+        | PUBLIC_KEY:SIGNATURE:NUMBER:HASH:TIMESTAMP:USER_ID
+        | ...
+        | Leavers:
+        | PUBLIC_KEY:SIGNATURE:NUMBER:HASH:TIMESTAMP:USER_ID
+        | ...
+        | Excluded:
+        | PUBLIC_KEY
+        | ...
+        | Certifications:
+        | PUBKEY_FROM:PUBKEY_TO:BLOCK_NUMBER:SIGNATURE
+        | ...
+        | Transactions:
+        | COMPACT_TRANSACTION
+        | ...
+        | BOTTOM_SIGNATURE
 
     """
 

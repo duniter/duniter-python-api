@@ -16,16 +16,16 @@ MembershipType = TypeVar("MembershipType", bound="Membership")
 
 class Membership(Document):
     """
-.. note:: A membership document is specified by the following format :
+    .. note:: A membership document is specified by the following format :
 
-    | Version: VERSION
-    | Type: Membership
-    | Currency: CURRENCY_NAME
-    | Issuer: ISSUER
-    | Block: NUMBER-HASH
-    | Membership: MEMBERSHIP_TYPE
-    | UserID: USER_ID
-    | CertTS: CERTIFICATION_TS
+        | Version: VERSION
+        | Type: Membership
+        | Currency: CURRENCY_NAME
+        | Issuer: ISSUER
+        | Block: NUMBER-HASH
+        | Membership: MEMBERSHIP_TYPE
+        | UserID: USER_ID
+        | CertTS: CERTIFICATION_TS
 
     """
 
