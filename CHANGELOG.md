@@ -1,3 +1,30 @@
+## [v0.58.0](https://git.duniter.org/clients/python/duniterpy/-/milestones/15) (9st September 2020)
+
+**Note**: This is the last major release with Python v3.5 support.
+
+[As Python 3.5 security fixes are dropped on September 13th of 2020](https://devguide.python.org/#status-of-python-branches).
+
+### CI/CD
+- #127: Change deprecated keyword in `.gitlab-ci.yml`
+- #124: Fix `publish_doc` job not working
+
+### Dependencies
+- !107: Fix pylint v2.6.0 new checks
+- Update black to v20.8b1, format code
+- !102: Update base58 to v2
+- !102: Update Sphinx to v3
+
+### Examples
+- !104: Rework send membership and identity documents examples
+
+### Documentation
+- !102: Add Repology’s packaging status to the Readme
+- !103: Rename file to `CONTRIBUTING.md` to be recognised by GitLab
+
+---
+
+- Thanks @vtexier, @Moul
+
 ## [v0.57.0](https://git.duniter.org/clients/python/duniterpy/-/milestones/11) (2nd April 2020)
 ### Code
 #### Enhancements
@@ -14,6 +41,8 @@
  
 ### CI/CD
 - #66, !93  Migrate to [Poetry](https://python-poetry.org/) (build and development environment)
+
+---
 
 - Thanks @vtexier, @Moul
 
@@ -141,6 +170,7 @@
 
 - Implement equality `__eq__()` and `__hash__()` methods for InputSource and OutputSource classes
 
+---
 Thanks @Moul, @vtexier
 
 ## v0.53.0 (30 March 2019)
