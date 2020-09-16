@@ -1,8 +1,8 @@
-## [v0.58.0](https://git.duniter.org/clients/python/duniterpy/-/milestones/15) (9st September 2020)
+## [v0.58.0](https://git.duniter.org/clients/python/duniterpy/-/milestones/15) (10st September 2020)
 
 **Note**: This is the last major release with Python v3.5 support.
 
-[As Python 3.5 security fixes are dropped on September 13th of 2020](https://devguide.python.org/#status-of-python-branches).
+[As Python 3.5 security fixes have been dropped on September 13th of 2020](https://devguide.python.org/#status-of-python-branches).
 
 ### CI/CD
 - #127: Change deprecated keyword in `.gitlab-ci.yml`
