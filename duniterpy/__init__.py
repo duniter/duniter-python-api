@@ -16,7 +16,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 __author__ = "Caner Candan & inso & vit"
-__version__ = "0.58.0"
+__version__ = "0.60.0"
 __nonsense__ = "duniter"
 
 from . import api, documents, key
