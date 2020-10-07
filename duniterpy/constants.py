@@ -25,10 +25,8 @@ BLOCK_ID_REGEX = "[0-9]+"
 BLOCK_UID_REGEX = "{block_id_regex}-{block_hash_regex}".format(
     block_id_regex=BLOCK_ID_REGEX, block_hash_regex=BLOCK_HASH_REGEX
 )
-CONDITIONS_REGEX = (
-    "(&&|\\|\\|| |[()]|(SIG\\({pubkey_regex}\\)|(XHX\\({hash_regex}\\))))*".format(
-        pubkey_regex=PUBKEY_REGEX, hash_regex=HASH_REGEX
-    )
+CONDITIONS_REGEX = "(&&|\\|\\|| |[()]|(SIG\\({pubkey_regex}\\)|(XHX\\({hash_regex}\\))))*".format(
+    pubkey_regex=PUBKEY_REGEX, hash_regex=HASH_REGEX
 )
 IPV4_REGEX = (
     "(?:(?:[0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\\.){3}(?:[0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4]["
