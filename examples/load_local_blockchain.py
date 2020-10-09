@@ -23,7 +23,8 @@ from duniterpy.helpers.blockchain import load
 
 bc = load()  # gets blockchain iterator
 b = next(bc)  # gets block
-b.number  # should return 0
+print(f"first block number is: {b.number}")  # should return 0
 # you can access all properties of this block through it's duniterpy objects attributes
-next(bc).number  # should return 1
-next(bc).number  # should return 2 (and so on)
+print(f"second block number is: {next(bc).number}")  # should return 1
+print(f"third block number is: {next(bc).number}")  # should return 2
+# (and so on)
