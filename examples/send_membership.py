@@ -35,7 +35,10 @@ BMAS_ENDPOINT = "BMAS g1-test.duniter.org 443"
 
 
 def get_membership_document(
-    membership_type: str, current_block: dict, identity: dict, key: SigningKey,
+    membership_type: str,
+    current_block: dict,
+    identity: dict,
+    key: SigningKey,
 ) -> Membership:
     """
     Get a Membership document

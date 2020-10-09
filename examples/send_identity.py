@@ -34,7 +34,11 @@ BMAS_ENDPOINT = "BMAS g1-test.duniter.org 443"
 ################################################
 
 
-def get_identity_document(current_block: dict, uid: str, key: SigningKey,) -> Identity:
+def get_identity_document(
+    current_block: dict,
+    uid: str,
+    key: SigningKey,
+) -> Identity:
     """
     Get an Identity document
 
