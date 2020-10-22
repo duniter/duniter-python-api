@@ -18,10 +18,13 @@ This library is used by two clients:
 
 ## Requirements
 - Python >= 3.6.8
-- [aiohttp >= 3.6.1](https://pypi.org/pypi/aiohttp)
-- [libnacl](https://pypi.org/pypi/libnacl)
-- [base58](https://pypi.org/pypi/base58)
-- [attr](https://pypi.org/project/attr/)
+- [aiohttp >= 3.6.3](https://pypi.org/project/aiohttp)
+- [jsonschema](https://pypi.org/project/jsonschema)
+- [pyPEG2](https://pypi.org/project/pyPEG2)
+- [attrs](https://pypi.org/project/attrs)
+- [base58](https://pypi.org/project/base58)
+- [libnacl](https://pypi.org/project/libnacl)
+- [pyaes](https://pypi.org/project/pyaes)
 
 ## Installation
 You can install DuniterPy and its dependencies with the following command:
