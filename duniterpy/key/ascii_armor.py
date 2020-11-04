@@ -1,5 +1,6 @@
 import base64
 import libnacl
+from libnacl.version import version as libnacl_version
 import re
 from typing import Optional, List, Dict, Any
 
@@ -14,7 +15,7 @@ HEADER_PREFIX = "-----"
 DASH_ESCAPE_PREFIX = "\x2D\x20"
 
 # Version field value
-VERSION_FIELD_VALUE = "Python Libnacl " + libnacl.__version__
+VERSION_FIELD_VALUE = "Python Libnacl " + libnacl_version
 
 # Parser cursor status
 ON_MESSAGE_FIELDS = 1

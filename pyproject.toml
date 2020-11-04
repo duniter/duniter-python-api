@@ -31,7 +31,7 @@ pypeg2 = "^2.15.2"
 attrs = "^19.3.0"
 base58 = "^2.0.0"
 pylibscrypt = "^1.8.0"
-libnacl = "^1.6.1"
+libnacl = "^1.7.2"
 pyaes = "^1.6.1"
 
 [tool.poetry.dev-dependencies]
