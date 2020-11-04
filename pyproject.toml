@@ -30,7 +30,7 @@ jsonschema = "^3.2.0"
 pypeg2 = "^2.15.2"
 attrs = "^20.2.0"
 base58 = "^2.0.0"
-libnacl = "^1.7.1"
+libnacl = "^1.7.2"
 pyaes = "^1.6.1"
 
 [tool.poetry.dev-dependencies]
