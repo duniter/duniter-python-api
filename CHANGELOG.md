@@ -1,4 +1,8 @@
-## [v0.60.0](https://git.duniter.org/clients/python/duniterpy/-/milestones/3) (26st September 2020)
+## v0.60.1 (7th November 2020)
+
+- #133, !116: Fix: Add support for libnacl from v1.7.2
+
+## [v0.60.0](https://git.duniter.org/clients/python/duniterpy/-/milestones/3) (26th September 2020)
 
 - #60, !106: Drop Python v3.5 support
 - #86, !106: Scrypt: migrate from `pylibscrypt` to `hashlib.scrypt` from the standard Python 3.6 lib
@@ -9,7 +13,11 @@
 
 - Thanks @vtexier, @Moul
 
-## [v0.58.0](https://git.duniter.org/clients/python/duniterpy/-/milestones/15) (10st September 2020)
+## v0.58.1 (7th November 2020)
+
+- #133, !116: Fix: Add support for libnacl from v1.7.2
+
+## [v0.58.0](https://git.duniter.org/clients/python/duniterpy/-/milestones/15) (10th September 2020)
 
 **Note**: This is the last major release with Python v3.5 support.
 
