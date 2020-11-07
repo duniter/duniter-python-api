@@ -1,3 +1,7 @@
+## v0.60.1 (7th November 2020)
+
+- #113, !116: Fix: Add support for libnacl from v1.7.2
+
 ## [v0.60.0](https://git.duniter.org/clients/python/duniterpy/-/milestones/3) (26st September 2020)
 
 - #60, !106: Drop Python v3.5 support
