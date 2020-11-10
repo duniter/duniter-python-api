@@ -322,7 +322,7 @@ class API:
         elif _json is not None:
             logging.debug("%s : %s, json=%s", method, url, _json)
             # http header to send json body
-            self.headers["Content-Type"] = "application/json; charset=utf-8"
+            self.headers["Content-Type"] = "application/json"
         else:
             logging.debug("%s : %s", method, url)
 
