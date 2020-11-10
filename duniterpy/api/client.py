@@ -19,6 +19,7 @@ import json
 import logging
 from typing import Callable, Union, Any, Optional, Dict
 
+import aiohttp
 import jsonschema
 from aiohttp import ClientResponse, ClientSession, ClientWebSocketResponse
 from aiohttp.client import _WSRequestContextManager
@@ -508,11 +509,14 @@ class Client:
 
         # return the chosen type
         result = response  # type: Any
-        if rtype == RESPONSE_TEXT:
+        if rtype == RESPONSE_TEXT or response.status > 399:
             result = await response.text()
         elif rtype == RESPONSE_JSON:
-            result = await response.json()
-
+            try:
+                result = await response.json()
+            except aiohttp.client_exceptions.ContentTypeError as exception:
+                logging.error("Response is not a json format")
+                # return response to debug...
         return result
 
     async def connect_ws(self, path: str = "") -> WSConnection:
