@@ -77,6 +77,18 @@ class JsonBlockchain:
             self.current_block_in_chunk - 1
         ]  # return block (before incrementation)
 
+    def current_block(self):
+        """returns current block as a duniterpy block document"""
+        json_block = self.chunk[self.current_block_in_chunk]
+        return Block.from_parsed_json(json_block)
+
+    def get_block_number(self, number):
+        """get one precise block (do not use for iteration)"""
+        self.current_chunk = number // CHUNK_SIZE
+        self.current_block_in_chunk = number % CHUNK_SIZE
+        self.parsechunk()
+        return self.current_block()
+
 
 def Blockchain(json_blockchain):
     """convert json to duniterpy block document"""
@@ -85,10 +97,16 @@ def Blockchain(json_blockchain):
         yield Block.from_parsed_json(jb)
 
 
+def load_json(path=DEFAULT_PATH):
+    """returns a JsonBlockchain object"""
+    path = pathlib.Path("~").joinpath(path).expanduser()  # expand path
+    jbc = JsonBlockchain(path)  # gets an iterator over json blockchain
+    return jbc
+
+
 def load(path=DEFAULT_PATH):
     """returns an iterator allowing to browse all the blockchain
     in practice, it will load chunk by chunk and only keep one in memory at a time"""
-    path = pathlib.Path("~").joinpath(path).expanduser()  # expand path
-    jbc = JsonBlockchain(path)  # gets an iterator over json blockchain
+    jbc = load_json(path)
     bc = Blockchain(jbc)  # convert it to an iterator over blocks
     return bc  # returns
