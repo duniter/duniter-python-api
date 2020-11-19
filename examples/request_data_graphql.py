@@ -11,14 +11,14 @@ from graphql.error import GraphQLSyntaxError
 # You can either use a complete defined endpoint : [NAME_OF_THE_API] [DOMAIN] [IPv4] [IPv6] [PORT]
 # or the simple definition : [NAME_OF_THE_API] [DOMAIN] [PORT]
 # Here we use the secure BASIC_MERKLED_API (BMAS) for standard http over ssl requests
-SWAPI_ENDPOINT = "BMAS g1.librelois.fr 443 gva"
+GVA_ENDPOINT = "BMAS g1.librelois.fr 443 gva"
 
 
 ################################################
 
 
 async def main():
-    client = Client(SWAPI_ENDPOINT)
+    client = Client(GVA_ENDPOINT)
 
     # get query to get schema from api
     query = get_introspection_query(False)
