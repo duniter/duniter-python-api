@@ -11,7 +11,7 @@ from graphql.error import GraphQLSyntaxError
 # You can either use a complete defined endpoint : [NAME_OF_THE_API] [DOMAIN] [IPv4] [IPv6] [PORT]
 # or the simple definition : [NAME_OF_THE_API] [DOMAIN] [PORT]
 # Here we use the secure BASIC_MERKLED_API (BMAS) for standard http over ssl requests
-GVA_ENDPOINT = "BMAS g1.librelois.fr 443 gva"
+GVA_ENDPOINT = "GVA S g1.librelois.fr 443 gva"
 
 
 ################################################
@@ -39,14 +39,13 @@ async def main():
     try:
         ast_document = language.parse(query)
     except GraphQLSyntaxError as exception:
-        print("Query syntax error: {0}".format(exception.message))
+        print(f"Query syntax error: {exception.message}")
         sys.exit(1)
 
     # validate query against schema
     errors = validate(schema, ast_document)
     if errors:
-        print("Schema errors:")
-        print(errors)
+        print(f"Schema errors: {errors}")
         sys.exit(1)
 
     # send valid query to api

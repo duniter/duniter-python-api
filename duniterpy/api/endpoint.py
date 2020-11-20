@@ -640,6 +640,151 @@ class ESSubscribtionEndpoint(Endpoint):
         return hash((ESSubscribtionEndpoint.API, self.server, self.port))
 
 
+# required to type hint cls in classmethod
+GVAEndpointType = TypeVar("GVAEndpointType", bound="GVAEndpoint")
+
+
+class GVAEndpoint(Endpoint):
+    API = "GVA"
+    endpoint_format = f"^GVA(?: ({constants.ENDPOINT_FLAGS_REGEX}))?(?: ({constants.HOST_REGEX}))?(?: ({constants.IPV4_REGEX}))?(?: ({constants.IPV6_REGEX}))? ([0-9]+)(?: ({constants.PATH_REGEX}))?$"
+    re_inline = re.compile(endpoint_format)
+
+    def __init__(
+        self,
+        flags: str,
+        server: str,
+        ipv4: str,
+        ipv6: str,
+        port: int,
+        path: str,
+    ) -> None:
+        """
+        Init GVAEndpoint instance
+
+        :param flags: Flags of endpoint
+        :param server: IP or domain name
+        :param ipv4: IP as IPv4 format
+        :param ipv6: IP as IPv6 format
+        :param port: Port number
+        :param path: Url path
+        """
+        self.flags = flags
+        self.server = server
+        self.ipv4 = ipv4
+        self.ipv6 = ipv6
+        self.port = port
+        self.path = path
+
+    @classmethod
+    def from_inline(cls: Type[GVAEndpointType], inline: str) -> GVAEndpointType:
+        """
+        Return GVAEndpoint instance from endpoint string
+
+        :param inline: Endpoint string
+        :return:
+        """
+        m = cls.re_inline.match(inline)
+        if m is None:
+            raise MalformedDocumentError(cls.API)
+        flags = m.group(1)
+        server = m.group(2)
+        ipv4 = m.group(3)
+        ipv6 = m.group(4)
+        port = int(m.group(5))
+        path = m.group(6)
+        if not flags:
+            flags = ""
+        if not path:
+            path = ""
+        return cls(flags, server, ipv4, ipv6, port, path)
+
+    def inline(self) -> str:
+        """
+        Return endpoint string
+
+        :return:
+        """
+        inlined = [
+            str(info)
+            for info in (
+                self.flags,
+                self.server,
+                self.ipv4,
+                self.ipv6,
+                self.port,
+                self.path,
+            )
+            if info
+        ]
+        return self.API + " " + " ".join(inlined)
+
+    def conn_handler(
+        self, session: ClientSession, proxy: str = None
+    ) -> ConnectionHandler:
+        """
+        Return connection handler instance for the endpoint
+
+        :param session: AIOHTTP client session instance
+        :param proxy: Proxy url
+        :return:
+        """
+        scheme_http = "https" if "S" in self.flags else "http"
+        scheme_ws = "wss" if "S" in self.flags else "ws"
+
+        if self.server:
+            conn_handler = ConnectionHandler(
+                scheme_http,
+                scheme_ws,
+                self.server,
+                self.port,
+                self.path,
+                session,
+                proxy,
+            )
+        elif self.ipv6:
+            conn_handler = ConnectionHandler(
+                scheme_http,
+                scheme_ws,
+                "[{0}]".format(self.ipv6),
+                self.port,
+                self.path,
+                session,
+                proxy,
+            )
+        else:
+            conn_handler = ConnectionHandler(
+                scheme_http, scheme_ws, self.ipv4, self.port, self.path, session, proxy
+            )
+
+        return conn_handler
+
+    def __str__(self) -> str:
+        return self.inline()
+
+    def __eq__(self, other: Any) -> bool:
+        if not isinstance(other, self.__class__):
+            return NotImplemented
+        return (
+            self.server == other.server
+            and self.ipv4 == other.ipv4
+            and self.ipv6 == other.ipv6
+            and self.port == other.port
+        )
+
+    def __hash__(self) -> int:
+        return hash((self.server, self.ipv4, self.ipv6, self.port))
+
+
+# required to type hint cls in classmethod
+GVASUBEndpointType = TypeVar("GVASUBEndpointType", bound="GVASUBEndpoint")
+
+
+class GVASUBEndpoint(GVAEndpoint):
+    API = "GVASUB"
+    endpoint_format = f"^GVASUB(?: ({constants.ENDPOINT_FLAGS_REGEX}))?(?: ({constants.HOST_REGEX}))?(?: ({constants.IPV4_REGEX}))?(?: ({constants.IPV6_REGEX}))? ([0-9]+)(?: ({constants.PATH_REGEX}))?$"
+    re_inline = re.compile(endpoint_format)
+
+
 MANAGED_API = {
     BMAEndpoint.API: BMAEndpoint,
     SecuredBMAEndpoint.API: SecuredBMAEndpoint,
@@ -647,6 +792,8 @@ MANAGED_API = {
     ESCoreEndpoint.API: ESCoreEndpoint,
     ESUserEndpoint.API: ESUserEndpoint,
     ESSubscribtionEndpoint.API: ESSubscribtionEndpoint,
+    GVAEndpoint.API: GVAEndpoint,
+    GVASUBEndpoint.API: GVASUBEndpoint,
 }  # type: Dict[str, Any]
 
 

@@ -515,7 +515,7 @@ class Client:
             try:
                 result = await response.json()
             except aiohttp.client_exceptions.ContentTypeError as exception:
-                logging.error("Response is not a json format")
+                logging.error("Response is not a json format: %s", exception)
                 # return response to debug...
         return result
 
