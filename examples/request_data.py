@@ -16,7 +16,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 import asyncio
-from duniterpy.api.client import Client, RESPONSE_AIOHTTP
+from duniterpy.api.client import Client, RESPONSE_HTTP
 from duniterpy.api import bma
 
 # CONFIG #######################################
@@ -77,7 +77,7 @@ async def main():
     # Get the node summary infos (direct REST GET request)
     print("\nCall direct get on node/summary")
     response = await client.get(
-        "node/summary", rtype=RESPONSE_AIOHTTP, schema=summary_schema
+        "node/summary", rtype=RESPONSE_HTTP, schema=summary_schema
     )
     print(response)
 
