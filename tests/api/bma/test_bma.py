@@ -21,7 +21,7 @@ import unittest
 import aiohttp
 
 from duniterpy.api.client import API, parse_error
-from duniterpy.api.endpoint import BMAEndpoint
+from duniterpy.api.endpoint import BMAEndpoint, SecuredBMAEndpoint, GVAEndpoint
 
 
 class TestBmaApi(unittest.TestCase):
@@ -49,6 +49,42 @@ class TestBmaApi(unittest.TestCase):
             self.assertEqual(
                 api.reverse_url("http", "/test/url"), "http://test.com:9092/test/url"
             )
+            await session.close()
+
+        self.loop.run_until_complete(go())
+
+    def test_reverse_url_complete_bmas(self):
+        async def go():
+            endpoint = SecuredBMAEndpoint(
+                "test.com",
+                "124.2.2.1",
+                "2001:0db8:0000:85a3:0000:0000:ac1f:8001 ",
+                9092,
+                "api_path",
+            )
+            session = aiohttp.ClientSession()
+            api = API(endpoint.conn_handler(session))
+            self.assertEqual(
+                api.reverse_url("http", "/test/url"),
+                "http://test.com:9092/api_path/test/url",
+            )
+            await session.close()
+
+        self.loop.run_until_complete(go())
+
+    def test_reverse_url_complete_gva(self):
+        async def go():
+            endpoint = GVAEndpoint(
+                "S",
+                "test.com",
+                "124.2.2.1",
+                "2001:0db8:0000:85a3:0000:0000:ac1f:8001 ",
+                9092,
+                "gva",
+            )
+            session = aiohttp.ClientSession()
+            api = API(endpoint.conn_handler(session))
+            self.assertEqual(api.reverse_url("https", ""), "https://test.com:9092/gva")
             await session.close()
 
         self.loop.run_until_complete(go())

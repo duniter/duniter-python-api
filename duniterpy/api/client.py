@@ -232,11 +232,14 @@ class API:
                 api_path=self.connection_handler.path,
             )
         else:
-            url = "{scheme}://{server}:{port}/".format(
+            url = "{scheme}://{server}:{port}".format(
                 scheme=scheme, server=server, port=port
             )
 
-        return url + path
+        if len(path.strip()) > 0:
+            return f"{url}/{path}"
+
+        return url
 
     async def requests_get(self, path: str, **kwargs: Any) -> ClientResponse:
         """
