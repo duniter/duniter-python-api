@@ -15,14 +15,10 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-import asyncio
 import json
 import time
 import sys
 
-from _socket import gaierror
-
-import aiohttp
 import jsonschema
 from jsonschema import ValidationError
 from typing import Any
@@ -46,7 +42,7 @@ CURRENCY = "g1-test"
 ################################################
 
 
-async def send(ws: WSConnection, request: str, request_id: str, schema: dict) -> Any:
+def send(ws: WSConnection, request: str, request_id: str, schema: dict) -> Any:
     """
     Send a WS2P request
 
@@ -57,14 +53,14 @@ async def send(ws: WSConnection, request: str, request_id: str, schema: dict) ->
     :param schema: Validation schema
     """
     # Send request
-    await ws.send_str(request)
+    ws.send_str(request)
 
     # Wait response with request id
-    response = await ws.receive_json()
+    response = ws.receive_json()
     while "resId" not in response or (
         "resId" in response and response["resId"] != request_id
     ):
-        response = await ws.receive_json()
+        response = ws.receive_json()
         time.sleep(1)
     try:
         # Check response format
@@ -83,7 +79,7 @@ async def send(ws: WSConnection, request: str, request_id: str, schema: dict) ->
     return response
 
 
-async def main():
+def main():
     """
     Main code
     """
@@ -104,7 +100,7 @@ async def main():
 
     # Create Client from endpoint string in Duniter format
     try:
-        ws2p_endpoint = await generate_ws2p_endpoint(BMAS_ENDPOINT)
+        ws2p_endpoint = generate_ws2p_endpoint(BMAS_ENDPOINT)
     except ValueError as e:
         print(e)
         return
@@ -112,13 +108,13 @@ async def main():
 
     try:
         # Create a Web Socket connection
-        ws = await client.connect_ws()
+        ws = client.connect_ws()
 
         print("Successfully connected to the web socket endpoint")
 
         # HANDSHAKE #######################################################
         try:
-            await handshake(ws, signing_key, CURRENCY)
+            handshake(ws, signing_key, CURRENCY)
         except ValidationError as exception:
             print(exception.message)
             print("HANDSHAKE FAILED !")
@@ -127,7 +123,7 @@ async def main():
         # Send ws2p request
         print("Send getCurrent() request")
         request_id = get_ws2p_challenge()[:8]
-        response = await send(
+        response = send(
             ws,
             requests.get_current(request_id),
             request_id,
@@ -138,7 +134,7 @@ async def main():
         # Send ws2p request
         print("Send getBlock(30000) request")
         request_id = get_ws2p_challenge()[:8]
-        response = await send(
+        response = send(
             ws,
             requests.get_block(request_id, 30000),
             request_id,
@@ -149,7 +145,7 @@ async def main():
         # Send ws2p request
         print("Send getBlocks(30000, 2) request")
         request_id = get_ws2p_challenge()[:8]
-        response = await send(
+        response = send(
             ws,
             requests.get_blocks(request_id, 30000, 2),
             request_id,
@@ -160,7 +156,7 @@ async def main():
         # Send ws2p request
         print("Send getRequirementsPending(3) request")
         request_id = get_ws2p_challenge()[:8]
-        response = await send(
+        response = send(
             ws,
             requests.get_requirements_pending(request_id, 3),
             request_id,
@@ -168,18 +164,9 @@ async def main():
         )
         print("Response: " + json.dumps(response, indent=2))
 
-        # Close session
-        await client.close()
-
-    except (aiohttp.WSServerHandshakeError, ValueError) as e:
-        print("Websocket handshake {0} : {1}".format(type(e).__name__, str(e)))
-    except (aiohttp.ClientError, gaierror, TimeoutError) as e:
-        print("{0} : {1}".format(str(e), ws2p_endpoint.inline()))
     except jsonschema.ValidationError as e:
         print("{:}:{:}".format(str(e.__class__.__name__), str(e)))
-    await client.close()
 
 
-# Latest duniter-python-api is asynchronous and you have to use asyncio, an asyncio loop and a "as" on the data.
-# ( https://docs.python.org/3/library/asyncio.html )
-asyncio.get_event_loop().run_until_complete(main())
+if __name__ == "__main__":
+    main()

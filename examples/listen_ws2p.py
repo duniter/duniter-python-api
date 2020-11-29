@@ -15,13 +15,8 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-import asyncio
 import json
 import sys
-
-from _socket import gaierror
-
-import aiohttp
 import jsonschema
 from jsonschema import ValidationError
 
@@ -42,7 +37,7 @@ CURRENCY = "g1-test"
 ################################################
 
 
-async def main():
+def main():
     """
     Main code
     """
@@ -63,7 +58,7 @@ async def main():
 
     # Create Client from endpoint string in Duniter format
     try:
-        ws2p_endpoint = await generate_ws2p_endpoint(BMAS_ENDPOINT)
+        ws2p_endpoint = generate_ws2p_endpoint(BMAS_ENDPOINT)
     except ValueError as e:
         print(e)
         return
@@ -71,7 +66,7 @@ async def main():
 
     try:
         # Create a Web Socket connection
-        ws = await client.connect_ws()
+        ws = client.connect_ws()
 
         print("Successfully connected to the web socket endpoint")
 
@@ -79,7 +74,7 @@ async def main():
         try:
             # Resolve handshake
             print("Handshake...")
-            await handshake(ws, signing_key, CURRENCY)
+            handshake(ws, signing_key, CURRENCY)
         except ValidationError as exception:
             print(exception.message)
             print("HANDSHAKE FAILED !")
@@ -87,27 +82,23 @@ async def main():
 
         print("Handshake ok")
 
-        loop = True
-        # Iterate on each message received...
-        while loop:
-            print("Waiting message...")
-            # Wait and capture next message
-            data = await ws.receive_json()
-            print("Message received:")
-            print(json.dumps(data, indent=2))
+        try:
+            loop = True
+            # Iterate on each message received...
+            while loop:
+                print("Waiting message, press CTRL-C to stop...")
+                # Wait and capture next message
+                data = ws.receive_json()
+                print("Message received:")
+                print(json.dumps(data, indent=2))
+        except KeyboardInterrupt:
+            # close the websocket connection
+            ws.close()
+            print("Connection closed.")
 
-        # Close session
-        await client.close()
-
-    except (aiohttp.WSServerHandshakeError, ValueError) as e:
-        print("Websocket handshake {0} : {1}".format(type(e).__name__, str(e)))
-    except (aiohttp.ClientError, gaierror, TimeoutError) as e:
-        print("{0} : {1}".format(str(e), ws2p_endpoint.inline()))
     except jsonschema.ValidationError as e:
         print("{:}:{:}".format(str(e.__class__.__name__), str(e)))
-    await client.close()
 
 
-# Latest duniter-python-api is asynchronous and you have to use asyncio, an asyncio loop and a "as" on the data.
-# ( https://docs.python.org/3/library/asyncio.html )
-asyncio.get_event_loop().run_until_complete(main())
+if __name__ == "__main__":
+    main()

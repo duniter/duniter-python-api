@@ -15,11 +15,8 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-import asyncio
 import json
-from _socket import gaierror
 
-import aiohttp
 import jsonschema
 
 from duniterpy.api import bma
@@ -36,7 +33,7 @@ BMAS_ENDPOINT = "BMAS g1-test.duniter.org 443"
 ################################################
 
 
-async def main():
+def main():
     """
     Main code
     """
@@ -44,8 +41,8 @@ async def main():
     client = Client(BMAS_ENDPOINT)
 
     try:
-        # Create Web Socket connection on block path (async method)
-        ws = await client(bma.ws.block)  # Type: WSConnection
+        # Create Web Socket connection on block path (method)
+        ws = client(bma.ws.block)  # Type: WSConnection
 
         print("Connected successfully to web socket block path")
 
@@ -54,23 +51,14 @@ async def main():
         while loop:
             print("Waiting message...")
             # Wait and capture next message
-            data = await ws.receive_json()
+            data = ws.receive_json()
             jsonschema.validate(data, bma.ws.WS_BLOCK_SCHEMA)
             print("Message received:")
             print(json.dumps(data, indent=2))
 
-        # Close session
-        await client.close()
-
-    except (aiohttp.WSServerHandshakeError, ValueError) as e:
-        print("Websocket block {0} : {1}".format(type(e).__name__, str(e)))
-    except (aiohttp.ClientError, gaierror, TimeoutError) as e:
-        print("{0} : {1}".format(str(e), BMAS_ENDPOINT))
     except jsonschema.ValidationError as e:
         print("{:}:{:}".format(str(e.__class__.__name__), str(e)))
-    await client.close()
 
 
-# Latest duniter-python-api is asynchronous and you have to use asyncio, an asyncio loop and a "as" on the data.
-# ( https://docs.python.org/3/library/asyncio.html )
-asyncio.get_event_loop().run_until_complete(main())
+if __name__ == "__main__":
+    main()

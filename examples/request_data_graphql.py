@@ -16,13 +16,13 @@ GVA_ENDPOINT = "GVA S g1.librelois.fr 443 gva"
 ################################################
 
 
-async def main():
+def main():
     client = Client(GVA_ENDPOINT)
 
     # get query to get schema from api
     query = get_introspection_query(False)
     # get schema from api
-    response = await client.query(query)
+    response = client.query(query)
     # convert response dict to schema
     schema = build_client_schema(response["data"])
 
@@ -48,16 +48,12 @@ async def main():
         sys.exit(1)
 
     # send valid query to api
-    response = await client.query(query)
+    response = client.query(query)
     if isinstance(response, str):
         print(response)
     else:
         print(json.dumps(response, indent=2))
 
-    # Close client aiohttp session
-    await client.close()
 
-
-# Latest duniter-python-api is asynchronous and you have to use asyncio, an asyncio loop and a "as" on the data.
-# ( https://docs.python.org/3/library/asyncio.html )
-asyncio.get_event_loop().run_until_complete(main())
+if __name__ == "__main__":
+    main()

@@ -15,7 +15,6 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-import asyncio
 from duniterpy.api.client import Client, RESPONSE_HTTP
 from duniterpy.api import bma
 
@@ -30,7 +29,7 @@ BMAS_ENDPOINT = "BMAS g1-test.duniter.org 443"
 ################################################
 
 
-async def main():
+def main():
     """
     Main code (synchronous requests)
     """
@@ -39,22 +38,22 @@ async def main():
 
     # Get the node summary infos by dedicated method (with json schema validation)
     print("\nCall bma.node.summary:")
-    response = await client(bma.node.summary)
+    response = client(bma.node.summary)
     print(response)
 
     # Get the money parameters located in the first block
     print("\nCall bma.blockchain.parameters:")
-    response = await client(bma.blockchain.parameters)
+    response = client(bma.blockchain.parameters)
     print(response)
 
     # Get the current block
     print("\nCall bma.blockchain.current:")
-    response = await client(bma.blockchain.current)
+    response = client(bma.blockchain.current)
     print(response)
 
     # Get the block number 10
     print("\nCall bma.blockchain.block(10):")
-    response = await client(bma.blockchain.block, 10)
+    response = client(bma.blockchain.block, 10)
     print(response)
 
     # jsonschema validator
@@ -75,16 +74,10 @@ async def main():
     }
 
     # Get the node summary infos (direct REST GET request)
-    print("\nCall direct get on node/summary")
-    response = await client.get(
-        "node/summary", rtype=RESPONSE_HTTP, schema=summary_schema
-    )
+    print("\nReturn http.client.HTTPResponse object from node/summary request")
+    response = client.get("node/summary", rtype=RESPONSE_HTTP, schema=summary_schema)
     print(response)
 
-    # Close client aiohttp session
-    await client.close()
 
-
-# Latest duniter-python-api is asynchronous and you have to use asyncio, an asyncio loop and a "as" on the data.
-# ( https://docs.python.org/3/library/asyncio.html )
-asyncio.get_event_loop().run_until_complete(main())
+if __name__ == "__main__":
+    main()

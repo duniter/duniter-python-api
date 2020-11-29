@@ -15,8 +15,6 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-import asyncio
-
 from duniterpy.api.client import Client
 
 # Duniter4j ES API documentation: https://git.duniter.org/clients/java/duniter4j/blob/master/src/site/markdown/ES_API.md
@@ -34,7 +32,7 @@ ES_USER_ENDPOINT = "ES_USER_API g1-test.data.duniter.fr 443"
 ################################################
 
 
-async def main():
+def main():
     """
     Main code (synchronous requests)
     """
@@ -43,18 +41,15 @@ async def main():
 
     # Get the current node (direct REST GET request)
     print("\nGET g1-test/block/current/_source:")
-    response = await client.get("g1-test/block/current/_source")
+    response = client.get("g1-test/block/current/_source")
     print(response)
 
     # Get the node number 2 with only selected fields (direct REST GET request)
     print("\nGET g1-test/block/2/_source:")
-    response = await client.get(
+    response = client.get(
         "g1-test/block/2/_source", {"_source": "number,hash,dividend,membersCount"}
     )
     print(response)
-
-    # Close client aiohttp session
-    await client.close()
 
     # Create Client from endpoint string in Duniter format
     client = Client(ES_USER_ENDPOINT)
@@ -64,13 +59,9 @@ async def main():
 
     # Get the profil of a public key (direct REST GET request)
     print("\nGET user/profile/{0}/_source:".format(pubkey))
-    response = await client.get("user/profile/{0}/_source".format(pubkey.strip(" \n")))
+    response = client.get("user/profile/{0}/_source".format(pubkey.strip(" \n")))
     print(response)
 
-    # Close client aiohttp session
-    await client.close()
 
-
-# Latest duniter-python-api is asynchronous and you have to use asyncio, an asyncio loop and a "as" on the data.
-# ( https://docs.python.org/3/library/asyncio.html )
-asyncio.get_event_loop().run_until_complete(main())
+if __name__ == "__main__":
+    main()

@@ -16,7 +16,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 import sys
-import asyncio
 import getpass
 
 from duniterpy.api import bma
@@ -106,7 +105,7 @@ def get_transaction_document(
     return transaction
 
 
-async def main():
+def main():
     """
     Main code
     """
@@ -114,7 +113,7 @@ async def main():
     client = Client(BMAS_ENDPOINT)
 
     # Get the node summary infos to test the connection
-    response = await client(bma.node.summary)
+    response = client(bma.node.summary)
     print(response)
 
     # prompt hidden user entry
@@ -131,10 +130,10 @@ async def main():
     pubkey_to = input("Enter recipient pubkey: ")
 
     # capture current block to get version and currency and blockstamp
-    current_block = await client(bma.blockchain.current)
+    current_block = client(bma.blockchain.current)
 
     # capture sources of account
-    response = await client(bma.tx.sources, pubkey_from)
+    response = client(bma.tx.sources, pubkey_from)
 
     if len(response["sources"]) == 0:
         print("no sources found for account %s" % pubkey_to)
@@ -152,17 +151,13 @@ async def main():
     transaction.sign([key])
 
     # send the Transaction document to the node
-    response = await client(bma.tx.process, transaction.signed_raw())
+    response = client(bma.tx.process, transaction.signed_raw())
 
     if response.status == 200:
-        print(await response.text())
+        print(response.read())
     else:
-        print("Error while publishing transaction: {0}".format(await response.text()))
-
-    # Close client aiohttp session
-    await client.close()
+        print("Error while publishing transaction: {0}".format(response.read()))
 
 
-# Latest duniter-python-api is asynchronous and you have to use asyncio, an asyncio loop and a "as" on the data.
-# ( https://docs.python.org/3/library/asyncio.html )
-asyncio.get_event_loop().run_until_complete(main())
+if __name__ == "__main__":
+    main()

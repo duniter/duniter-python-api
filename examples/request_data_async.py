@@ -35,6 +35,10 @@ async def print_response(request):
     print(await request)
 
 
+async def coroutine(function, *args, **kwargs):
+    return function(*args, **kwargs)
+
+
 async def main():
     """
     Main code (asynchronous requests)
@@ -52,21 +56,18 @@ async def main():
 
     # Get the node summary infos by dedicated method (with json schema validation)
     print("\nCall bma.node.summary:")
-    task = asyncio.ensure_future(client(bma.node.summary))
+    task = asyncio.ensure_future(coroutine(client, bma.node.summary))
     tasks.append(task)
 
     # Get the money parameters located in the first block
     print("\nCall bma.blockchain.parameters:")
-    task = asyncio.ensure_future(client(bma.blockchain.parameters))
+    task = asyncio.ensure_future(coroutine(client, bma.blockchain.parameters))
     tasks.append(task)
 
     responses = await asyncio.gather(*tasks)
     # you now have all response bodies in this variable
     print("\nResponses:")
     print(responses)
-
-    # Close client aiohttp session
-    await client.close()
 
 
 # Latest duniter-python-api is asynchronous and you have to use asyncio, an asyncio loop and a "as" on the data.

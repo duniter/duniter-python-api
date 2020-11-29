@@ -15,7 +15,6 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-import asyncio
 import getpass
 
 from duniterpy.api import bma
@@ -68,7 +67,7 @@ def get_identity_document(
     return identity
 
 
-async def main():
+def main():
     """
     Main code
     """
@@ -76,11 +75,11 @@ async def main():
     client = Client(BMAS_ENDPOINT)
 
     # Get the node summary infos to test the connection
-    response = await client(bma.node.summary)
+    response = client(bma.node.summary)
     print(response)
 
     # capture current block to get version and currency and blockstamp
-    current_block = await client(bma.blockchain.current)
+    current_block = client(bma.blockchain.current)
 
     # prompt entry
     uid = input("Enter your Unique IDentifier (pseudonym): ")
@@ -98,16 +97,12 @@ async def main():
     identity = get_identity_document(current_block, uid, key)
 
     # send the identity signed raw document to the node
-    response = await client(bma.wot.add, identity.signed_raw())
+    response = client(bma.wot.add, identity.signed_raw())
     if response.status == 200:
-        print(await response.text())
+        print(response.read())
     else:
-        print("Error while publishing identity : {0}".format(await response.text()))
-
-    # Close client aiohttp session
-    await client.close()
+        print("Error while publishing identity : {0}".format(response.read()))
 
 
-# Latest duniter-python-api is asynchronous and you have to use asyncio, an asyncio loop and a "as" on the data.
-# ( https://docs.python.org/3/library/asyncio.html )
-asyncio.get_event_loop().run_until_complete(main())
+if __name__ == "__main__":
+    main()

@@ -16,7 +16,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 import sys
-import asyncio
 import getpass
 from typing import Optional
 
@@ -36,7 +35,7 @@ BMAS_ENDPOINT = "BMAS g1-test.duniter.org 443"
 ################################################
 
 
-async def get_identity_document(
+def get_identity_document(
     client: Client, current_block: dict, pubkey: str
 ) -> Optional[Identity]:
     """
@@ -49,7 +48,7 @@ async def get_identity_document(
     :rtype: Identity
     """
     # Here we request for the path wot/lookup/pubkey
-    lookup_data = await client(bma.wot.lookup, pubkey)
+    lookup_data = client(bma.wot.lookup, pubkey)
     identity = None
 
     # parse results
@@ -99,7 +98,7 @@ def get_certification_document(
     )
 
 
-async def main():
+def main():
     """
     Main code
     """
@@ -107,7 +106,7 @@ async def main():
     client = Client(BMAS_ENDPOINT)
 
     # Get the node summary infos to test the connection
-    response = await client(bma.node.summary)
+    response = client(bma.node.summary)
     print(response)
 
     # prompt hidden user entry
@@ -124,14 +123,13 @@ async def main():
     pubkey_to = input("Enter certified pubkey: ")
 
     # capture current block to get version and currency and blockstamp
-    current_block = await client(bma.blockchain.current)
+    current_block = client(bma.blockchain.current)
 
     # create our Identity document to sign the Certification document
-    identity = await get_identity_document(client, current_block, pubkey_to)
+    identity = get_identity_document(client, current_block, pubkey_to)
     if identity is None:
         print("Identity not found for pubkey {0}".format(pubkey_to))
         # Close client aiohttp session
-        await client.close()
         sys.exit(1)
 
     # send the Certification document to the node
@@ -141,17 +139,13 @@ async def main():
     certification.sign([key])
 
     # Here we request for the path wot/certify
-    response = await client(bma.wot.certify, certification.signed_raw())
+    response = client(bma.wot.certify, certification.signed_raw())
 
     if response.status == 200:
-        print(await response.text())
+        print(response.read())
     else:
-        print("Error while publishing certification: {0}".format(await response.text()))
-
-    # Close client aiohttp session
-    await client.close()
+        print("Error while publishing certification: {0}".format(response.read()))
 
 
-# Latest duniter-python-api is asynchronous and you have to use asyncio, an asyncio loop and a "as" on the data.
-# ( https://docs.python.org/3/library/asyncio.html )
-asyncio.get_event_loop().run_until_complete(main())
+if __name__ == "__main__":
+    main()

@@ -15,7 +15,6 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-import asyncio
 import getpass
 import os
 import sys
@@ -56,7 +55,7 @@ PROTOCOL_VERSION = 10
 ################################################
 
 
-async def get_identity_document(
+def get_identity_document(
     client: Client, current_block: dict, pubkey: str
 ) -> Optional[Identity]:
     """
@@ -69,7 +68,7 @@ async def get_identity_document(
     :rtype: Identity
     """
     # Here we request for the path wot/lookup/pubkey
-    lookup_data = await client(bma.wot.lookup, pubkey)
+    lookup_data = client(bma.wot.lookup, pubkey)
     identity = None
 
     # parse results
@@ -115,7 +114,7 @@ def get_signed_raw_revocation_document(
     return revocation.signed_raw()
 
 
-async def main():
+def main():
     """
     Main code
     """
@@ -123,7 +122,7 @@ async def main():
     client = Client(BMAS_ENDPOINT)
 
     # Get the node summary infos to test the connection
-    response = await client(bma.node.summary)
+    response = client(bma.node.summary)
     print(response)
 
     # prompt hidden user entry
@@ -144,14 +143,13 @@ async def main():
         sys.exit(0)
 
     # capture current block to get currency name
-    current_block = await client(bma.blockchain.current)
+    current_block = client(bma.blockchain.current)
 
     # create our Identity document to sign the Certification document
-    identity = await get_identity_document(client, current_block, pubkey)
+    identity = get_identity_document(client, current_block, pubkey)
     if identity is None:
         print("Identity not found for pubkey {0}".format(pubkey))
         # Close client aiohttp session
-        await client.close()
         sys.exit(1)
 
     # get the revoke document
@@ -167,10 +165,6 @@ async def main():
     # document saved
     print("Revocation document saved in %s" % REVOCATION_DOCUMENT_FILE_PATH)
 
-    # Close client aiohttp session
-    await client.close()
 
-
-# Latest duniter-python-api is asynchronous and you have to use asyncio, an asyncio loop and a "as" on the data.
-# ( https://docs.python.org/3/library/asyncio.html )
-asyncio.get_event_loop().run_until_complete(main())
+if __name__ == "__main__":
+    main()

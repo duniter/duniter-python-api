@@ -15,8 +15,6 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-import asyncio
-
 from duniterpy.helpers import network
 from duniterpy.api.client import Client
 
@@ -26,20 +24,19 @@ from duniterpy.api.client import Client
 # or the simple definition : [NAME_OF_THE_API] [DOMAIN] [PORT] [PATH]
 # Here we use the secure BASIC_MERKLED_API (BMAS)
 BMAS_ENDPOINT = "BMAS g1-test.duniter.org 443"
-BMAS_ENDPOINT = "BMAS g1.duniter.org 443"
 
 
 ################################################
 
 
-async def main():
+def main():
     """
     Main code
     """
     # Create Client from endpoint string in Duniter format
     client = Client(BMAS_ENDPOINT)
 
-    groups = await network.get_available_nodes(client)
+    groups = network.get_available_nodes(client)
     for group in groups:
         block = group[0]["head"].blockstamp
         print(f"block {block} shared by {len(group)} nodes")
@@ -50,10 +47,6 @@ async def main():
         for endpoint in node["endpoints"]:
             print(endpoint)
 
-    # Close client aiohttp session
-    await client.close()
 
-
-# Latest duniter-python-api is asynchronous and you have to use asyncio, an asyncio loop and a "as" on the data.
-# ( https://docs.python.org/3/library/asyncio.html )
-asyncio.get_event_loop().run_until_complete(main())
+if __name__ == "__main__":
+    main()
