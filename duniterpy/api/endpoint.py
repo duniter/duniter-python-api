@@ -18,8 +18,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import re
 from typing import Any, Optional, TypeVar, Type, Dict
 
-from aiohttp import ClientSession
-
 import duniterpy.constants as constants
 from ..documents import MalformedDocumentError
 
@@ -34,7 +32,6 @@ class ConnectionHandler:
         server: str,
         port: int,
         path: str,
-        session: ClientSession,
         proxy: Optional[str] = None,
     ) -> None:
         """
@@ -45,7 +42,6 @@ class ConnectionHandler:
         :param server: Server IP or domain name
         :param port: Port number
         :param port: Url path
-        :param session: Session AIOHTTP
         :param proxy: Proxy (optional, default=None)
         """
         self.http_scheme = http_scheme
@@ -54,7 +50,6 @@ class ConnectionHandler:
         self.port = port
         self.path = path
         self.proxy = proxy
-        self.session = session
 
     def __str__(self) -> str:
         return "connection info: %s:%d" % (self.server, self.port)
@@ -72,9 +67,7 @@ class Endpoint:
     def inline(self) -> str:
         raise NotImplementedError("inline() is not implemented")
 
-    def conn_handler(
-        self, session: ClientSession, proxy: str = None
-    ) -> ConnectionHandler:
+    def conn_handler(self, proxy: str = None) -> ConnectionHandler:
         raise NotImplementedError("conn_handler is not implemented")
 
     def __str__(self) -> str:
@@ -121,17 +114,14 @@ class UnknownEndpoint(Endpoint):
             doc += " {0}".format(p)
         return doc
 
-    def conn_handler(
-        self, session: ClientSession, proxy: str = None
-    ) -> ConnectionHandler:
+    def conn_handler(self, proxy: str = None) -> ConnectionHandler:
         """
-        Return connection handler from session
+        Return connection handler
 
-        :param session: AIOHTTP Session
         :param proxy: Proxy server
         :return:
         """
-        return ConnectionHandler("", "", "", 0, "", ClientSession())
+        return ConnectionHandler("", "", "", 0, "")
 
     def __str__(self) -> str:
         return "{0} {1}".format(
@@ -205,27 +195,24 @@ class BMAEndpoint(Endpoint):
             PORT=(" {0}".format(self.port) if self.port else ""),
         )
 
-    def conn_handler(
-        self, session: ClientSession, proxy: str = None
-    ) -> ConnectionHandler:
+    def conn_handler(self, proxy: str = None) -> ConnectionHandler:
         """
         Return connection handler instance for the endpoint
 
-        :param session: AIOHTTP client session instance
         :param proxy: Proxy url
         :return:
         """
         if self.server:
             conn_handler = ConnectionHandler(
-                "http", "ws", self.server, self.port, "", session, proxy
+                "http", "ws", self.server, self.port, "", proxy
             )
         elif self.ipv6:
             conn_handler = ConnectionHandler(
-                "http", "ws", "[{0}]".format(self.ipv6), self.port, "", session, proxy
+                "http", "ws", "[{0}]".format(self.ipv6), self.port, "", proxy
             )
         else:
             conn_handler = ConnectionHandler(
-                "http", "ws", self.ipv4, self.port, "", session, proxy
+                "http", "ws", self.ipv4, self.port, "", proxy
             )
 
         return conn_handler
@@ -310,33 +297,24 @@ class SecuredBMAEndpoint(BMAEndpoint):
         ]
         return SecuredBMAEndpoint.API + " " + " ".join(inlined)
 
-    def conn_handler(
-        self, session: ClientSession, proxy: str = None
-    ) -> ConnectionHandler:
+    def conn_handler(self, proxy: str = None) -> ConnectionHandler:
         """
         Return connection handler instance for the endpoint
 
-        :param session: AIOHTTP client session instance
         :param proxy: Proxy url
         :return:
         """
         if self.server:
             conn_handler = ConnectionHandler(
-                "https", "wss", self.server, self.port, self.path, session, proxy
+                "https", "wss", self.server, self.port, self.path, proxy
             )
         elif self.ipv6:
             conn_handler = ConnectionHandler(
-                "https",
-                "wss",
-                "[{0}]".format(self.ipv6),
-                self.port,
-                self.path,
-                session,
-                proxy,
+                "https", "wss", "[{0}]".format(self.ipv6), self.port, self.path, proxy
             )
         else:
             conn_handler = ConnectionHandler(
-                "https", "wss", self.ipv4, self.port, self.path, session, proxy
+                "https", "wss", self.ipv4, self.port, self.path, proxy
             )
 
         return conn_handler
@@ -396,13 +374,10 @@ class WS2PEndpoint(Endpoint):
         ]
         return WS2PEndpoint.API + " " + " ".join(inlined)
 
-    def conn_handler(
-        self, session: ClientSession, proxy: str = None
-    ) -> ConnectionHandler:
+    def conn_handler(self, proxy: str = None) -> ConnectionHandler:
         """
         Return connection handler instance for the endpoint
 
-        :param session: AIOHTTP client session instance
         :param proxy: Proxy url
         :return:
         """
@@ -412,13 +387,7 @@ class WS2PEndpoint(Endpoint):
             http_scheme += "s"
             websocket_scheme += "s"
         return ConnectionHandler(
-            http_scheme,
-            websocket_scheme,
-            self.server,
-            self.port,
-            self.path,
-            session,
-            proxy,
+            http_scheme, websocket_scheme, self.server, self.port, self.path, proxy
         )
 
     def __str__(self) -> str:
@@ -478,19 +447,14 @@ class ESCoreEndpoint(Endpoint):
         inlined = [str(info) for info in (self.server, self.port) if info]
         return ESCoreEndpoint.API + " " + " ".join(inlined)
 
-    def conn_handler(
-        self, session: ClientSession, proxy: str = None
-    ) -> ConnectionHandler:
+    def conn_handler(self, proxy: str = None) -> ConnectionHandler:
         """
         Return connection handler instance for the endpoint
 
-        :param session: AIOHTTP client session instance
         :param proxy: Proxy url
         :return:
         """
-        return ConnectionHandler(
-            "https", "wss", self.server, self.port, "", session, proxy
-        )
+        return ConnectionHandler("https", "wss", self.server, self.port, "", proxy)
 
     def __str__(self) -> str:
         return self.inline()
@@ -544,19 +508,14 @@ class ESUserEndpoint(Endpoint):
         inlined = [str(info) for info in (self.server, self.port) if info]
         return ESUserEndpoint.API + " " + " ".join(inlined)
 
-    def conn_handler(
-        self, session: ClientSession, proxy: str = None
-    ) -> ConnectionHandler:
+    def conn_handler(self, proxy: str = None) -> ConnectionHandler:
         """
         Return connection handler instance for the endpoint
 
-        :param session: AIOHTTP client session instance
         :param proxy: Proxy url
         :return:
         """
-        return ConnectionHandler(
-            "https", "wss", self.server, self.port, "", session, proxy
-        )
+        return ConnectionHandler("https", "wss", self.server, self.port, "", proxy)
 
     def __str__(self) -> str:
         return self.inline()
@@ -614,19 +573,14 @@ class ESSubscribtionEndpoint(Endpoint):
         inlined = [str(info) for info in (self.server, self.port) if info]
         return ESSubscribtionEndpoint.API + " " + " ".join(inlined)
 
-    def conn_handler(
-        self, session: ClientSession, proxy: str = None
-    ) -> ConnectionHandler:
+    def conn_handler(self, proxy: str = None) -> ConnectionHandler:
         """
         Return connection handler instance for the endpoint
 
-        :param session: AIOHTTP client session instance
         :param proxy: Proxy url
         :return:
         """
-        return ConnectionHandler(
-            "https", "wss", self.server, self.port, "", session, proxy
-        )
+        return ConnectionHandler("https", "wss", self.server, self.port, "", proxy)
 
     def __str__(self) -> str:
         return self.inline()
@@ -718,13 +672,10 @@ class GVAEndpoint(Endpoint):
         ]
         return self.API + " " + " ".join(inlined)
 
-    def conn_handler(
-        self, session: ClientSession, proxy: str = None
-    ) -> ConnectionHandler:
+    def conn_handler(self, proxy: str = None) -> ConnectionHandler:
         """
         Return connection handler instance for the endpoint
 
-        :param session: AIOHTTP client session instance
         :param proxy: Proxy url
         :return:
         """
@@ -733,13 +684,7 @@ class GVAEndpoint(Endpoint):
 
         if self.server:
             conn_handler = ConnectionHandler(
-                scheme_http,
-                scheme_ws,
-                self.server,
-                self.port,
-                self.path,
-                session,
-                proxy,
+                scheme_http, scheme_ws, self.server, self.port, self.path, proxy
             )
         elif self.ipv6:
             conn_handler = ConnectionHandler(
@@ -748,12 +693,11 @@ class GVAEndpoint(Endpoint):
                 "[{0}]".format(self.ipv6),
                 self.port,
                 self.path,
-                session,
                 proxy,
             )
         else:
             conn_handler = ConnectionHandler(
-                scheme_http, scheme_ws, self.ipv4, self.port, self.path, session, proxy
+                scheme_http, scheme_ws, self.ipv4, self.port, self.path, proxy
             )
 
         return conn_handler

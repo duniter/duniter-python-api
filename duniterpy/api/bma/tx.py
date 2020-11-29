@@ -17,9 +17,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import logging
 
-from aiohttp import ClientResponse
+from http.client import HTTPResponse
 
-from duniterpy.api.client import Client, RESPONSE_AIOHTTP
+from duniterpy.api.client import Client, RESPONSE_HTTP
 
 logger = logging.getLogger("duniter/tx")
 
@@ -125,7 +125,7 @@ SOURCES_SCHEMA = {
 }
 
 
-async def history(client: Client, pubkey: str) -> dict:
+def history(client: Client, pubkey: str) -> dict:
     """
     Get transactions history of public key
 
@@ -133,10 +133,10 @@ async def history(client: Client, pubkey: str) -> dict:
     :param pubkey: Public key
     :return:
     """
-    return await client.get(MODULE + "/history/%s" % pubkey, schema=HISTORY_SCHEMA)
+    return client.get(MODULE + "/history/%s" % pubkey, schema=HISTORY_SCHEMA)
 
 
-async def process(client: Client, transaction_signed_raw: str) -> ClientResponse:
+def process(client: Client, transaction_signed_raw: str) -> HTTPResponse:
     """
     POST a transaction raw document
 
@@ -144,14 +144,14 @@ async def process(client: Client, transaction_signed_raw: str) -> ClientResponse
     :param transaction_signed_raw: Transaction signed raw document
     :return:
     """
-    return await client.post(
+    return client.post(
         MODULE + "/process",
         {"transaction": transaction_signed_raw},
-        rtype=RESPONSE_AIOHTTP,
+        rtype=RESPONSE_HTTP,
     )
 
 
-async def sources(client: Client, pubkey: str) -> dict:
+def sources(client: Client, pubkey: str) -> dict:
     """
     GET transaction sources
 
@@ -159,10 +159,10 @@ async def sources(client: Client, pubkey: str) -> dict:
     :param pubkey: Public key
     :return:
     """
-    return await client.get(MODULE + "/sources/%s" % pubkey, schema=SOURCES_SCHEMA)
+    return client.get(MODULE + "/sources/%s" % pubkey, schema=SOURCES_SCHEMA)
 
 
-async def pending(client: Client, pubkey: str) -> dict:
+def pending(client: Client, pubkey: str) -> dict:
     """
     GET pending transaction history for the given pubkey
 
@@ -170,12 +170,10 @@ async def pending(client: Client, pubkey: str) -> dict:
     :param pubkey: Public key
     :return:
     """
-    return await client.get(
-        MODULE + "/history/%s/pending" % pubkey, schema=HISTORY_SCHEMA
-    )
+    return client.get(MODULE + "/history/%s/pending" % pubkey, schema=HISTORY_SCHEMA)
 
 
-async def blocks(client: Client, pubkey: str, start: int, end: int) -> dict:
+def blocks(client: Client, pubkey: str, start: int, end: int) -> dict:
     """
     GET public key transactions history between start and end block number
 
@@ -185,13 +183,13 @@ async def blocks(client: Client, pubkey: str, start: int, end: int) -> dict:
     :param end: End to block number
     :return:
     """
-    return await client.get(
+    return client.get(
         MODULE + "/history/%s/blocks/%s/%s" % (pubkey, start, end),
         schema=HISTORY_SCHEMA,
     )
 
 
-async def times(client: Client, pubkey: str, start: int, end: int) -> dict:
+def times(client: Client, pubkey: str, start: int, end: int) -> dict:
     """
     GET public key transactions history between start and end timestamp
 
@@ -201,6 +199,6 @@ async def times(client: Client, pubkey: str, start: int, end: int) -> dict:
     :param end: End to timestamp
     :return:
     """
-    return await client.get(
+    return client.get(
         MODULE + "/history/%s/times/%s/%s" % (pubkey, start, end), schema=HISTORY_SCHEMA
     )

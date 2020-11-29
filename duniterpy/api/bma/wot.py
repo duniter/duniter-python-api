@@ -17,9 +17,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import logging
 
-from aiohttp import ClientResponse
+from http.client import HTTPResponse
 
-from duniterpy.api.client import Client, RESPONSE_AIOHTTP
+from duniterpy.api.client import Client, RESPONSE_HTTP
 
 logger = logging.getLogger("duniter/wot")
 
@@ -230,7 +230,7 @@ IDENTITY_OF_SCHEMA = {
 }
 
 
-async def add(client: Client, identity_signed_raw: str) -> ClientResponse:
+def add(client: Client, identity_signed_raw: str) -> HTTPResponse:
     """
     POST identity raw document
 
@@ -238,12 +238,12 @@ async def add(client: Client, identity_signed_raw: str) -> ClientResponse:
     :param identity_signed_raw: Identity raw document
     :return:
     """
-    return await client.post(
-        MODULE + "/add", {"identity": identity_signed_raw}, rtype=RESPONSE_AIOHTTP
+    return client.post(
+        MODULE + "/add", {"identity": identity_signed_raw}, rtype=RESPONSE_HTTP
     )
 
 
-async def certify(client: Client, certification_signed_raw: str) -> ClientResponse:
+def certify(client: Client, certification_signed_raw: str) -> HTTPResponse:
     """
     POST certification raw document
 
@@ -251,12 +251,12 @@ async def certify(client: Client, certification_signed_raw: str) -> ClientRespon
     :param certification_signed_raw: Certification raw document
     :return:
     """
-    return await client.post(
-        MODULE + "/certify", {"cert": certification_signed_raw}, rtype=RESPONSE_AIOHTTP
+    return client.post(
+        MODULE + "/certify", {"cert": certification_signed_raw}, rtype=RESPONSE_HTTP
     )
 
 
-async def revoke(client: Client, revocation_signed_raw: str) -> ClientResponse:
+def revoke(client: Client, revocation_signed_raw: str) -> HTTPResponse:
     """
     POST revocation document
 
@@ -264,14 +264,14 @@ async def revoke(client: Client, revocation_signed_raw: str) -> ClientResponse:
     :param revocation_signed_raw: Certification raw document
     :return:
     """
-    return await client.post(
+    return client.post(
         MODULE + "/revoke",
         {"revocation": revocation_signed_raw},
-        rtype=RESPONSE_AIOHTTP,
+        rtype=RESPONSE_HTTP,
     )
 
 
-async def lookup(client: Client, search: str) -> dict:
+def lookup(client: Client, search: str) -> dict:
     """
     GET UID/Public key data
 
@@ -279,10 +279,10 @@ async def lookup(client: Client, search: str) -> dict:
     :param search: UID or public key
     :return:
     """
-    return await client.get(MODULE + "/lookup/%s" % search, schema=LOOKUP_SCHEMA)
+    return client.get(MODULE + "/lookup/%s" % search, schema=LOOKUP_SCHEMA)
 
 
-async def certifiers_of(client: Client, search: str) -> dict:
+def certifiers_of(client: Client, search: str) -> dict:
     """
     GET UID/Public key certifiers
 
@@ -290,12 +290,12 @@ async def certifiers_of(client: Client, search: str) -> dict:
     :param search: UID or public key
     :return:
     """
-    return await client.get(
+    return client.get(
         MODULE + "/certifiers-of/%s" % search, schema=CERTIFICATIONS_SCHEMA
     )
 
 
-async def certified_by(client: Client, search: str) -> dict:
+def certified_by(client: Client, search: str) -> dict:
     """
     GET identities certified by UID/Public key
 
@@ -303,22 +303,22 @@ async def certified_by(client: Client, search: str) -> dict:
     :param search: UID or public key
     :return:
     """
-    return await client.get(
+    return client.get(
         MODULE + "/certified-by/%s" % search, schema=CERTIFICATIONS_SCHEMA
     )
 
 
-async def members(client: Client) -> dict:
+def members(client: Client) -> dict:
     """
     GET list of all current members of the Web of Trust
 
     :param client: Client to connect to the api
     :return:
     """
-    return await client.get(MODULE + "/members", schema=MEMBERS_SCHEMA)
+    return client.get(MODULE + "/members", schema=MEMBERS_SCHEMA)
 
 
-async def requirements(client: Client, search: str) -> dict:
+def requirements(client: Client, search: str) -> dict:
     """
     GET list of requirements for a given UID/Public key
 
@@ -326,12 +326,10 @@ async def requirements(client: Client, search: str) -> dict:
     :param search: UID or public key
     :return:
     """
-    return await client.get(
-        MODULE + "/requirements/%s" % search, schema=REQUIREMENTS_SCHEMA
-    )
+    return client.get(MODULE + "/requirements/%s" % search, schema=REQUIREMENTS_SCHEMA)
 
 
-async def requirements_of_pending(client: Client, minsig: int) -> dict:
+def requirements_of_pending(client: Client, minsig: int) -> dict:
     """
     GET list of requirements of all pending identities with a minimum of minsig certifications
 
@@ -339,12 +337,12 @@ async def requirements_of_pending(client: Client, minsig: int) -> dict:
     :param minsig: Minimum number of certifications
     :return:
     """
-    return await client.get(
+    return client.get(
         MODULE + "/requirements-of-pending/%d" % minsig, schema=REQUIREMENTS_SCHEMA
     )
 
 
-async def identity_of(client: Client, search: str) -> dict:
+def identity_of(client: Client, search: str) -> dict:
     """
     GET Identity data written in the blockchain
 
@@ -352,6 +350,4 @@ async def identity_of(client: Client, search: str) -> dict:
     :param search: UID or public key
     :return:
     """
-    return await client.get(
-        MODULE + "/identity-of/%s" % search, schema=IDENTITY_OF_SCHEMA
-    )
+    return client.get(MODULE + "/identity-of/%s" % search, schema=IDENTITY_OF_SCHEMA)

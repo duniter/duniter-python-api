@@ -26,7 +26,7 @@ from itertools import groupby
 from duniterpy.key import VerifyingKey
 
 
-async def get_available_nodes(client: Client) -> List[List[Dict[str, Any]]]:
+def get_available_nodes(client: Client) -> List[List[Dict[str, Any]]]:
     """
     Get available nodes grouped and sorted by descending blockstamp
 
@@ -52,8 +52,8 @@ async def get_available_nodes(client: Client) -> List[List[Dict[str, Any]]]:
     :return:
     """
     # capture heads and peers
-    heads_response = await client(bma.network.ws2p_heads)
-    peers_response = await client(bma.network.peers)
+    heads_response = client(bma.network.ws2p_heads)
+    peers_response = client(bma.network.peers)
 
     # get heads instances from WS2P messages
     heads = []

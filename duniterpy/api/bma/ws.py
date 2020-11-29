@@ -29,21 +29,21 @@ WS_BLOCK_SCHEMA = BLOCK_SCHEMA
 WS_PEER_SCHEMA = PEERING_SCHEMA
 
 
-async def block(client: Client) -> WSConnection:
+def block(client: Client) -> WSConnection:
     """
     Connect to block websocket
 
     :param client: Client to connect to the api
     :return:
     """
-    return await client.connect_ws(MODULE + "/block")
+    return client.connect_ws(MODULE + "/block")
 
 
-async def peer(client: Client) -> WSConnection:
+def peer(client: Client) -> WSConnection:
     """
     Connect to peer websocket
 
     :param client: Client to connect to the api
     :return:
     """
-    return await client.connect_ws(MODULE + "/peer")
+    return client.connect_ws(MODULE + "/peer")

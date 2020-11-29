@@ -25,7 +25,7 @@ from duniterpy.key import SigningKey
 import logging
 
 
-async def handshake(ws: WSConnection, signing_key: SigningKey, currency: str):
+def handshake(ws: WSConnection, signing_key: SigningKey, currency: str):
     """
     Perform ws2p handshake on the web socket connection using the signing_key instance
 
@@ -41,14 +41,14 @@ async def handshake(ws: WSConnection, signing_key: SigningKey, currency: str):
     connect_message = connect_document.get_signed_json(signing_key)
 
     logging.debug("Send CONNECT message")
-    await ws.send_str(connect_message)
+    ws.send_str(connect_message)
 
     loop = True
     remote_connect_document = None
     # Iterate on each message received...
     while loop:
 
-        data = await ws.receive_json()
+        data = ws.receive_json()
 
         if "auth" in data and data["auth"] == "CONNECT":
             jsonschema.validate(data, ws2p.network.WS2P_CONNECT_MESSAGE_SCHEMA)
@@ -67,7 +67,7 @@ async def handshake(ws: WSConnection, signing_key: SigningKey, currency: str):
 
             # Send ACK message
             logging.debug("Send ACK message...")
-            await ws.send_str(ack_message)
+            ws.send_str(ack_message)
 
         if "auth" in data and data["auth"] == "ACK":
             jsonschema.validate(data, ws2p.network.WS2P_ACK_MESSAGE_SCHEMA)
@@ -86,7 +86,7 @@ async def handshake(ws: WSConnection, signing_key: SigningKey, currency: str):
 
             # Send OK message
             logging.debug("Send OK message...")
-            await ws.send_str(ok_message)
+            ws.send_str(ok_message)
 
         if (
             remote_connect_document is not None
@@ -113,7 +113,7 @@ async def handshake(ws: WSConnection, signing_key: SigningKey, currency: str):
             break
 
 
-async def generate_ws2p_endpoint(
+def generate_ws2p_endpoint(
     bma_endpoint: Union[str, BMAEndpoint, SecuredBMAEndpoint]
 ) -> WS2PEndpoint:
     """
@@ -121,8 +121,7 @@ async def generate_ws2p_endpoint(
     Take the first one found
     """
     bma_client = Client(bma_endpoint)
-    peering = await bma_client(bma.network.peering)
-    await bma_client.close()
+    peering = bma_client(bma.network.peering)
 
     for endpoint in peering["endpoints"]:
         if endpoint.startswith("WS2P"):

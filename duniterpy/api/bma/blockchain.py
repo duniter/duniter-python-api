@@ -18,9 +18,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import logging
 from typing import Union
 
-from aiohttp import ClientResponse
+from http.client import HTTPResponse
 
-from duniterpy.api.client import Client, RESPONSE_AIOHTTP
+from duniterpy.api.client import Client, RESPONSE_HTTP
 
 logger = logging.getLogger("duniter/blockchain")
 
@@ -222,17 +222,17 @@ DIFFICULTIES_SCHEMA = {
 BRANCHES_SCHEMA = {"type": "object", "properties": {"blocks": BLOCKS_SCHEMA}}
 
 
-async def parameters(client: Client) -> dict:
+def parameters(client: Client) -> dict:
     """
     GET the blockchain parameters used by this node
 
     :param client: Client to connect to the api
     :return:
     """
-    return await client.get(MODULE + "/parameters", schema=PARAMETERS_SCHEMA)
+    return client.get(MODULE + "/parameters", schema=PARAMETERS_SCHEMA)
 
 
-async def memberships(client: Client, search: str) -> dict:
+def memberships(client: Client, search: str) -> dict:
     """
     GET list of Membership documents for UID/Public key
 
@@ -240,12 +240,10 @@ async def memberships(client: Client, search: str) -> dict:
     :param search: UID/Public key
     :return:
     """
-    return await client.get(
-        MODULE + "/memberships/%s" % search, schema=MEMBERSHIPS_SCHEMA
-    )
+    return client.get(MODULE + "/memberships/%s" % search, schema=MEMBERSHIPS_SCHEMA)
 
 
-async def membership(client: Client, membership_signed_raw: str) -> ClientResponse:
+def membership(client: Client, membership_signed_raw: str) -> HTTPResponse:
     """
     POST a Membership document
 
@@ -253,26 +251,26 @@ async def membership(client: Client, membership_signed_raw: str) -> ClientRespon
     :param membership_signed_raw: Membership signed raw document
     :return:
     """
-    return await client.post(
+    return client.post(
         MODULE + "/membership",
         {"membership": membership_signed_raw},
-        rtype=RESPONSE_AIOHTTP,
+        rtype=RESPONSE_HTTP,
     )
 
 
-async def current(client: Client) -> dict:
+def current(client: Client) -> dict:
     """
     GET the last accepted block
 
     :param client: Client to connect to the api
     :return:
     """
-    return await client.get(MODULE + "/current", schema=BLOCK_SCHEMA)
+    return client.get(MODULE + "/current", schema=BLOCK_SCHEMA)
 
 
-async def block(
+def block(
     client: Client, number: int = 0, block_raw: str = None, signature: str = None
-) -> Union[dict, ClientResponse]:
+) -> Union[dict, HTTPResponse]:
     """
     GET/POST a block from/to the blockchain
 
@@ -284,16 +282,16 @@ async def block(
     """
     # POST block
     if block_raw is not None and signature is not None:
-        return await client.post(
+        return client.post(
             MODULE + "/block",
             {"block": block_raw, "signature": signature},
-            rtype=RESPONSE_AIOHTTP,
+            rtype=RESPONSE_HTTP,
         )
     # GET block
-    return await client.get(MODULE + "/block/%d" % number, schema=BLOCK_SCHEMA)
+    return client.get(MODULE + "/block/%d" % number, schema=BLOCK_SCHEMA)
 
 
-async def blocks(client: Client, count: int, start: int) -> list:
+def blocks(client: Client, count: int, start: int) -> list:
     """
     GET list of blocks from the blockchain
 
@@ -305,12 +303,10 @@ async def blocks(client: Client, count: int, start: int) -> list:
     assert type(count) is int
     assert type(start) is int
 
-    return await client.get(
-        MODULE + "/blocks/%d/%d" % (count, start), schema=BLOCKS_SCHEMA
-    )
+    return client.get(MODULE + "/blocks/%d/%d" % (count, start), schema=BLOCKS_SCHEMA)
 
 
-async def hardship(client: Client, pubkey: str) -> dict:
+def hardship(client: Client, pubkey: str) -> dict:
     """
     GET hardship level for given member's public key for writing next block
 
@@ -318,114 +314,114 @@ async def hardship(client: Client, pubkey: str) -> dict:
     :param pubkey:  Public key of the member
     :return:
     """
-    return await client.get(MODULE + "/hardship/%s" % pubkey, schema=HARDSHIP_SCHEMA)
+    return client.get(MODULE + "/hardship/%s" % pubkey, schema=HARDSHIP_SCHEMA)
 
 
-async def difficulties(client: Client) -> dict:
+def difficulties(client: Client) -> dict:
     """
     GET difficulties levels for members into current window for writing next block
 
     :param client: Client to connect to the api
     :return:
     """
-    return await client.get(MODULE + "/difficulties", schema=DIFFICULTIES_SCHEMA)
+    return client.get(MODULE + "/difficulties", schema=DIFFICULTIES_SCHEMA)
 
 
-async def branches(client: Client) -> list:
+def branches(client: Client) -> list:
     """
     GET current branches of the node (top block of each branch)
 
     :param client: Client to connect to the api
     :return:
     """
-    return await client.get(MODULE + "/branches", schema=BRANCHES_SCHEMA)
+    return client.get(MODULE + "/branches", schema=BRANCHES_SCHEMA)
 
 
-async def newcomers(client: Client) -> dict:
+def newcomers(client: Client) -> dict:
     """
     GET the block numbers containing newcomers
 
     :param client: Client to connect to the api
     :return:
     """
-    return await client.get(MODULE + "/with/newcomers", schema=BLOCK_NUMBERS_SCHEMA)
+    return client.get(MODULE + "/with/newcomers", schema=BLOCK_NUMBERS_SCHEMA)
 
 
-async def certifications(client: Client) -> dict:
+def certifications(client: Client) -> dict:
     """
     GET the block numbers containing certifications
 
     :param client: Client to connect to the api
     :return:
     """
-    return await client.get(MODULE + "/with/certs", schema=BLOCK_NUMBERS_SCHEMA)
+    return client.get(MODULE + "/with/certs", schema=BLOCK_NUMBERS_SCHEMA)
 
 
-async def joiners(client: Client) -> dict:
+def joiners(client: Client) -> dict:
     """
     GET the block numbers containing joiners
 
     :param client: Client to connect to the api
     :return:
     """
-    return await client.get(MODULE + "/with/joiners", schema=BLOCK_NUMBERS_SCHEMA)
+    return client.get(MODULE + "/with/joiners", schema=BLOCK_NUMBERS_SCHEMA)
 
 
-async def actives(client: Client) -> dict:
+def actives(client: Client) -> dict:
     """
     GET the block numbers containing actives
 
     :param client: Client to connect to the api
     :return:
     """
-    return await client.get(MODULE + "/with/actives", schema=BLOCK_NUMBERS_SCHEMA)
+    return client.get(MODULE + "/with/actives", schema=BLOCK_NUMBERS_SCHEMA)
 
 
-async def leavers(client: Client) -> dict:
+def leavers(client: Client) -> dict:
     """
     GET the block numbers containing leavers
 
     :param client: Client to connect to the api
     :return:
     """
-    return await client.get(MODULE + "/with/leavers", schema=BLOCK_NUMBERS_SCHEMA)
+    return client.get(MODULE + "/with/leavers", schema=BLOCK_NUMBERS_SCHEMA)
 
 
-async def revoked(client: Client) -> dict:
+def revoked(client: Client) -> dict:
     """
     GET the block numbers containing revoked members.
 
     :param client: Client to connect to the api
     :return:
     """
-    return await client.get(MODULE + "/with/revoked", schema=BLOCK_NUMBERS_SCHEMA)
+    return client.get(MODULE + "/with/revoked", schema=BLOCK_NUMBERS_SCHEMA)
 
 
-async def excluded(client: Client) -> dict:
+def excluded(client: Client) -> dict:
     """
     GET the block numbers containing excluded
 
     :param client: Client to connect to the api
     :return:
     """
-    return await client.get(MODULE + "/with/excluded", schema=BLOCK_NUMBERS_SCHEMA)
+    return client.get(MODULE + "/with/excluded", schema=BLOCK_NUMBERS_SCHEMA)
 
 
-async def ud(client: Client) -> dict:
+def ud(client: Client) -> dict:
     """
     GET the block numbers containing universal dividend
 
     :param client: Client to connect to the api
     :return:
     """
-    return await client.get(MODULE + "/with/ud", schema=BLOCK_NUMBERS_SCHEMA)
+    return client.get(MODULE + "/with/ud", schema=BLOCK_NUMBERS_SCHEMA)
 
 
-async def tx(client: Client) -> dict:
+def tx(client: Client) -> dict:
     """
     GET the block numbers containing transactions
 
     :param client: Client to connect to the api
     :return:
     """
-    return await client.get(MODULE + "/with/tx", schema=BLOCK_NUMBERS_SCHEMA)
+    return client.get(MODULE + "/with/tx", schema=BLOCK_NUMBERS_SCHEMA)

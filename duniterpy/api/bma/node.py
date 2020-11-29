@@ -56,21 +56,21 @@ SANDBOXES_SCHEMA = {
 }
 
 
-async def summary(client: Client) -> dict:
+def summary(client: Client) -> dict:
     """
     GET Duniter node version and infos
 
     :param client: Client to connect to the api
     :return:
     """
-    return await client.get(MODULE + "/summary", schema=SUMMARY_SCHEMA)
+    return client.get(MODULE + "/summary", schema=SUMMARY_SCHEMA)
 
 
-async def sandboxes(client: Client) -> dict:
+def sandboxes(client: Client) -> dict:
     """
     GET Duniter node version and infos
 
     :param client: Client to connect to the api
     :return:
     """
-    return await client.get(MODULE + "/sandboxes", schema=SANDBOXES_SCHEMA)
+    return client.get(MODULE + "/sandboxes", schema=SANDBOXES_SCHEMA)

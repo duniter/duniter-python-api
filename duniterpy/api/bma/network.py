@@ -17,9 +17,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import logging
 
-from aiohttp import ClientResponse
+from http.client import HTTPResponse
 
-from duniterpy.api.client import Client, RESPONSE_AIOHTTP
+from duniterpy.api.client import Client, RESPONSE_HTTP
 
 logger = logging.getLogger("duniter/network")
 
@@ -120,7 +120,7 @@ WS2P_HEADS_SCHEMA = {
 }
 
 
-async def peers(client: Client) -> dict:
+def peers(client: Client) -> dict:
     """
     GET the exhaustive list of peers known by the node
 
@@ -128,20 +128,20 @@ async def peers(client: Client) -> dict:
     :return:
     """
 
-    return await client.get(MODULE + "/peers", schema=PEERS_SCHEMA)
+    return client.get(MODULE + "/peers", schema=PEERS_SCHEMA)
 
 
-async def peering(client: Client) -> dict:
+def peering(client: Client) -> dict:
     """
     GET peering information about a peer
 
     :param client: Client to connect to the api
     :return:
     """
-    return await client.get(MODULE + "/peering", schema=PEERING_SCHEMA)
+    return client.get(MODULE + "/peering", schema=PEERING_SCHEMA)
 
 
-async def peering_peers(client: Client, leaves: bool = False, leaf: str = "") -> dict:
+def peering_peers(client: Client, leaves: bool = False, leaf: str = "") -> dict:
     """
     GET peering entries of every node inside the currency network
 
@@ -151,17 +151,17 @@ async def peering_peers(client: Client, leaves: bool = False, leaf: str = "") ->
     :return:
     """
     if leaves is True:
-        response = await client.get(
+        response = client.get(
             MODULE + "/peering/peers", {"leaves": "true"}, schema=PEERING_PEERS_SCHEMA
         )
     else:
-        response = await client.get(
+        response = client.get(
             MODULE + "/peering/peers", {"leaf": leaf}, schema=PEERING_PEERS_SCHEMA
         )
     return response
 
 
-async def peer(client: Client, peer_signed_raw: str) -> ClientResponse:
+def peer(client: Client, peer_signed_raw: str) -> HTTPResponse:
     """
     POST a Peer signed raw document
 
@@ -169,16 +169,16 @@ async def peer(client: Client, peer_signed_raw: str) -> ClientResponse:
     :param peer_signed_raw: Peer signed raw document
     :return:
     """
-    return await client.post(
-        MODULE + "/peering/peers", {"peer": peer_signed_raw}, rtype=RESPONSE_AIOHTTP
+    return client.post(
+        MODULE + "/peering/peers", {"peer": peer_signed_raw}, rtype=RESPONSE_HTTP
     )
 
 
-async def ws2p_heads(client: Client) -> dict:
+def ws2p_heads(client: Client) -> dict:
     """
     GET ws2p heads known by the node
 
     :param client: Client to connect to the api
     :rtype: dict
     """
-    return await client.get(MODULE + "/ws2p/heads", schema=WS2P_HEADS_SCHEMA)
+    return client.get(MODULE + "/ws2p/heads", schema=WS2P_HEADS_SCHEMA)

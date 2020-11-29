@@ -14,6 +14,7 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
+import copy
 import json
 import logging
 from typing import Callable, Union, Any, Optional, Dict
@@ -21,7 +22,6 @@ from urllib import request, parse
 
 import jsonschema
 from websocket import WebSocket
-from aiohttp import ClientSession
 from http.client import HTTPResponse
 
 import duniterpy.api.endpoint as endpoint
@@ -32,11 +32,7 @@ logger = logging.getLogger("duniter")
 # Response type constants
 RESPONSE_JSON = "json"
 RESPONSE_TEXT = "text"
-RESPONSE_AIOHTTP = "aiohttp"
 RESPONSE_HTTP = "http"
-
-# Connection type constants
-CONNECTION_TYPE_AIOHTTP = 1
 
 # jsonschema validator
 ERROR_SCHEMA = {
@@ -81,11 +77,11 @@ def parse_error(text: str) -> dict:
     return data
 
 
-async def parse_response(response: str, schema: dict) -> Any:
+def parse_response(response: str, schema: dict) -> Any:
     """
     Validate and parse the BMA answer
 
-    :param response: Response of aiohttp request
+    :param response: Response content
     :param schema: The expected response structure
     :return: the json data
     """
@@ -113,7 +109,7 @@ class WSConnection:
         """
         self.connection = connection
 
-    async def send_str(self, data: str) -> None:
+    def send_str(self, data: str):
         """
         Send a data string to the web socket connection
 
@@ -124,9 +120,8 @@ class WSConnection:
             raise Exception("Connection property is empty")
 
         self.connection.send(data)
-        return None
 
-    async def receive_str(self, timeout: Optional[float] = None) -> str:
+    def receive_str(self, timeout: Optional[float] = None) -> str:
         """
         Wait for a data string from the web socket connection
 
@@ -139,7 +134,7 @@ class WSConnection:
             self.connection.settimeout(timeout)
         return self.connection.recv()
 
-    async def receive_json(self, timeout: Optional[float] = None) -> Any:
+    def receive_json(self, timeout: Optional[float] = None) -> Any:
         """
         Wait for json data from the web socket connection
 
@@ -152,7 +147,7 @@ class WSConnection:
             self.connection.settimeout(timeout)
         return json.loads(self.connection.recv())
 
-    async def close(self) -> None:
+    def close(self) -> None:
         """
         Close the web socket connection
 
@@ -161,12 +156,12 @@ class WSConnection:
         if self.connection is None:
             raise Exception("Connection property is empty")
 
-        await self.connection.close()
+        self.connection.close()
 
 
 class API:
     """
-    API is a class used as an abstraction layer over the request library (AIOHTTP).
+    API is a class used as an abstraction layer over the http/websocket libraries.
     """
 
     def __init__(
@@ -212,7 +207,7 @@ class API:
 
         return url
 
-    async def request_url(
+    def request_url(
         self,
         path: str,
         method: str = "GET",
@@ -265,7 +260,7 @@ class API:
         response = request.urlopen(duniter_request, timeout=15)  # type: HTTPResponse
 
         if response.status != 200:
-            content = response.read()
+            content = response.read().decode("utf-8")
             if bma_errors:
                 try:
                     error_data = parse_error(content)
@@ -280,16 +275,17 @@ class API:
             )
 
         # get response content
-        content = response.read()
+        return_response = copy.copy(response)
+        content = response.read().decode("utf-8")
         response.close()
 
         # if schema supplied...
         if schema is not None:
             # validate response
-            await parse_response(content, schema)
+            parse_response(content, schema)
 
         # return the chosen type
-        result = response  # type: Any
+        result = return_response  # type: Any
         if rtype == RESPONSE_TEXT:
             result = content
         elif rtype == RESPONSE_JSON:
@@ -297,14 +293,9 @@ class API:
 
         return result
 
-    async def connect_ws(self, path: str) -> WSConnection:
+    def connect_ws(self, path: str) -> WSConnection:
         """
-        Connect to a websocket in order to use API parameters
-
-        In reality, aiohttp.session.ws_connect returns a aiohttp.client._WSRequestContextManager instance.
-        It must be used in a with statement to get the ClientWebSocketResponse instance from it (__aenter__).
-        At the end of the with statement, aiohttp.client._WSRequestContextManager.__aexit__ is called
-        and close the ClientWebSocketResponse in it.
+        Connect to a websocket
 
         :param path: the url path
         :return:
@@ -316,7 +307,7 @@ class API:
             proxy_split = ":".split(self.connection_handler.proxy)
             if len(proxy_split) == 2:
                 host = proxy_split[0]
-                port = proxy_split[1]
+                port = int(proxy_split[1])
             else:
                 host = self.connection_handler.proxy
                 port = 80
@@ -335,14 +326,12 @@ class Client:
     def __init__(
         self,
         _endpoint: Union[str, endpoint.Endpoint],
-        session: Optional[ClientSession] = None,
         proxy: Optional[str] = None,
     ) -> None:
         """
         Init Client instance
 
         :param _endpoint: Endpoint string in duniter format
-        :param session: Aiohttp client session (optional, default None)
         :param proxy: Proxy server as hostname:port (optional, default None)
         """
         if isinstance(_endpoint, str):
@@ -356,15 +345,9 @@ class Client:
                 "{0} endpoint in not supported".format(self.endpoint.api)
             )
 
-        # if no user session...
-        if session is None:
-            # open a session
-            self.session = ClientSession()
-        else:
-            self.session = session
         self.proxy = proxy
 
-    async def get(
+    def get(
         self,
         url_path: str,
         params: Optional[dict] = None,
@@ -383,14 +366,14 @@ class Client:
         if params is None:
             params = dict()
 
-        client = API(self.endpoint.conn_handler(self.session, self.proxy))
+        client = API(self.endpoint.conn_handler(self.proxy))
 
         # get response
-        return await client.request_url(
+        return client.request_url(
             url_path, "GET", rtype, schema, bma_errors=True, **params
         )
 
-    async def post(
+    def post(
         self,
         url_path: str,
         params: Optional[dict] = None,
@@ -409,14 +392,14 @@ class Client:
         if params is None:
             params = dict()
 
-        client = API(self.endpoint.conn_handler(self.session, self.proxy))
+        client = API(self.endpoint.conn_handler(self.proxy))
 
         # get response
-        return await client.request_url(
+        return client.request_url(
             url_path, "POST", rtype, schema, bma_errors=True, **params
         )
 
-    async def query(
+    def query(
         self,
         query: str,
         variables: Optional[dict] = None,
@@ -427,7 +410,6 @@ class Client:
 
         :param query: GraphQL query string
         :param variables: Variables for the query (optional, default None)
-        :param rtype: Response type (optional, default RESPONSE_JSON)
         :param schema: Json Schema to validate response (optional, default None)
         :return:
         """
@@ -436,37 +418,29 @@ class Client:
         if variables is not None:
             payload["variables"] = variables
 
-        client = API(self.endpoint.conn_handler(self.session, self.proxy))
+        client = API(self.endpoint.conn_handler(self.proxy))
 
-        # get aiohttp response
-        response = await client.request_url(
+        # get json response
+        response = client.request_url(
             "", "POST", rtype=RESPONSE_JSON, schema=schema, json_data=payload
         )
 
         # if schema supplied...
         if schema is not None:
             # validate response
-            await parse_response(response, schema)
+            parse_response(response, schema)
 
         return response
 
-    async def connect_ws(self, path: str = "") -> WSConnection:
+    def connect_ws(self, path: str = "") -> WSConnection:
         """
         Connect to a websocket in order to use API parameters
 
         :param path: the url path
         :return:
         """
-        client = API(self.endpoint.conn_handler(self.session, self.proxy))
-        return await client.connect_ws(path)
-
-    async def close(self):
-        """
-        Close aiohttp session
-
-        :return:
-        """
-        await self.session.close()
+        client = API(self.endpoint.conn_handler(self.proxy))
+        return client.connect_ws(path)
 
     def __call__(self, _function: Callable, *args: Any, **kwargs: Any) -> Any:
         """

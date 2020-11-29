@@ -51,7 +51,7 @@ UD_SCHEMA = {
 }
 
 
-async def history(client: Client, pubkey: str) -> dict:
+def history(client: Client, pubkey: str) -> dict:
     """
     Get UD history of a member account
 
@@ -59,4 +59,4 @@ async def history(client: Client, pubkey: str) -> dict:
     :param pubkey:  Public key of the member
     :return:
     """
-    return await client.get(MODULE + "/history/%s" % pubkey, schema=UD_SCHEMA)
+    return client.get(MODULE + "/history/%s" % pubkey, schema=UD_SCHEMA)
