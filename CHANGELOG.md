@@ -1,3 +1,15 @@
+## [v0.61.0](https://git.duniter.org/clients/python/duniterpy/-/milestones/14) (30th November 2020)
+
+- #59 add GVA query support and example
+- #137 add GVAEndpoint and GVASUBEndpoint classes
+- fix bug in API.reverse_url
+
+- Readme: Update dependencies list
+- Upgrade to Poetry v1.1.x
+- Fix regex to update the documentation version
+- fix bug in pylint on examples
+- Add v0.58.1 and v0.60.1 changelogs
+
 ## v0.60.1 (7th November 2020)
 
 - #133, !116: Fix: Add support for libnacl from v1.7.2
