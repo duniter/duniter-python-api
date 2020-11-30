@@ -21,18 +21,6 @@ import jsonschema
 from jsonschema import SchemaError, ValidationError
 
 from duniterpy.api.bma.blockchain import (
-    parameters,
-    block,
-    current,
-    hardship,
-    memberships,
-    newcomers,
-    certifications,
-    joiners,
-    actives,
-    leavers,
-    ud,
-    tx,
     BLOCK_NUMBERS_SCHEMA,
     BLOCK_SCHEMA,
     BLOCKS_SCHEMA,
@@ -40,12 +28,9 @@ from duniterpy.api.bma.blockchain import (
     MEMBERSHIPS_SCHEMA,
     PARAMETERS_SCHEMA,
 )
-from duniterpy.api.client import Client
-from duniterpy.api.endpoint import BMAEndpoint
-from tests.api.webserver import WebFunctionalSetupMixin, web
 
 
-class TestBmaBlockchain(WebFunctionalSetupMixin, unittest.TestCase):
+class TestBmaBlockchain(unittest.TestCase):
     def test_parameters(self):
         json_sample = {
             "currency": "g1",
@@ -74,22 +59,6 @@ class TestBmaBlockchain(WebFunctionalSetupMixin, unittest.TestCase):
             jsonschema.validate(json_sample, PARAMETERS_SCHEMA)
         except (SchemaError, ValidationError) as e:
             raise self.failureException from e
-
-    def test_parameters_bad(self):
-        async def handler(request):
-            await request.read()
-            return web.Response(body=b"{}", content_type="application/json")
-
-        async def go():
-            _, port, _ = await self.create_server(
-                "GET", "/blockchain/parameters", handler
-            )
-            with self.assertRaises(jsonschema.exceptions.ValidationError):
-                client = Client(BMAEndpoint("127.0.0.1", "", "", port))
-                await client(parameters)
-            await client.close()
-
-        self.loop.run_until_complete(go())
 
     def test_schema_block_0(self):
         json_sample = {
@@ -242,36 +211,6 @@ class TestBmaBlockchain(WebFunctionalSetupMixin, unittest.TestCase):
         except (SchemaError, ValidationError) as e:
             raise self.failureException from e
 
-    def test_block_bad(self):
-        async def handler(request):
-            await request.read()
-            return web.Response(body=b"{}", content_type="application/json")
-
-        async def go():
-            _, port, _ = await self.create_server(
-                "GET", "/blockchain/block/100", handler
-            )
-            with self.assertRaises(jsonschema.exceptions.ValidationError):
-                client = Client(BMAEndpoint("127.0.0.1", "", "", port))
-                await client(block, 100)
-            await client.close()
-
-        self.loop.run_until_complete(go())
-
-    def test_current_bad(self):
-        async def handler(request):
-            await request.read()
-            return web.Response(body=b"{}", content_type="application/json")
-
-        async def go():
-            _, port, _ = await self.create_server("GET", "/blockchain/current", handler)
-            with self.assertRaises(jsonschema.exceptions.ValidationError):
-                client = Client(BMAEndpoint("127.0.0.1", "", "", port))
-                await client(current)
-            await client.close()
-
-        self.loop.run_until_complete(go())
-
     def test_schema_block(self):
         json_sample = {
             "version": 2,
@@ -355,24 +294,6 @@ class TestBmaBlockchain(WebFunctionalSetupMixin, unittest.TestCase):
         except (SchemaError, ValidationError) as e:
             raise self.failureException from e
 
-    def test_hardship_bad(self):
-        async def handler(request):
-            await request.read()
-            return web.Response(body=b"{}", content_type="application/json")
-
-        async def go():
-            _, port, _ = await self.create_server(
-                "GET",
-                "/blockchain/hardship/8Fi1VSTbjkXguwThF4v2ZxC5whK7pwG2vcGTkPUPjPGU",
-                handler,
-            )
-            with self.assertRaises(jsonschema.exceptions.ValidationError):
-                client = Client(BMAEndpoint("127.0.0.1", "", "", port))
-                await client(hardship, "8Fi1VSTbjkXguwThF4v2ZxC5whK7pwG2vcGTkPUPjPGU")
-            await client.close()
-
-        self.loop.run_until_complete(go())
-
     def test_schema_membership(self):
         json_sample = {
             "pubkey": "8Fi1VSTbjkXguwThF4v2ZxC5whK7pwG2vcGTkPUPjPGU",
@@ -402,49 +323,12 @@ class TestBmaBlockchain(WebFunctionalSetupMixin, unittest.TestCase):
         except (SchemaError, ValidationError) as e:
             raise self.failureException from e
 
-    def test_membership_bad(self):
-        async def handler(request):
-            await request.read()
-            return web.Response(body=b"{}", content_type="application/json")
-
-        async def go():
-            _, port, _ = await self.create_server(
-                "GET",
-                "/blockchain/memberships"
-                "/8Fi1VSTbjkXguwThF4v2ZxC5whK7pwG2vcGTkPUPjPGU",
-                handler,
-            )
-            with self.assertRaises(jsonschema.exceptions.ValidationError):
-                client = Client(BMAEndpoint("127.0.0.1", "", "", port))
-                await client(
-                    memberships, "8Fi1VSTbjkXguwThF4v2ZxC5whK7pwG2vcGTkPUPjPGU"
-                )
-            await client.close()
-
-        self.loop.run_until_complete(go())
-
     def test_schema_newcomers(self):
         json_sample = {"result": {"blocks": [223, 813]}}
         try:
             jsonschema.validate(json_sample, BLOCK_NUMBERS_SCHEMA)
         except (SchemaError, ValidationError) as e:
             raise self.failureException from e
-
-    def test_newcomers_bad(self):
-        async def handler(request):
-            await request.read()
-            return web.Response(body=b"{}", content_type="application/json")
-
-        async def go():
-            _, port, _ = await self.create_server(
-                "GET", "/blockchain/with/newcomers", handler
-            )
-            with self.assertRaises(jsonschema.exceptions.ValidationError):
-                client = Client(BMAEndpoint("127.0.0.1", "", "", port))
-                await client(newcomers)
-            await client.close()
-
-        self.loop.run_until_complete(go())
 
     def test_schema_certifications(self):
         json_sample = {"result": {"blocks": [223, 813]}}
@@ -453,44 +337,12 @@ class TestBmaBlockchain(WebFunctionalSetupMixin, unittest.TestCase):
         except (SchemaError, ValidationError) as e:
             raise self.failureException from e
 
-    def test_certifications_bad(self):
-        async def handler(request):
-            await request.read()
-            return web.Response(body=b"{}", content_type="application/json")
-
-        async def go():
-            _, port, _ = await self.create_server(
-                "GET", "/blockchain/with/certs", handler
-            )
-            with self.assertRaises(jsonschema.exceptions.ValidationError):
-                client = Client(BMAEndpoint("127.0.0.1", "", "", port))
-                await client(certifications)
-            await client.close()
-
-        self.loop.run_until_complete(go())
-
     def test_schema_joiners(self):
         json_sample = {"result": {"blocks": [223, 813]}}
         try:
             jsonschema.validate(json_sample, BLOCK_NUMBERS_SCHEMA)
         except (SchemaError, ValidationError) as e:
             raise self.failureException from e
-
-    def test_joiners_bad(self):
-        async def handler(request):
-            await request.read()
-            return web.Response(body=b"{}", content_type="application/json")
-
-        async def go():
-            _, port, _ = await self.create_server(
-                "GET", "/blockchain/with/joiners", handler
-            )
-            with self.assertRaises(jsonschema.exceptions.ValidationError):
-                client = Client(BMAEndpoint("127.0.0.1", "", "", port))
-                await client(joiners)
-            await client.close()
-
-        self.loop.run_until_complete(go())
 
     def test_schema_actives(self):
         json_sample = {"result": {"blocks": [223, 813]}}
@@ -499,44 +351,12 @@ class TestBmaBlockchain(WebFunctionalSetupMixin, unittest.TestCase):
         except (SchemaError, ValidationError) as e:
             raise self.failureException from e
 
-    def test_actives_bad(self):
-        async def handler(request):
-            await request.read()
-            return web.Response(body=b"{}", content_type="application/json")
-
-        async def go():
-            _, port, _ = await self.create_server(
-                "GET", "/blockchain/with/actives", handler
-            )
-            with self.assertRaises(jsonschema.exceptions.ValidationError):
-                client = Client(BMAEndpoint("127.0.0.1", "", "", port))
-                await client(actives)
-            await client.close()
-
-        self.loop.run_until_complete(go())
-
     def test_schema_leavers(self):
         json_sample = {"result": {"blocks": [223, 813]}}
         try:
             jsonschema.validate(json_sample, BLOCK_NUMBERS_SCHEMA)
         except (SchemaError, ValidationError) as e:
             raise self.failureException from e
-
-    def test_leavers_bad(self):
-        async def handler(request):
-            await request.read()
-            return web.Response(body=b"{}", content_type="application/json")
-
-        async def go():
-            _, port, _ = await self.create_server(
-                "GET", "/blockchain/with/leavers", handler
-            )
-            with self.assertRaises(jsonschema.exceptions.ValidationError):
-                client = Client(BMAEndpoint("127.0.0.1", "", "", port))
-                await client(leavers)
-            await client.close()
-
-        self.loop.run_until_complete(go())
 
     def test_schema_ud(self):
         json_sample = {"result": {"blocks": [223, 813]}}
@@ -664,37 +484,9 @@ class TestBmaBlockchain(WebFunctionalSetupMixin, unittest.TestCase):
         except (SchemaError, ValidationError) as e:
             raise self.failureException from e
 
-    def test_ud_bad(self):
-        async def handler(request):
-            await request.read()
-            return web.Response(body=b"{}", content_type="application/json")
-
-        async def go():
-            _, port, _ = await self.create_server("GET", "/blockchain/with/ud", handler)
-            with self.assertRaises(jsonschema.exceptions.ValidationError):
-                client = Client(BMAEndpoint("127.0.0.1", "", "", port))
-                await client(ud)
-            await client.close()
-
-        self.loop.run_until_complete(go())
-
     def test_schema_tx(self):
         json_sample = {"result": {"blocks": [223, 813]}}
         try:
             jsonschema.validate(json_sample, BLOCK_NUMBERS_SCHEMA)
         except (SchemaError, ValidationError) as e:
             raise self.failureException from e
-
-    def test_tx_bad(self):
-        async def handler(request):
-            await request.read()
-            return web.Response(body=b"{}", content_type="application/json")
-
-        async def go():
-            _, port, _ = await self.create_server("GET", "/blockchain/with/tx", handler)
-            with self.assertRaises(jsonschema.exceptions.ValidationError):
-                client = Client(BMAEndpoint("127.0.0.1", "", "", port))
-                await client(tx)
-            await client.close()
-
-        self.loop.run_until_complete(go())

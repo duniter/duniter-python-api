@@ -21,7 +21,7 @@ from duniterpy.helpers.ws2p import generate_ws2p_endpoint
 from duniterpy.api.endpoint import WS2PEndpoint, SecuredBMAEndpoint, BMAEndpoint
 
 
-async def peering_no_ws2p(self):
+def peering_no_ws2p(self):
     return {
         "version": 10,
         "currency": "g1-test",
@@ -35,7 +35,7 @@ async def peering_no_ws2p(self):
     }
 
 
-async def peering_ws2p(self):
+def peering_ws2p(self):
     return {
         "version": 10,
         "currency": "g1-test",
@@ -61,20 +61,18 @@ async def peering_ws2p(self):
         SecuredBMAEndpoint.from_inline("BMAS g1-test.duniter.org 443"),
     ],
 )
-@pytest.mark.asyncio
-async def test_generate_ws2p_endpoint(bma_endpoint, monkeypatch):
+def test_generate_ws2p_endpoint(bma_endpoint, monkeypatch):
     monkeypatch.setattr("duniterpy.api.bma.network.peering", peering_ws2p)
     reference_ep = WS2PEndpoint.from_inline(
         "WS2P 96675302 g1-test.duniter.org 443 ws2p"
     )
-    generated_ep = await generate_ws2p_endpoint(bma_endpoint)
+    generated_ep = generate_ws2p_endpoint(bma_endpoint)
     assert reference_ep == generated_ep
 
 
 @pytest.mark.parametrize("bma_endpoint", ["BMAS g1-test.duniter.org 443"])
-@pytest.mark.asyncio
-async def test_generate_ws2p_endpoint_no_ws2p(bma_endpoint, monkeypatch):
+def test_generate_ws2p_endpoint_no_ws2p(bma_endpoint, monkeypatch):
     monkeypatch.setattr("duniterpy.api.bma.network.peering", peering_no_ws2p)
     with pytest.raises(ValueError) as excinfo:
-        await generate_ws2p_endpoint(bma_endpoint)
+        generate_ws2p_endpoint(bma_endpoint)
     assert "No WS2P endpoint found" in str(excinfo.value)

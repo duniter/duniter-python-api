@@ -15,28 +15,20 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-import json
 import unittest
 
 import jsonschema
 from jsonschema import SchemaError, ValidationError
 
 from duniterpy.api.bma.wot import (
-    lookup,
-    members,
-    certified_by,
-    certifiers_of,
     REQUIREMENTS_SCHEMA,
     CERTIFICATIONS_SCHEMA,
     LOOKUP_SCHEMA,
     MEMBERS_SCHEMA,
 )
-from duniterpy.api.client import Client
-from duniterpy.api.endpoint import BMAEndpoint
-from tests.api.webserver import WebFunctionalSetupMixin, web
 
 
-class TestBmaWot(WebFunctionalSetupMixin, unittest.TestCase):
+class TestBmaWot(unittest.TestCase):
     def test_bma_wot_lookup(self):
         json_sample = {
             "partial": False,
@@ -174,20 +166,6 @@ class TestBmaWot(WebFunctionalSetupMixin, unittest.TestCase):
         except (SchemaError, ValidationError) as e:
             raise self.failureException from e
 
-    def test_bma_wot_lookup_bad(self):
-        async def handler(request):
-            await request.read()
-            return web.Response(body=b"{}", content_type="application/json")
-
-        async def go():
-            _, port, _ = await self.create_server("GET", "/wot/lookup/pubkey", handler)
-            with self.assertRaises(jsonschema.exceptions.ValidationError):
-                client = Client(BMAEndpoint("127.0.0.1", "", "", port))
-                await client(lookup, "pubkey")
-            await client.close()
-
-        self.loop.run_until_complete(go())
-
     def test_bma_wot_members(self):
         json_sample = {
             "results": [
@@ -209,20 +187,6 @@ class TestBmaWot(WebFunctionalSetupMixin, unittest.TestCase):
             jsonschema.validate(MEMBERS_SCHEMA, json_sample)
         except (SchemaError, ValidationError) as e:
             raise self.failureException from e
-
-    def test_bma_wot_members_bad(self):
-        async def handler(request):
-            await request.read()
-            return web.Response(body=b"{}", content_type="application/json")
-
-        async def go():
-            _, port, _ = await self.create_server("GET", "/wot/members", handler)
-            with self.assertRaises(jsonschema.exceptions.ValidationError):
-                client = Client(BMAEndpoint("127.0.0.1", "", "", port))
-                await client(members)
-            await client.close()
-
-        self.loop.run_until_complete(go())
 
     def test_bma_wot_cert(self):
         json_sample = {
@@ -259,76 +223,6 @@ class TestBmaWot(WebFunctionalSetupMixin, unittest.TestCase):
             jsonschema.validate(json_sample, CERTIFICATIONS_SCHEMA)
         except (SchemaError, ValidationError) as e:
             raise self.failureException from e
-
-    def test_bma_wot_certifiers_bad(self):
-        async def handler(request):
-            await request.read()
-            return web.Response(body=b"{}", content_type="application/json")
-
-        async def go():
-            _, port, _ = await self.create_server(
-                "GET", "/wot/certifiers-of/pubkey", handler
-            )
-            with self.assertRaises(jsonschema.exceptions.ValidationError):
-                client = Client(BMAEndpoint("127.0.0.1", "", "", port))
-                await client(certifiers_of, "pubkey")
-            await client.close()
-
-        self.loop.run_until_complete(go())
-
-    def test_bma_wot_certifiers_inner_bad(self):
-        async def handler(request):
-            await request.read()
-            return web.Response(
-                body=bytes(
-                    json.dumps(
-                        {
-                            "pubkey": "7Aqw6Efa9EzE7gtsc8SveLLrM7gm6NEGoywSv4FJx6pZ",
-                            "uid": "john",
-                            "isMember": True,
-                            "certifications": [
-                                {
-                                    "pubkey": "FADxcH5LmXGmGFgdixSes6nWnC4Vb4pRUBYT81zQRhjn",
-                                    "meta": {"block_number": 38580},
-                                    "uids": ["doe"],
-                                    "isMember": True,
-                                    "wasMember": True,
-                                    "signature": "8XYmBdElqNkkl4AeFjJnC5oj/ujBrzH9FNgPZvK8Cicp8Du0PQa0yYFG95EQ46MJhdV0fUT2g5xyH8N3/OGhDA==",
-                                }
-                            ],
-                        }
-                    ),
-                    "utf-8",
-                ),
-                content_type="application/json",
-            )
-
-        async def go():
-            _, port, _ = await self.create_server(
-                "GET", "/wot/certifiers-of/pubkey", handler
-            )
-            with self.assertRaises(jsonschema.exceptions.ValidationError):
-                client = Client(BMAEndpoint("127.0.0.1", "", "", port))
-                await client(certifiers_of, "pubkey")
-            await client.close()
-
-        self.loop.run_until_complete(go())
-
-    def test_bma_wot_certified_bad(self):
-        async def handler(request):
-            await request.read()
-            return web.Response(body=b"{}", content_type="application/json")
-
-        async def go():
-            _, port, _ = await self.create_server(
-                "GET", "/wot/certified-by/pubkey", handler
-            )
-            with self.assertRaises(jsonschema.exceptions.ValidationError):
-                client = Client(BMAEndpoint("127.0.0.1", "", "", port))
-                await client(certified_by, "pubkey")
-            await client.close()
-
-        self.loop.run_until_complete(go())
 
     def test_bma_wot_requirements(self):
         json_sample = {

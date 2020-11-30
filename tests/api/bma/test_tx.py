@@ -21,18 +21,12 @@ import jsonschema
 from jsonschema import SchemaError, ValidationError
 
 from duniterpy.api.bma.tx import (
-    history,
-    sources,
-    blocks,
     HISTORY_SCHEMA,
     SOURCES_SCHEMA,
 )
-from duniterpy.api.client import Client
-from duniterpy.api.endpoint import BMAEndpoint
-from tests.api.webserver import WebFunctionalSetupMixin, web
 
 
-class TestBmaTx(WebFunctionalSetupMixin, unittest.TestCase):
+class TestBmaTx(unittest.TestCase):
     def test_bma_tx_history(self):
         json_sample = {
             "currency": "meta_brouzouf",
@@ -157,36 +151,6 @@ class TestBmaTx(WebFunctionalSetupMixin, unittest.TestCase):
         except (SchemaError, ValidationError) as e:
             raise self.failureException from e
 
-    def test_bma_tx_history_bad(self):
-        async def handler(request):
-            await request.read()
-            return web.Response(body=b"{}", content_type="application/json")
-
-        async def go():
-            _, port, _ = await self.create_server("GET", "/tx/history/pubkey", handler)
-            with self.assertRaises(jsonschema.exceptions.ValidationError):
-                client = Client(BMAEndpoint("127.0.0.1", "", "", port))
-                await client(history, "pubkey")
-            await client.close()
-
-        self.loop.run_until_complete(go())
-
-    def test_bma_tx_history_blocks_bad(self):
-        async def handler(request):
-            await request.read()
-            return web.Response(body=b"{}", content_type="application/json")
-
-        async def go():
-            _, port, _ = await self.create_server(
-                "GET", "/tx/history/pubkey/blocks/0/100", handler
-            )
-            with self.assertRaises(jsonschema.exceptions.ValidationError):
-                client = Client(BMAEndpoint("127.0.0.1", "", "", port))
-                await client(blocks, "pubkey", 0, 100)
-            await client.close()
-
-        self.loop.run_until_complete(go())
-
     def test_bma_tx_sources(self):
         json_sample = {
             "currency": "meta_brouzouf",
@@ -214,17 +178,3 @@ class TestBmaTx(WebFunctionalSetupMixin, unittest.TestCase):
             jsonschema.validate(json_sample, SOURCES_SCHEMA)
         except (SchemaError, ValidationError) as e:
             raise self.failureException from e
-
-    def test_bma_tx_sources_bad(self):
-        async def handler(request):
-            await request.read()
-            return web.Response(body=b"{}", content_type="application/json")
-
-        async def go():
-            _, port, _ = await self.create_server("GET", "/tx/sources/pubkey", handler)
-            with self.assertRaises(jsonschema.exceptions.ValidationError):
-                client = Client(BMAEndpoint("127.0.0.1", "", "", port))
-                await client(sources, "pubkey")
-            await client.close()
-
-        self.loop.run_until_complete(go())

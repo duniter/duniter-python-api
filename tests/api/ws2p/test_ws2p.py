@@ -30,10 +30,9 @@ from duniterpy.api.ws2p.requests import (
 )
 from duniterpy.documents import Identity, BlockUID
 from duniterpy.documents.ws2p.messages import DocumentMessage
-from tests.api.webserver import WebFunctionalSetupMixin
 
 
-class TestWs2p(WebFunctionalSetupMixin, unittest.TestCase):
+class TestWs2p(unittest.TestCase):
     def test_block(self):
         json_sample = {
             "heads": [

@@ -21,12 +21,9 @@ import jsonschema
 from jsonschema import ValidationError, SchemaError
 
 from duniterpy.api.bma import network
-from duniterpy.api.client import Client
-from duniterpy.api.endpoint import BMAEndpoint
-from tests.api.webserver import WebFunctionalSetupMixin, web
 
 
-class TestBmaNetwork(WebFunctionalSetupMixin, unittest.TestCase):
+class TestBmaNetwork(unittest.TestCase):
     def test_peers(self):
         json_sample = {
             "peers": [
@@ -70,20 +67,6 @@ class TestBmaNetwork(WebFunctionalSetupMixin, unittest.TestCase):
         except (SchemaError, ValidationError) as e:
             raise self.failureException from e
 
-    def test_peering_bad(self):
-        async def handler(request):
-            await request.read()
-            return web.Response(body=b"{}", content_type="application/json")
-
-        async def go():
-            _, port, _ = await self.create_server("GET", "/network/peering", handler)
-            with self.assertRaises(jsonschema.exceptions.ValidationError):
-                client = Client(BMAEndpoint("127.0.0.1", "", "", port))
-                await client(network.peering)
-            await client.close()
-
-        self.loop.run_until_complete(go())
-
     def test_peering_peers_root(self):
         json_sample = {
             "depth": 3,
@@ -116,22 +99,6 @@ class TestBmaNetwork(WebFunctionalSetupMixin, unittest.TestCase):
         except (SchemaError, ValidationError) as e:
             raise self.failureException from e
 
-    def test_peering_peers_bad(self):
-        async def handler(request):
-            await request.read()
-            return web.Response(body=b"{}", content_type="application/json")
-
-        async def go():
-            _, port, _ = await self.create_server(
-                "GET", "/network/peering/peers", handler
-            )
-            with self.assertRaises(jsonschema.exceptions.ValidationError):
-                client = Client(BMAEndpoint("127.0.0.1", "", "", port))
-                await client(network.peering_peers)
-            await client.close()
-
-        self.loop.run_until_complete(go())
-
     def test_ws2p_heads(self):
         json_sample = {
             "heads": [
@@ -163,17 +130,3 @@ class TestBmaNetwork(WebFunctionalSetupMixin, unittest.TestCase):
             jsonschema.validate(json_sample, network.WS2P_HEADS_SCHEMA)
         except (SchemaError, ValidationError) as e:
             raise self.failureException from e
-
-    def test_ws2p_heads_bad(self):
-        async def handler(request):
-            await request.read()
-            return web.Response(body=b"{}", content_type="application/json")
-
-        async def go():
-            _, port, _ = await self.create_server("GET", "/network/ws2p/heads", handler)
-            with self.assertRaises(jsonschema.ValidationError):
-                client = Client(BMAEndpoint("127.0.0.1", "", "", port))
-                await client(network.ws2p_heads)
-            await client.close()
-
-        self.loop.run_until_complete(go())

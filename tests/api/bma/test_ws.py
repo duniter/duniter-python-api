@@ -21,10 +21,9 @@ from jsonschema import SchemaError, ValidationError
 
 from duniterpy.api.bma.ws import WS_BLOCK_SCHEMA, WS_PEER_SCHEMA
 from duniterpy.api.client import parse_text
-from tests.api.webserver import WebFunctionalSetupMixin
 
 
-class TestBmaWebsocket(WebFunctionalSetupMixin, unittest.TestCase):
+class TestBmaWebsocket(unittest.TestCase):
     def test_block(self):
         json_sample = """
 {
