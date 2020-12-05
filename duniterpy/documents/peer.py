@@ -149,3 +149,19 @@ Endpoints:
             doc += "{0}\n".format(_endpoint.inline())
 
         return doc
+
+    @classmethod
+    def from_bma(cls: Type[PeerType], data: dict) -> PeerType:
+        # get Peer Document from bma dict
+        version = data["version"]
+        currency = data["currency"]
+        pubkey = data["pubkey"]
+        block_uid = BlockUID.from_str(data["block"])
+
+        endpoints = []
+        for _endpoint in data["endpoints"]:
+            endpoints.append(endpoint(_endpoint))
+
+        signature = str(Peer.re_signature.match(data["signature"]))
+
+        return cls(version, currency, pubkey, block_uid, endpoints, signature)
