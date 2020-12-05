@@ -25,6 +25,41 @@ logger = logging.getLogger("duniter/network")
 
 MODULE = "network"
 
+PEERS_SCHEMA = {
+    "type": "object",
+    "properties": {
+        "peers": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "version": {"type": ["number", "string"]},
+                    "currency": {"type": "string"},
+                    "status": {"type": "string"},
+                    "first_down": {"type": ["null", "integer"]},
+                    "last_try": {"type": ["null", "integer"]},
+                    "pubkey": {"type": "string"},
+                    "block": {"type": "string"},
+                    "signature": {"type": "string"},
+                    "endpoints": {"type": "array", "items": {"type": "string"}},
+                },
+                "required": [
+                    "version",
+                    "currency",
+                    "status",
+                    "first_down",
+                    "last_try",
+                    "pubkey",
+                    "block",
+                    "signature",
+                    "endpoints",
+                ],
+            },
+        }
+    },
+    "required": ["peers"],
+}
+
 PEERING_SCHEMA = {
     "type": "object",
     "properties": {
@@ -37,7 +72,7 @@ PEERING_SCHEMA = {
     "required": ["version", "currency", "pubkey", "endpoints", "signature"],
 }
 
-PEERS_SCHEMA = schema = {
+PEERING_PEERS_SCHEMA = {
     "type": ["object"],
     "properties": {
         "depth": {"type": "number"},
@@ -85,6 +120,17 @@ WS2P_HEADS_SCHEMA = {
 }
 
 
+async def peers(client: Client) -> dict:
+    """
+    GET the exhaustive list of peers known by the node
+
+    :param client: Client to connect to the api
+    :return:
+    """
+
+    return await client.get(MODULE + "/peers", schema=PEERS_SCHEMA)
+
+
 async def peering(client: Client) -> dict:
     """
     GET peering information about a peer
@@ -95,7 +141,7 @@ async def peering(client: Client) -> dict:
     return await client.get(MODULE + "/peering", schema=PEERING_SCHEMA)
 
 
-async def peers(client: Client, leaves: bool = False, leaf: str = "") -> dict:
+async def peering_peers(client: Client, leaves: bool = False, leaf: str = "") -> dict:
     """
     GET peering entries of every node inside the currency network
 
@@ -106,11 +152,11 @@ async def peers(client: Client, leaves: bool = False, leaf: str = "") -> dict:
     """
     if leaves is True:
         response = await client.get(
-            MODULE + "/peering/peers", {"leaves": "true"}, schema=PEERS_SCHEMA
+            MODULE + "/peering/peers", {"leaves": "true"}, schema=PEERING_PEERS_SCHEMA
         )
     else:
         response = await client.get(
-            MODULE + "/peering/peers", {"leaf": leaf}, schema=PEERS_SCHEMA
+            MODULE + "/peering/peers", {"leaf": leaf}, schema=PEERING_PEERS_SCHEMA
         )
     return response
 

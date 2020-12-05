@@ -27,6 +27,32 @@ from tests.api.webserver import WebFunctionalSetupMixin, web
 
 
 class TestBmaNetwork(WebFunctionalSetupMixin, unittest.TestCase):
+    def test_peers(self):
+        json_sample = {
+            "peers": [
+                {
+                    "version": "1",
+                    "currency": "beta_brouzouf",
+                    "status": "UP",
+                    "first_down": None,
+                    "last_try": 1607180847,
+                    "pubkey": "HsLShAtzXTVxeUtQd7yi5Z5Zh4zNvbu8sTEZ53nfKcqY",
+                    "block": "378529-00028D6F71E384565A1A106C1247E5F4B0392645A84EDB121173AC930540D552",
+                    "signature": "42yQm4hGTJYWkPg39hQAUgP6S6EQ4vTfXdJuxKEHL1ih6YHiDL2hcwrFgBHjXLRgxRhj2VNVqqc6b4JayKqTE14r",
+                    "endpoints": [
+                        "BASIC_MERKLED_API some.dns.name 88.77.66.55 2001:0db8:0000:85a3:0000:0000:ac1f 9001",
+                        "BASIC_MERKLED_API some.dns.name 88.77.66.55 2001:0db8:0000:85a3:0000:0000:ac1f 9002",
+                        "OTHER_PROTOCOL 88.77.66.55 9001",
+                    ],
+                }
+            ]
+        }
+
+        try:
+            jsonschema.validate(json_sample, network.PEERS_SCHEMA)
+        except (SchemaError, ValidationError) as e:
+            raise self.failureException from e
+
     def test_peering(self):
         json_sample = {
             "version": "1",
@@ -58,7 +84,7 @@ class TestBmaNetwork(WebFunctionalSetupMixin, unittest.TestCase):
 
         self.loop.run_until_complete(go())
 
-    def test_peers_root(self):
+    def test_peering_peers_root(self):
         json_sample = {
             "depth": 3,
             "nodesCount": 6,
@@ -66,11 +92,11 @@ class TestBmaNetwork(WebFunctionalSetupMixin, unittest.TestCase):
             "root": "114B6E61CB5BB93D862CA3C1DFA8B99E313E66E9",
         }
         try:
-            jsonschema.validate(json_sample, network.PEERS_SCHEMA)
+            jsonschema.validate(json_sample, network.PEERING_PEERS_SCHEMA)
         except (SchemaError, ValidationError) as e:
             raise self.failureException from e
 
-    def test_peers_leaf(self):
+    def test_peering_peers_leaf(self):
         json_sample = {
             "hash": "2E69197FAB029D8669EF85E82457A1587CA0ED9C",
             "value": {
@@ -86,11 +112,11 @@ class TestBmaNetwork(WebFunctionalSetupMixin, unittest.TestCase):
             },
         }
         try:
-            jsonschema.validate(json_sample, network.PEERS_SCHEMA)
+            jsonschema.validate(json_sample, network.PEERING_PEERS_SCHEMA)
         except (SchemaError, ValidationError) as e:
             raise self.failureException from e
 
-    def test_peers_bad(self):
+    def test_peering_peers_bad(self):
         async def handler(request):
             await request.read()
             return web.Response(body=b"{}", content_type="application/json")
@@ -101,7 +127,7 @@ class TestBmaNetwork(WebFunctionalSetupMixin, unittest.TestCase):
             )
             with self.assertRaises(jsonschema.exceptions.ValidationError):
                 client = Client(BMAEndpoint("127.0.0.1", "", "", port))
-                await client(network.peers)
+                await client(network.peering_peers)
             await client.close()
 
         self.loop.run_until_complete(go())
