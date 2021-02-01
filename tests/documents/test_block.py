@@ -19,6 +19,7 @@ import unittest
 
 from duniterpy.documents.block import Block
 from duniterpy.documents.block_uid import BlockUID, block_uid
+from duniterpy.key.signing_key import SigningKey
 
 raw_block = """Version: 11
 Type: Block
@@ -46,6 +47,38 @@ Transactions:
 InnerHash: DB30D958EE5CB75186972286ED3F4686B8A1C2CD
 Nonce: 45079
 42yQm4hGTJYWkPg39hQAUgP6S6EQ4vTfXdJuxKEHL1ih6YHiDL2hcwrFgBHjXLRgxRhj2VNVqqc6b4JayKqTE14r
+"""
+
+key_raw_block_to_sign = SigningKey.from_credentials(
+    salt="a", password="a", scrypt_params=None
+)
+
+raw_block_to_sign = """Version: 12
+Type: Block
+Currency: g1-test
+Number: 699652
+PoWMin: 59
+Time: 1612006804
+MedianTime: 1612002508
+UnitBase: 3
+Issuer: 6upqFiJ66WV6N3bPc8x8y7rXT3syqKRmwnVyunCtEj7o
+IssuersFrame: 36
+IssuersFrameVar: 0
+DifferentIssuersCount: 7
+PreviousHash: 00029FC6A511CD41361B016DEA02982350B196474786FC460FCA25708F93BBD1
+PreviousIssuer: 8iy1coxB82TsK62ZXbWy92ZcntCgVxAcC3WKuZrTb62o
+MembersCount: 25
+Identities:
+Joiners:
+Actives:
+Leavers:
+Revoked:
+Excluded:
+Certifications:
+Transactions:
+InnerHash: 2E5E26304A59AD8925D193C4ABD87A89847B6B129F534E7B5E8F06A09B6BB605
+Nonce: 10000000085087
+oj3JKhkTs20st1o3bfg3CofDuuIXcdI/HrOcy336qGPeOU/P+CXjSH/olYhMh3VtLJyeR3Yp+MeneEPuWHksDw==
 """
 
 raw_block_with_tx = """Version: 11
@@ -313,6 +346,33 @@ class TestBlock(unittest.TestCase):
         self.assertEqual(block.certifications, [])
         self.assertEqual(block.transactions, [])
 
+    def test_fromraw_12(self):
+        block = Block.from_signed_raw(raw_block_to_sign)
+        self.assertEqual(block.version, 12)
+        self.assertEqual(block.currency, "g1-test")
+        self.assertEqual(block.nonce, 10000000085087)
+        self.assertEqual(block.number, 699652)
+        self.assertEqual(block.powmin, 59)
+        self.assertEqual(block.time, 1612006804)
+        self.assertEqual(block.mediantime, 1612002508)
+        self.assertEqual(block.issuer, "6upqFiJ66WV6N3bPc8x8y7rXT3syqKRmwnVyunCtEj7o")
+        self.assertEqual(
+            block.prev_hash,
+            "00029FC6A511CD41361B016DEA02982350B196474786FC460FCA25708F93BBD1",
+        )
+        self.assertEqual(
+            block.prev_issuer, "8iy1coxB82TsK62ZXbWy92ZcntCgVxAcC3WKuZrTb62o"
+        )
+        self.assertEqual(block.members_count, 25)
+        self.assertEqual(block.identities, [])
+        self.assertEqual(block.joiners, [])
+        self.assertEqual(block.actives, [])
+        self.assertEqual(block.leavers, [])
+        self.assertEqual(block.excluded, [])
+        self.assertEqual(block.certifications, [])
+        self.assertEqual(block.transactions, [])
+        self.assertEqual(block.inner_hash, block.computed_inner_hash())
+
     def test_from_signed_raw_block_zero(self):
         block = Block.from_signed_raw(raw_block_zero)
         self.assertEqual(block.version, 11)
@@ -569,6 +629,12 @@ AywstQpC0S5iaA/YQvbz2alpP6zTYG3tjkWpxy1jgeCo028Te2V327bBZbfDGDzsjxOrF4UVmEBiGsgb
             block_doc.proof_of_work(),
             "00000A84839226046082E2B1AD49664E382D98C845644945D133D4A90408813A",
         )
+
+    def test_block_signature(self):
+        block = Block.from_signed_raw(raw_block_to_sign)
+        orig_sig = block.signatures[0]
+        block.sign([key_raw_block_to_sign])
+        self.assertEqual(orig_sig, block.signatures[0])
 
 
 if __name__ == "__main__":
