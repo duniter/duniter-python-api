@@ -540,8 +540,8 @@ Nonce: {nonce}
         return hashlib.sha256(doc_str.encode("ascii")).hexdigest().upper()
 
     def computed_inner_hash(self) -> str:
-        doc = self.signed_raw()
-        inner_doc = "\n".join(doc.split("\n")[:-2]) + "\n"
+        doc = self.raw()
+        inner_doc = "\n".join(doc.split("\n")[:-3]) + "\n"
         return hashlib.sha256(inner_doc.encode("ascii")).hexdigest().upper()
 
     def sign(self, keys):
