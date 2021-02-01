@@ -550,7 +550,10 @@ Nonce: {nonce}
         Warning : current signatures will be replaced with the new ones.
         """
         key = keys[0]
-        signed = self.raw()[-2:]
+        signed = "InnerHash: {inner_hash}\nNonce: {nonce}\n".format(
+            inner_hash=self.inner_hash,
+            nonce=self.nonce,
+        )
         signing = base64.b64encode(key.signature(bytes(signed, "ascii")))
         self.signatures = [signing.decode("ascii")]
 
