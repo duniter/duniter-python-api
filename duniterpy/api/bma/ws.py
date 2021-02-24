@@ -18,6 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import logging
 
 from duniterpy.api.bma.blockchain import BLOCK_SCHEMA
+from duniterpy.api.bma.network import PEERING_SCHEMA
 from duniterpy.api.client import Client, WSConnection
 
 logger = logging.getLogger("duniter/ws")
@@ -25,18 +26,7 @@ logger = logging.getLogger("duniter/ws")
 MODULE = "ws"
 
 WS_BLOCK_SCHEMA = BLOCK_SCHEMA
-
-WS_PEER_SCHEMA = {
-    "type": "object",
-    "properties": {
-        "version": {"type": "number"},
-        "currency": {"type": "string"},
-        "pubkey": {"type": "string"},
-        "endpoints": {"type": "array", "items": {"type": "string"}},
-        "signature": {"type": "string"},
-    },
-    "required": ["version", "currency", "pubkey", "endpoints", "signature"],
-}
+WS_PEER_SCHEMA = PEERING_SCHEMA
 
 
 async def block(client: Client) -> WSConnection:
