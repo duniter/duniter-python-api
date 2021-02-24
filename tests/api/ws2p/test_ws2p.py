@@ -21,7 +21,7 @@ import unittest
 import jsonschema
 
 from duniterpy.api.client import parse_text
-from duniterpy.api.ws2p.network import WS2P_HEADS_SCHEMA
+from duniterpy.api.bma.network import WS2P_HEADS_SCHEMA
 from duniterpy.api.ws2p.requests import (
     BLOCK_RESPONSE_SCHEMA,
     ERROR_RESPONSE_SCHEMA,

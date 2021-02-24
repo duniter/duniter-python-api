@@ -17,42 +17,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import logging
 
-from duniterpy.api.client import Client
-
 logger = logging.getLogger("duniter/network")
-
-MODULE = "network"
-
-WS2P_HEADS_SCHEMA = {
-    "type": "object",
-    "properties": {
-        "heads": {
-            "type": "array",
-            "items": {
-                "type": "object",
-                "properties": {
-                    "message": {"type": "string"},
-                    "sig": {"type": "string"},
-                    "messageV2": {"type": "string"},
-                    "sigV2": {"type": "string"},
-                    "step": {"type": "number"},
-                },
-                "required": ["message", "sig"],
-            },
-        }
-    },
-    "required": ["heads"],
-}
-
-
-def heads(client: Client):
-    """
-    GET Certification data over a member
-
-    :param client: Client to connect to the api
-    :rtype: dict
-    """
-    return client.get(MODULE + "/ws2p/heads", schema=WS2P_HEADS_SCHEMA)
 
 
 WS2P_CONNECT_MESSAGE_SCHEMA = {
