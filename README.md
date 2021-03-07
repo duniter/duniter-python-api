@@ -1,20 +1,30 @@
-# Duniter Python API
+# DuniterPy
+Most complete client oriented Python library for [Duniter](https://git.duniter.org/nodes/typescript/duniter)/Ğ1 ecosystem.
 
-Python implementation for [Duniter](https://git.duniter.org/nodes/typescript/duniter) BMA API
-
-This is the most complete Python library to communicate with Duniter nodes endpoints.
-
-This library is used by two clients:
-- [Sakia](http://sakia-wallet.org/), the rich client to manage your Duniter's wallets.
-- [Silkaj](https://silkaj.duniter.org/), the command line client.
+This library was originally developed for [Sakia](http://sakia-wallet.org/) desktop client which is now discontinued.
+It is currently used by following programs:
+- [Tikka](https://git.duniter.org/clients/python), the desktop client (Work In Progress, not yet available).
+- [Silkaj](https://silkaj.duniter.org/), command line client.
+- [Jaklis](https://git.p2p.legal/axiom-team/jaklis), command line client for Cs+/Gchange pods.
+- [Ğ1Dons](https://git.duniter.org/matograine/g1pourboire), Ğ1Dons, paper-wallet generator aimed at giving tips in Ğ1.
 
 ## Features
-- Support Duniter's [Basic Merkle API](https://git.duniter.org/nodes/typescript/duniter/blob/master/doc/HTTP_API.md) and [protocol](https://git.duniter.org/nodes/common/doc/blob/master/rfc/0009_Duniter_Blockchain_Protocol_V11.md)
-- Asynchronous/synchronous without threads
-- Support HTTP, HTTPS and Web Socket transport for the BMA API
-- Support [Elasticsearch Duniter4j](https://git.duniter.org/clients/java/duniter4j/blob/master/src/site/markdown/ES.md#request-the-es-node>) API
+### Network
+- APIs support: BMA, GVA, WS2P, and CS+:
+  - [Basic Merkle API](https://git.duniter.org/nodes/typescript/duniter/-/blob/dev/doc/HTTP_API.md), first Duniter API to be deprecated
+  - GraphQL Verification API, Duniter API in developement meant to replace BMA. Based on GraphQL.
+  - Websocket to Peer, Duniter inter-nodes (servers) API
+  - Cesium+, non-Duniter API, used to store profile data related to the blockchain as well as ads for Cesium and Ğchange.
+- Non-threaded asynchronous/synchronous connections
+- Support HTTP, HTTPS, and WebSocket transport for the APIs
+- Endpoints management
+
+### Blockchain
+- Support [Duniter blockchain protocol](https://git.duniter.org/documents/rfcs#duniter-blockchain-protocol-dubp)
+- Duniter documents management: transaction, block and WoT documents
+- Multiple authentication methods
 - Duniter signing key
-- Sign/verify and encrypt/decrypt messages with the Duniter credentials
+- Sign/verify and encrypt/decrypt messages with Duniter credentials
 
 ## Requirements
 - Python >= 3.6.8
@@ -33,23 +43,18 @@ pip3 install duniterpy --user
 ```
 
 ## Install the development environment
-- Install [Poetry](https://poetry.eustace.io):
-```bash
-curl -sSL https://raw.githubusercontent.com/sdispater/poetry/master/get-poetry.py | python - --preview
-```
+- [Install Poetry](https://python-poetry.org/docs/#installation)
 
 ## Documentation
-Online official automaticaly generated documentation: https://clients.duniter.io/python/duniterpy/index.html
+[Online official automaticaly generated documentation](https://clients.duniter.io/python/duniterpy/index.html)
 
 The [examples folder](https://git.duniter.org/clients/python/duniterpy/tree/master/examples) contains scripts to help you!
 
-Please take a look at the document [HTTP API](https://git.duniter.org/nodes/typescript/duniter/blob/master/doc/HTTP_API.md) to learn more about the BMA API.
+### How to generate and read locally the autodoc
 
-How to generate and read locally the autodoc:
-
-- Install Sphinx
+- Install Sphinx, included into the development dependencies:
 ```bash
-poetry install -E sphinx
+poetry install
 ```
 
 - Generate documentation
@@ -61,7 +66,7 @@ poetry run make docs
 
 ## Development
 * When writing docstrings, use the reStructuredText format recommended by https://www.python.org/dev/peps/pep-0287/#docstring-significant-features
-* Use make commands to check the code and the format.
+* Use `make` commands to check the code and the format.
 
 Black, the formatting tool, requires Python 3.6 or higher.
 
@@ -99,28 +104,28 @@ make tests TESTS_FILTER=tests.documents.test_block.TestBlock.test_fromraw
 ```
 
 ## Packaging and deploy
-### PyPi
+### PyPI
 Change and commit and tag the new version number (semantic version number)
 ```bash
 ./release.sh 0.42.3
 ```
 
-Build the PyPi package in the `dist` folder
+Build the PyPI package in the `dist` folder
 ```bash
 make build
 ```
 
-Deploy the package to PyPi test repository (prefix the command with a space in order for the shell not to save in its history system the command containing the password)
+Deploy the package to PyPI test repository (prefix the command with a space for the shell to not save it in its history system, since the command contains credentials)
 ```bash
 [SPACE]make deploy_test PYPI_TEST_LOGIN=xxxx PYPI_TEST_PASSWORD=xxxx
 ```
 
-Install the package from PyPi test repository
+Install the package from PyPI test repository
 ```bash
 pip install --index-url https://test.pypi.org/simple/ --extra-index-url https://pypi.python.org/simple/ duniterpy
 ```
 
-Deploy the package on the PyPi repository (prefix the command with a space in order for the shell not to save in its history system the command containing the password)
+Deploy the package on the PyPI repository (prefix the command with a space for the shell to not save it in its history system, since the command contains credentials)
 ```bash
 [SPACE]make deploy PYPI_LOGIN=xxxx PYPI_PASSWORD=xxxx
 ```
