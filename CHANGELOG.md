@@ -1,3 +1,28 @@
+## [v0.62.0](https://git.duniter.org/clients/python/duniterpy/-/milestones/16) (16th March 2021)
+
+### This release breaks backward compatibility !
+
+### BEFORE
+- `bma.network.peers` was pointing to `/network/peering/peers` request
+
+### AFTER
+- `bma.network.peers` point to `/network/peers` request
+- `bma.network.peering_peers` point to `/network/peering/peers` request
+
+### Features
+- #141 Helper function to get best available nodes (for a real p2p client)
+- #130 Allow building Block instance from local Duniter json
+
+### Fixes
+- #143 Block : fix computed_inner_hash(), sign() and proof_of_work bug
+- Fixed documentation version on new release
+
+### Development
+- #147 Support pylint v1.7.2 rule R0801
+- #118 Set up complete CI/CD pipeline
+
+- Thanks @vtexier, @Moul, @matograine, @HugoTrentesaux
+
 ## [v0.61.0](https://git.duniter.org/clients/python/duniterpy/-/milestones/14) (30th November 2020)
 
 - #59 add GVA query support and example
