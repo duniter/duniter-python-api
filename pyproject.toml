@@ -1,7 +1,7 @@
 [tool]
 [tool.poetry]
 name = "duniterpy"
-version = "0.61.0"
+version = "0.62.0"
 description = "Python library for developers of Duniter clients"
 authors = ["inso <insomniak.fr@gmail.com>", "canercandan", "s_b"]
 maintainers = ["vit <vit@free.fr>", "Moul <moul@moul.re>"]
