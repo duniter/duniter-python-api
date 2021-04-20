@@ -37,7 +37,12 @@ It is currently used by following programs:
 - [pyaes](https://pypi.org/project/pyaes)
 
 ## Installation
-You can install DuniterPy and its dependencies with the following command:
+You will require following dependencies:
+```bash
+sudo apt install python3-pip python3-dev python3-wheel libsodium23
+```
+
+You can install DuniterPy and its dependencies with following command:
 ```bash
 pip3 install duniterpy --user
 ```
