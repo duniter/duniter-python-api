@@ -158,9 +158,8 @@ def main():
     )
 
     # save revoke document in a file
-    fp = open(REVOCATION_DOCUMENT_FILE_PATH, "w")
-    fp.write(revocation_signed_raw_document)
-    fp.close()
+    with open(REVOCATION_DOCUMENT_FILE_PATH, "w") as fp:
+        fp.write(revocation_signed_raw_document)
 
     # document saved
     print("Revocation document saved in %s" % REVOCATION_DOCUMENT_FILE_PATH)

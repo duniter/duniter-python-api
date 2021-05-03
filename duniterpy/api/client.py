@@ -257,27 +257,27 @@ class API:
                 self.connection_handler.proxy, self.connection_handler.http_scheme
             )
 
-        response = request.urlopen(duniter_request, timeout=15)  # type: HTTPResponse
+        with request.urlopen(
+            duniter_request, timeout=15
+        ) as response:  # type: HTTPResponse
+            if response.status != 200:
+                content = response.read().decode("utf-8")
+                if bma_errors:
+                    try:
+                        error_data = parse_error(content)
+                        raise DuniterError(error_data)
+                    except (TypeError, jsonschema.ValidationError) as exception:
+                        raise ValueError(
+                            "status code != 200 => %d (%s)" % (response.status, content)
+                        ) from exception
 
-        if response.status != 200:
+                raise ValueError(
+                    "status code != 200 => %d (%s)" % (response.status, content)
+                )
+
+            # get response content
+            return_response = copy.copy(response)
             content = response.read().decode("utf-8")
-            if bma_errors:
-                try:
-                    error_data = parse_error(content)
-                    raise DuniterError(error_data)
-                except (TypeError, jsonschema.ValidationError) as exception:
-                    raise ValueError(
-                        "status code != 200 => %d (%s)" % (response.status, content)
-                    ) from exception
-
-            raise ValueError(
-                "status code != 200 => %d (%s)" % (response.status, content)
-            )
-
-        # get response content
-        return_response = copy.copy(response)
-        content = response.read().decode("utf-8")
-        response.close()
 
         # if schema supplied...
         if schema is not None:
