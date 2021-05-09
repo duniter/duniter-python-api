@@ -73,8 +73,6 @@ poetry run make docs
 * When writing docstrings, use the reStructuredText format recommended by https://www.python.org/dev/peps/pep-0287/#docstring-significant-features
 * Use `make` commands to check the code and the format.
 
-Black, the formatting tool, requires Python 3.6 or higher.
-
 * Install runtime dependencies
 ```bash
 poetry install --no-dev
